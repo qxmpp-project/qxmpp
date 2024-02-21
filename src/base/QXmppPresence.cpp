@@ -49,6 +49,7 @@ public:
     QXmppMucItem mucItem;
     QString mucPassword;
     QList<int> mucStatusCodes;
+    QXmppMucHistory mucHistory;
     bool mucSupported;
 
     // XEP-0115: Entity Capabilities
@@ -356,6 +357,22 @@ void QXmppPresence::setMucStatusCodes(const QList<int> &codes)
     d->mucStatusCodes = codes;
 }
 
+/// Returns the MUC history limits
+
+QXmppMucHistory QXmppPresence::mucHistory() const
+{
+    return d->mucHistory;
+}
+
+/// Set the MUC history limits
+///
+/// \param history
+
+void QXmppPresence::setMucHistory(const QXmppMucHistory &history)
+{
+    d->mucHistory = history;
+}
+
 /// Returns true if the sender has indicated MUC support.
 
 bool QXmppPresence::isMucSupported() const
@@ -554,6 +571,10 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
     if (d->mucSupported) {
         xmlWriter->writeStartElement(QStringLiteral("x"));
         xmlWriter->writeDefaultNamespace(ns_muc);
+        if (!d->mucHistory.isNull())
+        {
+            d->mucHistory.toXml(xmlWriter);
+        }
         if (!d->mucPassword.isEmpty()) {
             xmlWriter->writeTextElement(QStringLiteral("password"), d->mucPassword);
         }

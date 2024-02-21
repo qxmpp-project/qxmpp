@@ -8,6 +8,7 @@
 
 #include "QXmppJingleIq.h"
 #include "QXmppMucIq.h"
+#include "QXmppMucHistory.h"
 #include "QXmppStanza.h"
 
 class QXmppPresencePrivate;
@@ -85,6 +86,9 @@ public:
 
     QList<int> mucStatusCodes() const;
     void setMucStatusCodes(const QList<int> &codes);
+
+    QXmppMucHistory mucHistory() const;
+    void setMucHistory(const QXmppMucHistory &history);
 
     bool isMucSupported() const;
     void setMucSupported(bool supported);
