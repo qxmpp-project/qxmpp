@@ -56,8 +56,6 @@ public:
     virtual bool isConnected() const;
 
     bool sendPacket(const QXmppNonza &);
-    QXmppTask<QXmpp::SendResult> send(QXmppNonza &&);
-    QXmppTask<QXmpp::SendResult> send(QXmppPacket &&);
 
     using IqResult = std::variant<QDomElement, QXmppError>;
     QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
@@ -102,8 +100,6 @@ private:
     friend class TestClient;
 
     void onStanzaReceived(const QDomElement &);
-
-    QXmppTask<QXmpp::SendResult> send(QXmppPacket &&, bool &);
 
     // for unit tests, see TestClient
     void enableStreamManagement(bool resetSequenceNumber);
