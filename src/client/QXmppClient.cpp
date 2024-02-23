@@ -439,10 +439,10 @@ QXmppTask<QXmpp::SendResult> QXmppClient::sendSensitive(QXmppStanza &&stanza, co
                                QXmlStreamWriter writer(&xml);
                                message->toXml(&writer, QXmpp::ScePublic);
 
-                               d->stream->send(QXmppPacket(xml, true, std::move(interface)));
+                               d->stream->streamAckManager().send(QXmppPacket(xml, true, std::move(interface)));
                            },
                            [&](std::unique_ptr<QXmppIq> &&iq) {
-                               d->stream->send(QXmppPacket(*iq, std::move(interface)));
+                               d->stream->streamAckManager().send(QXmppPacket(*iq, std::move(interface)));
                            },
                            [&](QXmppError &&error) {
                                interface.finish(std::move(error));
@@ -464,7 +464,7 @@ QXmppTask<QXmpp::SendResult> QXmppClient::sendSensitive(QXmppStanza &&stanza, co
                     std::move(dynamic_cast<QXmppIq &&>(stanza)), params));
         }
     }
-    return d->stream->send(stanza);
+    return d->stream->streamAckManager().send(stanza);
 }
 
 ///
@@ -481,7 +481,7 @@ QXmppTask<QXmpp::SendResult> QXmppClient::sendSensitive(QXmppStanza &&stanza, co
 ///
 QXmppTask<QXmpp::SendResult> QXmppClient::send(QXmppStanza &&stanza, const std::optional<QXmppSendStanzaParams> &)
 {
-    return d->stream->send(stanza);
+    return d->stream->streamAckManager().send(stanza);
 }
 
 ///

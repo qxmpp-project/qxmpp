@@ -36,7 +36,7 @@ public:
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
     : socket(stream),
-      streamAckManager(stream),
+      streamAckManager(socket),
       iqManager(stream)
 {
 }
@@ -118,43 +118,7 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 bool QXmppStream::sendPacket(const QXmppNonza &nonza)
 {
-    bool success;
-    send(nonza, success);
-    return success;
-}
-
-///
-/// Sends an XMPP packet to the peer.
-///
-/// \since QXmpp 1.5
-///
-QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppNonza &&nonza)
-{
-    bool success;
-    return send(QXmppPacket(nonza), success);
-}
-
-///
-/// Sends an XMPP packet to the peer.
-///
-/// \since QXmpp 1.5
-///
-QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet)
-{
-    bool success;
-    return send(std::move(packet), success);
-}
-
-QXmppTask<QXmpp::SendResult> QXmppStream::send(QXmppPacket &&packet, bool &writtenToSocket)
-{
-    // the writtenToSocket parameter is just for backwards compat (see
-    // QXmppStream::sendPacket())
-    writtenToSocket = sendData(packet.data());
-
-    // handle stream management
-    d->streamAckManager.handlePacketSent(packet, writtenToSocket);
-
-    return packet.task();
+    return d->streamAckManager.sendPacketCompat(nonza);
 }
 
 ///
@@ -199,7 +163,7 @@ QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const
     }
 
     // send request IQ and report sending errors (sending success is not reported in any way)
-    send(std::move(packet)).then(this, [this, id](SendResult result) {
+    d->streamAckManager.send(std::move(packet)).then(this, [this, id](SendResult result) {
         if (std::holds_alternative<QXmppError>(result)) {
             d->iqManager.finish(id, std::get<QXmppError>(std::move(result)));
         }

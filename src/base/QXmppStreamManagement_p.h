@@ -6,13 +6,19 @@
 #define QXMPPSTREAMMANAGEMENT_P_H
 
 #include "QXmppGlobal.h"
+#include "QXmppSendResult.h"
 #include "QXmppStanza.h"
+#include "QXmppTask.h"
 
 #include <QDomDocument>
 #include <QXmlStreamWriter>
 
 class QXmppStream;
 class QXmppPacket;
+
+namespace QXmpp::Private {
+class XmppSocket;
+}
 
 //
 //  W A R N I N G
@@ -172,7 +178,7 @@ namespace QXmpp::Private {
 class StreamAckManager
 {
 public:
-    explicit StreamAckManager(QXmppStream *stream);
+    explicit StreamAckManager(XmppSocket &socket);
     ~StreamAckManager();
 
     bool enabled() const;
@@ -187,13 +193,17 @@ public:
     void enableStreamManagement(bool resetSequenceNumber);
     void setAcknowledgedSequenceNumber(unsigned int sequenceNumber);
 
+    QXmppTask<QXmpp::SendResult> send(QXmppPacket &&);
+    bool sendPacketCompat(QXmppPacket &&);
+    std::tuple<bool, QXmppTask<QXmpp::SendResult>> internalSend(QXmppPacket &&);
+
 private:
     void handleAcknowledgement(const QDomElement &element);
 
     void sendAcknowledgement();
     void sendAcknowledgementRequest();
 
-    QXmppStream *stream;
+    QXmpp::Private::XmppSocket &socket;
 
     bool m_enabled = false;
     QMap<unsigned int, QXmppPacket> m_unacknowledgedStanzas;

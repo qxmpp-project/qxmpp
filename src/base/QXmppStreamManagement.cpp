@@ -319,8 +319,8 @@ void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)
 
 namespace QXmpp::Private {
 
-StreamAckManager::StreamAckManager(QXmppStream *stream)
-    : stream(stream)
+StreamAckManager::StreamAckManager(XmppSocket &socket)
+    : socket(socket)
 {
 }
 
@@ -346,22 +346,6 @@ void StreamAckManager::handleDisconnect()
 void StreamAckManager::handleStart()
 {
     m_enabled = false;
-}
-
-void StreamAckManager::handlePacketSent(QXmppPacket &packet, bool sentData)
-{
-    if (m_enabled && packet.isXmppStanza()) {
-        m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, packet);
-        sendAcknowledgementRequest();
-    } else {
-        if (sentData) {
-            packet.reportFinished(QXmpp::SendSuccess { false });
-        } else {
-            packet.reportFinished(QXmppError {
-                QStringLiteral("Couldn't write data to socket. No stream management enabled."),
-                QXmpp::SendError::SocketWriteError });
-        }
-    }
 }
 
 bool StreamAckManager::handleStanza(const QDomElement &stanza)
@@ -398,7 +382,7 @@ void StreamAckManager::enableStreamManagement(bool resetSequenceNumber)
 
             for (auto &packet : oldUnackedStanzas) {
                 m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, packet);
-                stream->sendData(packet.data());
+                socket.sendData(packet.data());
             }
 
             sendAcknowledgementRequest();
@@ -407,7 +391,7 @@ void StreamAckManager::enableStreamManagement(bool resetSequenceNumber)
         // resend unacked stanzas
         if (!m_unacknowledgedStanzas.isEmpty()) {
             for (auto &packet : m_unacknowledgedStanzas) {
-                stream->sendData(packet.data());
+                socket.sendData(packet.data());
             }
 
             sendAcknowledgementRequest();
@@ -427,6 +411,41 @@ void StreamAckManager::setAcknowledgedSequenceNumber(unsigned int sequenceNumber
     }
 }
 
+QXmppTask<SendResult> StreamAckManager::send(QXmppPacket &&packet)
+{
+    return std::get<1>(internalSend(std::move(packet)));
+}
+
+bool StreamAckManager::sendPacketCompat(QXmppPacket &&packet)
+{
+    return std::get<0>(internalSend(std::move(packet)));
+}
+
+// Returns written to socket (bool) and QXmppTask
+std::tuple<bool, QXmppTask<SendResult>> StreamAckManager::internalSend(QXmppPacket &&packet)
+{
+    // the writtenToSocket parameter is just for backwards compat (see
+    // QXmppStream::sendPacket())
+    bool writtenToSocket = socket.sendData(packet.data());
+
+    // handle stream management
+    if (m_enabled && packet.isXmppStanza()) {
+        m_unacknowledgedStanzas.insert(++m_lastOutgoingSequenceNumber, packet);
+        sendAcknowledgementRequest();
+    } else {
+        if (writtenToSocket) {
+            packet.reportFinished(QXmpp::SendSuccess { false });
+        } else {
+            packet.reportFinished(QXmppError {
+                QStringLiteral("Couldn't write data to socket. No stream management enabled."),
+                QXmpp::SendError::SocketWriteError,
+            });
+        }
+    }
+
+    return { writtenToSocket, packet.task() };
+}
+
 void StreamAckManager::handleAcknowledgement(const QDomElement &element)
 {
     if (!m_enabled) {
@@ -444,7 +463,7 @@ void StreamAckManager::sendAcknowledgement()
         return;
     }
 
-    stream->sendData(serializeNonza(QXmppStreamManagementAck(m_lastIncomingSequenceNumber)));
+    socket.sendData(serializeNonza(QXmppStreamManagementAck(m_lastIncomingSequenceNumber)));
 }
 
 void StreamAckManager::sendAcknowledgementRequest()
@@ -459,7 +478,7 @@ void StreamAckManager::sendAcknowledgementRequest()
     QXmppStreamManagementReq::toXml(&xmlStream);
 
     // send packet
-    stream->sendData(data);
+    socket.sendData(data);
 }
 
 void StreamAckManager::resetCache()
