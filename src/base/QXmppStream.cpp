@@ -165,16 +165,6 @@ void QXmppStream::onStanzaReceived(const QDomElement &stanza)
     handleStanza(stanza);
 }
 
-void QXmppStream::enableStreamManagement(bool resetSequenceNumber)
-{
-    d->streamAckManager.enableStreamManagement(resetSequenceNumber);
-}
-
-bool QXmppStream::handleIqResponse(const QDomElement &stanza)
-{
-    return d->iqManager.handleStanza(stanza);
-}
-
 namespace QXmpp::Private {
 
 XmppSocket::XmppSocket(QObject *parent)

@@ -766,6 +766,16 @@ void QXmppOutgoingClient::throwKeepAliveError()
     Q_EMIT error(QXmppClient::KeepAliveError);
 }
 
+void QXmppOutgoingClient::enableStreamManagement(bool resetSequenceNumber)
+{
+    d->streamAckManager.enableStreamManagement(resetSequenceNumber);
+}
+
+bool QXmppOutgoingClient::handleIqResponse(const QDomElement &stanza)
+{
+    return d->iqManager.handleStanza(stanza);
+}
+
 void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
 {
     QXmppNonSASLAuthIq authQuery;

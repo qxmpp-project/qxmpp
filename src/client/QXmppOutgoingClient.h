@@ -95,9 +95,14 @@ private:
     void onSMEnableFinished();
     void throwKeepAliveError();
 
+    // for unit tests, see TestClient
+    void enableStreamManagement(bool resetSequenceNumber);
+    bool handleIqResponse(const QDomElement &);
+
     friend class QXmppOutgoingClientPrivate;
     friend class QXmpp::Private::PingManager;
     friend class QXmpp::Private::C2sStreamManager;
+    friend class TestClient;
 
     const std::unique_ptr<QXmppOutgoingClientPrivate> d;
 };
