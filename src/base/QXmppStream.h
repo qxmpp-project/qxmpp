@@ -106,6 +106,7 @@ class OutgoingIqManager
 {
 public:
     OutgoingIqManager(QXmppLoggable *l, StreamAckManager &streamAckMananger);
+    ~OutgoingIqManager();
 
     QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
     QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);

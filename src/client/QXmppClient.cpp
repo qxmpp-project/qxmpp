@@ -225,10 +225,10 @@ QXmppClient::QXmppClient(InitialExtensions initialExtensions, QObject *parent)
     connect(d->stream->socket(), &QAbstractSocket::stateChanged,
             this, &QXmppClient::_q_socketStateChanged);
 
-    connect(d->stream, &QXmppStream::connected,
+    connect(d->stream, &QXmppOutgoingClient::connected,
             this, &QXmppClient::_q_streamConnected);
 
-    connect(d->stream, &QXmppStream::disconnected,
+    connect(d->stream, &QXmppOutgoingClient::disconnected,
             this, &QXmppClient::_q_streamDisconnected);
 
     connect(d->stream, &QXmppOutgoingClient::error,
@@ -409,7 +409,7 @@ void QXmppClient::connectToServer(const QString &jid, const QString &password)
 ///
 bool QXmppClient::sendPacket(const QXmppNonza &packet)
 {
-    return d->stream->sendPacket(packet);
+    return d->stream->streamAckManager().sendPacketCompat(packet);
 }
 
 ///
@@ -682,7 +682,7 @@ void QXmppClient::setActive(bool active)
     if (active != d->isActive && isConnected() && d->stream->isClientStateIndicationEnabled()) {
         d->isActive = active;
         QStringView packet = u"<%1 xmlns='%2'/>";
-        d->stream->sendData(packet.arg(active ? u"active" : u"inactive", ns_csi).toUtf8());
+        d->stream->xmppSocket().sendData(packet.arg(active ? u"active" : u"inactive", ns_csi).toUtf8());
     }
 }
 

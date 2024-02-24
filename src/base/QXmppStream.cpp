@@ -339,6 +339,8 @@ OutgoingIqManager::OutgoingIqManager(QXmppLoggable *l, StreamAckManager &streamA
 {
 }
 
+OutgoingIqManager::~OutgoingIqManager() = default;
+
 QXmppTask<IqResult> OutgoingIqManager::sendIq(QXmppIq &&iq, const QString &to)
 {
     if (iq.id().isEmpty()) {
