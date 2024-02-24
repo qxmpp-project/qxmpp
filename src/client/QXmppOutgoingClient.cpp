@@ -11,6 +11,7 @@
 #include "QXmppIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
+#include "QXmppPacket_p.h"
 #include "QXmppPresence.h"
 #include "QXmppPromise.h"
 #include "QXmppSasl_p.h"
@@ -88,7 +89,7 @@ private:
 class QXmppOutgoingClientPrivate
 {
 public:
-    QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
+    explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
     void connectToHost(const QString &host, quint16 port);
     void connectToNextDNSHost();
 
@@ -101,6 +102,11 @@ public:
     // required for connecting to the XMPP server.
     QXmppConfiguration config;
     QXmppStanza::Error::Condition xmppStreamError;
+
+    // Core stream
+    XmppSocket socket;
+    StreamAckManager streamAckManager;
+    OutgoingIqManager iqManager;
 
     // DNS
     QList<QDnsServiceRecord> srvRecords;
@@ -138,7 +144,10 @@ private:
 };
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
-    : nextSrvRecordIdx(0),
+    : socket(qq),
+      streamAckManager(socket),
+      iqManager(qq, streamAckManager),
+      nextSrvRecordIdx(0),
       redirectPort(0),
       bindModeAvailable(false),
       sessionAvailable(false),
@@ -192,25 +201,30 @@ void QXmppOutgoingClientPrivate::connectToNextDNSHost()
 /// Constructs an outgoing client stream.
 ///
 QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
-    : QXmppStream(parent),
+    : QXmppLoggable(parent),
       d(std::make_unique<QXmppOutgoingClientPrivate>(this))
 {
     // initialise socket
     auto *socket = new QSslSocket(this);
-    setSocket(socket);
+    d->socket.setSocket(socket);
 
     connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingClient::_q_socketDisconnected);
     connect(socket, QOverload<const QList<QSslError> &>::of(&QSslSocket::sslErrors), this, &QXmppOutgoingClient::socketSslErrors);
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingClient::socketError);
 
+    connect(&d->socket, &XmppSocket::started, this, &QXmppOutgoingClient::handleStart);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppOutgoingClient::handleStanza);
+    connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppOutgoingClient::handleStream);
+    connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppOutgoingClient::disconnectFromHost);
+
     // IQ response handling
-    connect(this, &QXmppStream::connected, this, [=]() {
+    connect(this, &QXmppOutgoingClient::connected, this, [=]() {
         if (!d->c2sStreamManager.streamResumed()) {
             // we can't expect a response because this is a new stream
             iqManager().cancelAll();
         }
     });
-    connect(this, &QXmppStream::disconnected, this, [=]() {
+    connect(this, &QXmppOutgoingClient::disconnected, this, [=]() {
         if (!d->c2sStreamManager.canResume()) {
             // this stream can't be resumed; we can cancel all ongoing IQs
             iqManager().cancelAll();
@@ -218,12 +232,35 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     });
 }
 
-QXmppOutgoingClient::~QXmppOutgoingClient() = default;
+QXmppOutgoingClient::~QXmppOutgoingClient()
+{
+    // causes tasks to be finished
+    d->streamAckManager.resetCache();
+    d->iqManager.cancelAll();
+}
 
 /// Returns a reference to the stream's configuration.
 QXmppConfiguration &QXmppOutgoingClient::configuration()
 {
     return d->config;
+}
+
+/// Returns access to the XMPP socket.
+XmppSocket &QXmppOutgoingClient::xmppSocket() const
+{
+    return d->socket;
+}
+
+/// Returns the manager for packet acknowledgements from Stream Management.
+StreamAckManager &QXmppOutgoingClient::streamAckManager() const
+{
+    return d->streamAckManager;
+}
+
+/// Returns the manager for outgoing IQ request tracking.
+OutgoingIqManager &QXmppOutgoingClient::iqManager() const
+{
+    return d->iqManager;
 }
 
 /// Returns the manager for C2s Stream Management.
@@ -284,7 +321,8 @@ void QXmppOutgoingClient::connectToHost()
 void QXmppOutgoingClient::disconnectFromHost()
 {
     d->c2sStreamManager.onDisconnecting();
-    QXmppStream::disconnectFromHost();
+    d->streamAckManager.handleDisconnect();
+    d->socket.disconnectFromHost();
 }
 
 /// Returns true if authentication has succeeded.
@@ -296,7 +334,7 @@ bool QXmppOutgoingClient::isAuthenticated() const
 /// Returns true if the socket is connected and a session has been started.
 bool QXmppOutgoingClient::isConnected() const
 {
-    return QXmppStream::isConnected() && d->sessionStarted;
+    return d->socket.isConnected() && d->sessionStarted;
 }
 
 ///
@@ -321,7 +359,12 @@ QXmppTask<IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
 {
     // If 'to' is empty the user's bare JID is meant implicitly (see RFC6120, section 10.3.3.).
     auto to = iq.to();
-    return iqManager().sendIq(std::move(iq), to.isEmpty() ? d->config.jidBare() : to);
+    return d->iqManager.sendIq(std::move(iq), to.isEmpty() ? d->config.jidBare() : to);
+}
+
+QSslSocket *QXmppOutgoingClient::socket() const
+{
+    return d->socket.socket();
 }
 
 void QXmppOutgoingClient::_q_socketDisconnected()
@@ -397,10 +440,9 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
     }
 }
 
-/// \cond
 void QXmppOutgoingClient::handleStart()
 {
-    QXmppStream::handleStart();
+    d->streamAckManager.handleStart();
 
     // reset stream information
     d->streamId.clear();
@@ -425,7 +467,7 @@ void QXmppOutgoingClient::handleStart()
     QByteArray data = "<?xml version='1.0'?><stream:stream to='";
     data.append(configuration().domain().toUtf8());
     data.append("' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
-    sendData(data);
+    d->socket.sendData(data);
 }
 
 void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
@@ -451,6 +493,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 {
     // if we receive any kind of data, stop the timeout timer
     d->pingManager.onDataReceived();
+
+    // handle possible stream management packets first
+    if (streamAckManager().handleStanza(nodeRecv) || iqManager().handleStanza(nodeRecv)) {
+        return;
+    }
 
     const QString ns = nodeRecv.namespaceURI();
 
@@ -535,7 +582,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 disconnectFromHost();
                 return;
             }
-            sendPacket(QXmppSaslAuth(d->saslClient->mechanism(), response));
+            d->streamAckManager.send(QXmppSaslAuth(d->saslClient->mechanism(), response));
             return;
         } else if (nonSaslAvailable && configuration().useNonSASLAuthentication()) {
             d->sendNonSASLAuthQuery();
@@ -577,7 +624,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 d->redirectHost = host;
                 d->redirectPort = port > 0 ? port : 5222;
 
-                QXmppStream::disconnectFromHost();
+                // only disconnect socket (so stream mangement can resume state is not reset)
+                d->socket.disconnectFromHost();
                 return;
             }
         }
@@ -605,7 +653,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             QByteArray response;
             if (d->saslClient->respond(challenge.value(), response)) {
-                sendPacket(QXmppSaslResponse(response));
+                d->streamAckManager.send(QXmppSaslResponse(response));
             } else {
                 warning(QStringLiteral("Could not respond to SASL challenge"));
                 disconnectFromHost();
@@ -735,7 +783,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     QXmppStanza::Error error(QXmppStanza::Error::Cancel,
                                              QXmppStanza::Error::FeatureNotImplemented);
                     iq.setError(error);
-                    sendPacket(iq);
+                    d->streamAckManager.send(iq);
                 } else {
                     Q_EMIT iqReceived(iqPacket);
                 }
@@ -757,12 +805,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         d->c2sStreamManager.handleElement(nodeRecv);
     }
 }
-/// \endcond
 
 void QXmppOutgoingClient::throwKeepAliveError()
 {
     warning(QStringLiteral("Ping timeout"));
-    QXmppStream::disconnectFromHost();
+    disconnectFromHost();
     Q_EMIT error(QXmppClient::KeepAliveError);
 }
 
@@ -788,7 +835,8 @@ void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
     }
     authQuery.setResource(q->configuration().resource());
     nonSASLAuthId = authQuery.id();
-    q->sendPacket(authQuery);
+
+    streamAckManager.send(std::move(authQuery));
 }
 
 void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
@@ -799,7 +847,8 @@ void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
     // FIXME : why are we setting the username, XEP-0078 states we should
     // not attempt to guess the required fields?
     authQuery.setUsername(q->configuration().user());
-    q->sendPacket(authQuery);
+
+    streamAckManager.send(std::move(authQuery));
 }
 
 void QXmppOutgoingClientPrivate::sendBind()
@@ -808,7 +857,8 @@ void QXmppOutgoingClientPrivate::sendBind()
     bind.setType(QXmppIq::Set);
     bind.setResource(q->configuration().resource());
     bindId = bind.id();
-    q->sendPacket(bind);
+
+    streamAckManager.send(std::move(bind));
 }
 
 void QXmppOutgoingClientPrivate::sendSessionStart()
@@ -817,7 +867,8 @@ void QXmppOutgoingClientPrivate::sendSessionStart()
     session.setType(QXmppIq::Set);
     session.setTo(q->configuration().domain());
     sessionId = session.id();
-    q->sendPacket(session);
+
+    streamAckManager.send(std::move(session));
 }
 
 /// Returns the type of the last XMPP stream error that occurred.
@@ -841,7 +892,7 @@ PingManager::PingManager(QXmppOutgoingClient *q)
     timeoutTimer->callOnTimeout(q, &QXmppOutgoingClient::throwKeepAliveError);
 
     // on connect: start ping timer
-    QObject::connect(q, &QXmppStream::connected, q, [this]() {
+    QObject::connect(q, &QXmppOutgoingClient::connected, q, [this]() {
         const auto interval = this->q->configuration().keepAliveInterval();
 
         // start ping timer
@@ -852,7 +903,7 @@ PingManager::PingManager(QXmppOutgoingClient *q)
     });
 
     // on disconnect: stop all timers
-    QObject::connect(q, &QXmppStream::disconnected, q, [this]() {
+    QObject::connect(q, &QXmppOutgoingClient::disconnected, q, [this]() {
         pingTimer->stop();
         timeoutTimer->stop();
     });
@@ -872,7 +923,7 @@ bool PingManager::handleIq(const QDomElement &el)
         QXmppIq iq(QXmppIq::Result);
         iq.setId(req.id());
         iq.setTo(req.from());
-        q->sendPacket(iq);
+        q->streamAckManager().send(iq);
         return true;
     }
     return false;
@@ -883,7 +934,7 @@ void PingManager::sendPing()
     // send ping packet
     QXmppPingIq ping;
     ping.setTo(q->configuration().domain());
-    q->sendPacket(ping);
+    q->streamAckManager().send(ping);
 
     // start timeout timer
     const int timeout = q->configuration().keepAliveTimeout();
@@ -969,12 +1020,12 @@ void C2sStreamManager::requestResume()
     m_isResuming = true;
 
     auto lastAckNumber = q->streamAckManager().lastIncomingSequenceNumber();
-    q->sendData(serializeNonza(QXmppStreamManagementResume(lastAckNumber, m_smId)));
+    q->xmppSocket().sendData(serializeNonza(QXmppStreamManagementResume(lastAckNumber, m_smId)));
 }
 
 void C2sStreamManager::requestEnable()
 {
-    q->sendData(serializeNonza(QXmppStreamManagementEnable(true)));
+    q->xmppSocket().sendData(serializeNonza(QXmppStreamManagementEnable(true)));
 }
 
 bool C2sStreamManager::setResumeAddress(const QString &address)

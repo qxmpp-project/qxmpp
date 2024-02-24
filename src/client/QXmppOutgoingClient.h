@@ -32,65 +32,66 @@ class C2sStreamManager;
 /// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
 /// to an XMPP server.
 ///
-class QXMPP_EXPORT QXmppOutgoingClient : public QXmppStream
+class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
 {
     Q_OBJECT
 
 public:
-    QXmppOutgoingClient(QObject *parent);
+    explicit QXmppOutgoingClient(QObject *parent);
     ~QXmppOutgoingClient() override;
 
     void connectToHost();
+    void disconnectFromHost();
     bool isAuthenticated() const;
-    bool isConnected() const override;
+    bool isConnected() const;
     bool isClientStateIndicationEnabled() const;
     QXmppTask<QXmpp::Private::IqResult> sendIq(QXmppIq &&);
 
     /// Returns the used socket
-    QSslSocket *socket() const { return QXmppStream::socket(); };
+    QSslSocket *socket() const;
     QXmppStanza::Error::Condition xmppStreamError();
 
     QXmppConfiguration &configuration();
 
+    QXmpp::Private::XmppSocket &xmppSocket() const;
+    QXmpp::Private::StreamAckManager &streamAckManager() const;
+    QXmpp::Private::OutgoingIqManager &iqManager() const;
     QXmpp::Private::C2sStreamManager &c2sStreamManager();
 
-Q_SIGNALS:
+    /// This signal is emitted when the stream is connected.
+    Q_SIGNAL void connected();
+
+    /// This signal is emitted when the stream is disconnected.
+    Q_SIGNAL void disconnected();
+
     /// This signal is emitted when an error is encountered.
-    void error(QXmppClient::Error);
+    Q_SIGNAL void error(QXmppClient::Error);
 
     /// This signal is emitted when an element is received.
-    void elementReceived(const QDomElement &element, bool &handled);
+    Q_SIGNAL void elementReceived(const QDomElement &element, bool &handled);
 
     /// This signal is emitted when a presence is received.
-    void presenceReceived(const QXmppPresence &);
+    Q_SIGNAL void presenceReceived(const QXmppPresence &);
 
     /// This signal is emitted when a message is received.
-    void messageReceived(const QXmppMessage &);
+    Q_SIGNAL void messageReceived(const QXmppMessage &);
 
     /// This signal is emitted when an IQ response (type result or error) has
     /// been received that was not handled by elementReceived().
-    void iqReceived(const QXmppIq &);
+    Q_SIGNAL void iqReceived(const QXmppIq &);
 
     /// This signal is emitted when SSL errors are encountered.
-    void sslErrors(const QList<QSslError> &errors);
+    Q_SIGNAL void sslErrors(const QList<QSslError> &errors);
 
-protected:
-    /// \cond
-    // Overridable methods
-    void handleStart() override;
-    void handleStanza(const QDomElement &element) override;
-    void handleStream(const QDomElement &element) override;
-    /// \endcond
+private:
+    void handleStart();
+    void handleStanza(const QDomElement &element);
+    void handleStream(const QDomElement &element);
 
-public Q_SLOTS:
-    void disconnectFromHost() override;
-
-private Q_SLOTS:
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError> &);
 
-private:
     void onSMResumeFinished();
     void onSMEnableFinished();
     void throwKeepAliveError();
