@@ -44,7 +44,7 @@ public:
     bool isAuthenticated() const;
     bool isConnected() const override;
     bool isClientStateIndicationEnabled() const;
-    QXmppTask<IqResult> sendIq(QXmppIq &&);
+    QXmppTask<QXmpp::Private::IqResult> sendIq(QXmppIq &&);
 
     /// Returns the used socket
     QSslSocket *socket() const { return QXmppStream::socket(); };
