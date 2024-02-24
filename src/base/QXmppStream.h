@@ -91,7 +91,6 @@ public Q_SLOTS:
     virtual bool sendData(const QByteArray &);
 
 private:
-    friend class QXmpp::Private::XmppSocket;
     friend class tst_QXmppStream;
     friend class TestClient;
 
@@ -133,10 +132,12 @@ private:
     std::unordered_map<QString, IqState> m_requests;
 };
 
-class QXMPP_EXPORT XmppSocket
+class QXMPP_EXPORT XmppSocket : public QXmppLoggable
 {
+    Q_OBJECT
 public:
-    XmppSocket(QXmppStream *q);
+    XmppSocket(QObject *parent);
+    ~XmppSocket() override = default;
 
     QSslSocket *socket() const { return m_socket; }
     void setSocket(QSslSocket *socket);
@@ -145,12 +146,15 @@ public:
     void disconnectFromHost();
     bool sendData(const QByteArray &);
 
+    Q_SIGNAL void started();
+    Q_SIGNAL void stanzaReceived(const QDomElement &);
+    Q_SIGNAL void streamReceived(const QDomElement &);
+    Q_SIGNAL void streamClosed();
+
 private:
     void processData(const QString &data);
 
     friend class ::TestStream;
-
-    QXmppStream *q;
 
     QString m_dataBuffer;
     QSslSocket *m_socket = nullptr;

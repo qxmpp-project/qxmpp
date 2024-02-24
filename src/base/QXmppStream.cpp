@@ -50,6 +50,10 @@ QXmppStream::QXmppStream(QObject *parent)
     : QXmppLoggable(parent),
       d(std::make_unique<QXmppStreamPrivate>(this))
 {
+    connect(&d->socket, &XmppSocket::started, this, &QXmppStream::handleStart);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppStream::onStanzaReceived);
+    connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppStream::handleStream);
+    connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppStream::disconnectFromHost);
 }
 
 ///
@@ -173,8 +177,8 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
 
 namespace QXmpp::Private {
 
-XmppSocket::XmppSocket(QXmppStream *q)
-    : q(q)
+XmppSocket::XmppSocket(QObject *parent)
+    : QXmppLoggable(parent)
 {
 }
 
@@ -185,24 +189,24 @@ void XmppSocket::setSocket(QSslSocket *socket)
         return;
     }
 
-    QObject::connect(socket, &QAbstractSocket::connected, q, [this]() {
-        q->info(QStringLiteral("Socket connected to %1 %2")
-                    .arg(m_socket->peerAddress().toString(),
-                         QString::number(m_socket->peerPort())));
+    QObject::connect(socket, &QAbstractSocket::connected, this, [this]() {
+        info(QStringLiteral("Socket connected to %1 %2")
+                 .arg(m_socket->peerAddress().toString(),
+                      QString::number(m_socket->peerPort())));
         m_dataBuffer.clear();
         m_streamOpenElement.clear();
-        q->handleStart();
+        Q_EMIT started();
     });
-    QObject::connect(socket, &QSslSocket::encrypted, q, [this]() {
-        q->debug(QStringLiteral("Socket encrypted"));
+    QObject::connect(socket, &QSslSocket::encrypted, this, [this]() {
+        debug(QStringLiteral("Socket encrypted"));
         m_dataBuffer.clear();
         m_streamOpenElement.clear();
-        q->handleStart();
+        Q_EMIT started();
     });
-    QObject::connect(socket, &QSslSocket::errorOccurred, q, [this](QAbstractSocket::SocketError) {
-        q->warning(QStringLiteral("Socket error: ") + m_socket->errorString());
+    QObject::connect(socket, &QSslSocket::errorOccurred, this, [this](QAbstractSocket::SocketError) {
+        warning(QStringLiteral("Socket error: ") + m_socket->errorString());
     });
-    QObject::connect(socket, &QSslSocket::readyRead, q, [this]() {
+    QObject::connect(socket, &QSslSocket::readyRead, this, [this]() {
         processData(QString::fromUtf8(m_socket->readAll()));
     });
 }
@@ -227,7 +231,7 @@ void XmppSocket::disconnectFromHost()
 
 bool XmppSocket::sendData(const QByteArray &data)
 {
-    q->logSent(QString::fromUtf8(data));
+    logSent(QString::fromUtf8(data));
     if (!m_socket || m_socket->state() != QAbstractSocket::ConnectedState) {
         return false;
     }
@@ -255,8 +259,8 @@ void XmppSocket::processData(const QString &data)
     if (m_dataBuffer.isEmpty() || m_dataBuffer.trimmed().isEmpty()) {
         m_dataBuffer.clear();
 
-        q->logReceived({});
-        q->onStanzaReceived(QDomElement());
+        logReceived({});
+        Q_EMIT stanzaReceived(QDomElement());
         return;
     }
 
@@ -313,24 +317,24 @@ void XmppSocket::processData(const QString &data)
     //
     // Success: We can clear the buffer and send a 'received' log message
     //
-    q->logReceived(m_dataBuffer);
+    logReceived(m_dataBuffer);
     m_dataBuffer.clear();
 
     // process stream start
     if (hasStreamOpen) {
         m_streamOpenElement = streamOpenMatch.captured();
-        q->handleStream(doc.documentElement());
+        Q_EMIT streamReceived(doc.documentElement());
     }
 
     // process stanzas
     auto stanza = doc.documentElement().firstChildElement();
     for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
-        q->onStanzaReceived(stanza);
+        Q_EMIT stanzaReceived(stanza);
     }
 
     // process stream end
     if (hasStreamClose) {
-        q->disconnectFromHost();
+        Q_EMIT streamClosed();
     }
 }
 
