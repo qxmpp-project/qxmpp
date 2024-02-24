@@ -57,10 +57,6 @@ public:
 
     bool sendPacket(const QXmppNonza &);
 
-    using IqResult = std::variant<QDomElement, QXmppError>;
-    QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
-    QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
-
     QXmpp::Private::XmppSocket &xmppSocket() const;
     QXmpp::Private::StreamAckManager &streamAckManager() const;
     QXmpp::Private::OutgoingIqManager &iqManager() const;
@@ -110,12 +106,15 @@ private:
 
 namespace QXmpp::Private {
 
+using IqResult = std::variant<QDomElement, QXmppError>;
+
 class OutgoingIqManager
 {
-    using IqResult = std::variant<QDomElement, QXmppError>;
-
 public:
-    explicit OutgoingIqManager(QXmppLoggable *l);
+    OutgoingIqManager(QXmppLoggable *l, StreamAckManager &streamAckMananger);
+
+    QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
+    QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
 
     bool hasId(const QString &id) const;
     bool isIdValid(const QString &id) const;
@@ -130,6 +129,7 @@ private:
     void warning(const QString &message);
 
     QXmppLoggable *l;
+    StreamAckManager &m_streamAckManager;
     std::unordered_map<QString, IqState> m_requests;
 };
 

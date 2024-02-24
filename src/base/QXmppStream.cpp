@@ -37,20 +37,9 @@ public:
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
     : socket(stream),
       streamAckManager(socket),
-      iqManager(stream)
+      iqManager(stream, streamAckManager)
 {
 }
-
-///
-/// \typedef QXmppStream::IqResult
-///
-/// Contains a QDomElement if an IQ response of type 'result' has been received. In case of an
-/// error response of if an error occurred while sending the IQ request, a QXmppError is used.
-///
-/// \warning THIS API IS NOT FINALIZED YET!
-///
-/// \since QXmpp 1.5
-///
 
 ///
 /// Constructs a base XMPP stream.
@@ -119,57 +108,6 @@ bool QXmppStream::sendData(const QByteArray &data)
 bool QXmppStream::sendPacket(const QXmppNonza &nonza)
 {
     return d->streamAckManager.sendPacketCompat(nonza);
-}
-
-///
-/// Sends an IQ packet and returns the response asynchronously.
-///
-/// \warning THIS API IS NOT FINALIZED YET!
-///
-/// \since QXmpp 1.5
-///
-QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppIq &&iq, const QString &to)
-{
-    using namespace QXmpp;
-
-    if (iq.id().isEmpty()) {
-        warning(QStringLiteral("QXmppStream::sendIq() error: ID is empty. Using random ID."));
-        iq.setId(QXmppUtils::generateStanzaUuid());
-    }
-    if (d->iqManager.hasId(iq.id())) {
-        warning(QStringLiteral("QXmppStream::sendIq() error:"
-                               "The IQ's ID (\"%1\") is already in use. Using random ID.")
-                    .arg(iq.id()));
-        iq.setId(QXmppUtils::generateStanzaUuid());
-    }
-
-    return sendIq(QXmppPacket(iq), iq.id(), to);
-}
-
-///
-/// Sends an IQ packet and returns the response asynchronously.
-///
-/// \warning THIS API IS NOT FINALIZED YET!
-///
-/// \since QXmpp 1.5
-///
-QXmppTask<QXmppStream::IqResult> QXmppStream::sendIq(QXmppPacket &&packet, const QString &id, const QString &to)
-{
-    auto task = d->iqManager.start(id, to);
-
-    // the task only finishes instantly if there was an error
-    if (task.isFinished()) {
-        return task;
-    }
-
-    // send request IQ and report sending errors (sending success is not reported in any way)
-    d->streamAckManager.send(std::move(packet)).then(this, [this, id](SendResult result) {
-        if (std::holds_alternative<QXmppError>(result)) {
-            d->iqManager.finish(id, std::get<QXmppError>(std::move(result)));
-        }
-    });
-
-    return task;
 }
 
 ///
@@ -397,11 +335,50 @@ void XmppSocket::processData(const QString &data)
 }
 
 struct IqState {
-    QXmppPromise<QXmppStream::IqResult> interface;
+    QXmppPromise<IqResult> interface;
     QString jid;
 };
 
-OutgoingIqManager::OutgoingIqManager(QXmppLoggable *l) : l(l) { }
+OutgoingIqManager::OutgoingIqManager(QXmppLoggable *l, StreamAckManager &streamAckManager)
+    : l(l),
+      m_streamAckManager(streamAckManager)
+{
+}
+
+QXmppTask<IqResult> OutgoingIqManager::sendIq(QXmppIq &&iq, const QString &to)
+{
+    if (iq.id().isEmpty()) {
+        warning(QStringLiteral("QXmppStream::sendIq() error: ID is empty. Using random ID."));
+        iq.setId(QXmppUtils::generateStanzaUuid());
+    }
+    if (hasId(iq.id())) {
+        warning(QStringLiteral("QXmppStream::sendIq() error:"
+                               "The IQ's ID (\"%1\") is already in use. Using random ID.")
+                    .arg(iq.id()));
+        iq.setId(QXmppUtils::generateStanzaUuid());
+    }
+
+    return sendIq(QXmppPacket(iq), iq.id(), to);
+}
+
+QXmppTask<IqResult> OutgoingIqManager::sendIq(QXmppPacket &&packet, const QString &id, const QString &to)
+{
+    auto task = start(id, to);
+
+    // the task only finishes instantly if there was an error
+    if (task.isFinished()) {
+        return task;
+    }
+
+    // send request IQ and report sending errors (sending success is not reported in any way)
+    m_streamAckManager.send(std::move(packet)).then(l, [this, id](SendResult result) {
+        if (std::holds_alternative<QXmppError>(result)) {
+            finish(id, std::get<QXmppError>(std::move(result)));
+        }
+    });
+
+    return task;
+}
 
 bool OutgoingIqManager::hasId(const QString &id) const
 {
@@ -413,7 +390,7 @@ bool OutgoingIqManager::isIdValid(const QString &id) const
     return !id.isEmpty() && !hasId(id);
 }
 
-QXmppTask<OutgoingIqManager::IqResult> OutgoingIqManager::start(const QString &id, const QString &to)
+QXmppTask<IqResult> OutgoingIqManager::start(const QString &id, const QString &to)
 {
     if (!isIdValid(id)) {
         return makeReadyTask<IqResult>(
