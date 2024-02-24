@@ -92,13 +92,8 @@ public Q_SLOTS:
 
 private:
     friend class tst_QXmppStream;
-    friend class TestClient;
 
     void onStanzaReceived(const QDomElement &);
-
-    // for unit tests, see TestClient
-    void enableStreamManagement(bool resetSequenceNumber);
-    bool handleIqResponse(const QDomElement &);
 
     const std::unique_ptr<QXmppStreamPrivate> d;
 };
