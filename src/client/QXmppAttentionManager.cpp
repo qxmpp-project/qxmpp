@@ -183,12 +183,16 @@ QString QXmppAttentionManager::requestAttention(const QString &jid, const QStrin
     return {};
 }
 
-void QXmppAttentionManager::setClient(QXmppClient *client)
+void QXmppAttentionManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
-
     connect(client, &QXmppClient::messageReceived,
             this, &QXmppAttentionManager::handleMessageReceived);
+}
+
+void QXmppAttentionManager::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::messageReceived,
+               this, &QXmppAttentionManager::handleMessageReceived);
 }
 
 void QXmppAttentionManager::handleMessageReceived(const QXmppMessage &message)

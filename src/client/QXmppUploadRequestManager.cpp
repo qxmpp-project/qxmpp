@@ -317,9 +317,8 @@ void QXmppUploadRequestManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
     return;
 }
 
-void QXmppUploadRequestManager::setClient(QXmppClient *client)
+void QXmppUploadRequestManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
     // connect to service discovery manager
     auto *disco = client->findExtension<QXmppDiscoveryManager>();
     if (disco) {
@@ -333,4 +332,10 @@ void QXmppUploadRequestManager::setClient(QXmppClient *client)
             Q_EMIT serviceFoundChanged();
         });
     }
+}
+
+void QXmppUploadRequestManager::onUnregistered(QXmppClient *client)
+{
+    // TODO: Proper clean up of connections (currently no issue because extensions are deleted
+    // on removal)
 }

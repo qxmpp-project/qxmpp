@@ -244,10 +244,14 @@ QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, c
 }
 
 /// \cond
-void QXmppAtmManager::setClient(QXmppClient *client)
+void QXmppAtmManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
     connect(client, &QXmppClient::messageReceived, this, &QXmppAtmManager::handleMessageReceived);
+}
+
+void QXmppAtmManager::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::messageReceived, this, &QXmppAtmManager::handleMessageReceived);
 }
 
 void QXmppAtmManager::handleMessageReceived(const QXmppMessage &message)

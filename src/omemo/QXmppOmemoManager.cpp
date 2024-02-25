@@ -1220,9 +1220,8 @@ bool Manager::handleMessage(const QXmppMessage &message)
 ///
 
 /// \cond
-void Manager::setClient(QXmppClient *client)
+void Manager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
     client->setEncryptionExtension(this);
 
     d->trustManager = client->findExtension<QXmppTrustManager>();
@@ -1262,6 +1261,12 @@ void Manager::setClient(QXmppClient *client)
             Q_EMIT deviceChanged(modifiedDevicesItr.key(), modifiedDevicesItr.value());
         }
     });
+}
+
+void Manager::onUnregistered(QXmppClient *client)
+{
+    // TODO: Proper clean up of connections (currently no issue because extensions are deleted
+    // on removal)
 }
 
 bool Manager::handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName)

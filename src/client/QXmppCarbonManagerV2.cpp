@@ -121,14 +121,14 @@ bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::o
     return true;
 }
 
-void QXmppCarbonManagerV2::setClient(QXmppClient *newClient)
+void QXmppCarbonManagerV2::onRegistered(QXmppClient *client)
 {
-    if (client()) {
-        disconnect(client(), &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
-    }
+    connect(client, &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
+}
 
-    QXmppClientExtension::setClient(newClient);
-    connect(newClient, &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
+void QXmppCarbonManagerV2::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
 }
 
 void QXmppCarbonManagerV2::enableCarbons()

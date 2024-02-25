@@ -295,11 +295,6 @@ bool QXmppCallInviteManager::handleMessage(const QXmppMessage &message)
 
     return false;
 }
-
-void QXmppCallInviteManager::setClient(QXmppClient *client)
-{
-    QXmppClientExtension::setClient(client);
-}
 /// \endcond
 
 ///

@@ -274,18 +274,23 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
 }
 /// \endcond
 
-void QXmppRegistrationManager::setClient(QXmppClient *client)
+void QXmppRegistrationManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
     // get service discovery manager
     auto *disco = client->findExtension<QXmppDiscoveryManager>();
-    if (disco) {
+    if (disco != nullptr) {
         connect(disco, &QXmppDiscoveryManager::infoReceived, this, &QXmppRegistrationManager::handleDiscoInfo);
     }
 
     connect(client, &QXmppClient::disconnected, this, [this]() {
         setSupportedByServer(false);
     });
+}
+
+void QXmppRegistrationManager::onUnregistered(QXmppClient *client)
+{
+    // TODO: Proper clean up of connections (currently no issue because extensions are deleted
+    // on removal)
 }
 
 void QXmppRegistrationManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)

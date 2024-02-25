@@ -313,11 +313,6 @@ bool QXmppJingleMessageInitiationManager::handleMessage(const QXmppMessage &mess
 
     return false;
 }
-
-void QXmppJingleMessageInitiationManager::setClient(QXmppClient *client)
-{
-    QXmppClientExtension::setClient(client);
-}
 /// \endcond
 
 ///

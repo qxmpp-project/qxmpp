@@ -944,12 +944,15 @@ bool QXmppTransferManager::handleStanza(const QDomElement &element)
     return false;
 }
 
-void QXmppTransferManager::setClient(QXmppClient *client)
+void QXmppTransferManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
-
     // XEP-0047: In-Band Bytestreams
     connect(client, &QXmppClient::iqReceived, this, &QXmppTransferManager::_q_iqReceived);
+}
+
+void QXmppTransferManager::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::iqReceived, this, &QXmppTransferManager::_q_iqReceived);
 }
 /// \endcond
 

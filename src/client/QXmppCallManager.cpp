@@ -91,10 +91,8 @@ bool QXmppCallManager::handleStanza(const QDomElement &element)
     return false;
 }
 
-void QXmppCallManager::setClient(QXmppClient *client)
+void QXmppCallManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
-
     connect(client, &QXmppClient::disconnected,
             this, &QXmppCallManager::_q_disconnected);
 
@@ -103,6 +101,18 @@ void QXmppCallManager::setClient(QXmppClient *client)
 
     connect(client, &QXmppClient::presenceReceived,
             this, &QXmppCallManager::_q_presenceReceived);
+}
+
+void QXmppCallManager::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::disconnected,
+               this, &QXmppCallManager::_q_disconnected);
+
+    disconnect(client, &QXmppClient::iqReceived,
+               this, &QXmppCallManager::_q_iqReceived);
+
+    disconnect(client, &QXmppClient::presenceReceived,
+               this, &QXmppCallManager::_q_presenceReceived);
 }
 /// \endcond
 

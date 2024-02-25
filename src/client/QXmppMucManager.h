@@ -16,6 +16,7 @@ class QXmppMucManagerPrivate;
 class QXmppMucRoom;
 class QXmppMucRoomPrivate;
 
+///
 /// \brief The QXmppMucManager class makes it possible to interact with
 /// multi-user chat rooms as defined by \xep{0045}: Multi-User Chat.
 ///
@@ -36,7 +37,7 @@ class QXmppMucRoomPrivate;
 /// \endcode
 ///
 /// \ingroup Managers
-
+///
 class QXMPP_EXPORT QXmppMucManager : public QXmppClientExtension
 {
     Q_OBJECT
@@ -67,7 +68,8 @@ Q_SIGNALS:
 
 protected:
     /// \cond
-    void setClient(QXmppClient *client) override;
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
     /// \endcond
 
 private Q_SLOTS:

@@ -120,12 +120,16 @@ bool QXmppMucManager::handleStanza(const QDomElement &element)
     return false;
 }
 
-void QXmppMucManager::setClient(QXmppClient *client)
+void QXmppMucManager::onRegistered(QXmppClient *client)
 {
-    QXmppClientExtension::setClient(client);
-
     connect(client, &QXmppClient::messageReceived,
             this, &QXmppMucManager::_q_messageReceived);
+}
+
+void QXmppMucManager::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::messageReceived,
+               this, &QXmppMucManager::_q_messageReceived);
 }
 /// \endcond
 

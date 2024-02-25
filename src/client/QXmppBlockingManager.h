@@ -73,7 +73,8 @@ public:
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    void setClient(QXmppClient *) override;
+    void onRegistered(QXmppClient *) override;
+    void onUnregistered(QXmppClient *) override;
     bool handleStanza(const QDomElement &, const std::optional<QXmppE2eeMetadata> &) override;
     /// \endcond
 

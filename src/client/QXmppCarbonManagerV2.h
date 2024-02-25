@@ -17,7 +17,8 @@ public:
     bool handleStanza(const QDomElement &, const std::optional<QXmppE2eeMetadata> &) override;
 
 protected:
-    void setClient(QXmppClient *client) override;
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
 
 private:
     void enableCarbons();

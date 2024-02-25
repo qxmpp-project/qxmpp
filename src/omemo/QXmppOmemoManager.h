@@ -147,7 +147,8 @@ public:
 
 protected:
     /// \cond
-    void setClient(QXmppClient *client) override;
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
     bool handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName) override;
     /// \endcond
 

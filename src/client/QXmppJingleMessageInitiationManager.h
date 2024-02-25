@@ -94,7 +94,6 @@ public:
 protected:
     /// \cond
     bool handleMessage(const QXmppMessage &) override;
-    void setClient(QXmppClient *client) override;
     /// \endcond
 
 private:

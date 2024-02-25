@@ -355,16 +355,14 @@ QStringList QXmppBlockingManager::discoveryFeatures() const
     return { XMLNS_BLOCKING.toString() };
 }
 
-void QXmppBlockingManager::setClient(QXmppClient *newClient)
+void QXmppBlockingManager::onRegistered(QXmppClient *client)
 {
-    // disconnect from old client
-    if (client()) {
-        disconnect(client(), &QXmppClient::connected, this, &QXmppBlockingManager::onConnected);
-    }
+    connect(client, &QXmppClient::connected, this, &QXmppBlockingManager::onConnected);
+}
 
-    QXmppClientExtension::setClient(newClient);
-
-    connect(client(), &QXmppClient::connected, this, &QXmppBlockingManager::onConnected);
+void QXmppBlockingManager::onUnregistered(QXmppClient *oldClient)
+{
+    disconnect(oldClient, &QXmppClient::connected, this, &QXmppBlockingManager::onConnected);
 }
 
 bool QXmppBlockingManager::handleStanza(const QDomElement &stanza, const std::optional<QXmppE2eeMetadata> &)

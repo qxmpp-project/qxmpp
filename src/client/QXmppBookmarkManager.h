@@ -38,7 +38,8 @@ Q_SIGNALS:
 
 protected:
     /// \cond
-    void setClient(QXmppClient *client) override;
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
     /// \endcond
 
 private Q_SLOTS:

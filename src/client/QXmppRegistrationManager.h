@@ -338,7 +338,8 @@ Q_SIGNALS:
     void registrationFailed(const QXmppStanza::Error &error);
 
 protected:
-    void setClient(QXmppClient *client) override;
+    void onRegistered(QXmppClient *client) override;
+    void onUnregistered(QXmppClient *client) override;
 
 private Q_SLOTS:
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);

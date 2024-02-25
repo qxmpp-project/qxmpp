@@ -124,18 +124,6 @@ bool QXmppBookmarkManager::setBookmarks(const QXmppBookmarkSet &bookmarks)
 }
 
 /// \cond
-void QXmppBookmarkManager::setClient(QXmppClient *client)
-{
-
-    QXmppClientExtension::setClient(client);
-
-    connect(client, &QXmppClient::connected,
-            this, &QXmppBookmarkManager::slotConnected);
-
-    connect(client, &QXmppClient::disconnected,
-            this, &QXmppBookmarkManager::slotDisconnected);
-}
-
 bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
 {
     if (stanza.tagName() == u"iq") {
@@ -161,6 +149,24 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
         }
     }
     return false;
+}
+
+void QXmppBookmarkManager::onRegistered(QXmppClient *client)
+{
+    connect(client, &QXmppClient::connected,
+            this, &QXmppBookmarkManager::slotConnected);
+
+    connect(client, &QXmppClient::disconnected,
+            this, &QXmppBookmarkManager::slotDisconnected);
+}
+
+void QXmppBookmarkManager::onUnregistered(QXmppClient *client)
+{
+    disconnect(client, &QXmppClient::connected,
+               this, &QXmppBookmarkManager::slotConnected);
+
+    disconnect(client, &QXmppClient::disconnected,
+               this, &QXmppBookmarkManager::slotDisconnected);
 }
 /// \endcond
 
