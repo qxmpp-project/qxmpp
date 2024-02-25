@@ -69,7 +69,7 @@ std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomE
         return {};
     }
 
-    auto queryId = resultElement.attribute("queryid");
+    auto queryId = resultElement.attribute(QStringLiteral("queryid"));
 
     auto messageElement = firstChildElement(forwardedElement, u"message", ns_client);
     if (messageElement.isNull()) {
@@ -79,7 +79,7 @@ std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomE
     auto parseDelay = [](const auto &forwardedEl) -> std::optional<QDateTime> {
         auto delayEl = firstChildElement(forwardedEl, u"delay", ns_delayed_delivery);
         if (!delayEl.isNull()) {
-            return QXmppUtils::datetimeFromString(delayEl.attribute("stamp"));
+            return QXmppUtils::datetimeFromString(delayEl.attribute(QStringLiteral("stamp")));
         }
         return {};
     };
@@ -156,7 +156,7 @@ QStringList QXmppMamManager::discoveryFeatures() const
 
 bool QXmppMamManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "message") {
+    if (element.tagName() == u"message") {
         if (auto result = parseMamMessageResult(element)) {
             auto &[message, queryId] = *result;
 
@@ -191,27 +191,27 @@ static QXmppMamQueryIq buildRequest(const QString &to,
     QList<QXmppDataForm::Field> fields;
 
     QXmppDataForm::Field hiddenField(QXmppDataForm::Field::HiddenField);
-    hiddenField.setKey("FORM_TYPE");
+    hiddenField.setKey(QStringLiteral("FORM_TYPE"));
     hiddenField.setValue(ns_mam.toString());
     fields << hiddenField;
 
     if (!jid.isEmpty()) {
         QXmppDataForm::Field jidField;
-        jidField.setKey("with");
+        jidField.setKey(QStringLiteral("with"));
         jidField.setValue(jid);
         fields << jidField;
     }
 
     if (start.isValid()) {
         QXmppDataForm::Field startField;
-        startField.setKey("start");
+        startField.setKey(QStringLiteral("start"));
         startField.setValue(QXmppUtils::datetimeToString(start));
         fields << startField;
     }
 
     if (end.isValid()) {
         QXmppDataForm::Field endField;
-        endField.setKey("end");
+        endField.setKey(QStringLiteral("end"));
         endField.setValue(QXmppUtils::datetimeToString(end));
         fields << endField;
     }

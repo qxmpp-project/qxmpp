@@ -43,9 +43,10 @@ static field_type field_types[] = {
 
 std::optional<QXmppDataForm::Field::Type> fieldTypeFromString(const QString &type)
 {
+    const auto typeStr = type.toStdString();
     struct field_type *ptr;
     for (ptr = field_types; ptr->str; ptr++) {
-        if (type == ptr->str) {
+        if (typeStr == ptr->str) {
             return ptr->type;
         }
     }
@@ -57,7 +58,7 @@ QString fieldTypeToString(QXmppDataForm::Field::Type type)
     struct field_type *ptr;
     for (ptr = field_types; ptr->str; ptr++) {
         if (type == ptr->type) {
-            return ptr->str;
+            return QString::fromLocal8Bit(ptr->str);
         }
     }
     return {};
@@ -65,16 +66,16 @@ QString fieldTypeToString(QXmppDataForm::Field::Type type)
 
 std::optional<QXmppDataForm::Type> formTypeFromString(const QString &type)
 {
-    if (type == "form") {
+    if (type == u"form") {
         return QXmppDataForm::Form;
     }
-    if (type == "submit") {
+    if (type == u"submit") {
         return QXmppDataForm::Submit;
     }
-    if (type == "cancel") {
+    if (type == u"cancel") {
         return QXmppDataForm::Cancel;
     }
-    if (type == "result") {
+    if (type == u"result") {
         return QXmppDataForm::Result;
     }
     return {};
@@ -84,13 +85,13 @@ QString formTypeToString(QXmppDataForm::Type type)
 {
     switch (type) {
     case QXmppDataForm::Form:
-        return "form";
+        return QStringLiteral("form");
     case QXmppDataForm::Submit:
-        return "submit";
+        return QStringLiteral("submit");
     case QXmppDataForm::Cancel:
-        return "cancel";
+        return QStringLiteral("cancel");
     case QXmppDataForm::Result:
-        return "result";
+        return QStringLiteral("result");
     default:
         return {};
     }
@@ -797,32 +798,33 @@ void QXmppDataForm::parse(const QDomElement &element)
     }
 
     /* form type */
-    if (const auto type = formTypeFromString(element.attribute("type"))) {
+    const auto typeStr = element.attribute(QStringLiteral("type"));
+    if (const auto type = formTypeFromString(typeStr)) {
         d->type = *type;
     } else {
-        qWarning() << "Unknown form type" << element.attribute("type");
+        qWarning() << "Unknown form type" << typeStr;
         return;
     }
 
     /* form properties */
-    d->title = element.firstChildElement("title").text();
-    d->instructions = element.firstChildElement("instructions").text();
+    d->title = firstChildElement(element, u"title").text();
+    d->instructions = firstChildElement(element, u"instructions").text();
 
     for (const auto &fieldElement : iterChildElements(element, u"field")) {
         QXmppDataForm::Field field;
 
         /* field type */
-        field.setType(fieldTypeFromString(fieldElement.attribute("type")).value_or(Field::TextSingleField));
+        field.setType(fieldTypeFromString(fieldElement.attribute(QStringLiteral("type"))).value_or(Field::TextSingleField));
 
         /* field attributes */
-        field.setLabel(fieldElement.attribute("label"));
-        field.setKey(fieldElement.attribute("var"));
+        field.setLabel(fieldElement.attribute(QStringLiteral("label")));
+        field.setKey(fieldElement.attribute(QStringLiteral("var")));
 
         /* field value(s) */
         switch (field.type()) {
         case Field::BooleanField: {
-            const auto valueStr = fieldElement.firstChildElement("value").text();
-            field.setValue(valueStr == "1" || valueStr == "true");
+            const auto valueStr = fieldElement.firstChildElement(QStringLiteral("value")).text();
+            field.setValue(valueStr == u"1" || valueStr == u"true");
             break;
         }
         case Field::ListMultiField:
@@ -836,14 +838,14 @@ void QXmppDataForm::parse(const QDomElement &element)
             break;
         }
         default:
-            field.setValue(fieldElement.firstChildElement("value").text());
+            field.setValue(fieldElement.firstChildElement(QStringLiteral("value")).text());
         }
 
         /* field media */
         if (const auto mediaElement = firstChildElement(fieldElement, u"media", ns_media_element);
             !mediaElement.isNull()) {
-            field.mediaSize().setHeight(mediaElement.attribute("height", "-1").toInt());
-            field.mediaSize().setWidth(mediaElement.attribute("width", "-1").toInt());
+            field.mediaSize().setHeight(mediaElement.attribute(QStringLiteral("height"), QStringLiteral("-1")).toInt());
+            field.mediaSize().setWidth(mediaElement.attribute(QStringLiteral("width"), QStringLiteral("-1")).toInt());
 
             QMimeDatabase database;
 
@@ -860,7 +862,8 @@ void QXmppDataForm::parse(const QDomElement &element)
         case Field::ListSingleField: {
             QList<QPair<QString, QString>> options;
             for (const auto &element : iterChildElements(fieldElement, u"option")) {
-                options << qMakePair(element.attribute("label"), element.firstChildElement("value").text());
+                options << qMakePair(element.attribute(QStringLiteral("label")),
+                                     firstChildElement(element, u"value").text());
             }
             field.setOptions(options);
         }
@@ -869,8 +872,8 @@ void QXmppDataForm::parse(const QDomElement &element)
         }
 
         /* other properties */
-        field.setDescription(fieldElement.firstChildElement("description").text());
-        field.setRequired(!fieldElement.firstChildElement("required").isNull());
+        field.setDescription(firstChildElement(fieldElement, u"description").text());
+        field.setRequired(!firstChildElement(fieldElement, u"required").isNull());
 
         d->fields.append(field);
     }
@@ -882,25 +885,25 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         return;
     }
 
-    writer->writeStartElement("x");
+    writer->writeStartElement(QSL65("x"));
     writer->writeDefaultNamespace(toString65(ns_data));
 
     /* form type */
-    writer->writeAttribute("type", formTypeToString(d->type));
+    writer->writeAttribute(QSL65("type"), formTypeToString(d->type));
 
     /* form properties */
     if (!d->title.isEmpty()) {
-        writer->writeTextElement("title", d->title);
+        writer->writeTextElement(QSL65("title"), d->title);
     }
     if (!d->instructions.isEmpty()) {
-        writer->writeTextElement("instructions", d->instructions);
+        writer->writeTextElement(QSL65("instructions"), d->instructions);
     }
 
     for (const auto &field : d->fields) {
-        writer->writeStartElement("field");
+        writer->writeStartElement(QSL65("field"));
 
         /* field type */
-        writer->writeAttribute("type", fieldTypeToString(field.type()));
+        writer->writeAttribute(QSL65("type"), fieldTypeToString(field.type()));
 
         /* field attributes */
         writeOptionalXmlAttribute(writer, u"label", field.label());
@@ -928,7 +931,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
         /* field media */
         if (!field.mediaSources().isEmpty()) {
-            writer->writeStartElement("media");
+            writer->writeStartElement(QSL65("media"));
             writer->writeDefaultNamespace(toString65(ns_media_element));
 
             // media width and height
@@ -947,7 +950,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
 
             const auto sources = field.mediaSources();
             for (const auto &source : sources) {
-                writer->writeStartElement(QStringLiteral("uri"));
+                writer->writeStartElement(QSL65("uri"));
                 writeOptionalXmlAttribute(writer, u"type", source.contentType().name());
                 writer->writeCharacters(source.uri().toString());
                 writer->writeEndElement();
@@ -962,7 +965,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
         case Field::ListSingleField: {
             const auto options = field.options();
             for (const auto &option : options) {
-                writer->writeStartElement("option");
+                writer->writeStartElement(QSL65("option"));
                 writeOptionalXmlAttribute(writer, u"label", option.first);
                 writeXmlTextElement(writer, u"value", option.second);
                 writer->writeEndElement();

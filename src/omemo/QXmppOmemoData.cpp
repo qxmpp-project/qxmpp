@@ -94,11 +94,11 @@ void QXmppOmemoDeviceElement::parse(const QDomElement &element)
 
 void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("device"));
+    writer->writeStartElement(QSL65("device"));
 
-    writer->writeAttribute(QStringLiteral("id"), QString::number(m_id));
+    writer->writeAttribute(QSL65("id"), QString::number(m_id));
     if (!m_label.isEmpty()) {
-        writer->writeAttribute(QStringLiteral("label"), m_label);
+        writer->writeAttribute(QSL65("label"), m_label);
     }
 
     writer->writeEndElement();  // device
@@ -135,7 +135,7 @@ void QXmppOmemoDeviceList::parse(const QDomElement &element)
 
 void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("devices"));
+    writer->writeStartElement(QSL65("devices"));
     writer->writeDefaultNamespace(toString65(ns_omemo_2));
 
     for (const auto &device : *this) {
@@ -317,27 +317,43 @@ void QXmppOmemoDeviceBundle::parse(const QDomElement &element)
 
 void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("bundle"));
+    writer->writeStartElement(QSL65("bundle"));
     writer->writeDefaultNamespace(toString65(ns_omemo_2));
 
-    writer->writeStartElement(QStringLiteral("ik"));
+    writer->writeStartElement(QSL65("ik"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     writer->writeCharacters(publicIdentityKey().toBase64());
+#else
+    writer->writeCharacters(QString::fromUtf8(publicIdentityKey().toBase64()));
+#endif
     writer->writeEndElement();
 
-    writer->writeStartElement(QStringLiteral("spk"));
-    writer->writeAttribute(QStringLiteral("id"), QString::number(signedPublicPreKeyId()));
+    writer->writeStartElement(QSL65("spk"));
+    writer->writeAttribute(QSL65("id"), QString::number(signedPublicPreKeyId()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     writer->writeCharacters(signedPublicPreKey().toBase64());
+#else
+    writer->writeCharacters(QString::fromUtf8(signedPublicPreKey().toBase64()));
+#endif
     writer->writeEndElement();
 
-    writer->writeStartElement(QStringLiteral("spks"));
+    writer->writeStartElement(QSL65("spks"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     writer->writeCharacters(signedPublicPreKeySignature().toBase64());
+#else
+    writer->writeCharacters(QString::fromUtf8(signedPublicPreKeySignature().toBase64()));
+#endif
     writer->writeEndElement();
 
-    writer->writeStartElement(QStringLiteral("prekeys"));
+    writer->writeStartElement(QSL65("prekeys"));
     for (auto it = m_publicPreKeys.cbegin(); it != m_publicPreKeys.cend(); it++) {
-        writer->writeStartElement(QStringLiteral("pk"));
-        writer->writeAttribute(QStringLiteral("id"), QString::number(it.key()));
+        writer->writeStartElement(QSL65("pk"));
+        writer->writeAttribute(QSL65("id"), QString::number(it.key()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(it.value().toBase64());
+#else
+        writer->writeCharacters(QString::fromUtf8(it.value().toBase64()));
+#endif
         writer->writeEndElement();
     }
     writer->writeEndElement();  // prekeys

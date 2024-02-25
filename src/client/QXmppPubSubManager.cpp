@@ -981,8 +981,8 @@ bool QXmppPubSubManager::handleStanza(const QDomElement &element)
 
     auto event = firstChildElement(element, u"event", ns_pubsub_event);
     if (!event.isNull()) {
-        const auto service = element.attribute("from");
-        const auto node = event.firstChildElement().attribute("node");
+        const auto service = element.attribute(QStringLiteral("from"));
+        const auto node = event.firstChildElement().attribute(QStringLiteral("node"));
 
         const auto extensions = client()->extensions();
         for (auto *extension : extensions) {

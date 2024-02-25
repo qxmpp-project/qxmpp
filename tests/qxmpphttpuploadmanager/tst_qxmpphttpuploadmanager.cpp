@@ -385,8 +385,8 @@ void tst_QXmppHttpUploadManager::testUpload()
         for (auto &future : infoFutures) {
             auto result = expectVariant<QXmppDiscoveryIq>(wait(future.toFuture(this)));
             for (const auto &identity : result.identities()) {
-                if (identity.category() == "store" &&
-                    identity.type() == "file" &&
+                if (identity.category() == u"store" &&
+                    identity.type() == u"file" &&
                     result.features().contains("urn:xmpp:http:upload:0")) {
                     return result.from();
                 }

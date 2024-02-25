@@ -89,7 +89,7 @@ void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("si"));
+    writer->writeStartElement(QSL65("si"));
     writer->writeDefaultNamespace(toString65(ns_stream_initiation));
     writeOptionalXmlAttribute(writer, u"id", m_siId);
     writeOptionalXmlAttribute(writer, u"mime-type", m_mimeType);
@@ -100,7 +100,7 @@ void QXmppStreamInitiationIq::toXmlElementFromChild(QXmlStreamWriter *writer) co
         m_fileInfo.toXml(writer);
     }
     if (!m_featureForm.isNull()) {
-        writer->writeStartElement(QStringLiteral("feature"));
+        writer->writeStartElement(QSL65("feature"));
         writer->writeDefaultNamespace(toString65(ns_feature_negotiation));
         m_featureForm.toXml(writer);
         writer->writeEndElement();

@@ -1361,7 +1361,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer) const
 
 void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
 {
-    writer->writeStartElement(QStringLiteral("message"));
+    writer->writeStartElement(QSL65("message"));
     writeOptionalXmlAttribute(writer, u"xml:lang", lang());
     writeOptionalXmlAttribute(writer, u"id", id());
     writeOptionalXmlAttribute(writer, u"to", to());
@@ -1537,7 +1537,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
                 QTextStream stream(&d->xhtml, QIODevice::WriteOnly);
                 bodyElement.save(stream, 0);
 
-                d->xhtml = d->xhtml.mid(d->xhtml.indexOf('>') + 1);
+                d->xhtml = d->xhtml.mid(d->xhtml.indexOf(u'>') + 1);
                 d->xhtml.replace(
                     QStringLiteral(" xmlns=\"http://www.w3.org/1999/xhtml\""),
                     QString());
@@ -1665,12 +1665,12 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 {
     if (sceMode & QXmpp::ScePublic) {
         if (sceMode == QXmpp::ScePublic && !d->e2eeFallbackBody.isEmpty()) {
-            writer->writeTextElement(QStringLiteral("body"), d->e2eeFallbackBody);
+            writer->writeTextElement(QSL65("body"), d->e2eeFallbackBody);
         }
 
         // XEP-0280: Message Carbons
         if (d->privatemsg) {
-            writer->writeStartElement(QStringLiteral("private"));
+            writer->writeStartElement(QSL65("private"));
             writer->writeDefaultNamespace(toString65(ns_carbons));
             writer->writeEndElement();
         }
@@ -1686,25 +1686,25 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0359: Unique and Stable Stanza IDs
         if (!d->stanzaId.isNull()) {
-            writer->writeStartElement(QStringLiteral("stanza-id"));
+            writer->writeStartElement(QSL65("stanza-id"));
             writer->writeDefaultNamespace(toString65(ns_sid));
-            writer->writeAttribute(QStringLiteral("id"), d->stanzaId);
+            writer->writeAttribute(QSL65("id"), d->stanzaId);
             if (!d->stanzaIdBy.isNull()) {
-                writer->writeAttribute(QStringLiteral("by"), d->stanzaIdBy);
+                writer->writeAttribute(QSL65("by"), d->stanzaIdBy);
             }
             writer->writeEndElement();
         }
 
         if (!d->originId.isNull()) {
-            writer->writeStartElement(QStringLiteral("origin-id"));
+            writer->writeStartElement(QSL65("origin-id"));
             writer->writeDefaultNamespace(toString65(ns_sid));
-            writer->writeAttribute(QStringLiteral("id"), d->originId);
+            writer->writeAttribute(QSL65("id"), d->originId);
             writer->writeEndElement();
         }
 
         // XEP-0369: Mediated Information eXchange (MIX)
         if (!d->mixUserJid.isEmpty() || !d->mixUserNick.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("mix"));
+            writer->writeStartElement(QSL65("mix"));
             writer->writeDefaultNamespace(toString65(ns_mix));
             writeXmlTextElement(writer, u"jid", d->mixUserJid);
             writeXmlTextElement(writer, u"nick", d->mixUserNick);
@@ -1713,9 +1713,9 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0380: Explicit Message Encryption
         if (!d->encryptionMethod.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("encryption"));
+            writer->writeStartElement(QSL65("encryption"));
             writer->writeDefaultNamespace(toString65(ns_eme));
-            writer->writeAttribute(QStringLiteral("namespace"), d->encryptionMethod);
+            writer->writeAttribute(QSL65("namespace"), d->encryptionMethod);
             writeOptionalXmlAttribute(writer, u"name", encryptionName());
             writer->writeEndElement();
         }
@@ -1729,14 +1729,14 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0428: Fallback Indication
         if (d->isFallback) {
-            writer->writeStartElement(QStringLiteral("fallback"));
+            writer->writeStartElement(QSL65("fallback"));
             writer->writeDefaultNamespace(toString65(ns_fallback_indication));
             writer->writeEndElement();
         }
     }
 
     if (sceMode & QXmpp::SceSensitive) {
-        const auto writeTextElement = [writer, &baseNamespace](const QString &tagName, const QString &text) {
+        const auto writeTextElement = [writer, &baseNamespace](const auto &tagName, const auto &text) {
             if (!text.isEmpty()) {
                 writer->writeStartElement(tagName);
                 if (!baseNamespace.isNull()) {
@@ -1748,11 +1748,11 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         };
 
         // XMPP-Core
-        writeTextElement(QStringLiteral("subject"), d->subject);
-        writeTextElement(QStringLiteral("body"), d->body);
+        writeTextElement(QSL65("subject"), d->subject);
+        writeTextElement(QSL65("body"), d->body);
 
         if (!d->thread.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("thread"));
+            writer->writeStartElement(QSL65("thread"));
             if (!baseNamespace.isNull()) {
                 writer->writeDefaultNamespace(baseNamespace);
             }
@@ -1768,9 +1768,9 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0071: XHTML-IM
         if (!d->xhtml.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("html"));
+            writer->writeStartElement(QSL65("html"));
             writer->writeDefaultNamespace(toString65(ns_xhtml_im));
-            writer->writeStartElement(QStringLiteral("body"));
+            writer->writeStartElement(QSL65("body"));
             writer->writeDefaultNamespace(toString65(ns_xhtml));
             writer->writeCharacters(QString());
             writer->device()->write(d->xhtml.toUtf8());
@@ -1790,13 +1790,13 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             QDateTime utcStamp = d->stamp.toUTC();
             if (d->stampType == DelayedDelivery) {
                 // XEP-0203: Delayed Delivery
-                writer->writeStartElement(QStringLiteral("delay"));
+                writer->writeStartElement(QSL65("delay"));
                 writer->writeDefaultNamespace(toString65(ns_delayed_delivery));
                 writeOptionalXmlAttribute(writer, u"stamp", QXmppUtils::datetimeToString(utcStamp));
                 writer->writeEndElement();
             } else {
                 // XEP-0091: Legacy Delayed Delivery
-                writer->writeStartElement(QStringLiteral("x"));
+                writer->writeStartElement(QSL65("x"));
                 writer->writeDefaultNamespace(toString65(ns_legacy_delayed_delivery));
                 writeOptionalXmlAttribute(writer, u"stamp", utcStamp.toString(u"yyyyMMddThh:mm:ss"));
                 writer->writeEndElement();
@@ -1808,33 +1808,33 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         // include a receipt request ("request" element) in order to prevent
         // looping.
         if (!d->receiptId.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("received"));
+            writer->writeStartElement(QSL65("received"));
             writer->writeDefaultNamespace(toString65(ns_message_receipts));
-            writer->writeAttribute(QStringLiteral("id"), d->receiptId);
+            writer->writeAttribute(QSL65("id"), d->receiptId);
             writer->writeEndElement();
         } else if (d->receiptRequested) {
-            writer->writeStartElement(QStringLiteral("request"));
+            writer->writeStartElement(QSL65("request"));
             writer->writeDefaultNamespace(toString65(ns_message_receipts));
             writer->writeEndElement();
         }
 
         // XEP-0224: Attention
         if (d->attentionRequested) {
-            writer->writeStartElement(QStringLiteral("attention"));
+            writer->writeStartElement(QSL65("attention"));
             writer->writeDefaultNamespace(toString65(ns_attention));
             writer->writeEndElement();
         }
 
         // XEP-0249: Direct MUC Invitations
         if (!d->mucInvitationJid.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("x"));
+            writer->writeStartElement(QSL65("x"));
             writer->writeDefaultNamespace(toString65(ns_conference));
-            writer->writeAttribute(QStringLiteral("jid"), d->mucInvitationJid);
+            writer->writeAttribute(QSL65("jid"), d->mucInvitationJid);
             if (!d->mucInvitationPassword.isEmpty()) {
-                writer->writeAttribute(QStringLiteral("password"), d->mucInvitationPassword);
+                writer->writeAttribute(QSL65("password"), d->mucInvitationPassword);
             }
             if (!d->mucInvitationReason.isEmpty()) {
-                writer->writeAttribute(QStringLiteral("reason"), d->mucInvitationReason);
+                writer->writeAttribute(QSL65("reason"), d->mucInvitationReason);
             }
             writer->writeEndElement();
         }
@@ -1846,24 +1846,24 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0308: Last Message Correction
         if (!d->replaceId.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("replace"));
+            writer->writeStartElement(QSL65("replace"));
             writer->writeDefaultNamespace(toString65(ns_message_correct));
-            writer->writeAttribute(QStringLiteral("id"), d->replaceId);
+            writer->writeAttribute(QSL65("id"), d->replaceId);
             writer->writeEndElement();
         }
 
         // XEP-0333: Chat Markers
         if (d->markable) {
-            writer->writeStartElement(QStringLiteral("markable"));
+            writer->writeStartElement(QSL65("markable"));
             writer->writeDefaultNamespace(toString65(ns_chat_markers));
             writer->writeEndElement();
         }
         if (d->marker != NoMarker) {
             writer->writeStartElement(MARKER_TYPES.at(d->marker));
             writer->writeDefaultNamespace(toString65(ns_chat_markers));
-            writer->writeAttribute(QStringLiteral("id"), d->markedId);
+            writer->writeAttribute(QSL65("id"), d->markedId);
             if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {
-                writer->writeAttribute(QStringLiteral("thread"), d->markedThread);
+                writer->writeAttribute(QSL65("thread"), d->markedThread);
             }
             writer->writeEndElement();
         }
@@ -1875,15 +1875,15 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0367: Message Attaching
         if (!d->attachId.isEmpty()) {
-            writer->writeStartElement(QStringLiteral("attach-to"));
+            writer->writeStartElement(QSL65("attach-to"));
             writer->writeDefaultNamespace(toString65(ns_message_attaching));
-            writer->writeAttribute(QStringLiteral("id"), d->attachId);
+            writer->writeAttribute(QSL65("id"), d->attachId);
             writer->writeEndElement();
         }
 
         // XEP-0382: Spoiler messages
         if (d->isSpoiler) {
-            writer->writeStartElement(QStringLiteral("spoiler"));
+            writer->writeStartElement(QSL65("spoiler"));
             writer->writeDefaultNamespace(toString65(ns_spoiler));
             writer->writeCharacters(d->spoilerHint);
             writer->writeEndElement();

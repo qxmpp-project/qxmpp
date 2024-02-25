@@ -10,6 +10,7 @@
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QSharedData>
+#include <QStringBuilder>
 
 using namespace QXmpp::Private;
 
@@ -388,10 +389,10 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     std::sort(sortedFeatures.begin(), sortedFeatures.end());
     sortedFeatures.removeDuplicates();
     for (const auto &identity : sortedIdentities) {
-        S += QString("%1/%2/%3/%4<").arg(identity.category(), identity.type(), identity.language(), identity.name());
+        S += identity.category() % u'/' % identity.type() % u'/' % identity.language() % u'/' % identity.name() % u'<';
     }
     for (const auto &feature : sortedFeatures) {
-        S += feature + QLatin1String("<");
+        S += feature + u'<';
     }
 
     if (!d->form.isNull()) {
@@ -401,23 +402,23 @@ QByteArray QXmppDiscoveryIq::verificationString() const
             fieldMap.insert(field.key(), field);
         }
 
-        if (fieldMap.contains("FORM_TYPE")) {
-            const QXmppDataForm::Field field = fieldMap.take("FORM_TYPE");
+        if (fieldMap.contains(QStringLiteral("FORM_TYPE"))) {
+            const QXmppDataForm::Field field = fieldMap.take(QStringLiteral("FORM_TYPE"));
             S += field.value().toString() + QLatin1String("<");
 
             QStringList keys = fieldMap.keys();
             std::sort(keys.begin(), keys.end());
             for (const auto &key : keys) {
                 const QXmppDataForm::Field field = fieldMap.value(key);
-                S += key + QLatin1String("<");
+                S += key + u'<';
                 if (field.value().canConvert<QStringList>()) {
                     QStringList list = field.value().toStringList();
                     list.sort();
-                    S += list.join(QLatin1String("<"));
+                    S += list.join(u'<');
                 } else {
                     S += field.value().toString();
                 }
-                S += QLatin1String("<");
+                S += u'<';
             }
         } else {
             qWarning("QXmppDiscoveryIq form does not contain FORM_TYPE");
@@ -441,14 +442,14 @@ bool QXmppDiscoveryIq::isDiscoveryIq(const QDomElement &element)
 /// \cond
 bool QXmppDiscoveryIq::checkIqType(const QString &tagName, const QString &xmlNamespace)
 {
-    return tagName == QStringLiteral("query") &&
+    return tagName == u"query" &&
         (xmlNamespace == ns_disco_info || xmlNamespace == ns_disco_items);
 }
 
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = firstChildElement(element, u"query");
-    d->queryNode = queryElement.attribute("node");
+    d->queryNode = queryElement.attribute(QStringLiteral("node"));
     if (queryElement.namespaceURI() == ns_disco_items) {
         d->queryType = ItemsQuery;
     } else {
@@ -457,19 +458,19 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 
     for (const auto &itemElement : iterChildElements(queryElement)) {
         if (itemElement.tagName() == u"feature") {
-            d->features.append(itemElement.attribute("var"));
+            d->features.append(itemElement.attribute(QStringLiteral("var")));
         } else if (itemElement.tagName() == u"identity") {
             QXmppDiscoveryIq::Identity identity;
-            identity.setLanguage(itemElement.attribute("xml:lang"));
-            identity.setCategory(itemElement.attribute("category"));
-            identity.setName(itemElement.attribute("name"));
-            identity.setType(itemElement.attribute("type"));
+            identity.setLanguage(itemElement.attribute(QStringLiteral("xml:lang")));
+            identity.setCategory(itemElement.attribute(QStringLiteral("category")));
+            identity.setName(itemElement.attribute(QStringLiteral("name")));
+            identity.setType(itemElement.attribute(QStringLiteral("type")));
 
             // FIXME: for some reason the language does not found,
             // so we are forced to use QDomNamedNodeMap
             QDomNamedNodeMap m(itemElement.attributes());
             for (int i = 0; i < m.size(); ++i) {
-                if (m.item(i).nodeName() == "xml:lang") {
+                if (m.item(i).nodeName() == u"xml:lang") {
                     identity.setLanguage(m.item(i).nodeValue());
                     break;
                 }
@@ -478,9 +479,9 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
             d->identities.append(identity);
         } else if (itemElement.tagName() == u"item") {
             QXmppDiscoveryIq::Item item;
-            item.setJid(itemElement.attribute("jid"));
-            item.setName(itemElement.attribute("name"));
-            item.setNode(itemElement.attribute("node"));
+            item.setJid(itemElement.attribute(QStringLiteral("jid")));
+            item.setName(itemElement.attribute(QStringLiteral("name")));
+            item.setNode(itemElement.attribute(QStringLiteral("node")));
             d->items.append(item);
         } else if (itemElement.tagName() == u"x" &&
                    itemElement.namespaceURI() == ns_data) {
@@ -491,13 +492,13 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(d->queryType == InfoQuery ? ns_disco_info : ns_disco_items));
     writeOptionalXmlAttribute(writer, u"node", d->queryNode);
 
     if (d->queryType == InfoQuery) {
         for (const auto &identity : d->identities) {
-            writer->writeStartElement("identity");
+            writer->writeStartElement(QSL65(u"identity"));
             writeOptionalXmlAttribute(writer, u"xml:lang", identity.language());
             writeOptionalXmlAttribute(writer, u"category", identity.category());
             writeOptionalXmlAttribute(writer, u"name", identity.name());
@@ -506,13 +507,13 @@ void QXmppDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         }
 
         for (const auto &feature : d->features) {
-            writer->writeStartElement("feature");
+            writer->writeStartElement(QSL65("feature"));
             writeOptionalXmlAttribute(writer, u"var", feature);
             writer->writeEndElement();
         }
     } else {
         for (const auto &item : d->items) {
-            writer->writeStartElement("item");
+            writer->writeStartElement(QSL65("item"));
             writeOptionalXmlAttribute(writer, u"jid", item.jid());
             writeOptionalXmlAttribute(writer, u"name", item.name());
             writeOptionalXmlAttribute(writer, u"node", item.node());

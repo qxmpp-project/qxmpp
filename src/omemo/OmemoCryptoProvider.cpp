@@ -29,12 +29,12 @@ int hmac_sha256_init_func(void **hmac_context, const uint8_t *key, size_t key_le
     auto *d = managerPrivate(user_data);
 
     if (!QCA::MessageAuthenticationCode::supportedTypes().contains(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE)) {
-        d->warning("Message authentication code type '" % QString(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE) % "' is not supported by this system");
+        d->warning(u"Message authentication code type '" % PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE % u"' is not supported by this system");
         return -1;
     }
 
     QCA::SymmetricKey authenticationKey(QByteArray(reinterpret_cast<const char *>(key), key_len));
-    *hmac_context = new QCA::MessageAuthenticationCode(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE, authenticationKey);
+    *hmac_context = new QCA::MessageAuthenticationCode(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE.toString(), authenticationKey);
     return 0;
 }
 
@@ -52,7 +52,7 @@ int hmac_sha256_final_func(void *hmac_context, signal_buffer **output, void *use
 
     auto messageAuthenticationCode = messageAuthenticationCodeGenerator->final();
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(messageAuthenticationCode.constData()), messageAuthenticationCode.size()))) {
-        d->warning("Message authentication code could not be loaded");
+        d->warning(QStringLiteral("Message authentication code could not be loaded"));
         return -1;
     }
 
@@ -85,7 +85,7 @@ int sha512_digest_final_func(void *digest_context, signal_buffer **output, void 
 
     auto hash = hashGenerator->result();
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(hash.constData()), hash.size()))) {
-        d->warning("Hash could not be loaded");
+        d->warning(QStringLiteral("Hash could not be loaded"));
         return -1;
     }
 
@@ -150,7 +150,7 @@ int encrypt_func(signal_buffer **output,
     }
 
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(encryptedData.constData()), encryptedData.size()))) {
-        d->warning("Encrypted data could not be loaded");
+        d->warning(QStringLiteral("Encrypted data could not be loaded"));
         return -4;
     }
 
@@ -209,7 +209,7 @@ int decrypt_func(signal_buffer **output,
     }
 
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(decryptedData.constData()), decryptedData.size()))) {
-        d->warning("Decrypted data could not be loaded");
+        d->warning(QStringLiteral("Decrypted data could not be loaded"));
         return -4;
     }
 

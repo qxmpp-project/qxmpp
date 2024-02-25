@@ -53,13 +53,13 @@ void QXmppStreamManagementEnable::parse(const QDomElement &element)
 
 void QXmppStreamManagementEnable::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("enable"));
+    writer->writeStartElement(QSL65("enable"));
     writer->writeDefaultNamespace(toString65(ns_stream_management));
     if (m_resume) {
-        writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
+        writer->writeAttribute(QSL65("resume"), QStringLiteral("true"));
     }
     if (m_max > 0) {
-        writer->writeAttribute(QStringLiteral("max"), QString::number(m_max));
+        writer->writeAttribute(QSL65("max"), QString::number(m_max));
     }
     writer->writeEndElement();
 }
@@ -125,16 +125,16 @@ void QXmppStreamManagementEnabled::parse(const QDomElement &element)
 
 void QXmppStreamManagementEnabled::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("enable"));
+    writer->writeStartElement(QSL65("enable"));
     writer->writeDefaultNamespace(toString65(ns_stream_management));
     if (m_resume) {
-        writer->writeAttribute(QStringLiteral("resume"), QStringLiteral("true"));
+        writer->writeAttribute(QSL65("resume"), QStringLiteral("true"));
     }
     if (m_max > 0) {
-        writer->writeAttribute(QStringLiteral("max"), QString::number(m_max));
+        writer->writeAttribute(QSL65("max"), QString::number(m_max));
     }
     if (!m_location.isEmpty()) {
-        writer->writeAttribute(QStringLiteral("location"), m_location);
+        writer->writeAttribute(QSL65("location"), m_location);
     }
     writer->writeEndElement();
 }
@@ -178,9 +178,9 @@ void QXmppStreamManagementResume::parse(const QDomElement &element)
 
 void QXmppStreamManagementResume::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("resume"));
-    writer->writeAttribute(QStringLiteral("h"), QString::number(m_h));
-    writer->writeAttribute(QStringLiteral("previd"), m_previd);
+    writer->writeStartElement(QSL65("resume"));
+    writer->writeAttribute(QSL65("h"), QString::number(m_h));
+    writer->writeAttribute(QSL65("previd"), m_previd);
     writer->writeEndElement();
 }
 
@@ -223,9 +223,9 @@ void QXmppStreamManagementResumed::parse(const QDomElement &element)
 
 void QXmppStreamManagementResumed::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("resumed"));
-    writer->writeAttribute(QStringLiteral("h"), QString::number(m_h));
-    writer->writeAttribute(QStringLiteral("previd"), m_previd);
+    writer->writeStartElement(QSL65("resumed"));
+    writer->writeAttribute(QSL65("h"), QString::number(m_h));
+    writer->writeAttribute(QSL65("previd"), m_previd);
     writer->writeEndElement();
 }
 
@@ -262,7 +262,7 @@ void QXmppStreamManagementFailed::toXml(QXmlStreamWriter *writer) const
 {
     QString errorString = conditionToString(m_error);
 
-    writer->writeStartElement(QStringLiteral("failed"));
+    writer->writeStartElement(QSL65("failed"));
     writer->writeDefaultNamespace(toString65(ns_stream_management));
     writer->writeStartElement(errorString);
     writer->writeDefaultNamespace(toString65(ns_stanza));
@@ -292,9 +292,9 @@ void QXmppStreamManagementAck::parse(const QDomElement &element)
 
 void QXmppStreamManagementAck::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("a"));
+    writer->writeStartElement(QSL65("a"));
     writer->writeDefaultNamespace(toString65(ns_stream_management));
-    writer->writeAttribute(QStringLiteral("h"), QString::number(m_seqNo));
+    writer->writeAttribute(QSL65("h"), QString::number(m_seqNo));
     writer->writeEndElement();
 }
 
@@ -312,7 +312,7 @@ bool QXmppStreamManagementReq::isStreamManagementReq(const QDomElement &element)
 
 void QXmppStreamManagementReq::toXml(QXmlStreamWriter *writer)
 {
-    writer->writeStartElement("r");
+    writer->writeStartElement(QSL65("r"));
     writer->writeDefaultNamespace(toString65(ns_stream_management));
     writer->writeEndElement();
 }

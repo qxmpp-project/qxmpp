@@ -98,7 +98,7 @@ auto QXmppEncryptedFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> da
 
     QXmppFileMetadata metadata;
     metadata.setFilename(QXmppUtils::generateStanzaHash(10));
-    metadata.setMediaType(QMimeDatabase().mimeTypeForName("application/octet-stream"));
+    metadata.setMediaType(QMimeDatabase().mimeTypeForName(QStringLiteral("application/octet-stream")));
     metadata.setSize(encryptedSize);
 
     // find provider for source of encrypted file

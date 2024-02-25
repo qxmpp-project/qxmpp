@@ -180,14 +180,18 @@ void QXmppBitsOfBinaryData::parseElementFromChild(const QDomElement &dataElement
 
 void QXmppBitsOfBinaryData::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("data"));
+    writer->writeStartElement(QSL65("data"));
     writer->writeDefaultNamespace(toString65(ns_bob));
     writeOptionalXmlAttribute(writer, u"cid", d->cid.toContentId());
     if (d->maxAge > -1) {
         writeOptionalXmlAttribute(writer, u"max-age", QString::number(d->maxAge));
     }
     writeOptionalXmlAttribute(writer, u"type", d->contentType.name());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     writer->writeCharacters(d->data.toBase64());
+#else
+    writer->writeCharacters(QString::fromUtf8(d->data.toBase64()));
+#endif
     writer->writeEndElement();
 }
 /// \endcond

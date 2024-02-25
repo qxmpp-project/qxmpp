@@ -80,16 +80,16 @@ constexpr auto DEVICE_REMOVAL_INTERVAL = 24h * 7 * 12;
 // interval to check for devices removed from their servers
 constexpr auto DEVICE_REMOVAL_CHECK_INTERVAL = 24h;
 
-constexpr auto PAYLOAD_CIPHER_TYPE = "aes256";
+constexpr QStringView PAYLOAD_CIPHER_TYPE = u"aes256";
 constexpr QCA::Cipher::Mode PAYLOAD_CIPHER_MODE = QCA::Cipher::CBC;
 constexpr QCA::Cipher::Padding PAYLOAD_CIPHER_PADDING = QCA::Cipher::PKCS7;
 
-constexpr auto HKDF_INFO = "OMEMO Payload";
+inline constexpr auto HKDF_INFO = "OMEMO Payload";
 constexpr int HKDF_KEY_SIZE = 32;
 constexpr int HKDF_SALT_SIZE = 32;
 constexpr int HKDF_OUTPUT_SIZE = 80;
 
-extern const QString PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE;
+inline constexpr QStringView PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE = u"hmac(sha256)";
 constexpr uint32_t PAYLOAD_MESSAGE_AUTHENTICATION_CODE_SIZE = 16;
 
 constexpr int PAYLOAD_KEY_SIZE = 32;

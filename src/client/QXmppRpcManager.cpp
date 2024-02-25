@@ -22,7 +22,7 @@ QXmppRpcManager::QXmppRpcManager()
 
 void QXmppRpcManager::addInvokableInterface(QXmppInvokable *interface)
 {
-    m_interfaces[interface->metaObject()->className()] = interface;
+    m_interfaces[QString::fromUtf8(interface->metaObject()->className())] = interface;
 }
 
 /// Invokes a remote interface using RPC.
@@ -33,7 +33,7 @@ void QXmppRpcManager::invokeInterfaceMethod(const QXmppRpcInvokeIq &iq)
 {
     QXmppStanza::Error error;
 
-    const QStringList methodBits = iq.method().split('.');
+    const QStringList methodBits = iq.method().split(u'.');
     if (methodBits.size() != 2) {
         return;
     }
@@ -148,8 +148,8 @@ QStringList QXmppRpcManager::discoveryFeatures() const
 QList<QXmppDiscoveryIq::Identity> QXmppRpcManager::discoveryIdentities() const
 {
     QXmppDiscoveryIq::Identity identity;
-    identity.setCategory("automation");
-    identity.setType("rpc");
+    identity.setCategory(QStringLiteral("automation"));
+    identity.setType(QStringLiteral("rpc"));
     return QList<QXmppDiscoveryIq::Identity>() << identity;
 }
 

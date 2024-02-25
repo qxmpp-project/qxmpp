@@ -28,13 +28,13 @@ bool QXmppTlsManager::handleStanza(const QDomElement &stanza)
         if (!clientStream()->socket()->supportsSsl() &&
             (localSecurity == QXmppConfiguration::TLSRequired ||
              remoteSecurity == QXmppStreamFeatures::Required)) {
-            warning("Disconnecting since TLS is required, but SSL support is not available");
+            warning(QStringLiteral("Disconnecting since TLS is required, but SSL support is not available"));
             client()->disconnectFromServer();
             return true;
         }
         if (localSecurity == QXmppConfiguration::TLSRequired &&
             remoteSecurity == QXmppStreamFeatures::Disabled) {
-            warning("Disconnecting since TLS is required, but not supported by the server");
+            warning(QStringLiteral("Disconnecting since TLS is required, but not supported by the server"));
             client()->disconnectFromServer();
             return true;
         }
@@ -49,7 +49,7 @@ bool QXmppTlsManager::handleStanza(const QDomElement &stanza)
     }
 
     if (QXmppStartTlsPacket::isStartTlsPacket(stanza, QXmppStartTlsPacket::Proceed)) {
-        debug("Starting encryption");
+        debug(QStringLiteral("Starting encryption"));
         clientStream()->socket()->startClientEncryption();
         return true;
     }

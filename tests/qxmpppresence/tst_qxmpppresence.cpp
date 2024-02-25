@@ -127,15 +127,15 @@ void tst_QXmppPresence::testPresenceWithCapability()
     // test parsing and serialization after parsing
     QXmppPresence presence;
     parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(presence.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(presence.to(), QStringLiteral("foo@example.com/QXmpp"));
+    QCOMPARE(presence.from(), QStringLiteral("bar@example.com/QXmpp"));
     QCOMPARE(presence.availableStatusType(), QXmppPresence::Away);
-    QCOMPARE(presence.statusText(), QString("In a meeting"));
+    QCOMPARE(presence.statusText(), QStringLiteral("In a meeting"));
     QCOMPARE(presence.priority(), 5);
     QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
-    QCOMPARE(presence.capabilityHash(), QString("sha-1"));
-    QCOMPARE(presence.capabilityNode(), QString("https://github.com/qxmpp-project/qxmpp"));
+    QCOMPARE(presence.capabilityHash(), QStringLiteral("sha-1"));
+    QCOMPARE(presence.capabilityNode(), QStringLiteral("https://github.com/qxmpp-project/qxmpp"));
     QCOMPARE(presence.capabilityVer(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
     QCOMPARE(presence.extensions().first().tagName(), QStringLiteral("x"));
     QCOMPARE(presence.extensions().first().attribute(QStringLiteral("xmlns")), QStringLiteral("urn:other:namespace"));
@@ -327,14 +327,14 @@ void tst_QXmppPresence::testPresenceWithMix()
     QXmppPresence presence;
     parsePacket(presence, xml);
 
-    QCOMPARE(presence.mixUserJid(), QString("hecate@shakespeare.example/UUID-x4r/2491"));
-    QCOMPARE(presence.mixUserNick(), QString("thirdwitch"));
+    QCOMPARE(presence.mixUserJid(), QStringLiteral("hecate@shakespeare.example/UUID-x4r/2491"));
+    QCOMPARE(presence.mixUserNick(), QStringLiteral("thirdwitch"));
     serializePacket(presence, xml);
 
     presence.setMixUserJid("alexander@example.org");
-    QCOMPARE(presence.mixUserJid(), QString("alexander@example.org"));
+    QCOMPARE(presence.mixUserJid(), QStringLiteral("alexander@example.org"));
     presence.setMixUserNick("erik");
-    QCOMPARE(presence.mixUserNick(), QString("erik"));
+    QCOMPARE(presence.mixUserNick(), QStringLiteral("erik"));
 }
 
 void tst_QXmppPresence::testPresenceWithVCard()

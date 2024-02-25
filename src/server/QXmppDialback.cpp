@@ -82,16 +82,16 @@ void QXmppDialback::parse(const QDomElement &element)
     } else {
         m_command = Verify;
     }
-    m_type = element.attribute("type");
+    m_type = element.attribute(QStringLiteral("type"));
     m_key = element.text();
 }
 
 void QXmppDialback::toXml(QXmlStreamWriter *xmlWriter) const
 {
     if (m_command == Result) {
-        xmlWriter->writeStartElement("db:result");
+        xmlWriter->writeStartElement(QSL65("db:result"));
     } else {
-        xmlWriter->writeStartElement("db:verify");
+        xmlWriter->writeStartElement(QSL65("db:verify"));
     }
     writeOptionalXmlAttribute(xmlWriter, u"id", id());
     writeOptionalXmlAttribute(xmlWriter, u"to", to());

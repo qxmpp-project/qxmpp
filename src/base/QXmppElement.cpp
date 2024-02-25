@@ -39,7 +39,7 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
     QString xmlns = element.namespaceURI();
     QString parentns = element.parentNode().namespaceURI();
     if (!xmlns.isEmpty() && xmlns != parentns) {
-        attributes.insert("xmlns", xmlns);
+        attributes.insert(QStringLiteral("xmlns"), xmlns);
     }
     QDomNamedNodeMap attrs = element.attributes();
     for (int i = 0; i < attrs.size(); i++) {
@@ -291,11 +291,11 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(d->name);
-    if (d->attributes.contains("xmlns")) {
-        writer->writeDefaultNamespace(d->attributes.value("xmlns"));
+    if (d->attributes.contains(QStringLiteral("xmlns"))) {
+        writer->writeDefaultNamespace(d->attributes.value(QStringLiteral("xmlns")));
     }
     std::for_each(d->attributes.keyBegin(), d->attributes.keyEnd(), [this, writer](const QString &key) {
-        if (key != "xmlns") {
+        if (key != u"xmlns") {
             writeOptionalXmlAttribute(writer, key, d->attributes.value(key));
         }
     });

@@ -248,13 +248,13 @@ void QXmppMixParticipantItem::parsePayload(const QDomElement &payload)
 
 void QXmppMixParticipantItem::serializePayload(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("participant"));
+    writer->writeStartElement(QSL65("participant"));
     writer->writeDefaultNamespace(toString65(ns_mix));
     if (!d->jid.isEmpty()) {
-        writer->writeTextElement("jid", d->jid);
+        writer->writeTextElement(QSL65("jid"), d->jid);
     }
     if (!d->nick.isEmpty()) {
-        writer->writeTextElement("nick", d->nick);
+        writer->writeTextElement(QSL65("nick"), d->nick);
     }
     writer->writeEndElement();
 }

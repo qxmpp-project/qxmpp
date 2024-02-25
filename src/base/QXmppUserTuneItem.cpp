@@ -259,15 +259,15 @@ void QXmppTuneItem::parsePayload(const QDomElement &tune)
 
 void QXmppTuneItem::serializePayload(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("tune"));
+    writer->writeStartElement(QSL65("tune"));
     writer->writeDefaultNamespace(toString65(ns_tune));
 
     writeXmlTextElement(writer, u"artist", d->artist);
     if (d->length) {
-        writer->writeTextElement(QStringLiteral("length"), QString::number(*d->length));
+        writer->writeTextElement(QSL65("length"), QString::number(*d->length));
     }
     if (d->rating) {
-        writer->writeTextElement(QStringLiteral("rating"), QString::number(*d->rating));
+        writer->writeTextElement(QSL65("rating"), QString::number(*d->rating));
     }
     writeXmlTextElement(writer, u"source", d->source);
     writeXmlTextElement(writer, u"title", d->title);

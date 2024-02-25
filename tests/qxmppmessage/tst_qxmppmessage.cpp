@@ -129,8 +129,8 @@ void tst_QXmppMessage::testBasic()
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(message.to(), QStringLiteral("foo@example.com/QXmpp"));
+    QCOMPARE(message.from(), QStringLiteral("bar@example.com/QXmpp"));
     QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(int(message.type()), type);
     QCOMPARE(message.body(), body);
@@ -193,8 +193,8 @@ void tst_QXmppMessage::testMessageAttention()
     QXmppMessage message;
     // parsing
     parsePacket(message, xml);
-    QCOMPARE(message.to(), QString("foo@example.com/QXmpp"));
-    QCOMPARE(message.from(), QString("bar@example.com/QXmpp"));
+    QCOMPARE(message.to(), QStringLiteral("foo@example.com/QXmpp"));
+    QCOMPARE(message.from(), QStringLiteral("bar@example.com/QXmpp"));
     QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(message.type(), QXmppMessage::Normal);
     QCOMPARE(message.body(), QString());
@@ -220,12 +220,12 @@ void tst_QXmppMessage::testMessageReceipt()
     QXmppMessage message;
     // parsing
     parsePacket(message, xml);
-    QCOMPARE(message.id(), QString("richard2-4.1.247"));
-    QCOMPARE(message.to(), QString("kingrichard@royalty.england.lit/throne"));
-    QCOMPARE(message.from(), QString("northumberland@shakespeare.lit/westminster"));
+    QCOMPARE(message.id(), QStringLiteral("richard2-4.1.247"));
+    QCOMPARE(message.to(), QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    QCOMPARE(message.from(), QStringLiteral("northumberland@shakespeare.lit/westminster"));
     QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(message.type(), QXmppMessage::Normal);
-    QCOMPARE(message.body(), QString("My lord, dispatch; read o'er these articles."));
+    QCOMPARE(message.body(), QStringLiteral("My lord, dispatch; read o'er these articles."));
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), true);
     QCOMPARE(message.receiptId(), QString());
@@ -247,15 +247,15 @@ void tst_QXmppMessage::testMessageReceipt()
 
     QXmppMessage receipt;
     parsePacket(receipt, receiptXml);
-    QCOMPARE(receipt.id(), QString("bi29sg183b4v"));
-    QCOMPARE(receipt.to(), QString("northumberland@shakespeare.lit/westminster"));
-    QCOMPARE(receipt.from(), QString("kingrichard@royalty.england.lit/throne"));
+    QCOMPARE(receipt.id(), QStringLiteral("bi29sg183b4v"));
+    QCOMPARE(receipt.to(), QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    QCOMPARE(receipt.from(), QStringLiteral("kingrichard@royalty.england.lit/throne"));
     QVERIFY(receipt.extendedAddresses().isEmpty());
     QCOMPARE(receipt.type(), QXmppMessage::Normal);
     QCOMPARE(receipt.body(), QString());
     QCOMPARE(receipt.isAttentionRequested(), false);
     QCOMPARE(receipt.isReceiptRequested(), false);
-    QCOMPARE(receipt.receiptId(), QString("richard2-4.1.247"));
+    QCOMPARE(receipt.receiptId(), QStringLiteral("richard2-4.1.247"));
 
     receipt = QXmppMessage();
     receipt.setId(QStringLiteral("bi29sg183b4v"));
@@ -272,15 +272,15 @@ void tst_QXmppMessage::testMessageReceipt()
 
     QXmppMessage old;
     parsePacket(old, oldXml);
-    QCOMPARE(old.id(), QString("richard2-4.1.247"));
-    QCOMPARE(old.to(), QString("northumberland@shakespeare.lit/westminster"));
-    QCOMPARE(old.from(), QString("kingrichard@royalty.england.lit/throne"));
+    QCOMPARE(old.id(), QStringLiteral("richard2-4.1.247"));
+    QCOMPARE(old.to(), QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    QCOMPARE(old.from(), QStringLiteral("kingrichard@royalty.england.lit/throne"));
     QVERIFY(old.extendedAddresses().isEmpty());
     QCOMPARE(old.type(), QXmppMessage::Normal);
     QCOMPARE(old.body(), QString());
     QCOMPARE(old.isAttentionRequested(), false);
     QCOMPARE(old.isReceiptRequested(), false);
-    QCOMPARE(old.receiptId(), QString("richard2-4.1.247"));
+    QCOMPARE(old.receiptId(), QStringLiteral("richard2-4.1.247"));
 
     // test that an ID is generated
     QXmppMessage message2;
@@ -491,9 +491,9 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(markableMessage, markableXml);
     QCOMPARE(markableMessage.isMarkable(), true);
     QCOMPARE(markableMessage.marker(), QXmppMessage::NoMarker);
-    QCOMPARE(markableMessage.id(), QString("message-1"));
+    QCOMPARE(markableMessage.id(), QStringLiteral("message-1"));
     QCOMPARE(markableMessage.markedId(), QString());
-    QCOMPARE(markableMessage.thread(), QString("sleeping"));
+    QCOMPARE(markableMessage.thread(), QStringLiteral("sleeping"));
     QCOMPARE(markableMessage.markedThread(), QString());
 
     const QByteArray receivedXml(
@@ -510,10 +510,10 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(receivedMessage, receivedXml);
     QCOMPARE(receivedMessage.isMarkable(), false);
     QCOMPARE(receivedMessage.marker(), QXmppMessage::Received);
-    QCOMPARE(receivedMessage.id(), QString("message-2"));
-    QCOMPARE(receivedMessage.markedId(), QString("message-1"));
+    QCOMPARE(receivedMessage.id(), QStringLiteral("message-2"));
+    QCOMPARE(receivedMessage.markedId(), QStringLiteral("message-1"));
     QCOMPARE(receivedMessage.thread(), QString());
-    QCOMPARE(receivedMessage.markedThread(), QString("sleeping"));
+    QCOMPARE(receivedMessage.markedThread(), QStringLiteral("sleeping"));
 
     const QByteArray displayedXml(
         "<message "
@@ -529,10 +529,10 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(displayedMessage, displayedXml);
     QCOMPARE(displayedMessage.isMarkable(), false);
     QCOMPARE(displayedMessage.marker(), QXmppMessage::Displayed);
-    QCOMPARE(displayedMessage.id(), QString("message-2"));
-    QCOMPARE(displayedMessage.markedId(), QString("message-1"));
+    QCOMPARE(displayedMessage.id(), QStringLiteral("message-2"));
+    QCOMPARE(displayedMessage.markedId(), QStringLiteral("message-1"));
     QCOMPARE(displayedMessage.thread(), QString());
-    QCOMPARE(displayedMessage.markedThread(), QString("sleeping"));
+    QCOMPARE(displayedMessage.markedThread(), QStringLiteral("sleeping"));
 
     const QByteArray acknowledgedXml(
         "<message "
@@ -548,10 +548,10 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(acknowledgedMessage, acknowledgedXml);
     QCOMPARE(acknowledgedMessage.isMarkable(), false);
     QCOMPARE(acknowledgedMessage.marker(), QXmppMessage::Acknowledged);
-    QCOMPARE(acknowledgedMessage.id(), QString("message-2"));
-    QCOMPARE(acknowledgedMessage.markedId(), QString("message-1"));
+    QCOMPARE(acknowledgedMessage.id(), QStringLiteral("message-2"));
+    QCOMPARE(acknowledgedMessage.markedId(), QStringLiteral("message-1"));
     QCOMPARE(acknowledgedMessage.thread(), QString());
-    QCOMPARE(acknowledgedMessage.markedThread(), QString("sleeping"));
+    QCOMPARE(acknowledgedMessage.markedThread(), QStringLiteral("sleeping"));
 
     const QByteArray emptyThreadXml(
         "<message "
@@ -566,8 +566,8 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(emptyThreadMessage, emptyThreadXml);
     QCOMPARE(emptyThreadMessage.isMarkable(), false);
     QCOMPARE(emptyThreadMessage.marker(), QXmppMessage::Received);
-    QCOMPARE(emptyThreadMessage.id(), QString("message-2"));
-    QCOMPARE(emptyThreadMessage.markedId(), QString("message-1"));
+    QCOMPARE(emptyThreadMessage.id(), QStringLiteral("message-2"));
+    QCOMPARE(emptyThreadMessage.markedId(), QStringLiteral("message-1"));
     QCOMPARE(emptyThreadMessage.thread(), QString());
     QCOMPARE(emptyThreadMessage.markedThread(), QString());
 
@@ -731,11 +731,11 @@ void tst_QXmppMessage::testMessageCorrect()
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.replaceId(), QString("badmessage"));
+    QCOMPARE(message.replaceId(), QStringLiteral("badmessage"));
     serializePacket(message, xml);
 
     message.setReplaceId("someotherid");
-    QCOMPARE(message.replaceId(), QString("someotherid"));
+    QCOMPARE(message.replaceId(), QStringLiteral("someotherid"));
 }
 
 void tst_QXmppMessage::testMessageAttaching()
@@ -748,11 +748,11 @@ void tst_QXmppMessage::testMessageAttaching()
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.attachId(), QString("SD24VCzSYQ"));
+    QCOMPARE(message.attachId(), QStringLiteral("SD24VCzSYQ"));
     serializePacket(message, xml);
 
     message.setAttachId("someotherid");
-    QCOMPARE(message.attachId(), QString("someotherid"));
+    QCOMPARE(message.attachId(), QStringLiteral("someotherid"));
 }
 
 void tst_QXmppMessage::testMix()
@@ -772,13 +772,13 @@ void tst_QXmppMessage::testMix()
     parsePacket(message, xml);
     serializePacket(message, xml);
 
-    QCOMPARE(message.mixUserJid(), QString("hag66@shakespeare.example"));
-    QCOMPARE(message.mixUserNick(), QString("thirdwitch"));
+    QCOMPARE(message.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(message.mixUserNick(), QStringLiteral("thirdwitch"));
 
     message.setMixUserJid("alexander@example.org");
-    QCOMPARE(message.mixUserJid(), QString("alexander@example.org"));
+    QCOMPARE(message.mixUserJid(), QStringLiteral("alexander@example.org"));
     message.setMixUserNick("erik");
-    QCOMPARE(message.mixUserNick(), QString("erik"));
+    QCOMPARE(message.mixUserNick(), QStringLiteral("erik"));
 }
 
 void tst_QXmppMessage::testEme()
@@ -792,9 +792,9 @@ void tst_QXmppMessage::testEme()
 
     QXmppMessage messageOmemo;
     parsePacket(messageOmemo, xmlOmemo);
-    QCOMPARE(messageOmemo.encryptionMethodNs(), QString("eu.siacs.conversations.axolotl"));
+    QCOMPARE(messageOmemo.encryptionMethodNs(), QStringLiteral("eu.siacs.conversations.axolotl"));
     QCOMPARE(messageOmemo.encryptionMethod(), QXmpp::OMEMO);
-    QCOMPARE(messageOmemo.encryptionName(), QString("OMEMO"));
+    QCOMPARE(messageOmemo.encryptionName(), QStringLiteral("OMEMO"));
     serializePacket(messageOmemo, xmlOmemo);
 
     // test custom encryption
@@ -806,23 +806,23 @@ void tst_QXmppMessage::testEme()
 
     QXmppMessage messageCustom;
     parsePacket(messageCustom, xmlCustom);
-    QCOMPARE(messageCustom.encryptionMethodNs(), QString("im:example:customcrypt:1"));
+    QCOMPARE(messageCustom.encryptionMethodNs(), QStringLiteral("im:example:customcrypt:1"));
     QCOMPARE(messageCustom.encryptionMethod(), QXmpp::UnknownEncryption);
-    QCOMPARE(messageCustom.encryptionName(), QString("CustomCrypt"));
+    QCOMPARE(messageCustom.encryptionName(), QStringLiteral("CustomCrypt"));
     serializePacket(messageCustom, xmlCustom);
 
     // test setters/getters
     QXmppMessage message;
     message.setEncryptionMethod(QXmpp::LegacyOpenPGP);
     QCOMPARE(message.encryptionMethod(), QXmpp::LegacyOpenPGP);
-    QCOMPARE(message.encryptionMethodNs(), QString("jabber:x:encrypted"));
-    QCOMPARE(message.encryptionName(), QString("Legacy OpenPGP"));
+    QCOMPARE(message.encryptionMethodNs(), QStringLiteral("jabber:x:encrypted"));
+    QCOMPARE(message.encryptionName(), QStringLiteral("Legacy OpenPGP"));
 
     message.setEncryptionMethodNs("fancyorg:encryption:fancycrypt:0");
     message.setEncryptionName("FancyCrypt");
     QCOMPARE(message.encryptionMethod(), QXmpp::UnknownEncryption);
-    QCOMPARE(message.encryptionMethodNs(), QString("fancyorg:encryption:fancycrypt:0"));
-    QCOMPARE(message.encryptionName(), QString("FancyCrypt"));
+    QCOMPARE(message.encryptionMethodNs(), QStringLiteral("fancyorg:encryption:fancycrypt:0"));
+    QCOMPARE(message.encryptionName(), QStringLiteral("FancyCrypt"));
 }
 
 void tst_QXmppMessage::testSpoiler()
@@ -837,7 +837,7 @@ void tst_QXmppMessage::testSpoiler()
     QXmppMessage messageWithHint;
     parsePacket(messageWithHint, xmlWithHint);
     QVERIFY(messageWithHint.isSpoiler());
-    QCOMPARE(messageWithHint.spoilerHint(), QString("Love story end"));
+    QCOMPARE(messageWithHint.spoilerHint(), QStringLiteral("Love story end"));
     serializePacket(messageWithHint, xmlWithHint);
 
     // test parsing without hint
@@ -850,7 +850,7 @@ void tst_QXmppMessage::testSpoiler()
     QXmppMessage messageWithoutHint;
     parsePacket(messageWithoutHint, xmlWithoutHint);
     QVERIFY(messageWithoutHint.isSpoiler());
-    QCOMPARE(messageWithoutHint.spoilerHint(), QString(""));
+    QCOMPARE(messageWithoutHint.spoilerHint(), QStringLiteral(""));
     serializePacket(messageWithoutHint, xmlWithoutHint);
 
     // test setters
@@ -860,7 +860,7 @@ void tst_QXmppMessage::testSpoiler()
 
     message.setIsSpoiler(false);
     message.setSpoilerHint("test hint");
-    QCOMPARE(message.spoilerHint(), QString("test hint"));
+    QCOMPARE(message.spoilerHint(), QStringLiteral("test hint"));
     QVERIFY(message.isSpoiler());
 }
 
@@ -888,9 +888,9 @@ void tst_QXmppMessage::testProcessingHints()
     // test serialization
     QXmppMessage message2;
     message2.setType(QXmppMessage::Chat);
-    message2.setFrom(QString("romeo@montague.lit/laptop"));
-    message2.setTo(QString("juliet@capulet.lit/laptop"));
-    message2.setBody(QString("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
+    message2.setFrom(QStringLiteral("romeo@montague.lit/laptop"));
+    message2.setTo(QStringLiteral("juliet@capulet.lit/laptop"));
+    message2.setBody(QStringLiteral("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
     message2.addHint(QXmppMessage::NoPermanentStore);
     message2.addHint(QXmppMessage::NoStore);
     message2.addHint(QXmppMessage::NoCopy);

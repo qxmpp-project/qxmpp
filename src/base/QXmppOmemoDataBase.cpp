@@ -109,14 +109,14 @@ void QXmppOmemoEnvelope::parse(const QDomElement &element)
 
 void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("key"));
-    writer->writeAttribute(QStringLiteral("rid"), QString::number(m_recipientDeviceId));
+    writer->writeStartElement(QSL65("key"));
+    writer->writeAttribute(QSL65("rid"), QString::number(m_recipientDeviceId));
 
     if (m_isUsedForKeyExchange) {
         writeOptionalXmlAttribute(writer, u"kex", QStringLiteral("true"));
     }
 
-    writer->writeCharacters(m_data.toBase64());
+    writer->writeCharacters(QString::fromUtf8(m_data.toBase64()));
     writer->writeEndElement();
 }
 
@@ -243,16 +243,16 @@ void QXmppOmemoElement::parse(const QDomElement &element)
 
 void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("encrypted"));
+    writer->writeStartElement(QSL65("encrypted"));
     writer->writeDefaultNamespace(toString65(ns_omemo_2));
 
-    writer->writeStartElement(QStringLiteral("header"));
-    writer->writeAttribute(QStringLiteral("sid"), QString::number(m_senderDeviceId));
+    writer->writeStartElement(QSL65("header"));
+    writer->writeAttribute(QSL65("sid"), QString::number(m_senderDeviceId));
 
     const auto recipientJids = m_envelopes.uniqueKeys();
     for (const auto &recipientJid : recipientJids) {
-        writer->writeStartElement(QStringLiteral("keys"));
-        writer->writeAttribute(QStringLiteral("jid"), recipientJid);
+        writer->writeStartElement(QSL65("keys"));
+        writer->writeAttribute(QSL65("jid"), recipientJid);
 
         for (auto itr = m_envelopes.constFind(recipientJid);
              itr != m_envelopes.constEnd() && itr.key() == recipientJid;
@@ -269,7 +269,7 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
     // The payload element is only included if there is a payload.
     // An empty OMEMO message does not contain a payload.
     if (!m_payload.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("payload"), m_payload.toBase64());
+        writer->writeTextElement(QSL65("payload"), QString::fromUtf8(m_payload.toBase64()));
     }
 
     writer->writeEndElement();  // encrypted

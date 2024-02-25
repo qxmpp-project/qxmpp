@@ -47,15 +47,15 @@ void tst_QXmppStanza::testExtendedAddress_data()
         << QByteArray(R"(<address jid="foo@example.com/QXmpp" type="bcc"/>)")
         << false
         << QString()
-        << QString("foo@example.com/QXmpp")
-        << QString("bcc");
+        << QStringLiteral("foo@example.com/QXmpp")
+        << QStringLiteral("bcc");
 
     QTest::newRow("full")
         << QByteArray(R"(<address delivered="true" desc="some description" jid="foo@example.com/QXmpp" type="bcc"/>)")
         << true
-        << QString("some description")
-        << QString("foo@example.com/QXmpp")
-        << QString("bcc");
+        << QStringLiteral("some description")
+        << QStringLiteral("foo@example.com/QXmpp")
+        << QStringLiteral("bcc");
 }
 
 void tst_QXmppStanza::testExtendedAddress()
@@ -340,8 +340,8 @@ void tst_QXmppStanza::testErrorFileTooLarge()
     QXmppStanza::Error error;
     parsePacket(error, xml);
     QCOMPARE(error.type(), QXmppStanza::Error::Modify);
-    QCOMPARE(error.text(), QString("File too large. The maximum file size is "
-                                   "20000 bytes"));
+    QCOMPARE(error.text(), QStringLiteral("File too large. The maximum file size is "
+                                          "20000 bytes"));
     QCOMPARE(error.condition(), QXmppStanza::Error::NotAcceptable);
     QVERIFY(error.fileTooLarge());
     QCOMPARE(error.maxFileSize(), 20000);
@@ -375,8 +375,8 @@ void tst_QXmppStanza::testErrorRetry()
     QXmppStanza::Error error;
     parsePacket(error, xml);
     QCOMPARE(error.type(), QXmppStanza::Error::Wait);
-    QCOMPARE(error.text(), QString("Quota reached. You can only upload 5 "
-                                   "files in 5 minutes"));
+    QCOMPARE(error.text(), QStringLiteral("Quota reached. You can only upload 5 "
+                                          "files in 5 minutes"));
     QCOMPARE(error.condition(), QXmppStanza::Error::ResourceConstraint);
     QCOMPARE(error.retryDate(), QDateTime(QDate(2017, 12, 03), QTime(23, 42, 05), Qt::UTC));
     serializePacket(error, xml);

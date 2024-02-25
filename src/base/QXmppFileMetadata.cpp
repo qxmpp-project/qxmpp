@@ -85,39 +85,47 @@ QVector<std::invoke_result_t<Func, QDomElement>> forAllChildElements(const QDomE
     return out;
 }
 
+template<typename ElementType>
+QVector<ElementType> parseChildElements(const QDomElement &el, QStringView tagName, QStringView namespaceUri)
+{
+    QVector<ElementType> vec;
+    for (const auto &subEl : iterChildElements(el, tagName, namespaceUri)) {
+        ElementType parsedElement;
+        parsedElement.parse(subEl);
+        vec.push_back(std::move(parsedElement));
+    }
+    return vec;
+}
+
 bool QXmppFileMetadata::parse(const QDomElement &el)
 {
     if (el.isNull()) {
         return false;
     }
 
-    if (auto dateEl = el.firstChildElement("date"); !dateEl.isNull()) {
+    if (auto dateEl = firstChildElement(el, u"date"); !dateEl.isNull()) {
         d->date = QXmppUtils::datetimeFromString(dateEl.text());
     }
 
-    if (auto descEl = el.firstChildElement("desc"); !descEl.isNull()) {
+    if (auto descEl = firstChildElement(el, u"desc"); !descEl.isNull()) {
         d->desc = descEl.text();
     }
 
-    d->hashes = forAllChildElements(el, "hash", [](const auto &el) {
-        QXmppHash hash;
-        hash.parse(el);
-        return hash;
-    });
+    d->hashes = parseChildElements<QXmppHash>(el, u"hash", ns_hashes);
 
-    if (auto heightEl = el.firstChildElement("height"); !heightEl.isNull()) {
-        d->height = el.firstChildElement("height").text().toUInt();
+    if (auto heightEl = firstChildElement(el, u"height"); !heightEl.isNull()) {
+        d->height = firstChildElement(el, u"height").text().toUInt();
     }
-    if (auto lengthEl = el.firstChildElement("length"); !lengthEl.isNull()) {
+    if (auto lengthEl = firstChildElement(el, u"length"); !lengthEl.isNull()) {
         d->length = lengthEl.text().toUInt();
     }
-    if (auto mediaTypeEl = el.firstChildElement("media-type"); !mediaTypeEl.isNull()) {
+    if (auto mediaTypeEl = firstChildElement(el, u"media-type"); !mediaTypeEl.isNull()) {
         d->mediaType = QMimeDatabase().mimeTypeForName(mediaTypeEl.text());
     }
-    if (auto nameEl = el.firstChildElement("name"); !nameEl.isNull()) {
+    if (auto nameEl = firstChildElement(el, u"name"); !nameEl.isNull()) {
         d->name = nameEl.text();
     }
-    if (auto sizeEl = el.firstChildElement("size"); !sizeEl.isNull()) {
+    if (auto sizeEl = firstChildElement(el, u"size"); !sizeEl.isNull()) {
         d->size = sizeEl.text().toULong();
     }
     for (const auto &thumbEl : iterChildElements(el, u"thumbnail")) {
@@ -126,7 +134,7 @@ bool QXmppFileMetadata::parse(const QDomElement &el)
             d->thumbnails.append(std::move(thumbnail));
         }
     }
-    if (auto widthEl = el.firstChildElement("width"); !widthEl.isNull()) {
+    if (auto widthEl = firstChildElement(el, u"width"); !widthEl.isNull()) {
         d->width = widthEl.text().toUInt();
     }
     return true;
@@ -134,14 +142,14 @@ bool QXmppFileMetadata::parse(const QDomElement &el)
 
 void QXmppFileMetadata::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("file");
+    writer->writeStartElement(QSL65("file"));
     writer->writeDefaultNamespace(toString65(ns_file_metadata));
     if (d->date) {
-        writer->writeTextElement("date", QXmppUtils::datetimeToString(*d->date));
+        writer->writeTextElement(QSL65("date"), QXmppUtils::datetimeToString(*d->date));
     }
 
     if (d->desc) {
-        writer->writeTextElement("desc", *d->desc);
+        writer->writeTextElement(QSL65("desc"), *d->desc);
     }
 
     for (const auto &hash : d->hashes) {
@@ -149,25 +157,25 @@ void QXmppFileMetadata::toXml(QXmlStreamWriter *writer) const
     }
 
     if (d->height) {
-        writer->writeTextElement("height", QString::number(*d->height));
+        writer->writeTextElement(QSL65("height"), QString::number(*d->height));
     }
     if (d->length) {
-        writer->writeTextElement("length", QString::number(*d->length));
+        writer->writeTextElement(QSL65("length"), QString::number(*d->length));
     }
     if (d->mediaType) {
-        writer->writeTextElement("media-type", d->mediaType->name());
+        writer->writeTextElement(QSL65("media-type"), d->mediaType->name());
     }
     if (d->name) {
-        writer->writeTextElement("name", *d->name);
+        writer->writeTextElement(QSL65("name"), *d->name);
     }
     if (d->size) {
-        writer->writeTextElement("size", QString::number(*d->size));
+        writer->writeTextElement(QSL65("size"), QString::number(*d->size));
     }
     for (const auto &thumbnail : d->thumbnails) {
         thumbnail.toXml(writer);
     }
     if (d->width) {
-        writer->writeTextElement("width", QString::number(*d->width));
+        writer->writeTextElement(QSL65("width"), QString::number(*d->width));
     }
     writer->writeEndElement();
 }

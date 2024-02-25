@@ -192,7 +192,7 @@ auto writeTextEl(QXmlStreamWriter *writer, const QString &name, const QString &v
 
 void QXmppGeolocItem::serializePayload(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("geoloc"));
+    writer->writeStartElement(QSL65("geoloc"));
     writer->writeDefaultNamespace(toString65(ns_geoloc));
 
     writeTextEl(writer, QStringLiteral("accuracy"), d->accuracy);

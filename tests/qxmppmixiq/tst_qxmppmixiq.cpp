@@ -340,13 +340,13 @@ void tst_QXmppMixIq::testSetters()
     iq.setActionType(QXmppMixIq::Join);
     QCOMPARE(iq.actionType(), QXmppMixIq::Join);
     iq.setJid("interestingnews@mix.example.com");
-    QCOMPARE(iq.jid(), QString("interestingnews@mix.example.com"));
+    QCOMPARE(iq.jid(), QStringLiteral("interestingnews@mix.example.com"));
     iq.setChannelName("interestingnews");
-    QCOMPARE(iq.channelName(), QString("interestingnews"));
+    QCOMPARE(iq.channelName(), QStringLiteral("interestingnews"));
     iq.setNodes(QStringList() << "com:example:mix:node:custom");
     QCOMPARE(iq.nodes(), QStringList() << "com:example:mix:node:custom");
     iq.setNick("SMUDO");
-    QCOMPARE(iq.nick(), QString("SMUDO"));
+    QCOMPARE(iq.nick(), QStringLiteral("SMUDO"));
 }
 
 void tst_QXmppMixIq::testInvalidActionType()

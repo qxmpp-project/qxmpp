@@ -78,7 +78,7 @@ QStringList QXmppCallManager::discoveryFeatures() const
 
 bool QXmppCallManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "iq") {
+    if (element.tagName() == u"iq") {
         // XEP-0166: Jingle
         if (QXmppJingleIq::isJingleIq(element)) {
             QXmppJingleIq jingleIq;
@@ -114,17 +114,17 @@ void QXmppCallManager::setClient(QXmppClient *client)
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
     if (jid.isEmpty()) {
-        warning("Refusing to call an empty jid");
+        warning(QStringLiteral("Refusing to call an empty jid"));
         return nullptr;
     }
 
     if (jid == client()->configuration().jid()) {
-        warning("Refusing to call self");
+        warning(QStringLiteral("Refusing to call self"));
         return nullptr;
     }
 
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
-    QXmppCallStream *stream = call->d->createStream("audio", "initiator", "microphone");
+    QXmppCallStream *stream = call->d->createStream(QStringLiteral("audio"), QStringLiteral("initiator"), QStringLiteral("microphone"));
     call->d->streams << stream;
     call->d->sid = QXmppUtils::generateStanzaHash();
 
@@ -294,7 +294,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         // for all other requests, require a valid call
         QXmppCall *call = d->findCall(iq.sid());
         if (!call) {
-            warning(QString("Remote party %1 sent a request for an unknown call %2").arg(iq.from(), iq.sid()));
+            warning(QStringLiteral("Remote party %1 sent a request for an unknown call %2").arg(iq.from(), iq.sid()));
             return;
         }
         call->d->handleRequest(iq);

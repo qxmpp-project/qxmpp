@@ -266,12 +266,12 @@ void QXmppExternalService::setUsername(std::optional<QString> username)
 ///
 bool QXmppExternalService::isExternalService(const QDomElement &element)
 {
-    if (element.tagName() != "service") {
+    if (element.tagName() != u"service") {
         return false;
     }
 
-    return element.hasAttribute("host") && !element.attribute("host").isEmpty() &&
-        element.hasAttribute("type") && !element.attribute("type").isEmpty();
+    return !element.attribute(QStringLiteral("host")).isEmpty() &&
+        !element.attribute(QStringLiteral("type")).isEmpty();
 }
 
 ///
@@ -281,40 +281,36 @@ void QXmppExternalService::parse(const QDomElement &el)
 {
     QDomNamedNodeMap attributes = el.attributes();
 
-    setHost(el.attribute("host"));
-    setType(el.attribute("type"));
+    setHost(el.attribute(QStringLiteral("host")));
+    setType(el.attribute(QStringLiteral("type")));
 
-    d->action = actionFromString(el.attribute("action"));
+    d->action = actionFromString(el.attribute(QStringLiteral("action")));
 
-    if (attributes.contains("expires")) {
-        setExpires(QXmppUtils::datetimeFromString(el.attribute("expires")));
+    if (attributes.contains(QStringLiteral("expires"))) {
+        setExpires(QXmppUtils::datetimeFromString(el.attribute(QStringLiteral("expires"))));
     }
 
-    if (attributes.contains("name")) {
-        setName(el.attribute("name"));
+    if (attributes.contains(QStringLiteral("name"))) {
+        setName(el.attribute(QStringLiteral("name")));
     }
 
-    if (attributes.contains("password")) {
-        setPassword(el.attribute("password"));
+    if (attributes.contains(QStringLiteral("password"))) {
+        setPassword(el.attribute(QStringLiteral("password")));
     }
 
-    if (attributes.contains("port")) {
-        setPort(el.attribute("port").toInt());
+    if (attributes.contains(QStringLiteral("port"))) {
+        setPort(el.attribute(QStringLiteral("port")).toInt());
     }
 
-    if (attributes.contains("restricted")) {
-        bool isRestricted {
-            el.attribute("restricted") == "true" ||
-            el.attribute("restricted") == "1"
-        };
-
-        setRestricted(isRestricted);
+    if (attributes.contains(QStringLiteral("restricted"))) {
+        auto restrictedStr = el.attribute(QStringLiteral("restricted"));
+        setRestricted(restrictedStr == u"true" || restrictedStr == u"1");
     }
 
-    d->transport = transportFromString(el.attribute("transport"));
+    d->transport = transportFromString(el.attribute(QStringLiteral("transport")));
 
-    if (attributes.contains("username")) {
-        setUsername(el.attribute("username"));
+    if (attributes.contains(QStringLiteral("username"))) {
+        setUsername(el.attribute(QStringLiteral("username")));
     }
 }
 
@@ -328,7 +324,7 @@ void QXmppExternalService::parse(const QDomElement &el)
 
 void QXmppExternalService::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("service");
+    writer->writeStartElement(QSL65("service"));
     writeOptionalXmlAttribute(writer, u"host", d->host);
     writeOptionalXmlAttribute(writer, u"type", d->type);
 
@@ -440,7 +436,7 @@ void QXmppExternalServiceDiscoveryIq::parseElementFromChild(const QDomElement &e
 
 void QXmppExternalServiceDiscoveryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("services");
+    writer->writeStartElement(QSL65("services"));
     writer->writeDefaultNamespace(toString65(ns_external_service_discovery));
 
     for (const QXmppExternalService &item : d->externalServices) {

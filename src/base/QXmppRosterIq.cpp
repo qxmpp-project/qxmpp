@@ -124,18 +124,18 @@ void QXmppRosterIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppRosterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_roster));
 
     // XEP-0237 roster versioning - If the server does not advertise support for roster versioning, the client MUST NOT include the 'ver' attribute.
     if (!version().isEmpty()) {
-        writer->writeAttribute(QStringLiteral("ver"), version());
+        writer->writeAttribute(QSL65("ver"), version());
     }
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->mixAnnotate) {
-        writer->writeStartElement(QStringLiteral("annotate"));
-        writer->writeAttribute(QStringLiteral("xmlns"), toString65(ns_mix_roster));
+        writer->writeStartElement(QSL65("annotate"));
+        writer->writeAttribute(QSL65("xmlns"), toString65(ns_mix_roster));
         writer->writeEndElement();
     }
 
@@ -317,20 +317,20 @@ QString QXmppRosterIq::Item::getSubscriptionTypeStr() const
 {
     switch (d->type) {
     case NotSet:
-        return "";
+        return QStringLiteral("");
     case None:
-        return "none";
+        return QStringLiteral("none");
     case Both:
-        return "both";
+        return QStringLiteral("both");
     case From:
-        return "from";
+        return QStringLiteral("from");
     case To:
-        return "to";
+        return QStringLiteral("to");
     case Remove:
-        return "remove";
+        return QStringLiteral("remove");
     default: {
         qWarning("QXmppRosterIq::Item::getTypeStr(): invalid type");
-        return "";
+        return QString();
     }
     }
 }
@@ -339,15 +339,15 @@ void QXmppRosterIq::Item::setSubscriptionTypeFromStr(const QString &type)
 {
     if (type.isEmpty()) {
         setSubscriptionType(NotSet);
-    } else if (type == QStringLiteral("none")) {
+    } else if (type == u"none") {
         setSubscriptionType(None);
-    } else if (type == QStringLiteral("both")) {
+    } else if (type == u"both") {
         setSubscriptionType(Both);
-    } else if (type == QStringLiteral("from")) {
+    } else if (type == u"from") {
         setSubscriptionType(From);
-    } else if (type == QStringLiteral("to")) {
+    } else if (type == u"to") {
         setSubscriptionType(To);
-    } else if (type == QStringLiteral("remove")) {
+    } else if (type == u"remove") {
         setSubscriptionType(Remove);
     } else {
         qWarning("QXmppRosterIq::Item::setTypeFromStr(): invalid type");
@@ -421,13 +421,13 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
 
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("item"));
+    writer->writeStartElement(QSL65("item"));
     writeOptionalXmlAttribute(writer, u"jid", d->bareJid);
     writeOptionalXmlAttribute(writer, u"name", d->name);
     writeOptionalXmlAttribute(writer, u"subscription", getSubscriptionTypeStr());
     writeOptionalXmlAttribute(writer, u"ask", subscriptionStatus());
     if (d->approved) {
-        writer->writeAttribute(QStringLiteral("approved"), QStringLiteral("true"));
+        writer->writeAttribute(QSL65("approved"), QStringLiteral("true"));
     }
 
     QSet<QString>::const_iterator i = d->groups.constBegin();
@@ -438,8 +438,8 @@ void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     if (d->isMixChannel) {
-        writer->writeStartElement(QStringLiteral("channel"));
-        writer->writeAttribute(QStringLiteral("xmlns"), toString65(ns_mix_roster));
+        writer->writeStartElement(QSL65("channel"));
+        writer->writeAttribute(QSL65("xmlns"), toString65(ns_mix_roster));
         writeOptionalXmlAttribute(writer, u"participant-id", d->mixParticipantId);
         writer->writeEndElement();
     }

@@ -436,7 +436,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
         setSubscription(subscription);
 
         // form inside following <options/>
-        d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("options"));
+        d->dataForm = parseDataFormFromChild(firstChildElement(pubSubElement, u"options"));
         return;
     }
 
@@ -484,7 +484,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
             d->maxItems = queryElement.attribute(QStringLiteral("max_items")).toUInt();
         } else if (d->queryType == Publish) {
             // form inside following <publish-options/>
-            d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("publish-options"));
+            d->dataForm = parseDataFormFromChild(firstChildElement(pubSubElement, u"publish-options"));
         }
 
         break;
@@ -508,12 +508,12 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
         break;
     case Create:
         // form inside following <configure/>
-        d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("configure"));
+        d->dataForm = parseDataFormFromChild(firstChildElement(pubSubElement, u"configure"));
         break;
     case Subscribe:
     case Subscription:
         // form inside following <options/>
-        d->dataForm = parseDataFormFromChild(pubSubElement.firstChildElement("options"));
+        d->dataForm = parseDataFormFromChild(firstChildElement(pubSubElement, u"options"));
         break;
     case Delete:
     case Purge:
@@ -524,7 +524,7 @@ void PubSubIqBase::parseElementFromChild(const QDomElement &element)
 
 void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("pubsub"));
+    writer->writeStartElement(QSL65("pubsub"));
     writer->writeDefaultNamespace(toString65(queryTypeIsOwnerIq(d->queryType) ? ns_pubsub_owner : ns_pubsub));
 
     // The SubscriptionQuery is special here: The query element is directly
@@ -557,7 +557,7 @@ void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
             break;
         case Items:
             if (d->maxItems > 0) {
-                writer->writeAttribute(QStringLiteral("max_items"), QString::number(d->maxItems));
+                writer->writeAttribute(QSL65("max_items"), QString::number(d->maxItems));
             }
             [[fallthrough]];
         case Publish:

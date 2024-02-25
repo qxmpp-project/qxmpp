@@ -137,10 +137,10 @@ void QXmppTrustMessageElement::parse(const QDomElement &element)
 
 void QXmppTrustMessageElement::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("trust-message"));
+    writer->writeStartElement(QSL65("trust-message"));
     writer->writeDefaultNamespace(toString65(ns_tm));
-    writer->writeAttribute(QStringLiteral("usage"), d->usage);
-    writer->writeAttribute(QStringLiteral("encryption"), d->encryption);
+    writer->writeAttribute(QSL65("usage"), d->usage);
+    writer->writeAttribute(QSL65("encryption"), d->encryption);
 
     for (const auto &keyOwner : d->keyOwners) {
         keyOwner.toXml(writer);
@@ -275,15 +275,23 @@ void QXmppTrustMessageKeyOwner::parse(const QDomElement &element)
 
 void QXmppTrustMessageKeyOwner::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("key-owner"));
-    writer->writeAttribute(QStringLiteral("jid"), d->jid);
+    writer->writeStartElement(QSL65("key-owner"));
+    writer->writeAttribute(QSL65("jid"), d->jid);
 
     for (const auto &keyIdentifier : d->trustedKeys) {
-        writer->writeTextElement(QStringLiteral("trust"), keyIdentifier.toBase64());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        writer->writeTextElement("trust", keyIdentifier.toBase64());
+#else
+        writer->writeTextElement(QStringLiteral("trust"), QString::fromUtf8(keyIdentifier.toBase64()));
+#endif
     }
 
     for (const auto &keyIdentifier : d->distrustedKeys) {
-        writer->writeTextElement(QStringLiteral("distrust"), keyIdentifier.toBase64());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        writer->writeTextElement("distrust", keyIdentifier.toBase64());
+#else
+        writer->writeTextElement(QStringLiteral("distrust"), QString::fromUtf8(keyIdentifier.toBase64()));
+#endif
     }
 
     writer->writeEndElement();

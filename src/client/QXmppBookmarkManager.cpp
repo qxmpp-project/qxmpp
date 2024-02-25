@@ -54,13 +54,13 @@ bool QXmppPrivateStorageIq::isPrivateStorageIq(const QDomElement &element)
 
 void QXmppPrivateStorageIq::parseElementFromChild(const QDomElement &element)
 {
-    const QDomElement queryElement = element.firstChildElement("query");
+    const QDomElement queryElement = firstChildElement(element, u"query");
     m_bookmarks.parse(queryElement.firstChildElement());
 }
 
 void QXmppPrivateStorageIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("query");
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_private));
     m_bookmarks.toXml(writer);
     writer->writeEndElement();
@@ -138,7 +138,7 @@ void QXmppBookmarkManager::setClient(QXmppClient *client)
 
 bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() == "iq") {
+    if (stanza.tagName() == u"iq") {
         if (QXmppPrivateStorageIq::isPrivateStorageIq(stanza)) {
             QXmppPrivateStorageIq iq;
             iq.parse(stanza);
@@ -149,7 +149,7 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
                 Q_EMIT bookmarksReceived(d->bookmarks);
             }
             return true;
-        } else if (!d->pendingId.isEmpty() && stanza.attribute("id") == d->pendingId) {
+        } else if (!d->pendingId.isEmpty() && stanza.attribute(QStringLiteral("id")) == d->pendingId) {
             QXmppIq iq;
             iq.parse(stanza);
             if (iq.type() == QXmppIq::Result) {

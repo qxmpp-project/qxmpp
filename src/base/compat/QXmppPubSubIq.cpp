@@ -181,7 +181,7 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppPubSubIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("pubsub"));
+    writer->writeStartElement(QSL65("pubsub"));
     writer->writeDefaultNamespace(toString65(ns_pubsub));
 
     // write query type

@@ -49,17 +49,17 @@ public:
 QXmppDiscoveryManager::QXmppDiscoveryManager()
     : d(new QXmppDiscoveryManagerPrivate)
 {
-    d->clientCapabilitiesNode = "https://github.com/qxmpp-project/qxmpp";
-    d->clientCategory = "client";
+    d->clientCapabilitiesNode = QStringLiteral("https://github.com/qxmpp-project/qxmpp");
+    d->clientCategory = QStringLiteral("client");
 #if defined Q_OS_ANDROID || defined Q_OS_BLACKBERRY || defined Q_OS_IOS || defined Q_OS_WP
-    d->clientType = "phone";
+    d->clientType = QStringLiteral("phone");
 #else
-    d->clientType = "pc";
+    d->clientType = QStringLiteral("pc");
 #endif
     if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty()) {
-        d->clientName = QString("%1 %2").arg("Based on QXmpp", QXmppVersion());
+        d->clientName = QStringLiteral("%1 %2").arg(u"Based on QXmpp", QXmppVersion());
     } else {
-        d->clientName = QString("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
+        d->clientName = QStringLiteral("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
     }
 }
 
@@ -311,7 +311,7 @@ bool QXmppDiscoveryManager::handleStanza(const QDomElement &element)
         return true;
     }
 
-    if (element.tagName() == "iq" && QXmppDiscoveryIq::isDiscoveryIq(element)) {
+    if (element.tagName() == u"iq" && QXmppDiscoveryIq::isDiscoveryIq(element)) {
         QXmppDiscoveryIq receivedIq;
         receivedIq.parse(element);
 

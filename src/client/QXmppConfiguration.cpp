@@ -8,6 +8,7 @@
 
 #include <QNetworkProxy>
 #include <QSslSocket>
+#include <QStringBuilder>
 
 class QXmppConfigurationPrivate : public QSharedData
 {
@@ -59,7 +60,19 @@ public:
 };
 
 QXmppConfigurationPrivate::QXmppConfigurationPrivate()
-    : port(5222), resource("QXmpp"), autoAcceptSubscriptions(false), sendIntialPresence(true), sendRosterRequest(true), keepAliveInterval(60), keepAliveTimeout(20), autoReconnectionEnabled(true), useSASLAuthentication(true), useNonSASLAuthentication(true), ignoreSslErrors(false), streamSecurityMode(QXmppConfiguration::TLSEnabled), nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
+    : port(5222),
+      resource(QStringLiteral("QXmpp")),
+      autoAcceptSubscriptions(false),
+      sendIntialPresence(true),
+      sendRosterRequest(true),
+      keepAliveInterval(60),
+      keepAliveTimeout(20),
+      autoReconnectionEnabled(true),
+      useSASLAuthentication(true),
+      useNonSASLAuthentication(true),
+      ignoreSslErrors(false),
+      streamSecurityMode(QXmppConfiguration::TLSEnabled),
+      nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
 {
 }
 
@@ -252,7 +265,7 @@ QString QXmppConfiguration::jid() const
     if (d->user.isEmpty()) {
         return d->domain;
     } else {
-        return jidBare() + "/" + d->resource;
+        return jidBare() % u'/' % d->resource;
     }
 }
 
@@ -267,7 +280,7 @@ QString QXmppConfiguration::jidBare() const
     if (d->user.isEmpty()) {
         return d->domain;
     } else {
-        return d->user + "@" + d->domain;
+        return d->user % u'@' % d->domain;
     }
 }
 

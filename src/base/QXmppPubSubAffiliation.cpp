@@ -158,8 +158,8 @@ void QXmppPubSubAffiliation::parse(const QDomElement &element)
 
 void QXmppPubSubAffiliation::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("affiliation"));
-    writer->writeAttribute(QStringLiteral("affiliation"), PUBSUB_AFFILIATIONS.at(int(d->type)));
+    writer->writeStartElement(QSL65("affiliation"));
+    writer->writeAttribute(QSL65("affiliation"), PUBSUB_AFFILIATIONS.at(int(d->type)));
     writeOptionalXmlAttribute(writer, u"node", d->node);
     writeOptionalXmlAttribute(writer, u"jid", d->jid);
     writer->writeEndElement();

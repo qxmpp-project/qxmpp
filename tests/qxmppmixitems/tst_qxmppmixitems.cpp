@@ -43,9 +43,9 @@ void tst_QXmppMixItem::testInfo()
     QXmppMixInfoItem item;
     parsePacket(item, xml);
 
-    QCOMPARE(item.name(), QString("Witches Coven"));
-    QCOMPARE(item.description(), QString("A location not far from the blasted "
-                                         "heath where the three witches meet"));
+    QCOMPARE(item.name(), QStringLiteral("Witches Coven"));
+    QCOMPARE(item.description(), QStringLiteral("A location not far from the blasted "
+                                                "heath where the three witches meet"));
     QCOMPARE(item.contactJids(), QStringList() << "greymalkin@shakespeare.example"
                                                << "joan@shakespeare.example");
 
@@ -53,9 +53,9 @@ void tst_QXmppMixItem::testInfo()
 
     // test setters
     item.setName("Skynet Development");
-    QCOMPARE(item.name(), QString("Skynet Development"));
+    QCOMPARE(item.name(), QStringLiteral("Skynet Development"));
     item.setDescription("Very cool development group.");
-    QCOMPARE(item.description(), QString("Very cool development group."));
+    QCOMPARE(item.description(), QStringLiteral("Very cool development group."));
     item.setContactJids(QStringList() << "somebody@example.org");
     QCOMPARE(item.contactJids(), QStringList() << "somebody@example.org");
 }
@@ -103,16 +103,16 @@ void tst_QXmppMixItem::testParticipant()
     QXmppMixParticipantItem item;
     parsePacket(item, xml);
 
-    QCOMPARE(item.nick(), QString("thirdwitch"));
-    QCOMPARE(item.jid(), QString("hag66@shakespeare.example"));
+    QCOMPARE(item.nick(), QStringLiteral("thirdwitch"));
+    QCOMPARE(item.jid(), QStringLiteral("hag66@shakespeare.example"));
 
     serializePacket(item, xml);
 
     // test setters
     item.setNick("thomasd");
-    QCOMPARE(item.nick(), QString("thomasd"));
+    QCOMPARE(item.nick(), QStringLiteral("thomasd"));
     item.setJid("thomas@d.example");
-    QCOMPARE(item.jid(), QString("thomas@d.example"));
+    QCOMPARE(item.jid(), QStringLiteral("thomas@d.example"));
 }
 
 void tst_QXmppMixItem::testIsParticipantItem()

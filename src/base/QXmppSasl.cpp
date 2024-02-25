@@ -3,19 +3,18 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppConstants_p.h"
 #include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
-#include <cstdlib>
-
-#include <QByteArray>
 #include <QDomElement>
 #include <QMessageAuthenticationCode>
-#include <QStringList>
+#include <QStringBuilder>
 #include <QUrlQuery>
 #include <QtEndian>
 
-const char *ns_xmpp_sasl = "urn:ietf:params:xml:ns:xmpp-sasl";
+using namespace QXmpp::Private;
 
 static QByteArray forcedNonce;
 
@@ -128,11 +127,15 @@ void QXmppSaslAuth::parse(const QDomElement &element)
 
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("auth"));
-    writer->writeDefaultNamespace(ns_xmpp_sasl);
-    writer->writeAttribute(QStringLiteral("mechanism"), m_mechanism);
+    writer->writeStartElement(QSL65("auth"));
+    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
+    writer->writeAttribute(QSL65("mechanism"), m_mechanism);
     if (!m_value.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(m_value.toBase64());
+#else
+        writer->writeCharacters(QString::fromUtf8(m_value.toBase64()));
+#endif
     }
     writer->writeEndElement();
 }
@@ -159,10 +162,14 @@ void QXmppSaslChallenge::parse(const QDomElement &element)
 
 void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("challenge"));
-    writer->writeDefaultNamespace(ns_xmpp_sasl);
+    writer->writeStartElement(QSL65("challenge"));
+    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
     if (!m_value.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(m_value.toBase64());
+#else
+        writer->writeCharacters(QString::fromUtf8(m_value.toBase64()));
+#endif
     }
     writer->writeEndElement();
 }
@@ -189,8 +196,8 @@ void QXmppSaslFailure::parse(const QDomElement &element)
 
 void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("failure"));
-    writer->writeDefaultNamespace(ns_xmpp_sasl);
+    writer->writeStartElement(QSL65("failure"));
+    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
     if (!m_condition.isEmpty()) {
         writer->writeEmptyElement(m_condition);
     }
@@ -219,10 +226,14 @@ void QXmppSaslResponse::parse(const QDomElement &element)
 
 void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("response"));
-    writer->writeDefaultNamespace(ns_xmpp_sasl);
+    writer->writeStartElement(QSL65("response"));
+    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
     if (!m_value.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(m_value.toBase64());
+#else
+        writer->writeCharacters(QString::fromUtf8(m_value.toBase64()));
+#endif
     }
     writer->writeEndElement();
 }
@@ -238,8 +249,8 @@ void QXmppSaslSuccess::parse(const QDomElement &element)
 
 void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("success"));
-    writer->writeDefaultNamespace(ns_xmpp_sasl);
+    writer->writeStartElement(QSL65("success"));
+    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
     writer->writeEndElement();
 }
 
@@ -286,19 +297,19 @@ QStringList QXmppSaslClient::availableMechanisms()
 ///
 QXmppSaslClient *QXmppSaslClient::create(const QString &mechanism, QObject *parent)
 {
-    if (mechanism == QStringLiteral("PLAIN")) {
+    if (mechanism == u"PLAIN") {
         return new QXmppSaslClientPlain(parent);
-    } else if (mechanism == QStringLiteral("DIGEST-MD5")) {
+    } else if (mechanism == u"DIGEST-MD5") {
         return new QXmppSaslClientDigestMd5(parent);
-    } else if (mechanism == QStringLiteral("ANONYMOUS")) {
+    } else if (mechanism == u"ANONYMOUS") {
         return new QXmppSaslClientAnonymous(parent);
     } else if (SCRAM_ALGORITHMS.contains(mechanism)) {
         return new QXmppSaslClientScram(SCRAM_ALGORITHMS.value(mechanism), parent);
-    } else if (mechanism == QStringLiteral("X-FACEBOOK-PLATFORM")) {
+    } else if (mechanism == u"X-FACEBOOK-PLATFORM") {
         return new QXmppSaslClientFacebook(parent);
-    } else if (mechanism == QStringLiteral("X-MESSENGER-OAUTH2")) {
+    } else if (mechanism == u"X-MESSENGER-OAUTH2") {
         return new QXmppSaslClientWindowsLive(parent);
-    } else if (mechanism == QStringLiteral("X-OAUTH2")) {
+    } else if (mechanism == u"X-OAUTH2") {
         return new QXmppSaslClientGoogle(parent);
     } else {
         return nullptr;
@@ -392,7 +403,7 @@ QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5(QObject *parent)
 
 QString QXmppSaslClientDigestMd5::mechanism() const
 {
-    return "DIGEST-MD5";
+    return QStringLiteral("DIGEST-MD5");
 }
 
 bool QXmppSaslClientDigestMd5::respond(const QByteArray &challenge, QByteArray &response)
@@ -481,7 +492,7 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         return true;
     } else if (m_step == 1) {
         // parse request
-        QUrlQuery requestUrl(challenge);
+        QUrlQuery requestUrl(QString::fromUtf8(challenge));
         if (!requestUrl.hasQueryItem(QStringLiteral("method")) || !requestUrl.hasQueryItem(QStringLiteral("nonce"))) {
             warning(QStringLiteral("QXmppSaslClientFacebook : Invalid challenge, nonce or method missing"));
             return false;
@@ -491,7 +502,7 @@ bool QXmppSaslClientFacebook::respond(const QByteArray &challenge, QByteArray &r
         QUrlQuery responseUrl;
         responseUrl.addQueryItem(QStringLiteral("access_token"), password());
         responseUrl.addQueryItem(QStringLiteral("api_key"), username());
-        responseUrl.addQueryItem(QStringLiteral("call_id"), nullptr);
+        responseUrl.addQueryItem(QStringLiteral("call_id"), QString());
         responseUrl.addQueryItem(QStringLiteral("method"), requestUrl.queryItemValue(QStringLiteral("method")));
         responseUrl.addQueryItem(QStringLiteral("nonce"), requestUrl.queryItemValue(QStringLiteral("nonce")));
         responseUrl.addQueryItem(QStringLiteral("v"), QStringLiteral("1.0"));
@@ -521,7 +532,7 @@ bool QXmppSaslClientGoogle::respond(const QByteArray &challenge, QByteArray &res
     Q_UNUSED(challenge);
     if (m_step == 0) {
         // send initial response
-        response = QString('\0' + username() + '\0' + password()).toUtf8();
+        response = QString(u'\0' % username() % u'\0' % password()).toUtf8();
         m_step++;
         return true;
     } else {
@@ -544,7 +555,7 @@ bool QXmppSaslClientPlain::respond(const QByteArray &challenge, QByteArray &resp
 {
     Q_UNUSED(challenge);
     if (m_step == 0) {
-        response = QString('\0' + username() + '\0' + password()).toUtf8();
+        response = QString(u'\0' % username() % u'\0' % password()).toUtf8();
         m_step++;
         return true;
     } else {

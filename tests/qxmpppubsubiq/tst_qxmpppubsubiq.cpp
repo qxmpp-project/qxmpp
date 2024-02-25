@@ -117,7 +117,7 @@ void tst_QXmppPubSubIq::testCreateNode()
 
     PubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QString("create1"));
+    QCOMPARE(iq.id(), QStringLiteral("create1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
@@ -147,7 +147,7 @@ void tst_QXmppPubSubIq::testDeleteNode()
 
     PubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QString("delete1"));
+    QCOMPARE(iq.id(), QStringLiteral("delete1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
@@ -225,7 +225,7 @@ void tst_QXmppPubSubIq::testRetractItem()
 
     PubSubIq<> iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QString("retract1"));
+    QCOMPARE(iq.id(), QStringLiteral("retract1"));
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
@@ -294,13 +294,13 @@ void tst_QXmppPubSubIq::testSubscription()
 
     PubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QString("sub1"));
-    QCOMPARE(iq.to(), QString("francisco@denmark.lit/barracks"));
-    QCOMPARE(iq.from(), QString("pubsub.shakespeare.lit"));
+    QCOMPARE(iq.id(), QStringLiteral("sub1"));
+    QCOMPARE(iq.to(), QStringLiteral("francisco@denmark.lit/barracks"));
+    QCOMPARE(iq.from(), QStringLiteral("pubsub.shakespeare.lit"));
     QCOMPARE(iq.type(), QXmppIq::Result);
     QCOMPARE(iq.queryType(), PubSubIq<>::Subscription);
-    QCOMPARE(iq.subscription()->jid(), QString("francisco@denmark.lit"));
-    QCOMPARE(iq.subscription()->node(), QString("princely_musings"));
+    QCOMPARE(iq.subscription()->jid(), QStringLiteral("francisco@denmark.lit"));
+    QCOMPARE(iq.subscription()->node(), QStringLiteral("princely_musings"));
     QCOMPARE(iq.subscription()->subId(), QStringLiteral("ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
     serializePacket(iq, xml);
 

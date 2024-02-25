@@ -25,6 +25,7 @@ inline constexpr QStringView ns_roster = u"jabber:iq:roster";
 inline constexpr QStringView ns_tls = u"urn:ietf:params:xml:ns:xmpp-tls";
 inline constexpr QStringView ns_sasl = u"urn:ietf:params:xml:ns:xmpp-sasl";
 inline constexpr QStringView ns_bind = u"urn:ietf:params:xml:ns:xmpp-bind";
+inline constexpr QStringView ns_xmpp_sasl = u"urn:ietf:params:xml:ns:xmpp-sasl";
 inline constexpr QStringView ns_session = u"urn:ietf:params:xml:ns:xmpp-session";
 inline constexpr QStringView ns_stanza = u"urn:ietf:params:xml:ns:xmpp-stanzas";
 inline constexpr QStringView ns_pre_approval = u"urn:xmpp:features:pre-approval";
@@ -47,6 +48,8 @@ inline constexpr QStringView ns_muc_owner = u"http://jabber.org/protocol/muc#own
 inline constexpr QStringView ns_muc_user = u"http://jabber.org/protocol/muc#user";
 // XEP-0047: In-Band Bytestreams
 inline constexpr QStringView ns_ibb = u"http://jabber.org/protocol/ibb";
+// XEP-0048: Bookmarks
+inline constexpr QStringView ns_bookmarks = u"storage:bookmarks";
 // XEP-0049: Private XML Storage
 inline constexpr QStringView ns_private = u"jabber:iq:private";
 // XEP-0054: vcard-temp

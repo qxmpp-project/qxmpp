@@ -55,7 +55,7 @@ void tst_QXmppUserLocationManager::testRequest()
     QCoreApplication::processEvents();
 
     auto item = expectFutureVariant<QXmppGeolocItem>(future);
-    QCOMPARE(item.id(), QString("abc3"));
+    QCOMPARE(item.id(), QStringLiteral("abc3"));
     COMPARE_OPT(item.accuracy(), 20.0);
     COMPARE_OPT(item.longitude(), 12.33);
     COMPARE_OPT(item.latitude(), 45.44);
@@ -97,7 +97,7 @@ void tst_QXmppUserLocationManager::testPublish()
                          "<item id='some-id'/>"
                          "</publish></pubsub></iq>");
 
-    QCOMPARE(expectFutureVariant<QString>(future), QString("some-id"));
+    QCOMPARE(expectFutureVariant<QString>(future), QStringLiteral("some-id"));
 }
 
 void tst_QXmppUserLocationManager::testEvents()
@@ -124,9 +124,9 @@ void tst_QXmppUserLocationManager::testEvents()
     psManager->handleStanza(xmlToDom(event));
 
     QCOMPARE(spy.count(), 1);
-    QCOMPARE(spy.constFirst().at(0).toString(), QString("stpeter@jabber.org"));
-    QCOMPARE(spy.constFirst().at(1).value<QXmppGeolocItem>().id(), QString("bffe6584-0f9c-11dc-84ba-001143d5d5db"));
-    QCOMPARE(spy.constFirst().at(1).value<QXmppGeolocItem>().country(), QString("Italy"));
+    QCOMPARE(spy.constFirst().at(0).toString(), QStringLiteral("stpeter@jabber.org"));
+    QCOMPARE(spy.constFirst().at(1).value<QXmppGeolocItem>().id(), QStringLiteral("bffe6584-0f9c-11dc-84ba-001143d5d5db"));
+    QCOMPARE(spy.constFirst().at(1).value<QXmppGeolocItem>().country(), QStringLiteral("Italy"));
 }
 
 QTEST_MAIN(tst_QXmppUserLocationManager)

@@ -30,7 +30,7 @@ static QVector<QString> parseItems(const QDomElement &el)
 {
     QVector<QString> jids;
     for (const auto &item : iterChildElements(el, u"item")) {
-        jids.append(item.attribute("jid"));
+        jids.append(item.attribute(QStringLiteral("jid")));
     }
     return jids;
 }
@@ -38,8 +38,8 @@ static QVector<QString> parseItems(const QDomElement &el)
 static void serializeItems(QXmlStreamWriter *writer, const QVector<QString> &jids)
 {
     for (const auto &jid : jids) {
-        writer->writeStartElement("item");
-        writer->writeAttribute("jid", jid);
+        writer->writeStartElement(QSL65("item"));
+        writer->writeAttribute(QSL65("jid"), jid);
         writer->writeEndElement();
     }
 }
@@ -56,7 +56,7 @@ public:
     }
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
-        writer->writeStartElement("blocklist");
+        writer->writeStartElement(QSL65("blocklist"));
         writer->writeDefaultNamespace(XMLNS_BLOCKING.toString());
         serializeItems(writer, jids);
         writer->writeEndElement();
@@ -83,7 +83,7 @@ public:
     }
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
-        writer->writeStartElement(QStringLiteral("block"));
+        writer->writeStartElement(QSL65("block"));
         writer->writeDefaultNamespace(XMLNS_BLOCKING.toString());
         serializeItems(writer, jids);
         writer->writeEndElement();
@@ -111,7 +111,7 @@ public:
 
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
-        writer->writeStartElement(QStringLiteral("unblock"));
+        writer->writeStartElement(QSL65("unblock"));
         writer->writeDefaultNamespace(XMLNS_BLOCKING.toString());
         serializeItems(writer, jids);
         writer->writeEndElement();

@@ -31,7 +31,7 @@ public:
     }
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
-        writer->writeStartElement(QStringLiteral("enable"));
+        writer->writeStartElement(QSL65("enable"));
         writer->writeDefaultNamespace(toString65(ns_carbons));
         writer->writeEndElement();
     }
@@ -102,8 +102,8 @@ bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::o
     // carbon copies must always come from our bare JID
     auto from = element.attribute(QStringLiteral("from"));
     if (from != client()->configuration().jidBare()) {
-        info("Received carbon copy from attacker or buggy client '" % from %
-             "' trying to use CVE-2017-5603.");
+        info(u"Received carbon copy from attacker or buggy client '" % from %
+             u"' trying to use CVE-2017-5603.");
         return false;
     }
 
@@ -140,9 +140,9 @@ void QXmppCarbonManagerV2::enableCarbons()
 
     client()->sendIq(CarbonEnableIq()).then(this, [this](QXmppClient::IqResult domResult) {
         if (auto err = parseIq(std::move(domResult))) {
-            warning("Could not enable message carbons: " % err->description);
+            warning(u"Could not enable message carbons: " % err->description);
         } else {
-            info("Message Carbons enabled.");
+            info(QStringLiteral("Message Carbons enabled."));
         }
     });
 }

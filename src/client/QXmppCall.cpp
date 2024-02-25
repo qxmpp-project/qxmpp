@@ -89,7 +89,7 @@ void QXmppCallPrivate::ssrcActive(uint sessionId, uint ssrc)
 
 void QXmppCallPrivate::padAdded(GstPad *pad)
 {
-    auto nameParts = QString(gst_pad_get_name(pad)).split("_");
+    auto nameParts = QString::fromUtf8(gst_pad_get_name(pad)).split(u'_');
     if (nameParts.size() < 4) {
         return;
     }
@@ -141,7 +141,7 @@ GstCaps *QXmppCallPrivate::ptMap(uint sessionId, uint pt)
                                        nullptr);
         }
     }
-    q->warning(QString("Remote party %1 transmits wrong %2 payload for call %3").arg(jid, stream->media(), sid));
+    q->warning(QStringLiteral("Remote party %1 transmits wrong %2 payload for call %3").arg(jid, stream->media(), sid));
     return nullptr;
 }
 
@@ -209,7 +209,7 @@ void QXmppCallPrivate::handleAck(const QXmppIq &ack)
         if (id == requests[i].id()) {
             // process acknowledgement
             const QXmppJingleIq request = requests.takeAt(i);
-            q->debug(QString("Received ACK for packet %1").arg(id));
+            q->debug(QStringLiteral("Received ACK for packet %1").arg(id));
 
             // handle termination
             if (request.action() == QXmppJingleIq::SessionTerminate) {
@@ -265,7 +265,7 @@ bool QXmppCallPrivate::handleDescription(QXmppCallStream *stream, const QXmppJin
     }
 
     if (stream->d->payloadTypes.empty()) {
-        q->warning(QString("Remote party %1 did not provide any known %2 payloads for call %3").arg(jid, stream->media(), sid));
+        q->warning(QStringLiteral("Remote party %1 did not provide any known %2 payloads for call %3").arg(jid, stream->media(), sid));
         return false;
     }
 
@@ -295,7 +295,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
     if (iq.action() == QXmppJingleIq::SessionAccept) {
 
         if (direction == QXmppCall::IncomingDirection) {
-            q->warning("Ignoring Session-Accept for an incoming call");
+            q->warning(QStringLiteral("Ignoring Session-Accept for an incoming call"));
             return;
         }
 
@@ -327,7 +327,7 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
         sendAck(iq);
 
         // terminate
-        q->info(QString("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
+        q->info(QStringLiteral("Remote party %1 terminated call %2").arg(iq.from(), iq.sid()));
         q->terminated();
 
     } else if (iq.action() == QXmppJingleIq::ContentAccept) {
@@ -408,12 +408,12 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
     Q_ASSERT(manager);
 
     if (media != AUDIO_MEDIA && media != VIDEO_MEDIA) {
-        q->warning(QString("Unsupported media type %1").arg(media));
+        q->warning(QStringLiteral("Unsupported media type %1").arg(media));
         return nullptr;
     }
 
-    if (!isFormatSupported("rtpbin")) {
-        q->warning("The rtpbin GStreamer plugin is missing. Calls are not possible.");
+    if (!isFormatSupported(QStringLiteral("rtpbin"))) {
+        q->warning(QStringLiteral("The rtpbin GStreamer plugin is missing. Calls are not possible."));
         return nullptr;
     }
 
@@ -455,7 +455,7 @@ QXmppJingleIq::Content QXmppCallPrivate::localContent(QXmppCallStream *stream) c
     QXmppJingleIq::Content content;
     content.setCreator(stream->creator());
     content.setName(stream->name());
-    content.setSenders("both");
+    content.setSenders(QStringLiteral("both"));
 
     // description
     content.setDescriptionMedia(stream->media());
@@ -712,7 +712,7 @@ QXmppCall::State QXmppCall::state() const
 void QXmppCall::addVideo()
 {
     if (d->state != QXmppCall::ActiveState) {
-        warning("Cannot add video, call is not active");
+        warning(QStringLiteral("Cannot add video, call is not active"));
         return;
     }
 

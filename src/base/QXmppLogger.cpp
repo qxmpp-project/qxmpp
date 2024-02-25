@@ -11,33 +11,32 @@
 #include <QDateTime>
 #include <QFile>
 #include <QMetaType>
+#include <QStringBuilder>
 #include <QTextStream>
 
 QXmppLogger *QXmppLogger::m_logger = nullptr;
 
-static const char *typeName(QXmppLogger::MessageType type)
+static QStringView typeName(QXmppLogger::MessageType type)
 {
     switch (type) {
     case QXmppLogger::DebugMessage:
-        return "DEBUG";
+        return u"DEBUG";
     case QXmppLogger::InformationMessage:
-        return "INFO";
+        return u"INFO";
     case QXmppLogger::WarningMessage:
-        return "WARNING";
+        return u"WARNING";
     case QXmppLogger::ReceivedMessage:
-        return "RECEIVED";
+        return u"RECEIVED";
     case QXmppLogger::SentMessage:
-        return "SENT";
+        return u"SENT";
     default:
-        return "";
+        return {};
     }
 }
 
 static QString formatted(QXmppLogger::MessageType type, const QString &text)
 {
-    return QDateTime::currentDateTime().toString() + " " +
-        QString::fromLatin1(typeName(type)) + " " +
-        text;
+    return QDateTime::currentDateTime().toString() % u' ' % typeName(type) % u' ' % text;
 }
 
 static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)
@@ -96,7 +95,10 @@ public:
 };
 
 QXmppLoggerPrivate::QXmppLoggerPrivate()
-    : loggingType(QXmppLogger::NoLogging), logFile(nullptr), logFilePath("QXmppClientLog.log"), messageTypes(QXmppLogger::AnyMessage)
+    : loggingType(QXmppLogger::NoLogging),
+      logFile(nullptr),
+      logFilePath(QStringLiteral("QXmppClientLog.log")),
+      messageTypes(QXmppLogger::AnyMessage)
 {
 }
 

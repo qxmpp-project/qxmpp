@@ -346,7 +346,7 @@ void tst_QXmppPubSubManager::testCreateInstantNode()
                                "</pubsub></iq>"));
 
     const auto nodeId = expectFutureVariant<QString>(future);
-    QCOMPARE(nodeId, QString("25e3d37dabbab9541f7523321421edc5bfeb2dae"));
+    QCOMPARE(nodeId, QStringLiteral("25e3d37dabbab9541f7523321421edc5bfeb2dae"));
 }
 
 void tst_QXmppPubSubManager::testCreateInstantNodeWithConfig()
@@ -974,10 +974,10 @@ void tst_QXmppPubSubManager::testRequestNodeAffiliations()
 
     QCOMPARE(affiliations.size(), 2);
     QCOMPARE(affiliations[0].node(), QString());
-    QCOMPARE(affiliations[0].jid(), QString("hamlet@denmark.lit"));
+    QCOMPARE(affiliations[0].jid(), QStringLiteral("hamlet@denmark.lit"));
     QCOMPARE(affiliations[0].type(), AffiliationType::Owner);
     QCOMPARE(affiliations[1].node(), QString());
-    QCOMPARE(affiliations[1].jid(), QString("polonius@denmark.lit"));
+    QCOMPARE(affiliations[1].jid(), QStringLiteral("polonius@denmark.lit"));
     QCOMPARE(affiliations[1].type(), AffiliationType::Outcast);
 }
 
@@ -997,7 +997,7 @@ void tst_QXmppPubSubManager::testRequestAffiliations()
 
     const auto affiliations = expectFutureVariant<QVector<Affiliation>>(future);
     QCOMPARE(affiliations.size(), 4);
-    QCOMPARE(affiliations[3].node(), QString("node6"));
+    QCOMPARE(affiliations[3].node(), QStringLiteral("node6"));
     QCOMPARE(affiliations[3].jid(), QString());
     QCOMPARE(affiliations[3].type(), AffiliationType::Owner);
 }
@@ -1015,7 +1015,7 @@ void tst_QXmppPubSubManager::testRequestAffiliationsNode()
 
     const auto affiliations = expectFutureVariant<QVector<Affiliation>>(future);
     QCOMPARE(affiliations.size(), 1);
-    QCOMPARE(affiliations[0].node(), QString("node6"));
+    QCOMPARE(affiliations[0].node(), QStringLiteral("node6"));
     QCOMPARE(affiliations[0].jid(), QString());
     QCOMPARE(affiliations[0].type(), AffiliationType::Owner);
 }

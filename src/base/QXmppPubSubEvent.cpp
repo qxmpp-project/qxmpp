@@ -370,7 +370,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
         return;
     }
 
-    writer->writeStartElement(QStringLiteral("event"));
+    writer->writeStartElement(QSL65("event"));
     writer->writeDefaultNamespace(toString65(ns_pubsub_event));
 
     if (d->eventType == Subscription && d->subscription) {
@@ -385,7 +385,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
         case Retract:
         case Purge:
             // node attribute is required
-            writer->writeAttribute(QStringLiteral("node"), d->node);
+            writer->writeAttribute(QSL65("node"), d->node);
             break;
         case Configuration:
             // node attribute is optional
@@ -403,8 +403,8 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
             break;
         case Delete:
             if (!d->redirectUri.isEmpty()) {
-                writer->writeStartElement(QStringLiteral("redirect"));
-                writer->writeAttribute(QStringLiteral("uri"), d->redirectUri);
+                writer->writeStartElement(QSL65("redirect"));
+                writer->writeAttribute(QSL65("uri"), d->redirectUri);
                 writer->writeEndElement();
             }
         case Items:
@@ -415,8 +415,8 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
         case Retract:
             // serialize retract ids
             for (const auto &id : std::as_const(d->retractIds)) {
-                writer->writeStartElement(QStringLiteral("retract"));
-                writer->writeAttribute(QStringLiteral("id"), id);
+                writer->writeStartElement(QSL65("retract"));
+                writer->writeAttribute(QSL65("id"), id);
                 writer->writeEndElement();
             }
 

@@ -19,7 +19,7 @@ QStringList QXmppArchiveManager::discoveryFeatures() const
 
 bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "iq") {
+    if (element.tagName() != u"iq") {
         return false;
     }
 

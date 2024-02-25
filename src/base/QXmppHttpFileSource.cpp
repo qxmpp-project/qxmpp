@@ -50,8 +50,8 @@ void QXmppHttpFileSource::setUrl(QUrl url)
 /// \cond
 bool QXmppHttpFileSource::parse(const QDomElement &el)
 {
-    if (el.tagName() == "url-data" && el.namespaceURI() == ns_url_data) {
-        m_url = QUrl(el.attribute("target"));
+    if (el.tagName() == u"url-data" && el.namespaceURI() == ns_url_data) {
+        m_url = QUrl(el.attribute(QStringLiteral("target")));
         return true;
     }
     return false;
@@ -59,9 +59,9 @@ bool QXmppHttpFileSource::parse(const QDomElement &el)
 
 void QXmppHttpFileSource::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("url-data");
+    writer->writeStartElement(QSL65("url-data"));
     writer->writeDefaultNamespace(toString65(ns_url_data));
-    writer->writeAttribute("target", m_url.toString());
+    writer->writeAttribute(QSL65("target"), m_url.toString());
     writer->writeEndElement();
 }
 /// \endcond

@@ -64,14 +64,14 @@ bool QXmppEntityTimeIq::checkIqType(const QString &tagName, const QString &xmlns
 
 void QXmppEntityTimeIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement timeElement = element.firstChildElement("time");
-    m_tzo = QXmppUtils::timezoneOffsetFromString(timeElement.firstChildElement("tzo").text());
-    m_utc = QXmppUtils::datetimeFromString(timeElement.firstChildElement("utc").text());
+    QDomElement timeElement = firstChildElement(element, u"time");
+    m_tzo = QXmppUtils::timezoneOffsetFromString(firstChildElement(timeElement, u"tzo").text());
+    m_utc = QXmppUtils::datetimeFromString(firstChildElement(timeElement, u"utc").text());
 }
 
 void QXmppEntityTimeIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("time");
+    writer->writeStartElement(QSL65("time"));
     writer->writeDefaultNamespace(toString65(ns_entity_time));
 
     if (m_utc.isValid()) {

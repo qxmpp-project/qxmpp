@@ -200,7 +200,7 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
         return true;
     }
 
-    if (stanza.tagName() == "iq") {
+    if (stanza.tagName() == u"iq") {
         const QString &id = stanza.attribute(QStringLiteral("id"));
 
         if (!id.isEmpty() && id == d->registrationIqId) {

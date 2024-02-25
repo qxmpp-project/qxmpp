@@ -37,8 +37,8 @@ using IqDecryptResult = QXmppE2eeExtension::IqDecryptResult;
 
 static bool isIqResponse(const QDomElement &el)
 {
-    auto type = el.attribute("type");
-    return el.tagName() == "iq" && (type == "result" || type == "error");
+    auto type = el.attribute(QStringLiteral("type"));
+    return el.tagName() == u"iq" && (type == u"result" || type == u"error");
 }
 
 /// \cond
@@ -59,7 +59,7 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence &presence)
 {
     auto *ext = q->findExtension<QXmppDiscoveryManager>();
     if (ext) {
-        presence.setCapabilityHash("sha-1");
+        presence.setCapabilityHash(QStringLiteral("sha-1"));
         presence.setCapabilityNode(ext->clientCapabilitiesNode());
         presence.setCapabilityVer(ext->capabilities().verificationString());
     }
@@ -154,7 +154,7 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
 
 bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extensions, QXmppE2eeExtension *e2eeExt, const QDomElement &element)
 {
-    if (element.tagName() != "message") {
+    if (element.tagName() != u"message") {
         return false;
     }
     QXmppMessage message;
@@ -643,7 +643,7 @@ void QXmppClient::disconnectFromServer()
     d->reconnectionTimer->stop();
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
-    d->clientPresence.setStatusText("Logged out");
+    d->clientPresence.setStatusText(QStringLiteral("Logged out"));
     if (d->stream->isConnected()) {
         sendPacket(d->clientPresence);
     }
@@ -690,8 +690,8 @@ void QXmppClient::setActive(bool active)
 {
     if (active != d->isActive && isConnected() && d->stream->isClientStateIndicationEnabled()) {
         d->isActive = active;
-        QString packet = "<%1 xmlns='%2'/>";
-        d->stream->sendData(packet.arg(active ? "active" : "inactive", ns_csi).toUtf8());
+        QStringView packet = u"<%1 xmlns='%2'/>";
+        d->stream->sendData(packet.arg(active ? u"active" : u"inactive", ns_csi).toUtf8());
     }
 }
 
@@ -863,18 +863,18 @@ QXmppVersionManager &QXmppClient::versionManager()
 
 void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)
 {
-    if (element.tagName() != "iq") {
+    if (element.tagName() != u"iq") {
         return;
     }
     if (!StanzaPipeline::process(d->extensions, element, e2eeMetadata)) {
-        const auto iqType = element.attribute("type");
-        if (iqType == "get" || iqType == "set") {
+        const auto iqType = element.attribute(QStringLiteral("type"));
+        if (iqType == u"get" || iqType == u"set") {
             // send error IQ
             using Err = QXmppStanza::Error;
 
             QXmppIq iq(QXmppIq::Error);
-            iq.setTo(element.attribute("from"));
-            iq.setId(element.attribute("id"));
+            iq.setTo(element.attribute(QStringLiteral("from")));
+            iq.setId(element.attribute(QStringLiteral("id")));
             const auto errMessage = e2eeMetadata.has_value()
                 ? QStringLiteral("Feature not implemented or not supported with end-to-end encryption.")
                 : QStringLiteral("Feature not implemented.");
@@ -912,7 +912,7 @@ void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 void QXmppClient::_q_reconnect()
 {
     if (d->stream->configuration().autoReconnectionEnabled()) {
-        debug("Reconnecting to server");
+        debug(QStringLiteral("Reconnecting to server"));
         d->stream->connectToHost();
     }
 }
