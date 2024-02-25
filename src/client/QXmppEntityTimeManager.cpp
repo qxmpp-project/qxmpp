@@ -76,7 +76,7 @@ bool QXmppEntityTimeManager::handleStanza(const QDomElement &element)
         return true;
     }
 
-    if (element.tagName() == "iq" && QXmppEntityTimeIq::isEntityTimeIq(element)) {
+    if (element.tagName() == u"iq" && QXmppEntityTimeIq::isEntityTimeIq(element)) {
         QXmppEntityTimeIq entityTime;
         entityTime.parse(element);
         Q_EMIT timeReceived(entityTime);

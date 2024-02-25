@@ -191,13 +191,13 @@ void tst_QXmppRosterIq::testMixChannel()
     QXmppRosterIq::Item item;
     parsePacket(item, xml);
     QCOMPARE(item.isMixChannel(), true);
-    QCOMPARE(item.mixParticipantId(), QString("123456"));
+    QCOMPARE(item.mixParticipantId(), QStringLiteral("123456"));
     serializePacket(item, xml);
 
     item.setIsMixChannel(false);
     QCOMPARE(item.isMixChannel(), false);
     item.setMixParticipantId("23a7n");
-    QCOMPARE(item.mixParticipantId(), QString("23a7n"));
+    QCOMPARE(item.mixParticipantId(), QStringLiteral("23a7n"));
 }
 
 QTEST_MAIN(tst_QXmppRosterIq)

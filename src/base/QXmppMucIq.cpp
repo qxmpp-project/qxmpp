@@ -74,15 +74,15 @@ QString QXmppMucItem::affiliationToString(Affiliation affiliation)
 {
     switch (affiliation) {
     case QXmppMucItem::OwnerAffiliation:
-        return "owner";
+        return QStringLiteral("owner");
     case QXmppMucItem::AdminAffiliation:
-        return "admin";
+        return QStringLiteral("admin");
     case QXmppMucItem::MemberAffiliation:
-        return "member";
+        return QStringLiteral("member");
     case QXmppMucItem::OutcastAffiliation:
-        return "outcast";
+        return QStringLiteral("outcast");
     case QXmppMucItem::NoAffiliation:
-        return "none";
+        return QStringLiteral("none");
     default:
         return QString();
     }
@@ -202,19 +202,19 @@ void QXmppMucItem::parse(const QDomElement &element)
     m_jid = element.attribute(QStringLiteral("jid"));
     m_nick = element.attribute(QStringLiteral("nick"));
     m_role = QXmppMucItem::roleFromString(element.attribute(QStringLiteral("role")).toLower());
-    m_actor = element.firstChildElement(QStringLiteral("actor")).attribute("jid");
+    m_actor = element.firstChildElement(QStringLiteral("actor")).attribute(QStringLiteral("jid"));
     m_reason = element.firstChildElement(QStringLiteral("reason")).text();
 }
 
 void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("item"));
+    writer->writeStartElement(QSL65("item"));
     writeOptionalXmlAttribute(writer, u"affiliation", affiliationToString(m_affiliation));
     writeOptionalXmlAttribute(writer, u"jid", m_jid);
     writeOptionalXmlAttribute(writer, u"nick", m_nick);
     writeOptionalXmlAttribute(writer, u"role", roleToString(m_role));
     if (!m_actor.isEmpty()) {
-        writer->writeStartElement(QStringLiteral("actor"));
+        writer->writeStartElement(QSL65("actor"));
         writeOptionalXmlAttribute(writer, u"jid", m_actor);
         writer->writeEndElement();
     }
@@ -260,7 +260,7 @@ void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_muc_admin));
     for (const QXmppMucItem &item : m_items) {
         item.toXml(writer);
@@ -300,7 +300,7 @@ void QXmppMucOwnerIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMucOwnerIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_muc_owner));
     m_form.toXml(writer);
     writer->writeEndElement();

@@ -70,7 +70,7 @@ bool QXmppVersionIq::isVersionIq(const QDomElement &element)
 
 bool QXmppVersionIq::checkIqType(const QString &tagName, const QString &xmlNamespace)
 {
-    return tagName == "query" && xmlNamespace == ns_version;
+    return tagName == u"query" && xmlNamespace == ns_version;
 }
 
 void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
@@ -83,7 +83,7 @@ void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_version));
 
     if (!m_name.isEmpty()) {

@@ -48,7 +48,7 @@ public:
 
     bool handleStanza(const QDomElement &stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata) override
     {
-        if (stanza.tagName() == "iq" && QXmppBitsOfBinaryIq::isBitsOfBinaryIq(stanza)) {
+        if (stanza.tagName() == u"iq" && QXmppBitsOfBinaryIq::isBitsOfBinaryIq(stanza)) {
             QXmppBitsOfBinaryIq iq;
             iq.parse(stanza);
 

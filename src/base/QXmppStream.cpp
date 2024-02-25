@@ -339,7 +339,7 @@ void QXmppStream::_q_socketConnected()
 
 void QXmppStream::_q_socketEncrypted()
 {
-    debug("Socket encrypted");
+    debug(QStringLiteral("Socket encrypted"));
     handleStart();
 }
 
@@ -383,8 +383,8 @@ void QXmppStream::processData(const QString &data)
     //
     // Check whether we received a stream open or closing tag
     //
-    static const QRegularExpression streamStartRegex(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)");
-    static const QRegularExpression streamEndRegex("</stream:stream>$");
+    static const QRegularExpression streamStartRegex(QStringLiteral(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)"));
+    static const QRegularExpression streamEndRegex(QStringLiteral("</stream:stream>$"));
 
     QRegularExpressionMatch streamOpenMatch;
     bool hasStreamOpen = d->streamOpenElement.isEmpty() &&
@@ -482,7 +482,7 @@ bool QXmppStream::handleIqResponse(const QDomElement &stanza)
         // attribute or have it set to the user's bare JID.
         // If 'from' is empty, the IQ has been sent by the server. In this case we don't need to
         // do the check as we trust the server anyways.
-        if (const auto from = stanza.attribute("from"); !from.isEmpty() && from != expectedFrom) {
+        if (const auto from = stanza.attribute(QStringLiteral("from")); !from.isEmpty() && from != expectedFrom) {
             warning(QStringLiteral("Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'")
                         .arg(id, from, expectedFrom));
             return false;

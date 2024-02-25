@@ -28,7 +28,7 @@ QXmppVersionManager::QXmppVersionManager()
 {
     d->clientName = qApp->applicationName();
     if (d->clientName.isEmpty()) {
-        d->clientName = "Based on QXmpp";
+        d->clientName = QStringLiteral("Based on QXmpp");
     }
 
     d->clientOs = QSysInfo::prettyProductName();
@@ -128,7 +128,7 @@ bool QXmppVersionManager::handleStanza(const QDomElement &element)
         return true;
     }
 
-    if (element.tagName() == "iq" && QXmppVersionIq::isVersionIq(element)) {
+    if (element.tagName() == u"iq" && QXmppVersionIq::isVersionIq(element)) {
         QXmppVersionIq versionIq;
         versionIq.parse(element);
 

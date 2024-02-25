@@ -177,9 +177,9 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         }
 
         if (d->actionType == ClientJoin) {
-            writer->writeStartElement(QStringLiteral("join"));
+            writer->writeStartElement(QSL65("join"));
         } else if (d->actionType == ClientLeave) {
-            writer->writeStartElement(QStringLiteral("leave"));
+            writer->writeStartElement(QSL65("leave"));
         }
     }
 
@@ -190,12 +190,12 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
 
     for (const auto &node : d->nodes) {
-        writer->writeStartElement(QStringLiteral("subscribe"));
-        writer->writeAttribute(QStringLiteral("node"), node);
+        writer->writeStartElement(QSL65("subscribe"));
+        writer->writeAttribute(QSL65("node"), node);
         writer->writeEndElement();
     }
     if (!d->nick.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("nick"), d->nick);
+        writer->writeTextElement(QSL65("nick"), d->nick);
     }
 
     writer->writeEndElement();

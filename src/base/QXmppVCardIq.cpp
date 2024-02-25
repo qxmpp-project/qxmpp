@@ -188,7 +188,7 @@ void QXmppVCardAddress::parse(const QDomElement &element)
 
 void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("ADR"));
+    writer->writeStartElement(QSL65("ADR"));
     if (d->type & Home) {
         writer->writeEmptyElement(QStringLiteral("HOME"));
     }
@@ -203,19 +203,19 @@ void QXmppVCardAddress::toXml(QXmlStreamWriter *writer) const
     }
 
     if (!d->country.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("CTRY"), d->country);
+        writer->writeTextElement(QSL65("CTRY"), d->country);
     }
     if (!d->locality.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("LOCALITY"), d->locality);
+        writer->writeTextElement(QSL65("LOCALITY"), d->locality);
     }
     if (!d->postcode.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("PCODE"), d->postcode);
+        writer->writeTextElement(QSL65("PCODE"), d->postcode);
     }
     if (!d->region.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("REGION"), d->region);
+        writer->writeTextElement(QSL65("REGION"), d->region);
     }
     if (!d->street.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("STREET"), d->street);
+        writer->writeTextElement(QSL65("STREET"), d->street);
     }
 
     writer->writeEndElement();
@@ -322,7 +322,7 @@ void QXmppVCardEmail::parse(const QDomElement &element)
 
 void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("EMAIL"));
+    writer->writeStartElement(QSL65("EMAIL"));
     if (d->type & Home) {
         writer->writeEmptyElement(QStringLiteral("HOME"));
     }
@@ -338,7 +338,7 @@ void QXmppVCardEmail::toXml(QXmlStreamWriter *writer) const
     if (d->type & X400) {
         writer->writeEmptyElement(QStringLiteral("X400"));
     }
-    writer->writeTextElement(QStringLiteral("USERID"), d->address);
+    writer->writeTextElement(QSL65("USERID"), d->address);
     writer->writeEndElement();
 }
 /// \endcond
@@ -467,7 +467,7 @@ void QXmppVCardPhone::parse(const QDomElement &element)
 
 void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("TEL"));
+    writer->writeStartElement(QSL65("TEL"));
     if (d->type & Home) {
         writer->writeEmptyElement(QStringLiteral("HOME"));
     }
@@ -507,7 +507,7 @@ void QXmppVCardPhone::toXml(QXmlStreamWriter *writer) const
     if (d->type & Preferred) {
         writer->writeEmptyElement(QStringLiteral("PREF"));
     }
-    writer->writeTextElement(QStringLiteral("NUMBER"), d->number);
+    writer->writeTextElement(QSL65("NUMBER"), d->number);
     writer->writeEndElement();
 }
 /// \endcond
@@ -634,9 +634,9 @@ void QXmppVCardOrganization::parse(const QDomElement &cardElem)
 void QXmppVCardOrganization::toXml(QXmlStreamWriter *stream) const
 {
     if (!d->unit.isEmpty() || !d->organization.isEmpty()) {
-        stream->writeStartElement(QStringLiteral("ORG"));
-        stream->writeTextElement(QStringLiteral("ORGNAME"), d->organization);
-        stream->writeTextElement(QStringLiteral("ORGUNIT"), d->unit);
+        stream->writeStartElement(QSL65("ORG"));
+        stream->writeTextElement(QSL65("ORGNAME"), d->organization);
+        stream->writeTextElement(QSL65("ORGUNIT"), d->unit);
         stream->writeEndElement();
     }
 
@@ -988,7 +988,7 @@ bool QXmppVCardIq::isVCard(const QDomElement &el)
 
 bool QXmppVCardIq::checkIqType(const QString &tagName, const QString &xmlNamespace)
 {
-    return tagName == "vCard" && xmlNamespace == ns_vcard;
+    return tagName == u"vCard" && xmlNamespace == ns_vcard;
 }
 
 void QXmppVCardIq::parseElementFromChild(const QDomElement &nodeRecv)
@@ -1030,7 +1030,7 @@ void QXmppVCardIq::parseElementFromChild(const QDomElement &nodeRecv)
 
 void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("vCard"));
+    writer->writeStartElement(QSL65("vCard"));
     writer->writeDefaultNamespace(toString65(ns_vcard));
     for (const QXmppVCardAddress &address : d->addresses) {
         address.toXml(writer);
@@ -1053,7 +1053,7 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!d->firstName.isEmpty() ||
         !d->lastName.isEmpty() ||
         !d->middleName.isEmpty()) {
-        writer->writeStartElement("N");
+        writer->writeStartElement(QSL65("N"));
         if (!d->firstName.isEmpty()) {
             writeXmlTextElement(writer, u"GIVEN", d->firstName);
         }
@@ -1070,7 +1070,7 @@ void QXmppVCardIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         phone.toXml(writer);
     }
     if (!photo().isEmpty()) {
-        writer->writeStartElement(QStringLiteral("PHOTO"));
+        writer->writeStartElement(QSL65("PHOTO"));
         QString photoType = d->photoType;
         if (photoType.isEmpty()) {
             photoType = getImageType(d->photo);

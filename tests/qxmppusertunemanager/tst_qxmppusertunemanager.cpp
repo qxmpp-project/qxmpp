@@ -44,8 +44,8 @@ void tst_QXmppUserTuneManager::testRequest()
 
     QCoreApplication::processEvents();
     auto item = expectFutureVariant<QXmppTuneItem>(future);
-    QCOMPARE(item.id(), QString("abc3"));
-    QCOMPARE(item.title(), QString("I Kiste girl"));
+    QCOMPARE(item.id(), QStringLiteral("abc3"));
+    QCOMPARE(item.title(), QStringLiteral("I Kiste girl"));
 }
 
 void tst_QXmppUserTuneManager::testPublish()
@@ -78,7 +78,7 @@ void tst_QXmppUserTuneManager::testPublish()
                                "<item id='abcdf'/>"
                                "</publish></pubsub></iq>"));
 
-    QCOMPARE(expectFutureVariant<QString>(future), QString("abcdf"));
+    QCOMPARE(expectFutureVariant<QString>(future), QStringLiteral("abcdf"));
 }
 
 void tst_QXmppUserTuneManager::testEvents()
@@ -100,8 +100,8 @@ void tst_QXmppUserTuneManager::testEvents()
                                                     "</event></message>")));
 
     QCOMPARE(spy.count(), 1);
-    QCOMPARE(spy.constFirst().at(0).toString(), QString("stpeter@jabber.org"));
-    QCOMPARE(spy.constFirst().at(1).value<QXmppTuneItem>().artist(), QString("Yes"));
+    QCOMPARE(spy.constFirst().at(0).toString(), QStringLiteral("stpeter@jabber.org"));
+    QCOMPARE(spy.constFirst().at(1).value<QXmppTuneItem>().artist(), QStringLiteral("Yes"));
 }
 
 QTEST_MAIN(tst_QXmppUserTuneManager)

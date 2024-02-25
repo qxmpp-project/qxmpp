@@ -266,9 +266,9 @@ void tst_QXmppPubSubEvent::testCustomItem()
     QXmppPubSubEvent<TestItem> event;
     parsePacket(event, xml);
 
-    QCOMPARE(event.id(), QString("foo"));
+    QCOMPARE(event.id(), QStringLiteral("foo"));
     QCOMPARE(event.eventType(), QXmppPubSubEvent<>::Items);
-    QCOMPARE(event.node(), QString("princely_musings"));
+    QCOMPARE(event.node(), QStringLiteral("princely_musings"));
     QCOMPARE(event.items().count(), 2);
     QCOMPARE(event.items().at(0).id(), QString::number(42));
     QCOMPARE(event.items().at(1).id(), QString::number(23));

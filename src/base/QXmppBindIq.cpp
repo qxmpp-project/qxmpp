@@ -63,7 +63,7 @@ void QXmppBindIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppBindIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("bind"));
+    writer->writeStartElement(QSL65("bind"));
     writer->writeDefaultNamespace(toString65(ns_bind));
     if (!m_jid.isEmpty()) {
         writeXmlTextElement(writer, u"jid", m_jid);

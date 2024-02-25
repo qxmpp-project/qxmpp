@@ -35,12 +35,6 @@ using Error = QXmppStanza::Error;
 using Manager = QXmppOmemoManager;
 using ManagerPrivate = QXmppOmemoManagerPrivate;
 
-namespace QXmpp::Omemo::Private {
-
-const QString PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE = QStringLiteral("hmac(sha256)");
-
-}  // namespace QXmpp::Omemo::Private
-
 //
 // Contains address data for an OMEMO device and a method to get the corresponding OMEMO library
 // data structure.
@@ -223,7 +217,7 @@ bool ManagerPrivate::initGlobalContext()
     // the OMEMO library when no explicit "user_data" is set for those
     // functions (e.g., to the lock and unlock functions).
     if (signal_context_create(globalContext.ptrRef(), q) < 0) {
-        warning("Signal context could not be be created");
+        warning(QStringLiteral("Signal context could not be be created"));
         return false;
     }
 
@@ -250,7 +244,7 @@ bool ManagerPrivate::initLocking()
     };
 
     if (signal_context_set_locking_functions(globalContext.get(), lock, unlock) < 0) {
-        warning("Locking functions could not be set");
+        warning(QStringLiteral("Locking functions could not be set"));
         return false;
     }
 
@@ -267,7 +261,7 @@ bool ManagerPrivate::initCryptoProvider()
     cryptoProvider = createOmemoCryptoProvider(this);
 
     if (signal_context_set_crypto_provider(globalContext.get(), &cryptoProvider) < 0) {
-        warning("Crypto provider could not be set");
+        warning(QStringLiteral("Crypto provider could not be set"));
         return false;
     }
 
@@ -310,13 +304,13 @@ signal_protocol_identity_key_store ManagerPrivate::createIdentityKeyStore() cons
 
         const auto &privateIdentityKey = d->ownDevice.privateIdentityKey;
         if (!(*private_data = signal_buffer_create(reinterpret_cast<const uint8_t *>(privateIdentityKey.constData()), privateIdentityKey.size()))) {
-            manager->warning("Private identity key could not be loaded");
+            manager->warning(QStringLiteral("Private identity key could not be loaded"));
             return -1;
         }
 
         const auto &publicIdentityKey = d->ownDevice.publicIdentityKey;
         if (!(*public_data = signal_buffer_create(reinterpret_cast<const uint8_t *>(publicIdentityKey.constData()), publicIdentityKey.size()))) {
-            manager->warning("Public identity key could not be loaded");
+            manager->warning(QStringLiteral("Public identity key could not be loaded"));
             return -1;
         }
 
@@ -370,7 +364,7 @@ signal_protocol_signed_pre_key_store ManagerPrivate::createSignedPreKeyStore() c
         }
 
         if (!(*record = signal_buffer_create(reinterpret_cast<const uint8_t *>(signedPreKeyPair.constData()), signedPreKeyPair.size()))) {
-            manager->warning("Signed pre key pair could not be loaded");
+            manager->warning(QStringLiteral("Signed pre key pair could not be loaded"));
             return SG_ERR_INVALID_KEY_ID;
         }
 
@@ -434,7 +428,7 @@ signal_protocol_pre_key_store ManagerPrivate::createPreKeyStore() const
         }
 
         if (!(*record = signal_buffer_create(reinterpret_cast<const uint8_t *>(preKey.constData()), preKey.size()))) {
-            manager->warning("Pre key could not be loaded");
+            manager->warning(QStringLiteral("Pre key could not be loaded"));
             return SG_ERR_INVALID_KEY_ID;
         }
 
@@ -498,7 +492,7 @@ signal_protocol_session_store ManagerPrivate::createSessionStore() const
         }
 
         if (!(*record = signal_buffer_create(reinterpret_cast<const uint8_t *>(session.constData()), size_t(session.size())))) {
-            manager->warning("Session could not be loaded");
+            manager->warning(QStringLiteral("Session could not be loaded"));
             return -1;
         }
 
@@ -525,7 +519,7 @@ signal_protocol_session_store ManagerPrivate::createSessionStore() const
         for (auto itr = userDevices.cbegin(); itr != userDevices.cend(); ++itr) {
             const auto deviceId = itr.key();
             if (signal_int_list_push_back(deviceIds, int(deviceId)) < 0) {
-                manager->warning("Device ID could not be added to list");
+                manager->warning(QStringLiteral("Device ID could not be added to list"));
                 return -1;
             }
         }
@@ -616,7 +610,7 @@ QXmppTask<bool> ManagerPrivate::setUpDeviceId()
             if (auto stanzaErr = error->value<QXmppStanza::Error>()) {
                 // allow Cancel|ItemNotFound here
                 if (!(stanzaErr->type() == Error::Cancel && stanzaErr->condition() == Error::ItemNotFound)) {
-                    warning("Existing / Published device IDs could not be retrieved: " % errorToString(*error));
+                    warning(u"Existing / Published device IDs could not be retrieved: " % errorToString(*error));
                     return false;
                 }
                 // do not return here
@@ -644,7 +638,7 @@ std::optional<uint32_t> QXmppOmemoManagerPrivate::generateDeviceId()
 {
     uint32_t deviceId = 0;
     if (signal_protocol_key_helper_generate_registration_id(&deviceId, 0, globalContext.get()) < 0) {
-        warning("Device ID could not be generated");
+        warning(QStringLiteral("Device ID could not be generated"));
         return {};
     }
     return deviceId;
@@ -661,7 +655,7 @@ std::optional<uint32_t> QXmppOmemoManagerPrivate::generateDeviceId(const QVector
 
     do {
         if (signal_protocol_key_helper_generate_registration_id(&deviceId, 0, globalContext.get()) < 0) {
-            warning("Device ID could not be generated");
+            warning(QStringLiteral("Device ID could not be generated"));
             return {};
         }
     } while (existingIds.contains(QString::number(deviceId)));
@@ -679,14 +673,14 @@ std::optional<uint32_t> QXmppOmemoManagerPrivate::generateDeviceId(const QVector
 bool ManagerPrivate::setUpIdentityKeyPair(ratchet_identity_key_pair **identityKeyPair)
 {
     if (signal_protocol_key_helper_generate_identity_key_pair(identityKeyPair, globalContext.get()) < 0) {
-        warning("Identity key pair could not be generated");
+        warning(QStringLiteral("Identity key pair could not be generated"));
         return false;
     }
 
     BufferSecurePtr privateIdentityKeyBuffer;
 
     if (ec_private_key_serialize(privateIdentityKeyBuffer.ptrRef(), ratchet_identity_key_pair_get_private(*identityKeyPair)) < 0) {
-        warning("Private identity key could not be serialized");
+        warning(QStringLiteral("Private identity key could not be serialized"));
         return false;
     }
 
@@ -751,7 +745,7 @@ void ManagerPrivate::renewSignedPreKeyPairs()
 
         publishDeviceBundleItem([=](bool isPublished) {
             if (!isPublished) {
-                warning("Own device bundle item could not be published during renewal of signed pre key pairs");
+                warning(QStringLiteral("Own device bundle item could not be published during renewal of signed pre key pairs"));
             }
         });
     }
@@ -791,14 +785,14 @@ bool ManagerPrivate::updateSignedPreKeyPair(ratchet_identity_key_pair *identityK
             latestSignedPreKeyId,
             uint64_t(QDateTime::currentMSecsSinceEpoch()),
             globalContext.get()) < 0) {
-        warning("Signed pre key pair could not be generated");
+        warning(QStringLiteral("Signed pre key pair could not be generated"));
         return false;
     }
 
     BufferSecurePtr signedPreKeyPairBuffer;
 
     if (session_signed_pre_key_serialize(signedPreKeyPairBuffer.ptrRef(), signedPreKeyPair.get()) < 0) {
-        warning("Signed pre key pair could not be serialized");
+        warning(QStringLiteral("Signed pre key pair could not be serialized"));
         return false;
     }
 
@@ -843,7 +837,7 @@ bool ManagerPrivate::renewPreKeyPairs(uint32_t keyPairBeingRenewed)
 
     publishDeviceBundleItem([=](bool isPublished) {
         if (!isPublished) {
-            warning("Own device bundle item could not be published during renewal of pre key pairs");
+            warning(QStringLiteral("Own device bundle item could not be published during renewal of pre key pairs"));
         }
     });
 
@@ -882,7 +876,7 @@ bool ManagerPrivate::updatePreKeyPairs(uint32_t count)
     }
 
     if (signal_protocol_key_helper_generate_pre_keys(newPreKeyPairs.ptrRef(), latestPreKeyId, count, globalContext.get()) < 0) {
-        warning("Pre key pairs could not be generated");
+        warning(QStringLiteral("Pre key pairs could not be generated"));
         return false;
     }
 
@@ -896,7 +890,7 @@ bool ManagerPrivate::updatePreKeyPairs(uint32_t count)
         auto preKeyPair = signal_protocol_key_helper_key_list_element(node);
 
         if (session_pre_key_serialize(preKeyPairBuffer.ptrRef(), preKeyPair) < 0) {
-            warning("Pre key pair could not be serialized");
+            warning(QStringLiteral("Pre key pair could not be serialized"));
             return false;
         }
 
@@ -1066,8 +1060,8 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                     // Skip encrypting for a device if it does not respond for a while.
                     if (const auto unrespondedSentStanzasCount = device.unrespondedSentStanzasCount; unrespondedSentStanzasCount == UNRESPONDED_STANZAS_UNTIL_ENCRYPTION_IS_STOPPED) {
                         if (++(*skippedDevicesCount) == devicesCount) {
-                            warning("OMEMO element could not be created because no recipient device responded to " %
-                                    QString::number(unrespondedSentStanzasCount) % " sent stanzas");
+                            warning(u"OMEMO element could not be created because no recipient device responded to " %
+                                    QString::number(unrespondedSentStanzasCount) % u" sent stanzas");
                             interface.finish(std::nullopt);
                         }
 
@@ -1081,8 +1075,8 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
 
                         if (++(*processedDevicesCount) == devicesCount) {
                             if (*successfullyProcessedDevicesCount == 0) {
-                                warning("OMEMO element could not be created because no recipient "
-                                        "devices with keys having accepted trust levels could be found");
+                                warning(QStringLiteral("OMEMO element could not be created because no recipient "
+                                                       "devices with keys having accepted trust levels could be found"));
                                 interface.finish(std::nullopt);
                             } else {
                                 omemoElement->setSenderDeviceId(ownDevice.id);
@@ -1099,9 +1093,9 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                         // and the corresponding device has not been removed by another method
                         // in the meantime.
                         if (const auto data = createOmemoEnvelopeData(address.data(), payloadEncryptionResult.decryptionData); data.isEmpty()) {
-                            warning("OMEMO envelope for recipient JID '" % jid %
-                                    "' and device ID '" % QString::number(deviceId) %
-                                    "' could not be created because its data could not be encrypted");
+                            warning(u"OMEMO envelope for recipient JID '" % jid %
+                                    u"' and device ID '" % QString::number(deviceId) %
+                                    u"' could not be created because its data could not be encrypted");
                             controlDeviceProcessing(false);
                         } else if (devices.value(jid).contains(deviceId)) {
                             auto &deviceBeingModified = devices[jid][deviceId];
@@ -1123,13 +1117,13 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                     auto buildSessionDependingOnTrustLevel = [=](const QXmppOmemoDeviceBundle &deviceBundle, TrustLevel trustLevel) mutable {
                         // Build a session if the device's key has a specific trust level.
                         if (!acceptedTrustLevels.testFlag(trustLevel)) {
-                            q->debug("Session could not be created for JID '" % jid %
-                                     "' with device ID '" % QString::number(deviceId) %
-                                     "' because its key's trust level '" %
-                                     QString::number(int(trustLevel)) % "' is not accepted");
+                            q->debug(u"Session could not be created for JID '" % jid %
+                                     u"' with device ID '" % QString::number(deviceId) %
+                                     u"' because its key's trust level '" %
+                                     QString::number(int(trustLevel)) % u"' is not accepted");
                             controlDeviceProcessing(false);
                         } else if (!buildSession(address.data(), deviceBundle)) {
-                            warning("Session could not be created for JID '" % jid % "' and device ID '" % QString::number(deviceId) % "'");
+                            warning(u"Session could not be created for JID '" % jid % u"' and device ID '" % QString::number(deviceId) % u"'");
                             controlDeviceProcessing(false);
                         } else {
                             addOmemoEnvelope(true);
@@ -1171,7 +1165,7 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                                     }
                                 });
                             } else {
-                                warning("OMEMO envelope could not be created because no device bundle could be fetched");
+                                warning(QStringLiteral("OMEMO envelope could not be created because no device bundle could be fetched"));
                                 controlDeviceProcessing(false);
                             }
                         });
@@ -1190,7 +1184,7 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                                             const auto &deviceBundle = *optionalDeviceBundle;
                                             buildSessionDependingOnTrustLevel(deviceBundle, trustLevel);
                                         } else {
-                                            warning("OMEMO envelope could not be created because no device bundle could be fetched");
+                                            warning(QStringLiteral("OMEMO envelope could not be created because no device bundle could be fetched"));
                                             controlDeviceProcessing(false);
                                         }
                                     });
@@ -1198,10 +1192,10 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                                     addOmemoEnvelope();
                                 }
                             } else {
-                                q->debug("OMEMO envelope could not be created for JID '" % jid %
-                                         "' and device ID '" % QString::number(deviceId) %
-                                         "' because the device's key has an unaccepted trust level '" %
-                                         QString::number(int(trustLevel)) % "'");
+                                q->debug(u"OMEMO envelope could not be created for JID '" % jid %
+                                         u"' and device ID '" % QString::number(deviceId) %
+                                         u"' because the device's key has an unaccepted trust level '" %
+                                         QString::number(int(trustLevel)) % u"'");
                                 controlDeviceProcessing(false);
                             }
                         });
@@ -1209,11 +1203,11 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                 }
             }
         } else {
-            warning("OMEMO element could not be created because no recipient devices could be found");
+            warning(QStringLiteral("OMEMO element could not be created because no recipient devices could be found"));
             interface.finish(std::nullopt);
         }
     } else {
-        warning("OMEMO payload could not be encrypted");
+        warning(QStringLiteral("OMEMO payload could not be encrypted"));
         interface.finish(std::nullopt);
     }
 
@@ -1251,20 +1245,20 @@ std::optional<PayloadEncryptionResult> ManagerPrivate::encryptPayload(const QByt
     const auto initializationVectorOffset = hkdfOutput.data() + PAYLOAD_KEY_SIZE + PAYLOAD_AUTHENTICATION_KEY_SIZE;
     std::copy(initializationVectorOffset, initializationVectorOffset + PAYLOAD_INITIALIZATION_VECTOR_SIZE, initializationVector.data());
 
-    QCA::Cipher cipher(PAYLOAD_CIPHER_TYPE, PAYLOAD_CIPHER_MODE, PAYLOAD_CIPHER_PADDING, QCA::Encode, encryptionKey, initializationVector);
+    QCA::Cipher cipher(PAYLOAD_CIPHER_TYPE.toString(), PAYLOAD_CIPHER_MODE, PAYLOAD_CIPHER_PADDING, QCA::Encode, encryptionKey, initializationVector);
     auto encryptedPayload = cipher.process(QCA::MemoryRegion(payload));
 
     if (encryptedPayload.isEmpty()) {
-        warning("Following payload could not be encrypted: " % QString::fromUtf8(payload));
+        warning(u"Following payload could not be encrypted: " % QString::fromUtf8(payload));
         return {};
     }
 
     if (!QCA::MessageAuthenticationCode::supportedTypes().contains(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE)) {
-        warning("Message authentication code type '" % QString(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE) % "' is not supported by this system");
+        warning(u"Message authentication code type '" % PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE.toString() % u"' is not supported by this system");
         return {};
     }
 
-    auto messageAuthenticationCodeGenerator = QCA::MessageAuthenticationCode(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE, authenticationKey);
+    auto messageAuthenticationCodeGenerator = QCA::MessageAuthenticationCode(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE.toString(), authenticationKey);
     auto messageAuthenticationCode = QCA::SecureArray(messageAuthenticationCodeGenerator.process(encryptedPayload));
     messageAuthenticationCode.resize(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_SIZE);
 
@@ -1297,7 +1291,7 @@ QByteArray ManagerPrivate::createSceEnvelope(const T &stanza)
     sceEnvelopeWriter.writeTimestamp(QDateTime::currentDateTimeUtc());
     sceEnvelopeWriter.writeTo(QXmppUtils::jidToBareJid(stanza.to()));
     sceEnvelopeWriter.writeFrom(q->client()->configuration().jidBare());
-    sceEnvelopeWriter.writeRpad(generateRandomBytes(SCE_RPAD_SIZE_MIN, SCE_RPAD_SIZE_MAX).toBase64());
+    sceEnvelopeWriter.writeRpad(QString::fromUtf8(generateRandomBytes(SCE_RPAD_SIZE_MIN, SCE_RPAD_SIZE_MAX).toBase64()));
     sceEnvelopeWriter.writeContent([&writer, &stanza] {
         if constexpr (std::is_same_v<T, QXmppMessage>) {
             stanza.serializeExtensions(&writer, SceSensitive, ns_client.toString());
@@ -1334,7 +1328,7 @@ QByteArray ManagerPrivate::createOmemoEnvelopeData(const signal_protocol_address
     SessionCipherPtr sessionCipher;
 
     if (session_cipher_create(sessionCipher.ptrRef(), storeContext.get(), &address, globalContext.get()) < 0) {
-        warning("Session cipher could not be created");
+        warning(QStringLiteral("Session cipher could not be created"));
         return {};
     }
 
@@ -1342,7 +1336,7 @@ QByteArray ManagerPrivate::createOmemoEnvelopeData(const signal_protocol_address
 
     RefCountedPtr<ciphertext_message> encryptedOmemoEnvelopeData;
     if (session_cipher_encrypt(sessionCipher.get(), reinterpret_cast<const uint8_t *>(payloadDecryptionData.constData()), payloadDecryptionData.size(), encryptedOmemoEnvelopeData.ptrRef()) != SG_SUCCESS) {
-        warning("Payload decryption data could not be encrypted");
+        warning(QStringLiteral("Payload decryption data could not be encrypted"));
         return {};
     }
 
@@ -1387,9 +1381,9 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
             auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, *omemoEnvelope);
             future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
                 if (!payloadDecryptionData) {
-                    warning("Empty OMEMO message could not be successfully processed");
+                    warning(QStringLiteral("Empty OMEMO message could not be successfully processed"));
                 } else {
-                    q->debug("Successfully processed empty OMEMO message");
+                    q->debug(QStringLiteral("Successfully processed empty OMEMO message"));
                 }
 
                 interface.finish(std::nullopt);
@@ -1483,7 +1477,7 @@ QXmppTask<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanz
     auto future = extractSceEnvelope(senderJid, senderDeviceId, omemoEnvelope, omemoPayload, isMessageStanza);
     future.then(q, [=](QByteArray serializedSceEnvelope) mutable {
         if (serializedSceEnvelope.isEmpty()) {
-            warning("SCE envelope could not be extracted");
+            warning(QStringLiteral("SCE envelope could not be extracted"));
             interface.finish(std::nullopt);
         } else {
             QDomDocument document;
@@ -1491,17 +1485,17 @@ QXmppTask<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanz
             QXmppSceEnvelopeReader sceEnvelopeReader(document.documentElement());
 
             if (sceEnvelopeReader.from() != senderJid) {
-                q->info("Sender '" % senderJid % "' of stanza does not match SCE 'from' affix element '" % sceEnvelopeReader.from() % "'");
+                q->info(u"Sender '" % senderJid % u"' of stanza does not match SCE 'from' affix element '" % sceEnvelopeReader.from() % u"'");
             }
 
             if (const auto recipientJid = QXmppUtils::jidToBareJid(stanza.to()); isMessageStanza) {
                 if (const auto &message = dynamic_cast<const QXmppMessage &>(stanza); message.type() == QXmppMessage::GroupChat && (sceEnvelopeReader.to() != recipientJid)) {
-                    warning("Recipient of group chat message does not match SCE affix element '<to/>'");
+                    warning(QStringLiteral("Recipient of group chat message does not match SCE affix element '<to/>'"));
                     interface.finish(std::nullopt);
                     return;
                 }
             } else if (sceEnvelopeReader.to() != recipientJid) {
-                q->info("Recipient of IQ does not match SCE affix element '<to/>'");
+                q->info(QStringLiteral("Recipient of IQ does not match SCE affix element '<to/>'"));
             }
 
             auto &device = devices[senderJid][senderDeviceId];
@@ -1551,7 +1545,7 @@ QXmppTask<QByteArray> ManagerPrivate::extractSceEnvelope(const QString &senderJi
     auto future = extractPayloadDecryptionData(senderJid, senderDeviceId, omemoEnvelope, isMessageStanza);
     future.then(q, [=](std::optional<QCA::SecureArray> payloadDecryptionData) mutable {
         if (!payloadDecryptionData) {
-            warning("Data for decrypting OMEMO payload could not be extracted");
+            warning(QStringLiteral("Data for decrypting OMEMO payload could not be extracted"));
             interface.finish(QByteArray());
         } else {
             interface.finish(decryptPayload(*payloadDecryptionData, omemoPayload));
@@ -1582,7 +1576,7 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
     const auto addressData = address.data();
 
     if (session_cipher_create(sessionCipher.ptrRef(), storeContext.get(), &addressData, globalContext.get()) < 0) {
-        warning("Session cipher could not be created");
+        warning(QStringLiteral("Session cipher could not be created"));
         return makeReadyTask<std::optional<QCA::SecureArray>>(std::nullopt);
     }
 
@@ -1617,13 +1611,13 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
                                                      serializedOmemoEnvelopeData.size(),
                                                      senderDeviceId,
                                                      globalContext.get()) < 0) {
-            warning("OMEMO envelope data could not be deserialized");
+            warning(QStringLiteral("OMEMO envelope data could not be deserialized"));
             interface.finish(std::nullopt);
         } else {
             BufferPtr publicIdentityKeyBuffer;
 
             if (ec_public_key_serialize(publicIdentityKeyBuffer.ptrRef(), pre_key_signal_message_get_identity_key(omemoEnvelopeData.get())) < 0) {
-                warning("Public Identity key could not be retrieved");
+                warning(QStringLiteral("Public Identity key could not be retrieved"));
                 interface.finish(std::nullopt);
             } else {
                 const auto key = publicIdentityKeyBuffer.toByteArray();
@@ -1640,30 +1634,30 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
                 // Decrypt the OMEMO envelope data and build a session.
                 switch (session_cipher_decrypt_pre_key_signal_message(sessionCipher.get(), omemoEnvelopeData.get(), nullptr, payloadDecryptionDataBuffer.ptrRef())) {
                 case SG_ERR_INVALID_MESSAGE:
-                    warning("OMEMO envelope data for key exchange is not valid");
+                    warning(QStringLiteral("OMEMO envelope data for key exchange is not valid"));
                     interface.finish(std::nullopt);
                     break;
                 case SG_ERR_DUPLICATE_MESSAGE:
-                    warning("OMEMO envelope data for key exchange is already received");
+                    warning(QStringLiteral("OMEMO envelope data for key exchange is already received"));
                     interface.finish(std::nullopt);
                     break;
                 case SG_ERR_LEGACY_MESSAGE:
-                    warning("OMEMO envelope data for key exchange format is deprecated");
+                    warning(QStringLiteral("OMEMO envelope data for key exchange format is deprecated"));
                     interface.finish(std::nullopt);
                     break;
                 case SG_ERR_INVALID_KEY_ID: {
                     const auto preKeyId = QString::number(pre_key_signal_message_get_pre_key_id(omemoEnvelopeData.get()));
-                    warning("Pre key with ID '" % preKeyId %
-                            "' of OMEMO envelope data for key exchange could not be found locally");
+                    warning(u"Pre key with ID '" % preKeyId %
+                            u"' of OMEMO envelope data for key exchange could not be found locally");
                     interface.finish(std::nullopt);
                     break;
                 }
                 case SG_ERR_INVALID_KEY:
-                    warning("OMEMO envelope data for key exchange is incorrectly formatted");
+                    warning(QStringLiteral("OMEMO envelope data for key exchange is incorrectly formatted"));
                     interface.finish(std::nullopt);
                     break;
                 case SG_ERR_UNTRUSTED_IDENTITY:
-                    warning("Identity key of OMEMO envelope data for key exchange is not trusted by OMEMO library");
+                    warning(QStringLiteral("Identity key of OMEMO envelope data for key exchange is not trusted by OMEMO library"));
                     interface.finish(std::nullopt);
                     break;
                 case SG_SUCCESS:
@@ -1688,8 +1682,8 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
             }
         }
     } else if (auto &device = devices[senderJid][senderDeviceId]; device.session.isEmpty()) {
-        warning("Received OMEMO stanza cannot be decrypted because there is no session with "
-                "sending device, new session is being built");
+        warning(QStringLiteral("Received OMEMO stanza cannot be decrypted because there is no session with "
+                               "sending device, new session is being built"));
 
         auto future = buildSessionWithDeviceBundle(senderJid, senderDeviceId, device);
         future.then(q, [=](auto) mutable {
@@ -1700,25 +1694,25 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
         const auto serializedOmemoEnvelopeData = omemoEnvelope.data();
 
         if (signal_message_deserialize_omemo(omemoEnvelopeData.ptrRef(), reinterpret_cast<const uint8_t *>(serializedOmemoEnvelopeData.data()), serializedOmemoEnvelopeData.size(), globalContext.get()) < 0) {
-            warning("OMEMO envelope data could not be deserialized");
+            warning(QStringLiteral("OMEMO envelope data could not be deserialized"));
             interface.finish(std::nullopt);
         } else {
             // Decrypt the OMEMO envelope data.
             switch (session_cipher_decrypt_signal_message(sessionCipher.get(), omemoEnvelopeData.get(), nullptr, payloadDecryptionDataBuffer.ptrRef())) {
             case SG_ERR_INVALID_MESSAGE:
-                warning("OMEMO envelope data is not valid");
+                warning(QStringLiteral("OMEMO envelope data is not valid"));
                 interface.finish(std::nullopt);
                 break;
             case SG_ERR_DUPLICATE_MESSAGE:
-                warning("OMEMO envelope data is already received");
+                warning(QStringLiteral("OMEMO envelope data is already received"));
                 interface.finish(std::nullopt);
                 break;
             case SG_ERR_LEGACY_MESSAGE:
-                warning("OMEMO envelope data format is deprecated");
+                warning(QStringLiteral("OMEMO envelope data format is deprecated"));
                 interface.finish(std::nullopt);
                 break;
             case SG_ERR_NO_SESSION:
-                warning("Session for OMEMO envelope data could not be found");
+                warning(QStringLiteral("Session for OMEMO envelope data could not be found"));
                 interface.finish(std::nullopt);
             case SG_SUCCESS:
                 reportResult(payloadDecryptionDataBuffer);
@@ -1760,26 +1754,26 @@ QByteArray ManagerPrivate::decryptPayload(const QCA::SecureArray &payloadDecrypt
     std::copy(initializationVectorOffset, initializationVectorOffset + PAYLOAD_INITIALIZATION_VECTOR_SIZE, initializationVector.data());
 
     if (!QCA::MessageAuthenticationCode::supportedTypes().contains(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE)) {
-        warning("Message authentication code type '" % QString(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE) % "' is not supported by this system");
+        warning(u"Message authentication code type '" % PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE % u"' is not supported by this system");
         return {};
     }
 
-    auto messageAuthenticationCodeGenerator = QCA::MessageAuthenticationCode(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE, authenticationKey);
+    auto messageAuthenticationCodeGenerator = QCA::MessageAuthenticationCode(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_TYPE.toString(), authenticationKey);
     auto messageAuthenticationCode = QCA::SecureArray(messageAuthenticationCodeGenerator.process(payload));
     messageAuthenticationCode.resize(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_SIZE);
 
     auto expectedMessageAuthenticationCode = QCA::SecureArray(payloadDecryptionData.toByteArray().right(PAYLOAD_MESSAGE_AUTHENTICATION_CODE_SIZE));
 
     if (messageAuthenticationCode != expectedMessageAuthenticationCode) {
-        warning("Message authentication code does not match expected one");
+        warning(QStringLiteral("Message authentication code does not match expected one"));
         return {};
     }
 
-    QCA::Cipher cipher(PAYLOAD_CIPHER_TYPE, PAYLOAD_CIPHER_MODE, PAYLOAD_CIPHER_PADDING, QCA::Decode, encryptionKey, initializationVector);
+    QCA::Cipher cipher(PAYLOAD_CIPHER_TYPE.toString(), PAYLOAD_CIPHER_MODE, PAYLOAD_CIPHER_PADDING, QCA::Decode, encryptionKey, initializationVector);
     auto decryptedPayload = cipher.process(QCA::MemoryRegion(payload));
 
     if (decryptedPayload.isEmpty()) {
-        warning("Following payload could not be decrypted: " % QString(payload));
+        warning(u"Following payload could not be decrypted: " % QString::fromUtf8(payload));
         return {};
     }
 
@@ -1798,8 +1792,8 @@ QXmppTask<bool> ManagerPrivate::publishOmemoData()
     auto future = pubSubManager->requestOwnPepFeatures();
     future.then(q, [=](QXmppPubSubManager::FeaturesResult result) mutable {
         if (const auto error = std::get_if<QXmppError>(&result)) {
-            warning("Features of PEP service '" % ownBareJid() % "' could not be retrieved: " % errorToString(*error));
-            warning("Device bundle and device list could not be published");
+            warning(u"Features of PEP service '" % ownBareJid() % u"' could not be retrieved: " % errorToString(*error));
+            warning(QStringLiteral("Device bundle and device list could not be published"));
             interface.finish(false);
         } else {
             const auto &pepServiceFeatures = std::get<QVector<QString>>(result);
@@ -1816,10 +1810,10 @@ QXmppTask<bool> ManagerPrivate::publishOmemoData()
                 auto future = pubSubManager->requestOwnPepNodes();
                 future.then(q, [=](QXmppPubSubManager::NodesResult result) mutable {
                     if (const auto error = std::get_if<QXmppError>(&result)) {
-                        warning("Nodes of JID '" % ownBareJid() % "' could not be fetched to check if nodes '" %
-                                ns_omemo_2_bundles % "' and '" % ns_omemo_2_devices %
-                                "' exist: " % errorToString(*error));
-                        warning("Device bundle and device list could not be published");
+                        warning(u"Nodes of JID '" % ownBareJid() % u"' could not be fetched to check if nodes '" %
+                                ns_omemo_2_bundles % u"' and '" % ns_omemo_2_devices %
+                                u"' exist: " % errorToString(*error));
+                        warning(QStringLiteral("Device bundle and device list could not be published"));
                         interface.finish(false);
                     } else {
                         const auto &nodes = std::get<QVector<QString>>(result);
@@ -1851,12 +1845,12 @@ QXmppTask<bool> ManagerPrivate::publishOmemoData()
                                                      isConfigurationSupported,
                                                      [=](bool isPublished) mutable {
                                                          if (!isPublished) {
-                                                             warning("Device element could not be published");
+                                                             warning(QStringLiteral("Device element could not be published"));
                                                          }
                                                          interface.finish(std::move(isPublished));
                                                      });
                             } else {
-                                warning("Device bundle could not be published");
+                                warning(QStringLiteral("Device bundle could not be published"));
                                 interface.finish(false);
                             }
                         };
@@ -1871,8 +1865,8 @@ QXmppTask<bool> ManagerPrivate::publishOmemoData()
                     }
                 });
             } else {
-                warning("Publishing (multiple) items to PEP node '" % ownBareJid() % "' is not supported");
-                warning("Device bundle and device list could not be published");
+                warning(u"Publishing (multiple) items to PEP node '" % ownBareJid() % u"' is not supported");
+                warning(QStringLiteral("Device bundle and device list could not be published"));
                 interface.finish(false);
             }
         }
@@ -1926,13 +1920,13 @@ void ManagerPrivate::publishDeviceBundle(bool isDeviceBundlesNodeExistent,
                 } else {
                     auto handleResult = [this, continuation = std::move(continuation)](bool isPublished) mutable {
                         if (!isPublished) {
-                            q->debug("PEP service '" % ownBareJid() %
-                                     "' does not support feature '" %
+                            q->debug(u"PEP service '" % ownBareJid() %
+                                     u"' does not support feature '" %
                                      ns_pubsub_publish_options %
-                                     "' for all publish options, also not '" %
+                                     u"' for all publish options, also not '" %
                                      ns_pubsub_create_and_configure %
-                                     "', '" % ns_pubsub_create_nodes % "', '" %
-                                     ns_pubsub_config_node % "' and the node does not exist");
+                                     u"', '" % ns_pubsub_create_nodes % u"', '" %
+                                     ns_pubsub_config_node % u"' and the node does not exist");
                         }
                         continuation(isPublished);
                     };
@@ -1966,11 +1960,11 @@ void ManagerPrivate::publishDeviceBundle(bool isDeviceBundlesNodeExistent,
                         } else if (isConfigurationSupported) {
                             configureNodeAndPublishDeviceBundle(isConfigNodeMaxSupported, continuation);
                         } else {
-                            q->debug("PEP service '" % ownBareJid() %
-                                     "' does not support feature '" %
+                            q->debug(u"PEP service '" % ownBareJid() %
+                                     u"' does not support feature '" %
                                      ns_pubsub_publish_options %
-                                     "' for all publish options and also not '" %
-                                     ns_pubsub_config_node % "'");
+                                     u"' for all publish options and also not '" %
+                                     ns_pubsub_config_node % u"'");
                             continuation(false);
                         }
                     });
@@ -1979,19 +1973,19 @@ void ManagerPrivate::publishDeviceBundle(bool isDeviceBundlesNodeExistent,
                 }
             });
         } else {
-            q->debug("PEP service '" % ownBareJid() % "' does not support features '" %
-                     ns_pubsub_auto_create % "', '" % ns_pubsub_create_nodes %
-                     "' and the node does not exist");
+            q->debug(u"PEP service '" % ownBareJid() % u"' does not support features '" %
+                     ns_pubsub_auto_create % u"', '" % ns_pubsub_create_nodes %
+                     u"' and the node does not exist");
             continuation(false);
         }
     } else {
         auto handleResult = [this, continuation = std::move(continuation)](bool isPublished) mutable {
             if (!isPublished) {
-                q->debug("PEP service '" % ownBareJid() % "' does not support features '" %
-                         ns_pubsub_publish_options % "', '" %
-                         ns_pubsub_create_and_configure % "', '" %
-                         ns_pubsub_create_nodes % "', '" %
-                         ns_pubsub_config_node % "' and the node does not exist");
+                q->debug(u"PEP service '" % ownBareJid() % u"' does not support features '" %
+                         ns_pubsub_publish_options % u"', '" %
+                         ns_pubsub_create_and_configure % u"', '" %
+                         ns_pubsub_create_nodes % u"', '" %
+                         ns_pubsub_config_node % u"' and the node does not exist");
             }
             continuation(isPublished);
         };
@@ -2227,8 +2221,8 @@ QXmppTask<std::optional<QXmppOmemoDeviceBundle>> ManagerPrivate::requestDeviceBu
     auto future = pubSubManager->requestItem<QXmppOmemoDeviceBundleItem>(deviceOwnerJid, ns_omemo_2_bundles.toString(), QString::number(deviceId));
     future.then(q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceBundleItem> result) mutable {
         if (const auto error = std::get_if<QXmppError>(&result)) {
-            warning("Device bundle for JID '" % deviceOwnerJid % "' and device ID '" %
-                    QString::number(deviceId) % "' could not be retrieved: " % errorToString(*error));
+            warning(u"Device bundle for JID '" % deviceOwnerJid % u"' and device ID '" %
+                    QString::number(deviceId) % u"' could not be retrieved: " % errorToString(*error));
             interface.finish(std::nullopt);
         } else {
             const auto &item = std::get<QXmppOmemoDeviceBundleItem>(result);
@@ -2298,7 +2292,7 @@ void ManagerPrivate::publishDeviceElement(bool isDeviceListNodeExistent,
                         } else {
                             auto handleResult = [this, continuation = std::move(continuation)](bool isPublished) mutable {
                                 if (!isPublished) {
-                                    q->debug("PEP service '" % ownBareJid() % "' does not support feature '" % ns_pubsub_publish_options % "' for all publish options, also not '" % ns_pubsub_create_and_configure % "', '" % ns_pubsub_create_nodes % "', '" % ns_pubsub_config_node % "' and the node does not exist");
+                                    q->debug(u"PEP service '" % ownBareJid() % u"' does not support feature '" % ns_pubsub_publish_options % u"' for all publish options, also not '" % ns_pubsub_create_and_configure % u"', '" % ns_pubsub_create_nodes % u"', '" % ns_pubsub_config_node % u"' and the node does not exist");
                                 }
                                 continuation(isPublished);
                             };
@@ -2328,11 +2322,11 @@ void ManagerPrivate::publishDeviceElement(bool isDeviceListNodeExistent,
                                 } else if (isConfigurationSupported) {
                                     configureNodeAndPublishDeviceElement(continuation);
                                 } else {
-                                    q->debug("PEP service '" % ownBareJid() %
-                                             "' does not support feature '" %
+                                    q->debug(u"PEP service '" % ownBareJid() %
+                                             u"' does not support feature '" %
                                              ns_pubsub_publish_options %
-                                             "' for all publish options and also not '" %
-                                             ns_pubsub_config_node % "'");
+                                             u"' for all publish options and also not '" %
+                                             ns_pubsub_config_node % u"'");
                                     continuation(false);
                                 }
                             });
@@ -2341,15 +2335,15 @@ void ManagerPrivate::publishDeviceElement(bool isDeviceListNodeExistent,
                         }
                     });
                 } else {
-                    q->debug("PEP service '" % ownBareJid() % "' does not support features '" %
-                             ns_pubsub_auto_create % "', '" %
-                             ns_pubsub_create_nodes % "' and the node does not exist");
+                    q->debug(u"PEP service '" % ownBareJid() % u"' does not support features '" %
+                             ns_pubsub_auto_create % u"', '" %
+                             ns_pubsub_create_nodes % u"' and the node does not exist");
                     continuation(false);
                 }
             } else {
                 auto handleResult = [=](bool isPublished) mutable {
                     if (!isPublished) {
-                        q->debug("PEP service '" % ownBareJid() % "' does not support features '" % ns_pubsub_publish_options % "', '" % ns_pubsub_create_and_configure % "', '" % ns_pubsub_create_nodes % "', '" % ns_pubsub_config_node % "' and the node does not exist");
+                        q->debug(u"PEP service '" % ownBareJid() % u"' does not support features '" % ns_pubsub_publish_options % u"', '" % ns_pubsub_create_and_configure % u"', '" % ns_pubsub_create_nodes % u"', '" % ns_pubsub_config_node % u"' and the node does not exist");
                     }
                     continuation(isPublished);
                 };
@@ -2532,8 +2526,8 @@ void ManagerPrivate::updateOwnDevicesLocally(bool isDeviceListNodeExistent, Func
         auto future = pubSubManager->requestOwnPepItem<QXmppOmemoDeviceListItem>(ns_omemo_2_devices.toString(), QXmppPubSubManager::Current);
         future.then(q, [=](QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem> result) mutable {
             if (const auto error = std::get_if<QXmppError>(&result)) {
-                warning("Device list for JID '" % ownBareJid() %
-                        "' could not be retrieved and thus not updated: " %
+                warning(u"Device list for JID '" % ownBareJid() %
+                        u"' could not be retrieved and thus not updated: " %
                         errorToString(*error));
                 continuation(false);
             } else {
@@ -2607,7 +2601,7 @@ std::optional<QXmppOmemoDeviceListItem> QXmppOmemoManagerPrivate::updateContactD
             updateDevices(deviceOwnerJid, *itr);
             return *itr;
         } else {
-            warning("Device list for JID '" % deviceOwnerJid % "' could not be updated because the node contains more than one item but none with the singleton node's specific ID '" % QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current) % "'");
+            warning(u"Device list for JID '" % deviceOwnerJid % u"' could not be updated because the node contains more than one item but none with the singleton node's specific ID '" % QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current) % u"'");
             handleIrregularDeviceListChanges(deviceOwnerJid);
             return {};
         }
@@ -2633,8 +2627,8 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
     // Do not exceed the maximum of manageable devices.
     if (deviceList.size() > maximumDevicesPerJid) {
         warning(u"Received OMEMO device list of JID '" % deviceOwnerJid %
-                "' could not be stored locally completely because the devices are more than the "
-                "maximum of manageable devices " %
+                u"' could not be stored locally completely because the devices are more than the "
+                u"maximum of manageable devices " %
                 QString::number(maximumDevicesPerJid) %
                 u" - Use 'QXmppOmemoManager::setMaximumDevicesPerJid()' to increase the maximum");
         deviceList = deviceList.mid(0, maximumDevicesPerJid);
@@ -2757,7 +2751,7 @@ void ManagerPrivate::updateDevices(const QString &deviceOwnerJid, const QXmppOme
         if (!devices.isEmpty()) {
             publishDeviceListItem(true, [=](bool isPublished) {
                 if (!isPublished) {
-                    warning("Own device list item could not be published in order to correct the PEP service's one");
+                    warning(QStringLiteral("Own device list item could not be published in order to correct the PEP service's one"));
                 }
             });
         }
@@ -2781,19 +2775,18 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
         auto future = pubSubManager->deleteOwnPepNode(ns_omemo_2_devices.toString());
         future.then(q, [=](QXmppPubSubManager::Result result) {
             if (const auto error = std::get_if<QXmppError>(&result)) {
-                warning("Node '" % ns_omemo_2_devices % "' of JID '" % deviceOwnerJid %
-                        "' could not be deleted in order to recover from an inconsistent node: " %
+                warning(u"Node '" % ns_omemo_2_devices % u"' of JID '" % deviceOwnerJid %
+                        u"' could not be deleted in order to recover from an inconsistent node: " %
                         errorToString(*error));
             } else {
                 auto future = pubSubManager->requestOwnPepFeatures();
                 future.then(q, [=](QXmppPubSubManager::FeaturesResult result) {
                     if (const auto error = std::get_if<QXmppError>(&result)) {
-                        warning("Features of PEP service '" % deviceOwnerJid %
-                                "' could not be retrieved: " % errorToString(*error));
-                        warning("Device list could not be published");
+                        warning(u"Features of PEP service '" % deviceOwnerJid %
+                                u"' could not be retrieved: " % errorToString(*error));
+                        warning(QStringLiteral("Device list could not be published"));
                     } else {
                         const auto &pepServiceFeatures = std::get<QVector<QString>>(result);
-
                         const auto arePublishOptionsSupported = pepServiceFeatures.contains(toString60(ns_pubsub_publish_options));
                         const auto isAutomaticCreationSupported = pepServiceFeatures.contains(toString60(ns_pubsub_auto_create));
                         const auto isCreationAndConfigurationSupported = pepServiceFeatures.contains(toString60(ns_pubsub_create_and_configure));
@@ -2808,7 +2801,7 @@ void ManagerPrivate::handleIrregularDeviceListChanges(const QString &deviceOwner
                                              isConfigurationSupported,
                                              [=](bool isPublished) {
                                                  if (!isPublished) {
-                                                     warning("Device element could not be published");
+                                                     warning(QStringLiteral("Device element could not be published"));
                                                  }
                                              });
                     }
@@ -2859,7 +2852,7 @@ template<typename Function>
 void ManagerPrivate::createNode(const QString &node, Function continuation)
 {
     runPubSubQueryWithContinuation(pubSubManager->createOwnPepNode(node),
-                                   "Node '" % node % "' of JID '" % ownBareJid() % "' could not be created",
+                                   u"Node '" % node % u"' of JID '" % ownBareJid() % u"' could not be created",
                                    std::move(continuation));
 }
 
@@ -2874,7 +2867,7 @@ template<typename Function>
 void ManagerPrivate::createNode(const QString &node, const QXmppPubSubNodeConfig &config, Function continuation)
 {
     runPubSubQueryWithContinuation(pubSubManager->createOwnPepNode(node, config),
-                                   "Node '" % node % "' of JID '" % ownBareJid() % "' could not be created",
+                                   u"Node '" % node % u"' of JID '" % ownBareJid() % u"' could not be created",
                                    std::move(continuation));
 }
 
@@ -2889,7 +2882,7 @@ template<typename Function>
 void ManagerPrivate::configureNode(const QString &node, const QXmppPubSubNodeConfig &config, Function continuation)
 {
     runPubSubQueryWithContinuation(pubSubManager->configureOwnPepNode(node, config),
-                                   "Node '" % node % "' of JID '" % ownBareJid() % "' could not be configured",
+                                   u"Node '" % node % u"' of JID '" % ownBareJid() % u"' could not be configured",
                                    std::move(continuation));
 }
 
@@ -2905,7 +2898,7 @@ void ManagerPrivate::retractItem(const QString &node, uint32_t itemId, Function 
 {
     const auto itemIdString = QString::number(itemId);
     runPubSubQueryWithContinuation(pubSubManager->retractOwnPepItem(node, itemIdString),
-                                   "Item '" % itemIdString % "' of node '" % node % "' and JID '" % ownBareJid() % "' could not be retracted",
+                                   u"Item '" % itemIdString % u"' of node '" % node % u"' and JID '" % ownBareJid() % u"' could not be retracted",
                                    std::move(continuation));
 }
 
@@ -2924,7 +2917,7 @@ void ManagerPrivate::deleteNode(const QString &node, Function continuation)
             if (auto err = error->value<QXmppStanza::Error>()) {
                 // Skip the error handling if the node is already deleted.
                 if (!(err->type() == Error::Cancel && err->condition() == Error::ItemNotFound)) {
-                    warning("Node '" % node % "' of JID '" % ownBareJid() % "' could not be deleted: " %
+                    warning(u"Node '" % node % u"' of JID '" % ownBareJid() % u"' could not be deleted: " %
                             errorToString(*error));
                     continuation(false);
                 } else {
@@ -2950,9 +2943,9 @@ template<typename T, typename Function>
 void ManagerPrivate::publishItem(const QString &node, const T &item, Function continuation)
 {
     runPubSubQueryWithContinuation(pubSubManager->publishOwnPepItem(node, item),
-                                   "Item with ID '" % item.id() %
-                                       "' could not be published to node '" % node % "' of JID '" %
-                                       ownBareJid() % "'",
+                                   u"Item with ID '" % item.id() %
+                                       u"' could not be published to node '" % node % u"' of JID '" %
+                                       ownBareJid() % u"'",
                                    std::move(continuation));
 }
 
@@ -2968,7 +2961,7 @@ template<typename T, typename Function>
 void ManagerPrivate::publishItem(const QString &node, const T &item, const QXmppPubSubPublishOptions &publishOptions, Function continuation)
 {
     runPubSubQueryWithContinuation(pubSubManager->publishOwnPepItem(node, item, publishOptions),
-                                   "Item with ID '" % item.id() % "' could not be published to node '" % node % "' of JID '" % ownBareJid() % "'",
+                                   u"Item with ID '" % item.id() % u"' could not be published to node '" % node % u"' of JID '" % ownBareJid() % u"'",
                                    std::move(continuation));
 }
 
@@ -3034,16 +3027,16 @@ QXmppTask<QXmppPubSubManager::ItemResult<QXmppOmemoDeviceListItem>> ManagerPriva
     auto future = pubSubManager->requestItems<QXmppOmemoDeviceListItem>(jid, ns_omemo_2_devices.toString());
     future.then(q, [this, interface, jid](QXmppPubSubManager::ItemsResult<QXmppOmemoDeviceListItem> result) mutable {
         if (const auto error = std::get_if<QXmppError>(&result)) {
-            warning("Device list for JID '" % jid % "' could not be retrieved: " % errorToString(*error));
+            warning(u"Device list for JID '" % jid % u"' could not be retrieved: " % errorToString(*error));
             interface.finish(*error);
         } else if (const auto &items = std::get<QXmppPubSubManager::Items<QXmppOmemoDeviceListItem>>(result).items; items.isEmpty()) {
-            const auto errorMessage = "Device list for JID '" % jid % "' could not be retrieved because the node does not contain any item";
+            const auto errorMessage = u"Device list for JID '" % jid % u"' could not be retrieved because the node does not contain any item";
             warning(errorMessage);
-            interface.finish(QXmppError { errorMessage });
+            interface.finish(QXmppError { errorMessage, {} });
         } else if (const auto item = updateContactDevices(jid, items); item) {
             interface.finish(*item);
         } else {
-            interface.finish(QXmppError { "Device list for JID '" % jid % "' could not be retrieved because the node does not contain an appropriate item" });
+            interface.finish(QXmppError { u"Device list for JID '" % jid % u"' could not be retrieved because the node does not contain an appropriate item", {} });
         }
     });
     return interface.task();
@@ -3080,7 +3073,7 @@ QXmppTask<QXmppPubSubManager::Result> ManagerPrivate::subscribeToDeviceList(cons
     auto future = pubSubManager->subscribeToNode(jid, ns_omemo_2_devices.toString(), ownFullJid());
     future.then(q, [=](QXmppPubSubManager::Result result) mutable {
         if (const auto error = std::get_if<QXmppError>(&result)) {
-            warning("Device list for JID '" % jid % "' could not be subscribed: " % errorToString(*error));
+            warning(u"Device list for JID '" % jid % u"' could not be subscribed: " % errorToString(*error));
             interface.finish(std::move(*error));
         } else {
             jidsOfManuallySubscribedDevices.append(jid);
@@ -3153,7 +3146,7 @@ QXmppTask<QXmppPubSubManager::Result> ManagerPrivate::unsubscribeFromDeviceList(
     auto future = pubSubManager->unsubscribeFromNode(jid, ns_omemo_2_devices.toString(), ownFullJid());
     future.then(q, [=](QXmppPubSubManager::Result result) mutable {
         if (const auto error = std::get_if<QXmppError>(&result)) {
-            warning("Device list for JID '" % jid % "' could not be unsubscribed: " % errorToString(*error));
+            warning(u"Device list for JID '" % jid % u"' could not be unsubscribed: " % errorToString(*error));
         } else {
             jidsOfManuallySubscribedDevices.removeAll(jid);
         }
@@ -3283,20 +3276,20 @@ QXmppTask<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid,
                     // level and send an empty OMEMO (key exchange) message to
                     // make the receiving device build a new session too.
                     if (!acceptedSessionBuildingTrustLevels.testFlag(trustLevel)) {
-                        warning("Session could not be created for JID '" % jid % "' with device ID '" %
-                                QString::number(deviceId) % "' because its key's trust level '" %
-                                QString::number(int(trustLevel)) % "' is not accepted");
+                        warning(u"Session could not be created for JID '" % jid % u"' with device ID '" %
+                                QString::number(deviceId) % u"' because its key's trust level '" %
+                                QString::number(int(trustLevel)) % u"' is not accepted");
                         interface.finish(false);
                     } else if (const auto address = Address(jid, deviceId); !buildSession(address.data(), deviceBundle)) {
-                        warning("Session could not be created for JID '" % jid % "' and device ID '" %
-                                QString::number(deviceId) % "'");
+                        warning(u"Session could not be created for JID '" % jid % u"' and device ID '" %
+                                QString::number(deviceId) % u"'");
                         interface.finish(false);
                     } else {
                         auto future = sendEmptyMessage(jid, deviceId, true);
                         future.then(q, [=](QXmpp::SendResult result) mutable {
                             if (std::holds_alternative<QXmppError>(result)) {
-                                warning("Session could be created but empty message could not be sent to JID '" %
-                                        jid % "' and device ID '" % QString::number(deviceId) % "'");
+                                warning(u"Session could be created but empty message could not be sent to JID '" %
+                                        jid % u"' and device ID '" % QString::number(deviceId) % u"'");
                                 interface.finish(false);
                             } else {
                                 interface.finish(true);
@@ -3316,9 +3309,8 @@ QXmppTask<bool> ManagerPrivate::buildSessionWithDeviceBundle(const QString &jid,
                 }
             });
         } else {
-            warning("Session could not be created because no device bundle could be fetched for "
-                    "JID '" %
-                    jid % "' and device ID '" % QString::number(deviceId) % "'");
+            warning(u"Session could not be created because no device bundle could be fetched for JID '" %
+                    jid % u"' and device ID '" % QString::number(deviceId) % u"'");
             interface.finish(false);
         }
     });
@@ -3343,7 +3335,7 @@ bool ManagerPrivate::buildSession(signal_protocol_address address, const QXmppOm
     // Choose a pre key randomly.
     const auto publicPreKeys = deviceBundle.publicPreKeys();
     if (publicPreKeys.isEmpty()) {
-        warning("No public pre key could be found in device bundle");
+        warning(QStringLiteral("No public pre key could be found in device bundle"));
     }
     const auto publicPreKeyIds = publicPreKeys.keys();
     const auto publicPreKeyIndex = QRandomGenerator::system()->bounded(publicPreKeyIds.size());
@@ -3352,7 +3344,7 @@ bool ManagerPrivate::buildSession(signal_protocol_address address, const QXmppOm
 
     SessionBuilderPtr sessionBuilder;
     if (session_builder_create(sessionBuilder.ptrRef(), storeContext.get(), &address, globalContext.get()) < 0) {
-        warning("Session builder could not be created");
+        warning(QStringLiteral("Session builder could not be created"));
         return false;
     }
     session_builder_set_version(sessionBuilder.get(), CIPHERTEXT_OMEMO_VERSION);
@@ -3366,12 +3358,12 @@ bool ManagerPrivate::buildSession(signal_protocol_address address, const QXmppOm
                              deviceBundle.signedPublicPreKeySignature(),
                              publicPreKey,
                              publicPreKeyId)) {
-        warning("Session bundle could not be created");
+        warning(QStringLiteral("Session bundle could not be created"));
         return false;
     }
 
     if (session_builder_process_pre_key_bundle(sessionBuilder.get(), sessionBundle.get()) != SG_SUCCESS) {
-        warning("Session bundle could not be processed");
+        warning(QStringLiteral("Session bundle could not be processed"));
         return false;
     }
 
@@ -3430,7 +3422,7 @@ bool ManagerPrivate::createSessionBundle(session_pre_key_bundle **sessionBundle,
 
         return true;
     } else {
-        warning("Session bundle data could not be deserialized");
+        warning(QStringLiteral("Session bundle data could not be deserialized"));
         return false;
     }
 }
@@ -3453,7 +3445,7 @@ bool ManagerPrivate::deserializeIdentityKeyPair(ratchet_identity_key_pair **iden
     deserializePublicIdentityKey(publicIdentityKey.ptrRef(), ownDevice.publicIdentityKey);
 
     if (ratchet_identity_key_pair_create(identityKeyPair, publicIdentityKey.get(), privateIdentityKey.get()) < 0) {
-        warning("Identity key pair could not be deserialized");
+        warning(QStringLiteral("Identity key pair could not be deserialized"));
         return false;
     }
 
@@ -3473,12 +3465,12 @@ bool ManagerPrivate::deserializePrivateIdentityKey(ec_private_key **privateIdent
     BufferSecurePtr privateIdentityKeyBuffer = BufferSecurePtr::fromByteArray(serializedPrivateIdentityKey);
 
     if (!privateIdentityKeyBuffer) {
-        warning("Buffer for serialized private identity key could not be created");
+        warning(QStringLiteral("Buffer for serialized private identity key could not be created"));
         return false;
     }
 
     if (curve_decode_private_point(privateIdentityKey, signal_buffer_data(privateIdentityKeyBuffer.get()), signal_buffer_len(privateIdentityKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Private identity key could not be deserialized");
+        warning(QStringLiteral("Private identity key could not be deserialized"));
         return false;
     }
 
@@ -3498,12 +3490,12 @@ bool ManagerPrivate::deserializePublicIdentityKey(ec_public_key **publicIdentity
     BufferPtr publicIdentityKeyBuffer = BufferPtr::fromByteArray(serializedPublicIdentityKey);
 
     if (!publicIdentityKeyBuffer) {
-        warning("Buffer for serialized public identity key could not be created");
+        warning(QStringLiteral("Buffer for serialized public identity key could not be created"));
         return false;
     }
 
     if (curve_decode_point_ed(publicIdentityKey, signal_buffer_data(publicIdentityKeyBuffer.get()), signal_buffer_len(publicIdentityKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Public identity key could not be deserialized");
+        warning(QStringLiteral("Public identity key could not be deserialized"));
         return false;
     }
 
@@ -3523,12 +3515,12 @@ bool ManagerPrivate::deserializeSignedPublicPreKey(ec_public_key **signedPublicP
     BufferPtr signedPublicPreKeyBuffer = BufferPtr::fromByteArray(serializedSignedPublicPreKey);
 
     if (!signedPublicPreKeyBuffer) {
-        warning("Buffer for serialized signed public pre key could not be created");
+        warning(QStringLiteral("Buffer for serialized signed public pre key could not be created"));
         return false;
     }
 
     if (curve_decode_point_mont(signedPublicPreKey, signal_buffer_data(signedPublicPreKeyBuffer.get()), signal_buffer_len(signedPublicPreKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Signed public pre key could not be deserialized");
+        warning(QStringLiteral("Signed public pre key could not be deserialized"));
         return false;
     }
 
@@ -3548,12 +3540,12 @@ bool ManagerPrivate::deserializePublicPreKey(ec_public_key **publicPreKey, const
     auto publicPreKeyBuffer = BufferPtr::fromByteArray(serializedPublicPreKey);
 
     if (!publicPreKeyBuffer) {
-        warning("Buffer for serialized public pre key could not be created");
+        warning(QStringLiteral("Buffer for serialized public pre key could not be created"));
         return false;
     }
 
     if (curve_decode_point_mont(publicPreKey, signal_buffer_data(publicPreKeyBuffer.get()), signal_buffer_len(publicPreKeyBuffer.get()), globalContext.get()) < 0) {
-        warning("Public pre key could not be deserialized");
+        warning(QStringLiteral("Public pre key could not be deserialized"));
         return false;
     }
 
@@ -3581,9 +3573,9 @@ QXmppTask<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &rec
     const auto decryptionData = QCA::SecureArray(EMPTY_MESSAGE_DECRYPTION_DATA_SIZE);
 
     if (const auto data = createOmemoEnvelopeData(address.data(), decryptionData); data.isEmpty()) {
-        warning("OMEMO envelope for recipient JID '" % recipientJid % "' and device ID '" %
+        warning(u"OMEMO envelope for recipient JID '" % recipientJid % u"' and device ID '" %
                 QString::number(recipientDeviceId) %
-                "' could not be created because its data could not be encrypted");
+                u"' could not be created because its data could not be encrypted");
         QXmppError error {
             QStringLiteral("OMEMO envelope could not be created"),
             SendError::EncryptionError

@@ -295,7 +295,7 @@ void QXmppSocksServer::slotReadyRead()
 
         // notify of connection
         m_states.insert(socket, ReadyState);
-        Q_EMIT newConnection(socket, hostName, hostPort);
+        Q_EMIT newConnection(socket, QString::fromUtf8(hostName), hostPort);
 
         // send response
         buffer.resize(3);

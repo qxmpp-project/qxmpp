@@ -359,14 +359,14 @@ QXmppTask<bool> Manager::load()
         if (optionalOwnDevice) {
             d->ownDevice = *optionalOwnDevice;
         } else {
-            debug("Device could not be loaded because it is not stored");
+            debug(QStringLiteral("Device could not be loaded because it is not stored"));
             interface.finish(false);
             return;
         }
 
         const auto &signedPreKeyPairs = omemoData.signedPreKeyPairs;
         if (signedPreKeyPairs.isEmpty()) {
-            warning("Signed Pre keys could not be loaded because none is stored");
+            warning(QStringLiteral("Signed Pre keys could not be loaded because none is stored"));
             interface.finish(false);
             return;
         } else {
@@ -376,7 +376,7 @@ QXmppTask<bool> Manager::load()
 
         const auto &preKeyPairs = omemoData.preKeyPairs;
         if (preKeyPairs.isEmpty()) {
-            warning("Pre keys could not be loaded because none is stored");
+            warning(QStringLiteral("Pre keys could not be loaded because none is stored"));
             interface.finish(false);
             return;
         } else {
@@ -762,7 +762,7 @@ QXmppTask<QXmppPubSubManager::Result> Manager::removeContactDevices(const QStrin
     auto future = d->unsubscribeFromDeviceList(jid);
     future.then(this, [=](QXmppPubSubManager::Result result) mutable {
         if (std::holds_alternative<QXmppError>(result)) {
-            warning("Contact '" % jid % "' could not be removed because the device list subscription could not be removed");
+            warning(u"Contact '" % jid % u"' could not be removed because the device list subscription could not be removed");
             interface.finish(std::move(result));
         } else {
             d->devices.remove(jid);
@@ -864,7 +864,7 @@ QXmppTask<void> Manager::buildMissingSessions(const QList<QString> &jids)
     for (const auto &jid : jids) {
         // Do not exceed the maximum of manageable devices.
         if (devicesCount > d->maximumDevicesPerStanza - devicesCount) {
-            warning("Sessions could not be built for all JIDs because their devices are "
+            warning(u"Sessions could not be built for all JIDs because their devices are "
                     "altogether more than the maximum of manageable devices " %
                     QString::number(d->maximumDevicesPerStanza) %
                     u" - Use QXmppOmemoManager::setMaximumDevicesPerStanza() to increase the maximum");
@@ -1121,24 +1121,24 @@ bool QXmppOmemoManager::isEncrypted(const QXmppMessage &message)
 QStringList Manager::discoveryFeatures() const
 {
     return {
-        ns_omemo_2_devices % "+notify"
+        ns_omemo_2_devices % u"+notify"
     };
 }
 
 bool Manager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() != "iq" || !QXmppOmemoIq::isOmemoIq(stanza)) {
+    if (stanza.tagName() != u"iq" || !QXmppOmemoIq::isOmemoIq(stanza)) {
         return false;
     }
 
     // TODO: Queue incoming IQs until OMEMO is initialized
     if (!d->isStarted) {
-        warning("Couldn't decrypt incoming IQ because the manager isn't initialized yet.");
+        warning(QStringLiteral("Couldn't decrypt incoming IQ because the manager isn't initialized yet."));
         return false;
     }
 
-    auto type = stanza.attribute("type");
-    if (type != "get" && type != "set") {
+    auto type = stanza.attribute(QStringLiteral("type"));
+    if (type != u"get" && type != u"set") {
         // ignore incoming result and error IQs (they are handled via Client::sendIq())
         return false;
     }
@@ -1147,7 +1147,7 @@ bool Manager::handleStanza(const QDomElement &stanza)
         if (result) {
             injectIq(result->iq, result->e2eeMetadata);
         } else {
-            warning("Could not decrypt incoming OMEMO IQ.");
+            warning(QStringLiteral("Could not decrypt incoming OMEMO IQ."));
         }
     });
     return true;

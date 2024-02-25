@@ -294,11 +294,11 @@ void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_register));
 
     if (!d->instructions.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("instructions"), d->instructions);
+        writer->writeTextElement(QSL65("instructions"), d->instructions);
     }
 
     if (d->isRegistered) {
@@ -309,19 +309,19 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
 
     if (!d->username.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("username"), d->username);
+        writer->writeTextElement(QSL65("username"), d->username);
     } else if (!d->username.isNull()) {
         writer->writeEmptyElement(QStringLiteral("username"));
     }
 
     if (!d->password.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("password"), d->password);
+        writer->writeTextElement(QSL65("password"), d->password);
     } else if (!d->password.isNull()) {
         writer->writeEmptyElement(QStringLiteral("password"));
     }
 
     if (!d->email.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("email"), d->email);
+        writer->writeTextElement(QSL65("email"), d->email);
     } else if (!d->email.isNull()) {
         writer->writeEmptyElement(QStringLiteral("email"));
     }
@@ -330,9 +330,9 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     d->bitsOfBinaryData.toXml(writer);
 
     if (!d->outOfBandUrl.isEmpty()) {
-        writer->writeStartElement(QStringLiteral("x"));
+        writer->writeStartElement(QSL65("x"));
         writer->writeDefaultNamespace(toString65(ns_oob));
-        writer->writeTextElement(QStringLiteral("url"), d->outOfBandUrl);
+        writer->writeTextElement(QSL65("url"), d->outOfBandUrl);
         writer->writeEndElement();
     }
 

@@ -98,25 +98,25 @@ void QXmppThumbnail::setHeight(std::optional<uint32_t> newHeight)
 /// \cond
 bool QXmppThumbnail::parse(const QDomElement &el)
 {
-    if (el.tagName() == "thumbnail" && el.namespaceURI() == ns_thumbs) {
-        if (!el.hasAttribute("uri")) {
+    if (el.tagName() == u"thumbnail" && el.namespaceURI() == ns_thumbs) {
+        if (!el.hasAttribute(QStringLiteral("uri"))) {
             return false;
         }
 
-        d->uri = el.attribute("uri");
-        if (el.hasAttribute("media-type")) {
+        d->uri = el.attribute(QStringLiteral("uri"));
+        if (el.hasAttribute(QStringLiteral("media-type"))) {
             d->mediaType = QMimeDatabase().mimeTypeForName(el.attribute(QStringLiteral("media-type")));
         }
 
         bool success = false;
-        if (auto string = el.attribute("width"); !string.isEmpty()) {
+        if (auto string = el.attribute(QStringLiteral("width")); !string.isEmpty()) {
             if (auto parsedInt = string.toUInt(&success); success) {
                 d->width = parsedInt;
             } else {
                 return false;
             }
         }
-        if (auto string = el.attribute("height"); !string.isEmpty()) {
+        if (auto string = el.attribute(QStringLiteral("height")); !string.isEmpty()) {
             if (auto parsedInt = string.toUInt(&success); success) {
                 d->height = parsedInt;
             } else {
@@ -130,17 +130,17 @@ bool QXmppThumbnail::parse(const QDomElement &el)
 
 void QXmppThumbnail::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("thumbnail"));
+    writer->writeStartElement(QSL65("thumbnail"));
     writer->writeDefaultNamespace(toString65(ns_thumbs));
-    writer->writeAttribute(QStringLiteral("uri"), d->uri);
+    writer->writeAttribute(QSL65("uri"), d->uri);
     if (d->mediaType.isValid()) {
-        writer->writeAttribute("media-type", d->mediaType.name());
+        writer->writeAttribute(QSL65("media-type"), d->mediaType.name());
     }
     if (d->width) {
-        writer->writeAttribute("width", QString::number(*d->width));
+        writer->writeAttribute(QSL65("width"), QString::number(*d->width));
     }
     if (d->height) {
-        writer->writeAttribute("height", QString::number(*d->height));
+        writer->writeAttribute(QSL65("height"), QString::number(*d->height));
     }
     writer->writeEndElement();
 }

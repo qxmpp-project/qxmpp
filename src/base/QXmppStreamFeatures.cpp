@@ -327,7 +327,7 @@ static void writeBoolenFeature(QXmlStreamWriter *writer, QStringView tagName, QS
 
 void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("stream:features"));
+    writer->writeStartElement(QSL65("stream:features"));
     writeFeature(writer, u"bind", ns_bind, d->bindMode);
     writeFeature(writer, u"session", ns_session, d->sessionMode);
     writeFeature(writer, u"auth", ns_authFeature, d->nonSaslAuthMode);
@@ -339,18 +339,18 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
     writeBoolenFeature(writer, u"ver", ns_rosterver, d->rosterVersioningSupported);
 
     if (!d->compressionMethods.isEmpty()) {
-        writer->writeStartElement(QStringLiteral("compression"));
+        writer->writeStartElement(QSL65("compression"));
         writer->writeDefaultNamespace(toString65(ns_compressFeature));
         for (const auto &method : std::as_const(d->compressionMethods)) {
-            writer->writeTextElement(QStringLiteral("method"), method);
+            writer->writeTextElement(QSL65("method"), method);
         }
         writer->writeEndElement();
     }
     if (!d->authMechanisms.isEmpty()) {
-        writer->writeStartElement(QStringLiteral("mechanisms"));
+        writer->writeStartElement(QSL65("mechanisms"));
         writer->writeDefaultNamespace(toString65(ns_sasl));
         for (const auto &mechanism : std::as_const(d->authMechanisms)) {
-            writer->writeTextElement(QStringLiteral("mechanism"), mechanism);
+            writer->writeTextElement(QSL65("mechanism"), mechanism);
         }
         writer->writeEndElement();
     }

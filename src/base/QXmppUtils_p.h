@@ -53,6 +53,13 @@ inline auto toString65(QStringView s)
 #endif
 }
 
+// QStringLiteral for Qt < 6.5, otherwise uses string view
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+#define QSL65(text) u"" text
+#else
+#define QSL65(text) QStringLiteral(text)
+#endif
+
 // XML streams
 void writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name, QStringView value);
 void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView value);

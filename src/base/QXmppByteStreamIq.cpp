@@ -210,7 +210,7 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_bytestreams));
     writeOptionalXmlAttribute(writer, u"sid", m_sid);
     QString modeStr;
@@ -221,7 +221,7 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
     writeOptionalXmlAttribute(writer, u"mode", modeStr);
     for (const auto &streamHost : m_streamHosts) {
-        writer->writeStartElement(QStringLiteral("streamhost"));
+        writer->writeStartElement(QSL65("streamhost"));
         writeOptionalXmlAttribute(writer, u"host", streamHost.host());
         writeOptionalXmlAttribute(writer, u"jid", streamHost.jid());
         writeOptionalXmlAttribute(writer, u"port", QString::number(streamHost.port()));
@@ -232,7 +232,7 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
         writeXmlTextElement(writer, u"activate", m_activate);
     }
     if (!m_streamHostUsed.isEmpty()) {
-        writer->writeStartElement(QStringLiteral("streamhost-used"));
+        writer->writeStartElement(QSL65("streamhost-used"));
         writeOptionalXmlAttribute(writer, u"jid", m_streamHostUsed);
         writer->writeEndElement();
     }

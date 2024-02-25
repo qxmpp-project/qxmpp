@@ -142,13 +142,13 @@ void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMamQueryIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_mam));
     if (!d->node.isEmpty()) {
-        writer->writeAttribute(QStringLiteral("node"), d->node);
+        writer->writeAttribute(QSL65("node"), d->node);
     }
     if (!d->queryId.isEmpty()) {
-        writer->writeAttribute(QStringLiteral("queryid"), d->queryId);
+        writer->writeAttribute(QSL65("queryid"), d->queryId);
     }
     d->form.toXml(writer);
     d->resultSetQuery.toXml(writer);
@@ -248,10 +248,10 @@ void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppMamResultIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("fin"));
+    writer->writeStartElement(QSL65("fin"));
     writer->writeDefaultNamespace(toString65(ns_mam));
     if (d->complete) {
-        writer->writeAttribute(QStringLiteral("complete"), QStringLiteral("true"));
+        writer->writeAttribute(QSL65("complete"), QStringLiteral("true"));
     }
     d->resultSetReply.toXml(writer);
     writer->writeEndElement();

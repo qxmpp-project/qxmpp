@@ -164,7 +164,7 @@ QString QXmppUtils::jidToDomain(const QString &jid)
 
 QString QXmppUtils::jidToResource(const QString &jid)
 {
-    const int pos = jid.indexOf(QChar('/'));
+    const int pos = jid.indexOf(u'/');
     if (pos < 0) {
         return QString();
     }
@@ -175,7 +175,7 @@ QString QXmppUtils::jidToResource(const QString &jid)
 
 QString QXmppUtils::jidToUser(const QString &jid)
 {
-    const int pos = jid.indexOf(QChar('@'));
+    const int pos = jid.indexOf(u'@');
     if (pos < 0) {
         return QString();
     }
@@ -186,7 +186,7 @@ QString QXmppUtils::jidToUser(const QString &jid)
 
 QString QXmppUtils::jidToBareJid(const QString &jid)
 {
-    const int pos = jid.indexOf(QChar('/'));
+    const int pos = jid.indexOf(u'/');
     if (pos < 0) {
         return jid;
     }

@@ -17,6 +17,7 @@
 #include "QXmppStreamManagement_p.h"
 #include "QXmppTask.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QCryptographicHash>
 #include <QDnsLookup>
@@ -24,6 +25,7 @@
 #include <QNetworkProxy>
 #include <QSslConfiguration>
 #include <QSslSocket>
+#include <QStringBuilder>
 #include <QUrl>
 
 // IQ types
@@ -39,6 +41,8 @@
 #include <QStringList>
 #include <QTimer>
 #include <QXmlStreamWriter>
+
+using namespace QXmpp::Private;
 
 class QXmppOutgoingClientPrivate
 {
@@ -127,7 +131,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
 
 void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port)
 {
-    q->info(QString("Connecting to %1:%2").arg(host, QString::number(port)));
+    q->info(QStringLiteral("Connecting to %1:%2").arg(host, QString::number(port)));
 
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
@@ -146,7 +150,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
     if (localSecurity == QXmppConfiguration::LegacySSL) {
         if (!q->socket()->supportsSsl()) {
-            q->warning("Not connecting as legacy SSL was requested, but SSL support is not available");
+            q->warning(QStringLiteral("Not connecting as legacy SSL was requested, but SSL support is not available"));
             return;
         }
         q->socket()->connectToHostEncrypted(host, port);
@@ -234,8 +238,8 @@ void QXmppOutgoingClient::connectToHost()
 
     // otherwise, lookup server
     const QString domain = configuration().domain();
-    debug(QString("Looking up server for domain %1").arg(domain));
-    d->dns.setName("_xmpp-client._tcp." + domain);
+    debug(QStringLiteral("Looking up server for domain %1").arg(domain));
+    d->dns.setName(QStringLiteral("_xmpp-client._tcp.") + domain);
     d->dns.setType(QDnsLookup::SRV);
     d->dns.lookup();
     d->nextSrvRecordIdx = 0;
@@ -260,7 +264,7 @@ void QXmppOutgoingClient::_q_dnsLookupFinished()
         d->connectToNextDNSHost();
     } else {
         // as a fallback, use domain as the host name
-        warning(QString("Lookup for domain %1 failed: %2")
+        warning(QStringLiteral("Lookup for domain %1 failed: %2")
                     .arg(d->dns.name(), d->dns.errorString()));
         d->connectToHost(d->config.domain(), d->config.port());
     }
@@ -331,7 +335,7 @@ QXmppTask<QXmppStream::IqResult> QXmppOutgoingClient::sendIq(QXmppIq &&iq)
 
 void QXmppOutgoingClient::_q_socketDisconnected()
 {
-    debug("Socket disconnected");
+    debug(QStringLiteral("Socket disconnected"));
     d->isAuthenticated = false;
     if (!d->redirectHost.isEmpty() && d->redirectPort > 0) {
         d->connectToHost(d->redirectHost, d->redirectPort);
@@ -345,7 +349,7 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
 {
     // log errors
-    warning("SSL errors");
+    warning(QStringLiteral("SSL errors"));
     for (int i = 0; i < errors.count(); ++i) {
         warning(errors.at(i).errorString());
     }
@@ -407,13 +411,13 @@ void QXmppOutgoingClient::handleStart()
 void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
 {
     if (d->streamId.isEmpty()) {
-        d->streamId = streamElement.attribute("id");
+        d->streamId = streamElement.attribute(QStringLiteral("id"));
     }
     if (d->streamFrom.isEmpty()) {
-        d->streamFrom = streamElement.attribute("from");
+        d->streamFrom = streamElement.attribute(QStringLiteral("from"));
     }
     if (d->streamVersion.isEmpty()) {
-        d->streamVersion = streamElement.attribute("version");
+        d->streamVersion = streamElement.attribute(QStringLiteral("version"));
 
         // no version specified, signals XMPP Version < 1.0.
         // switch to old auth mechanism if enabled
@@ -457,13 +461,13 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 supportedMechanisms.prepend(preferredMechanism);
             }
             if (configuration().facebookAppId().isEmpty() || configuration().facebookAccessToken().isEmpty()) {
-                supportedMechanisms.removeAll("X-FACEBOOK-PLATFORM");
+                supportedMechanisms.removeAll(QStringLiteral("X-FACEBOOK-PLATFORM"));
             }
             if (configuration().windowsLiveAccessToken().isEmpty()) {
-                supportedMechanisms.removeAll("X-MESSENGER-OAUTH2");
+                supportedMechanisms.removeAll(QStringLiteral("X-MESSENGER-OAUTH2"));
             }
             if (configuration().googleAccessToken().isEmpty()) {
-                supportedMechanisms.removeAll("X-OAUTH2");
+                supportedMechanisms.removeAll(QStringLiteral("X-OAUTH2"));
             }
 
             // determine SASL Authentication mechanism to use
@@ -475,7 +479,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 }
             }
             if (commonMechanisms.isEmpty()) {
-                warning("No supported SASL Authentication mechanism available");
+                warning(QStringLiteral("No supported SASL Authentication mechanism available"));
                 disconnectFromHost();
                 return;
             } else {
@@ -484,19 +488,19 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             d->saslClient = QXmppSaslClient::create(usedMechanism, this);
             if (!d->saslClient) {
-                warning("SASL mechanism negotiation failed");
+                warning(QStringLiteral("SASL mechanism negotiation failed"));
                 disconnectFromHost();
                 return;
             }
-            info(QString("SASL mechanism '%1' selected").arg(d->saslClient->mechanism()));
+            info(QStringLiteral("SASL mechanism '%1' selected").arg(d->saslClient->mechanism()));
             d->saslClient->setHost(d->config.domain());
-            d->saslClient->setServiceType("xmpp");
-            if (d->saslClient->mechanism() == "X-FACEBOOK-PLATFORM") {
+            d->saslClient->setServiceType(QStringLiteral("xmpp"));
+            if (d->saslClient->mechanism() == u"X-FACEBOOK-PLATFORM") {
                 d->saslClient->setUsername(configuration().facebookAppId());
                 d->saslClient->setPassword(configuration().facebookAccessToken());
-            } else if (d->saslClient->mechanism() == "X-MESSENGER-OAUTH2") {
+            } else if (d->saslClient->mechanism() == u"X-MESSENGER-OAUTH2") {
                 d->saslClient->setPassword(configuration().windowsLiveAccessToken());
-            } else if (d->saslClient->mechanism() == "X-OAUTH2") {
+            } else if (d->saslClient->mechanism() == u"X-OAUTH2") {
                 d->saslClient->setUsername(configuration().user());
                 d->saslClient->setPassword(configuration().googleAccessToken());
             } else {
@@ -507,7 +511,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             // send SASL auth request
             QByteArray response;
             if (!d->saslClient->respond(QByteArray(), response)) {
-                warning("SASL initial response failed");
+                warning(QStringLiteral("SASL initial response failed"));
                 disconnectFromHost();
                 return;
             }
@@ -549,9 +553,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // otherwise we are done
         d->sessionStarted = true;
         Q_EMIT connected();
-    } else if (ns == ns_stream && nodeRecv.tagName() == "error") {
+    } else if (ns == ns_stream && nodeRecv.tagName() == u"error") {
         // handle redirects
-        const auto otherHost = nodeRecv.firstChildElement("see-other-host");
+        const auto otherHost = firstChildElement(nodeRecv, u"see-other-host");
         if (!otherHost.isNull()) {
             // try to parse address
             if (auto [host, port] = parseHostAddress(otherHost.text()); !host.isEmpty()) {
@@ -563,9 +567,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             }
         }
 
-        if (!nodeRecv.firstChildElement("conflict").isNull()) {
+        if (!firstChildElement(nodeRecv, u"conflict").isNull()) {
             d->xmppStreamError = QXmppStanza::Error::Conflict;
-        } else if (!nodeRecv.firstChildElement("not-authorized").isNull()) {
+        } else if (!firstChildElement(nodeRecv, u"not-authorized").isNull()) {
             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
         } else {
             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
@@ -573,14 +577,14 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         Q_EMIT error(QXmppClient::XmppStreamError);
     } else if (ns == ns_sasl) {
         if (!d->saslClient) {
-            warning("SASL stanza received, but no mechanism selected");
+            warning(QStringLiteral("SASL stanza received, but no mechanism selected"));
             return;
         }
-        if (nodeRecv.tagName() == "success") {
-            debug("Authenticated");
+        if (nodeRecv.tagName() == u"success") {
+            debug(QStringLiteral("Authenticated"));
             d->isAuthenticated = true;
             handleStart();
-        } else if (nodeRecv.tagName() == "challenge") {
+        } else if (nodeRecv.tagName() == u"challenge") {
             QXmppSaslChallenge challenge;
             challenge.parse(nodeRecv);
 
@@ -588,34 +592,34 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             if (d->saslClient->respond(challenge.value(), response)) {
                 sendPacket(QXmppSaslResponse(response));
             } else {
-                warning("Could not respond to SASL challenge");
+                warning(QStringLiteral("Could not respond to SASL challenge"));
                 disconnectFromHost();
             }
-        } else if (nodeRecv.tagName() == "failure") {
+        } else if (nodeRecv.tagName() == u"failure") {
             QXmppSaslFailure failure;
             failure.parse(nodeRecv);
 
             // RFC3920 defines the error condition as "not-authorized", but
             // some broken servers use "bad-auth" instead. We tolerate this
             // by remapping the error to "not-authorized".
-            if (failure.condition() == "not-authorized" || failure.condition() == "bad-auth") {
+            if (failure.condition() == u"not-authorized" || failure.condition() == u"bad-auth") {
                 d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
             } else {
                 d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
             }
             Q_EMIT error(QXmppClient::XmppStreamError);
 
-            warning("Authentication failure");
+            warning(QStringLiteral("Authentication failure"));
             disconnectFromHost();
         }
     } else if (ns == ns_client) {
 
-        if (nodeRecv.tagName() == "iq") {
+        if (nodeRecv.tagName() == u"iq") {
             QDomElement element = nodeRecv.firstChildElement();
-            QString id = nodeRecv.attribute("id");
-            QString type = nodeRecv.attribute("type");
+            QString id = nodeRecv.attribute(QStringLiteral("id"));
+            QString type = nodeRecv.attribute(QStringLiteral("type"));
             if (type.isEmpty()) {
-                warning("QXmppStream: iq type can't be empty");
+                warning(QStringLiteral("QXmppStream: iq type can't be empty"));
             }
 
             if (id == d->sessionId) {
@@ -636,14 +640,14 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 // bind result
                 if (bind.type() == QXmppIq::Result) {
                     if (!bind.jid().isEmpty()) {
-                        static const QRegularExpression jidRegex("^([^@/]+)@([^@/]+)/(.+)$");
+                        static const QRegularExpression jidRegex(QStringLiteral("^([^@/]+)@([^@/]+)/(.+)$"));
 
                         if (const auto match = jidRegex.match(bind.jid()); match.hasMatch()) {
                             configuration().setUser(match.captured(1));
                             configuration().setDomain(match.captured(2));
                             configuration().setResource(match.captured(3));
                         } else {
-                            warning("Bind IQ received with invalid JID: " + bind.jid());
+                            warning(QStringLiteral("Bind IQ received with invalid JID: ") + bind.jid());
                         }
                     }
 
@@ -662,25 +666,25 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 } else if (bind.type() == QXmppIq::Error) {
                     d->xmppStreamError = bind.error().condition();
                     Q_EMIT error(QXmppClient::XmppStreamError);
-                    warning("Resource binding error received: " + bind.error().text());
+                    warning(QStringLiteral("Resource binding error received: ") + bind.error().text());
                     disconnectFromHost();
                 }
             }
             // extensions
 
             // XEP-0078: Non-SASL Authentication
-            else if (id == d->nonSASLAuthId && type == "result") {
+            else if (id == d->nonSASLAuthId && type == u"result") {
                 // successful Non-SASL Authentication
-                debug("Authenticated (Non-SASL)");
+                debug(QStringLiteral("Authenticated (Non-SASL)"));
                 d->isAuthenticated = true;
 
                 // xmpp connection made
                 d->sessionStarted = true;
                 Q_EMIT connected();
             } else if (QXmppNonSASLAuthIq::isNonSASLAuthIq(nodeRecv)) {
-                if (type == "result") {
-                    bool digest = !nodeRecv.firstChildElement("query").firstChildElement("digest").isNull();
-                    bool plain = !nodeRecv.firstChildElement("query").firstChildElement("password").isNull();
+                if (type == u"result") {
+                    bool digest = !firstChildElement(firstChildElement(nodeRecv, u"query"), u"digest").isNull();
+                    bool plain = !firstChildElement(firstChildElement(nodeRecv, u"query"), u"password").isNull();
                     bool plainText = false;
 
                     if (plain && digest) {
@@ -695,7 +699,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     } else if (digest) {
                         plainText = false;
                     } else {
-                        warning("No supported Non-SASL Authentication mechanism available");
+                        warning(QStringLiteral("No supported Non-SASL Authentication mechanism available"));
                         disconnectFromHost();
                         return;
                     }
@@ -717,7 +721,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                 // if we didn't understant the iq, reply with error
                 // except for "result" and "error" iqs
-                if (type != "result" && type != "error") {
+                if (type != u"result" && type != u"error") {
                     QXmppIq iq(QXmppIq::Error);
                     iq.setId(iqPacket.id());
                     iq.setTo(iqPacket.from());
@@ -729,13 +733,13 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     Q_EMIT iqReceived(iqPacket);
                 }
             }
-        } else if (nodeRecv.tagName() == "presence") {
+        } else if (nodeRecv.tagName() == u"presence") {
             QXmppPresence presence;
             presence.parse(nodeRecv);
 
             // emit presence
             Q_EMIT presenceReceived(presence);
-        } else if (nodeRecv.tagName() == "message") {
+        } else if (nodeRecv.tagName() == u"message") {
             QXmppMessage message;
             message.parse(nodeRecv);
 
@@ -829,7 +833,7 @@ void QXmppOutgoingClient::pingSend()
 
 void QXmppOutgoingClient::pingTimeout()
 {
-    warning("Ping timeout");
+    warning(QStringLiteral("Ping timeout"));
     QXmppStream::disconnectFromHost();
     Q_EMIT error(QXmppClient::KeepAliveError);
 }
@@ -855,7 +859,7 @@ bool QXmppOutgoingClient::setResumeAddress(const QString &address)
 
 std::pair<QString, int> QXmppOutgoingClient::parseHostAddress(const QString &address)
 {
-    QUrl url("//" + address);
+    QUrl url(u"//" % address);
     if (url.isValid() && !url.host().isEmpty()) {
         return { url.host(), url.port() };
     }

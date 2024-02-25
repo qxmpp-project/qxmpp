@@ -4,6 +4,11 @@
 
 include(GenerateExportHeader)
 
+# extra definitions, only for src/
+add_definitions(
+    -DQT_NO_CAST_FROM_ASCII
+)
+
 set(INSTALL_HEADER_FILES
     # Base
     base/QXmppArchiveIq.h

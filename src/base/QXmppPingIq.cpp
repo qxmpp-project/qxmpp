@@ -36,7 +36,7 @@ bool QXmppPingIq::isPingIq(const QDomElement &element)
 /// \cond
 void QXmppPingIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("ping"));
+    writer->writeStartElement(QSL65("ping"));
     writer->writeDefaultNamespace(toString65(ns_ping));
     writer->writeEndElement();
 }

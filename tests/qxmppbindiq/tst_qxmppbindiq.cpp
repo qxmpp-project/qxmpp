@@ -28,7 +28,7 @@ void tst_QXmppBindIq::testNoResource()
     QXmppBindIq bind;
     parsePacket(bind, xml);
     QCOMPARE(bind.type(), QXmppIq::Set);
-    QCOMPARE(bind.id(), QString("bind_1"));
+    QCOMPARE(bind.id(), QStringLiteral("bind_1"));
     QCOMPARE(bind.jid(), QString());
     QCOMPARE(bind.resource(), QString());
     serializePacket(bind, xml);
@@ -46,9 +46,9 @@ void tst_QXmppBindIq::testResource()
     QXmppBindIq bind;
     parsePacket(bind, xml);
     QCOMPARE(bind.type(), QXmppIq::Set);
-    QCOMPARE(bind.id(), QString("bind_2"));
+    QCOMPARE(bind.id(), QStringLiteral("bind_2"));
     QCOMPARE(bind.jid(), QString());
-    QCOMPARE(bind.resource(), QString("someresource"));
+    QCOMPARE(bind.resource(), QStringLiteral("someresource"));
     serializePacket(bind, xml);
 }
 
@@ -64,8 +64,8 @@ void tst_QXmppBindIq::testResult()
     QXmppBindIq bind;
     parsePacket(bind, xml);
     QCOMPARE(bind.type(), QXmppIq::Result);
-    QCOMPARE(bind.id(), QString("bind_2"));
-    QCOMPARE(bind.jid(), QString("somenode@example.com/someresource"));
+    QCOMPARE(bind.id(), QStringLiteral("bind_2"));
+    QCOMPARE(bind.jid(), QStringLiteral("somenode@example.com/someresource"));
     QCOMPARE(bind.resource(), QString());
     serializePacket(bind, xml);
 }

@@ -34,22 +34,22 @@ static QString cipherToString(Cipher cipher)
 {
     switch (cipher) {
     case Aes128GcmNoPad:
-        return "urn:xmpp:ciphers:aes-128-gcm-nopadding:0";
+        return QStringLiteral("urn:xmpp:ciphers:aes-128-gcm-nopadding:0");
     case Aes256GcmNoPad:
-        return "urn:xmpp:ciphers:aes-256-gcm-nopadding:0";
+        return QStringLiteral("urn:xmpp:ciphers:aes-256-gcm-nopadding:0");
     case Aes256CbcPkcs7:
-        return "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0";
+        return QStringLiteral("urn:xmpp:ciphers:aes-256-cbc-pkcs7:0");
     }
     Q_UNREACHABLE();
 }
 
 static std::optional<Cipher> cipherFromString(const QString &cipher)
 {
-    if (cipher == "urn:xmpp:ciphers:aes-128-gcm-nopadding:0") {
+    if (cipher == u"urn:xmpp:ciphers:aes-128-gcm-nopadding:0") {
         return Aes128GcmNoPad;
-    } else if (cipher == "urn:xmpp:ciphers:aes-256-gcm-nopadding:0") {
+    } else if (cipher == u"urn:xmpp:ciphers:aes-256-gcm-nopadding:0") {
         return Aes256GcmNoPad;
-    } else if (cipher == "urn:xmpp:ciphers:aes-256-cbc-pkcs7:0") {
+    } else if (cipher == u"urn:xmpp:ciphers:aes-256-cbc-pkcs7:0") {
         return Aes256CbcPkcs7;
     }
     return {};
@@ -174,15 +174,20 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
 
 void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("encrypted"));
+    writer->writeStartElement(QSL65("encrypted"));
     writer->writeDefaultNamespace(toString65(ns_esfs));
-    writer->writeAttribute(QStringLiteral("cipher"), cipherToString(d->cipher));
-    writer->writeTextElement(QStringLiteral("key"), d->key.toBase64());
-    writer->writeTextElement(QStringLiteral("iv"), d->iv.toBase64());
+    writer->writeAttribute(QSL65("cipher"), cipherToString(d->cipher));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    writer->writeTextElement("key", d->key.toBase64());
+    writer->writeTextElement("iv", d->iv.toBase64());
+#else
+    writer->writeTextElement(QStringLiteral("key"), QString::fromUtf8(d->key.toBase64()));
+    writer->writeTextElement(QStringLiteral("iv"), QString::fromUtf8(d->iv.toBase64()));
+#endif
     for (const auto &hash : d->hashes) {
         hash.toXml(writer);
     }
-    writer->writeStartElement(QStringLiteral("sources"));
+    writer->writeStartElement(QSL65("sources"));
     writer->writeDefaultNamespace(toString65(ns_sfs));
     for (const auto &source : d->httpSources) {
         source.toXml(writer);

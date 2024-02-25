@@ -107,7 +107,7 @@ QStringList QXmppInvokable::interfaces() const
     for (int idx = 0; idx < methodCount; ++idx) {
         if (metaObject()->method(idx).methodType() == QMetaMethod::Slot) {
             QByteArray signature = metaObject()->method(idx).methodSignature();
-            results << signature.left(signature.indexOf('('));
+            results << QString::fromUtf8(signature.left(signature.indexOf(u'(')));
         }
     }
     return results;

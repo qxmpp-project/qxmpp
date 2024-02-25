@@ -11,6 +11,7 @@
 #include <QDataStream>
 #include <QHostInfo>
 #include <QNetworkInterface>
+#include <QStringBuilder>
 #include <QTimer>
 #include <QUdpSocket>
 #include <QVariant>
@@ -94,7 +95,7 @@ static QString computeFoundation(QXmppJingleCandidate::Type type, const QString 
 {
     QCryptographicHash hash(QCryptographicHash::Md5);
     hash.addData((QString::number(type) + protocol + baseAddress.toString()).toUtf8());
-    return hash.result().toHex();
+    return QString::fromUtf8(hash.result().toHex());
 }
 
 static bool isIPv6LinkLocalAddress(const QHostAddress &addr)
@@ -554,7 +555,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
         // only FINGERPRINT is allowed after MESSAGE-INTEGRITY
         if (after_integrity && a_type != Fingerprint) {
-            *errors << QString("Skipping attribute %1 after MESSAGE-INTEGRITY").arg(QString::number(a_type));
+            *errors << QStringLiteral("Skipping attribute %1 after MESSAGE-INTEGRITY").arg(QString::number(a_type));
             stream.skipRawData(a_length + pad_length);
             done += 4 + a_length + pad_length;
             continue;
@@ -1148,7 +1149,7 @@ QString QXmppStunMessage::toString() const
         dumpLines << QStringLiteral(" * USE-CANDIDATE");
     }
 
-    return dumpLines.join("\n");
+    return dumpLines.join(u'\n');
 }
 
 /// \cond
@@ -1332,7 +1333,7 @@ QXmppJingleCandidate QXmppTurnAllocation::localCandidate(int component) const
     candidate.setHost(relayedHost());
     candidate.setId(QXmppUtils::generateStanzaHash(10));
     candidate.setPort(relayedPort());
-    candidate.setProtocol("udp");
+    candidate.setProtocol(QStringLiteral("udp"));
     candidate.setType(QXmppJingleCandidate::RelayedType);
     candidate.setPriority(candidatePriority(candidate));
     candidate.setFoundation(computeFoundation(
@@ -1516,7 +1517,7 @@ void QXmppTurnAllocation::transactionFinished()
         m_nonce = reply.nonce();
         m_realm = reply.realm();
         QCryptographicHash hash(QCryptographicHash::Md5);
-        hash.addData((m_username + ":" + m_realm + ":" + m_password).toUtf8());
+        hash.addData((m_username % u':' % m_realm % u':' % m_password).toUtf8());
         m_key = hash.result();
 
         // retry request
@@ -1540,7 +1541,7 @@ void QXmppTurnAllocation::transactionFinished()
         if (reply.xorRelayedHost.isNull() ||
             reply.xorRelayedHost.protocol() != QAbstractSocket::IPv4Protocol ||
             !reply.xorRelayedPort) {
-            warning("Allocation did not yield a valid relayed address");
+            warning(QStringLiteral("Allocation did not yield a valid relayed address"));
             setState(UnconnectedState);
             return;
         }
@@ -2356,7 +2357,7 @@ void QXmppIceComponent::transactionFinished()
             candidate.setHost(reflexiveHost);
             candidate.setId(QXmppUtils::generateStanzaHash(10));
             candidate.setPort(reflexivePort);
-            candidate.setProtocol("udp");
+            candidate.setProtocol(QStringLiteral("udp"));
             candidate.setType(QXmppJingleCandidate::ServerReflexiveType);
             candidate.setPriority(candidatePriority(candidate));
             candidate.setFoundation(computeFoundation(
@@ -2891,7 +2892,9 @@ void QXmppIceConnection::slotGatheringStateChanged()
     }
 
     if (newGatheringState != d->gatheringState) {
-        info(QStringLiteral("ICE gathering state changed from '%1' to '%2'").arg(gathering_states[d->gatheringState], gathering_states[newGatheringState]));
+        info(QStringLiteral("ICE gathering state changed from '%1' to '%2'")
+                 .arg(QString::fromUtf8(gathering_states[d->gatheringState]),
+                      QString::fromUtf8(gathering_states[newGatheringState])));
         d->gatheringState = newGatheringState;
         Q_EMIT gatheringStateChanged();
     }

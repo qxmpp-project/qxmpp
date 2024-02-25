@@ -48,7 +48,7 @@ void tst_QXmppDataForm::testSimple()
     QCOMPARE(form.fields().size(), 1);
     QCOMPARE(form.fields().at(0).type(), QXmppDataForm::Field::TextSingleField);
     QCOMPARE(form.fields().at(0).isRequired(), true);
-    QCOMPARE(form.fields().at(0).key(), QString("search_request"));
+    QCOMPARE(form.fields().at(0).key(), QStringLiteral("search_request"));
 
     serializePacket(form, xml);
 }

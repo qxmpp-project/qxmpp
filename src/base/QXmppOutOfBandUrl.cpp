@@ -80,11 +80,11 @@ bool QXmppOutOfBandUrl::parse(const QDomElement &el)
 
 void QXmppOutOfBandUrl::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("x"));
+    writer->writeStartElement(QSL65("x"));
     writer->writeDefaultNamespace(toString65(ns_oob));
-    writer->writeTextElement(QStringLiteral("url"), d->url);
+    writer->writeTextElement(QSL65("url"), d->url);
     if (d->description) {
-        writer->writeTextElement(QStringLiteral("desc"), *d->description);
+        writer->writeTextElement(QSL65("desc"), *d->description);
     }
     writer->writeEndElement();
 }

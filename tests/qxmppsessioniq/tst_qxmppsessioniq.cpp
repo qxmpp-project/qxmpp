@@ -24,8 +24,8 @@ void TestPackets::testSession()
 
     QXmppSessionIq session;
     parsePacket(session, xml);
-    QCOMPARE(session.id(), QString("session_1"));
-    QCOMPARE(session.to(), QString("example.com"));
+    QCOMPARE(session.id(), QStringLiteral("session_1"));
+    QCOMPARE(session.to(), QStringLiteral("example.com"));
     QCOMPARE(session.type(), QXmppIq::Set);
     serializePacket(session, xml);
 }

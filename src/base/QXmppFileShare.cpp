@@ -21,10 +21,10 @@ using Disposition = QXmppFileShare::Disposition;
 
 static std::optional<Disposition> dispositionFromString(const QString &str)
 {
-    if (str == "inline") {
+    if (str == u"inline") {
         return Disposition::Inline;
     }
-    if (str == "attachment") {
+    if (str == u"attachment") {
         return Disposition::Attachment;
     }
     return {};
@@ -152,13 +152,13 @@ void QXmppFileShare::addSource(const std::any &source)
 
 bool QXmppFileShare::parse(const QDomElement &el)
 {
-    if (el.tagName() == "file-sharing" && el.namespaceURI() == ns_sfs) {
+    if (el.tagName() == u"file-sharing" && el.namespaceURI() == ns_sfs) {
         // disposition
-        d->disposition = dispositionFromString(el.attribute("disposition"))
+        d->disposition = dispositionFromString(el.attribute(QStringLiteral("disposition")))
                              .value_or(Disposition::Inline);
 
         // file metadata
-        auto fileEl = el.firstChildElement("file");
+        auto fileEl = firstChildElement(el, u"file");
         d->metadata = QXmppFileMetadata();
         if (!d->metadata.parse(fileEl)) {
             return false;
@@ -186,11 +186,11 @@ bool QXmppFileShare::parse(const QDomElement &el)
 
 void QXmppFileShare::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement("file-sharing");
+    writer->writeStartElement(QSL65("file-sharing"));
     writer->writeDefaultNamespace(toString65(ns_sfs));
-    writer->writeAttribute("disposition", dispositionToString(d->disposition));
+    writer->writeAttribute(QSL65("disposition"), dispositionToString(d->disposition));
     d->metadata.toXml(writer);
-    writer->writeStartElement("sources");
+    writer->writeStartElement(QSL65("sources"));
     for (const auto &source : d->httpSources) {
         source.toXml(writer);
     }

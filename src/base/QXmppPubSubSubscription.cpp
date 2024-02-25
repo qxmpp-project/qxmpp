@@ -296,20 +296,20 @@ void QXmppPubSubSubscription::parse(const QDomElement &element)
 
 void QXmppPubSubSubscription::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("subscription"));
+    writer->writeStartElement(QSL65("subscription"));
 
     // jid is required
-    writer->writeAttribute(QStringLiteral("jid"), d->jid);
+    writer->writeAttribute(QSL65("jid"), d->jid);
     writeOptionalXmlAttribute(writer, u"node", d->node);
     writeOptionalXmlAttribute(writer, u"subscription", stateToString(d->state));
     writeOptionalXmlAttribute(writer, u"subid", d->subId);
     if (d->expiry.isValid()) {
-        writer->writeAttribute(QStringLiteral("expiry"),
+        writer->writeAttribute(QSL65("expiry"),
                                QXmppUtils::datetimeToString(d->expiry));
     }
 
     if (d->configurationSupport > Unavailable) {
-        writer->writeStartElement(QStringLiteral("subscribe-options"));
+        writer->writeStartElement(QSL65("subscribe-options"));
         if (d->configurationSupport == Required) {
             writer->writeEmptyElement(QStringLiteral("required"));
         }

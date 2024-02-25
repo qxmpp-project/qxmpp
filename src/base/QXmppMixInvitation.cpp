@@ -132,7 +132,7 @@ void QXmppMixInvitation::parse(const QDomElement &element)
 
 void QXmppMixInvitation::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("invitation"));
+    writer->writeStartElement(QSL65("invitation"));
     writer->writeDefaultNamespace(toString65(ns_mix_misc));
 
     writeXmlTextElement(writer, u"inviter", d->inviterJid);

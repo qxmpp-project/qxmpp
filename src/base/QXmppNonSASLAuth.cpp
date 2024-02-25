@@ -110,19 +110,23 @@ void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
 
 void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QStringLiteral("query"));
+    writer->writeStartElement(QSL65("query"));
     writer->writeDefaultNamespace(toString65(ns_auth));
     if (!m_username.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("username"), m_username);
+        writer->writeTextElement(QSL65("username"), m_username);
     }
     if (!m_digest.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("digest"), m_digest.toHex());
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        writer->writeTextElement("digest", m_digest.toHex());
+#else
+        writer->writeTextElement(QStringLiteral("digest"), QString::fromUtf8(m_digest.toHex()));
+#endif
     }
     if (!m_password.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("password"), m_password);
+        writer->writeTextElement(QSL65("password"), m_password);
     }
     if (!m_resource.isEmpty()) {
-        writer->writeTextElement(QStringLiteral("resource"), m_resource);
+        writer->writeTextElement(QSL65("resource"), m_resource);
     }
     writer->writeEndElement();
 }

@@ -121,7 +121,7 @@ void QXmppResultSetQuery::toXml(QXmlStreamWriter *writer) const
     if (isNull()) {
         return;
     }
-    writer->writeStartElement(QStringLiteral("set"));
+    writer->writeStartElement(QSL65("set"));
     writer->writeDefaultNamespace(toString65(ns_rsm));
     if (m_max >= 0) {
         writeXmlTextElement(writer, u"max", QString::number(m_max));
@@ -222,17 +222,17 @@ bool QXmppResultSetReply::isNull() const
 /// \cond
 void QXmppResultSetReply::parse(const QDomElement &element)
 {
-    QDomElement setElement = (element.tagName() == "set") ? element : element.firstChildElement("set");
+    QDomElement setElement = (element.tagName() == u"set") ? element : firstChildElement(element, u"set");
     if (setElement.namespaceURI() == ns_rsm) {
-        m_count = setElement.firstChildElement("count").text().toInt();
-        QDomElement firstElem = setElement.firstChildElement("first");
+        m_count = firstChildElement(setElement, u"count").text().toInt();
+        QDomElement firstElem = firstChildElement(setElement, u"first");
         m_first = firstElem.text();
         bool ok = false;
-        m_index = firstElem.attribute("index").toInt(&ok);
+        m_index = firstElem.attribute(QStringLiteral("index")).toInt(&ok);
         if (!ok) {
             m_index = -1;
         }
-        m_last = setElement.firstChildElement("last").text();
+        m_last = firstChildElement(setElement, u"last").text();
     }
 }
 
@@ -241,12 +241,12 @@ void QXmppResultSetReply::toXml(QXmlStreamWriter *writer) const
     if (isNull()) {
         return;
     }
-    writer->writeStartElement("set");
+    writer->writeStartElement(QSL65("set"));
     writer->writeDefaultNamespace(toString65(ns_rsm));
     if (!m_first.isNull() || m_index >= 0) {
-        writer->writeStartElement("first");
+        writer->writeStartElement(QSL65("first"));
         if (m_index >= 0) {
-            writer->writeAttribute("index", QString::number(m_index));
+            writer->writeAttribute(QSL65("index"), QString::number(m_index));
         }
         writer->writeCharacters(m_first);
         writer->writeEndElement();

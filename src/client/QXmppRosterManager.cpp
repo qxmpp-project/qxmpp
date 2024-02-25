@@ -142,13 +142,13 @@ void QXmppRosterManager::_q_disconnected()
 /// \cond
 bool QXmppRosterManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() != "iq" || !QXmppRosterIq::isRosterIq(element)) {
+    if (element.tagName() != u"iq" || !QXmppRosterIq::isRosterIq(element)) {
         return false;
     }
 
     // Security check: only server should send this iq
     // from() should be either empty or bareJid of the user
-    const auto fromJid = element.attribute("from");
+    const auto fromJid = element.attribute(QStringLiteral("from"));
     if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare()) {
         return false;
     }

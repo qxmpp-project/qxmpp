@@ -55,8 +55,8 @@ const QXmppVCardIq &QXmppVCardManager::clientVCard() const
 void QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
 {
     d->clientVCard = clientVCard;
-    d->clientVCard.setTo("");
-    d->clientVCard.setFrom("");
+    d->clientVCard.setTo({});
+    d->clientVCard.setFrom({});
     d->clientVCard.setType(QXmppIq::Set);
     client()->sendPacket(d->clientVCard);
 }
@@ -90,7 +90,7 @@ QStringList QXmppVCardManager::discoveryFeatures() const
 
 bool QXmppVCardManager::handleStanza(const QDomElement &element)
 {
-    if (element.tagName() == "iq" && QXmppVCardIq::isVCard(element)) {
+    if (element.tagName() == u"iq" && QXmppVCardIq::isVCard(element)) {
         QXmppVCardIq vCardIq;
         vCardIq.parse(element);
 

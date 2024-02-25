@@ -143,16 +143,16 @@ void QXmppPushEnableIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 {
     switch (d->mode) {
     case Enable:
-        writer->writeStartElement(QStringLiteral("enable"));
+        writer->writeStartElement(QSL65("enable"));
         break;
     case Disable:
-        writer->writeStartElement(QStringLiteral("disable"));
+        writer->writeStartElement(QSL65("disable"));
         break;
     }
 
     writer->writeDefaultNamespace(toString65(ns_push));
-    writer->writeAttribute(QStringLiteral("jid"), d->jid);
-    writer->writeAttribute(QStringLiteral("node"), d->node);
+    writer->writeAttribute(QSL65("jid"), d->jid);
+    writer->writeAttribute(QSL65("node"), d->node);
 
     if (d->mode == Enable) {
         d->dataForm.toXml(writer);
