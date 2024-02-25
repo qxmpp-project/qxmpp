@@ -148,6 +148,7 @@ void tst_QXmppOmemoManager::initOmemoUser(OmemoUser &omemoUser)
     omemoUser.omemoStorage = std::make_unique<QXmppOmemoMemoryStorage>();
     omemoUser.manager = new QXmppOmemoManager(omemoUser.omemoStorage.get());
     omemoUser.client.addExtension(omemoUser.manager);
+    omemoUser.client.setEncryptionExtension(omemoUser.manager);
 
     omemoUser.carbonManager = new QXmppCarbonManagerV2;
     omemoUser.client.addExtension(omemoUser.carbonManager);

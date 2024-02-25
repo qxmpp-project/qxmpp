@@ -1222,8 +1222,6 @@ bool Manager::handleMessage(const QXmppMessage &message)
 /// \cond
 void Manager::onRegistered(QXmppClient *client)
 {
-    client->setEncryptionExtension(this);
-
     d->trustManager = client->findExtension<QXmppTrustManager>();
     if (!d->trustManager) {
         qFatal("QXmppTrustManager is not available, it must be added to the client before adding QXmppOmemoManager");
