@@ -5,7 +5,7 @@
 cmake_minimum_required(VERSION 3.7)
 project(qxmpp VERSION 1.7.0)
 
-set(SO_VERSION 4)
+set(SO_VERSION 5)
 
 # C++ standard settings:
 set(CMAKE_CXX_STANDARD 17)
