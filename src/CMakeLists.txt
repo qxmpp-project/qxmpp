@@ -73,7 +73,6 @@ set(INSTALL_HEADER_FILES
     base/QXmppRosterIq.h
     base/QXmppRpcIq.h
     base/QXmppSendResult.h
-    base/QXmppSessionIq.h
     base/QXmppSocks.h
     base/QXmppStanza.h
     base/QXmppStartTlsPacket.h
@@ -89,6 +88,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppUtils.h
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
+    base/compat/QXmppSessionIq.h
     base/compat/QXmppPubSubIq.h
     base/compat/QXmppPubSubItem.h
 
@@ -210,7 +210,6 @@ set(SOURCE_FILES
     base/QXmppRosterIq.cpp
     base/QXmppRpcIq.cpp
     base/QXmppSasl.cpp
-    base/QXmppSessionIq.cpp
     base/QXmppSocks.cpp
     base/QXmppStanza.cpp
     base/QXmppStartTlsPacket.cpp
@@ -226,6 +225,7 @@ set(SOURCE_FILES
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
+    base/compat/removed_api.cpp
     base/compat/QXmppPubSubIq.cpp
     base/compat/QXmppPubSubItem.cpp
 

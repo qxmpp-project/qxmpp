@@ -8,10 +8,10 @@
 #include "QXmppConstants_p.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppSasl_p.h"
-#include "QXmppSessionIq.h"
 #include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomElement>
 #include <QHostAddress>
@@ -19,6 +19,8 @@
 #include <QSslSocket>
 #include <QStringBuilder>
 #include <QTimer>
+
+using namespace QXmpp::Private;
 
 class QXmppIncomingClientPrivate
 {
@@ -285,6 +287,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     } else if (ns == ns_client) {
         if (nodeRecv.tagName() == QLatin1String("iq")) {
             const QString type = nodeRecv.attribute(QStringLiteral("type"));
+            const auto id = nodeRecv.attribute(QStringLiteral("id"));
+
             if (QXmppBindIq::isBindIq(nodeRecv) && type == QLatin1String("set")) {
                 QXmppBindIq bindSet;
                 bindSet.parse(nodeRecv);
@@ -303,13 +307,10 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 // bound
                 Q_EMIT connected();
                 return;
-            } else if (QXmppSessionIq::isSessionIq(nodeRecv) && type == QLatin1String("set")) {
-                QXmppSessionIq sessionSet;
-                sessionSet.parse(nodeRecv);
-
+            } else if (isIqType(nodeRecv, u"session", ns_session) && type == u"set") {
                 QXmppIq sessionResult;
                 sessionResult.setType(QXmppIq::Result);
-                sessionResult.setId(sessionSet.id());
+                sessionResult.setId(id);
                 sessionResult.setTo(d->jid);
                 sendPacket(sessionResult);
                 return;

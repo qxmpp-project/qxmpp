@@ -5,6 +5,7 @@
 
 #include "QXmppBindIq.h"
 
+#include "compat/QXmppSessionIq.h"
 #include "util.h"
 #include <QObject>
 
@@ -16,6 +17,8 @@ private:
     Q_SLOT void testNoResource();
     Q_SLOT void testResource();
     Q_SLOT void testResult();
+
+    Q_SLOT void testSessionIq();
 };
 
 void tst_QXmppBindIq::testNoResource()
@@ -68,6 +71,22 @@ void tst_QXmppBindIq::testResult()
     QCOMPARE(bind.jid(), QStringLiteral("somenode@example.com/someresource"));
     QCOMPARE(bind.resource(), QString());
     serializePacket(bind, xml);
+}
+
+void tst_QXmppBindIq::testSessionIq()
+{
+    const QByteArray xml(
+        "<iq id=\"session_1\" to=\"example.com\" type=\"set\">"
+        "<session xmlns=\"urn:ietf:params:xml:ns:xmpp-session\"/>"
+        "</iq>");
+
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
+    QXmppSessionIq session;
+    QT_WARNING_POP
+
+    parsePacket(session, xml);
+    serializePacket(session, xml);
 }
 
 QTEST_MAIN(tst_QXmppBindIq)
