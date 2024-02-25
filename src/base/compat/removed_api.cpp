@@ -3,10 +3,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppSessionIq.h"
-
 #include "QXmppConstants_p.h"
-#include "QXmppUtils.h"
+#include "QXmppSessionIq.h"
 #include "QXmppUtils_p.h"
 
 #include <QDomElement>
@@ -14,7 +12,6 @@
 
 using namespace QXmpp::Private;
 
-/// \cond
 bool QXmppSessionIq::isSessionIq(const QDomElement &element)
 {
     return isIqType(element, u"session", ns_session);
@@ -26,4 +23,3 @@ void QXmppSessionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeDefaultNamespace(toString65(ns_session));
     writer->writeEndElement();
 }
-/// \endcond

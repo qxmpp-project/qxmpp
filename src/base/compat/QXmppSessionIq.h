@@ -8,22 +8,15 @@
 
 #include "QXmppIq.h"
 
-/// \brief The QXmppSessionIq class represents an IQ used for session
-/// establishment as defined by RFC 3921.
-///
-/// \ingroup Stanzas
-
+#if QXMPP_DEPRECATED_SINCE(1, 7)
 class QXMPP_EXPORT QXmppSessionIq : public QXmppIq
 {
 public:
-    /// \cond
-    static bool isSessionIq(const QDomElement &element);
-    /// \endcond
+    [[deprecated]] static bool isSessionIq(const QDomElement &element);
 
 private:
-    /// \cond
-    void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
-    /// \endcond
+    [[deprecated]] void toXmlElementFromChild(QXmlStreamWriter *writer) const override;
 };
+#endif
 
 #endif  // QXMPPSESSION_H
