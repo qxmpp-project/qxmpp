@@ -33,7 +33,6 @@
 // IQ types
 #include "QXmppBindIq.h"
 #include "QXmppPingIq.h"
-#include "QXmppSessionIq.h"
 
 #include <QCoreApplication>
 #include <QDomDocument>
@@ -96,7 +95,6 @@ public:
     void sendNonSASLAuth(bool plaintext);
     void sendNonSASLAuthQuery();
     void sendBind();
-    void sendSessionStart();
 
     // This object provides the configuration
     // required for connecting to the XMPP server.
@@ -123,9 +121,7 @@ public:
 
     // Session
     QString bindId;
-    QString sessionId;
     bool bindModeAvailable;
-    bool sessionAvailable;
     bool sessionStarted;
 
     // Authentication
@@ -150,7 +146,6 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       nextSrvRecordIdx(0),
       redirectPort(0),
       bindModeAvailable(false),
-      sessionAvailable(false),
       sessionStarted(false),
       isAuthenticated(false),
       saslClient(nullptr),
@@ -409,12 +404,6 @@ void QXmppOutgoingClient::onSMResumeFinished()
             return;
         }
 
-        // check whether session is available
-        if (d->sessionAvailable) {
-            d->sendSessionStart();
-            return;
-        }
-
         // otherwise we are done
         d->sessionStarted = true;
         Q_EMIT connected();
@@ -457,8 +446,6 @@ void QXmppOutgoingClient::handleStart()
 
     // reset session information
     d->bindId.clear();
-    d->sessionId.clear();
-    d->sessionAvailable = false;
     d->sessionStarted = false;
 
     d->c2sStreamManager.onStreamStart();
@@ -590,7 +577,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
 
         // store which features are available
-        d->sessionAvailable = (features.sessionMode() != QXmppStreamFeatures::Disabled);
         d->bindModeAvailable = (features.bindMode() != QXmppStreamFeatures::Disabled);
         d->c2sStreamManager.onStreamFeatures(features);
 
@@ -603,12 +589,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether bind is available
         if (d->bindModeAvailable) {
             d->sendBind();
-            return;
-        }
-
-        // check whether session is available
-        if (d->sessionAvailable) {
-            d->sendSessionStart();
             return;
         }
 
@@ -685,18 +665,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 warning(QStringLiteral("QXmppStream: iq type can't be empty"));
             }
 
-            if (id == d->sessionId) {
-                QXmppSessionIq session;
-                session.parse(nodeRecv);
-                d->sessionStarted = true;
-
-                if (d->c2sStreamManager.canRequestEnable()) {
-                    d->c2sStreamManager.requestEnable();
-                } else {
-                    // we are connected now
-                    Q_EMIT connected();
-                }
-            } else if (QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId) {
+            if (QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId) {
                 QXmppBindIq bind;
                 bind.parse(nodeRecv);
 
@@ -714,17 +683,12 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         }
                     }
 
-                    if (d->sessionAvailable) {
-                        d->sendSessionStart();
+                    d->sessionStarted = true;
+                    if (d->c2sStreamManager.canRequestEnable()) {
+                        d->c2sStreamManager.requestEnable();
                     } else {
-                        d->sessionStarted = true;
-
-                        if (d->c2sStreamManager.canRequestEnable()) {
-                            d->c2sStreamManager.requestEnable();
-                        } else {
-                            // we are connected now
-                            Q_EMIT connected();
-                        }
+                        // we are connected now
+                        Q_EMIT connected();
                     }
                 } else if (bind.type() == QXmppIq::Error) {
                     d->xmppStreamError = bind.error().condition();
@@ -859,16 +823,6 @@ void QXmppOutgoingClientPrivate::sendBind()
     bindId = bind.id();
 
     streamAckManager.send(std::move(bind));
-}
-
-void QXmppOutgoingClientPrivate::sendSessionStart()
-{
-    QXmppSessionIq session;
-    session.setType(QXmppIq::Set);
-    session.setTo(q->configuration().domain());
-    sessionId = session.id();
-
-    streamAckManager.send(std::move(session));
 }
 
 /// Returns the type of the last XMPP stream error that occurred.
