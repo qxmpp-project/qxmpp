@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -47,6 +48,18 @@ QXmppRosterIq &QXmppRosterIq::operator=(QXmppRosterIq &&) = default;
 void QXmppRosterIq::addItem(const Item &item)
 {
     d->items.append(item);
+}
+
+///
+/// Adds a bunch of items to the roster IQ.
+///
+/// \param items
+///
+/// \since QXmpp 1.7
+///
+void QXmppRosterIq::addItems(const QList<Item> &items)
+{
+    d->items.append(items);
 }
 
 ///
