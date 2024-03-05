@@ -96,7 +96,7 @@ private:
         }
 
         if (debugEnabled) {
-            qDebug() << "LOG" << text;
+            qDebug().noquote() << "LOG:" << text;
         }
 
         m_sentPackets << text;
