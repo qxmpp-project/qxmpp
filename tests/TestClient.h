@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2021 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -96,7 +97,7 @@ private:
         }
 
         if (debugEnabled) {
-            qDebug() << "LOG" << text;
+            qDebug() << "LOG:" << text.toLocal8Bit().constData();
         }
 
         m_sentPackets << text;
