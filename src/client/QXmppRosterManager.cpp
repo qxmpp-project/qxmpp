@@ -48,9 +48,6 @@ public:
 
     // flag to store that the roster has been populated
     bool isRosterReceived;
-
-    // id of the initial roster request
-    QString rosterReqId;
 };
 
 QXmppRosterManagerPrivate::QXmppRosterManagerPrivate()
@@ -62,7 +59,6 @@ void QXmppRosterManagerPrivate::clear()
 {
     entries.clear();
     presences.clear();
-    rosterReqId.clear();
     isRosterReceived = false;
 }
 
@@ -116,18 +112,20 @@ void QXmppRosterManager::_q_connected()
         d->clear();
     }
 
-    if (!d->isRosterReceived) {
-        QXmppRosterIq roster;
-        roster.setType(QXmppIq::Get);
-        roster.setFrom(client()->configuration().jid());
+    if (!d->isRosterReceived && client()->isAuthenticated()) {
+        requestRoster().then(this, [this](auto &&result) {
+            if (auto *rosterIq = std::get_if<QXmppRosterIq>(&result)) {
+                d->isRosterReceived = true;
+                Q_EMIT rosterReceived();
 
-        // TODO: Request MIX annotations only when the server supports MIX-PAM.
-        roster.setMixAnnotate(true);
-
-        d->rosterReqId = roster.id();
-        if (client()->isAuthenticated()) {
-            client()->sendPacket(roster);
-        }
+                // reset entries
+                d->entries.clear();
+                const auto items = rosterIq->items();
+                for (const auto &item : items) {
+                    d->entries.insert(item.bareJid(), item);
+                }
+            }
+        });
     }
 }
 
@@ -156,11 +154,6 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
     QXmppRosterIq rosterIq;
     rosterIq.parse(element);
 
-    bool isInitial = (d->rosterReqId == rosterIq.id());
-    if (isInitial) {
-        d->rosterReqId.clear();
-    }
-
     switch (rosterIq.type()) {
     case QXmppIq::Set: {
         // send result iq
@@ -188,17 +181,6 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
                     Q_EMIT itemChanged(bareJid);
                 }
             }
-        }
-    } break;
-    case QXmppIq::Result: {
-        const auto items = rosterIq.items();
-        for (const auto &item : items) {
-            const auto bareJid = item.bareJid();
-            d->entries.insert(bareJid, item);
-        }
-        if (isInitial) {
-            d->isRosterReceived = true;
-            Q_EMIT rosterReceived();
         }
         break;
     }
@@ -244,6 +226,18 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
     default:
         break;
     }
+}
+
+QXmppTask<QXmppRosterManager::RosterResult> QXmppRosterManager::requestRoster()
+{
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Get);
+    iq.setFrom(client()->configuration().jid());
+
+    // TODO: Request MIX annotations only when the server supports MIX-PAM.
+    iq.setMixAnnotate(true);
+
+    return chainIq<RosterResult>(client()->sendIq(std::move(iq)), this);
 }
 
 ///
@@ -307,7 +301,6 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const
 ///
 QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const QString &bareJid, const QString &name)
 {
-    using Error = QXmppStanza::Error;
     if (!d->entries.contains(bareJid)) {
         return makeReadyTask<Result>(
             QXmppError { QStringLiteral("The roster doesn't contain this user."), {} });
