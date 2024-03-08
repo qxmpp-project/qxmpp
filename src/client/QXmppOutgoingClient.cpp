@@ -66,6 +66,30 @@ QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObje
     return task;
 }
 
+struct BoundAddress {
+    QString user;
+    QString domain;
+    QString resource;
+};
+
+// Resource Binding
+class BindManager
+{
+public:
+    using Result = std::variant<BoundAddress, QXmppError>;
+
+    explicit BindManager(XmppSocket &socket) : m_socket(socket) { }
+
+    void reset();
+    QXmppTask<Result> bindAddress(const QString &resource);
+    bool handleElement(const QDomElement &el);
+
+private:
+    XmppSocket &m_socket;
+    QString m_iqId;
+    std::optional<QXmppPromise<Result>> m_promise;
+};
+
 // XEP-0199: XMPP Ping
 class PingManager
 {
@@ -94,7 +118,6 @@ public:
 
     void sendNonSASLAuth(bool plaintext);
     void sendNonSASLAuthQuery();
-    void sendBind();
 
     // This object provides the configuration
     // required for connecting to the XMPP server.
@@ -120,7 +143,7 @@ public:
     quint16 redirectPort;
 
     // Session
-    QString bindId;
+    BindManager bindManager;
     bool bindModeAvailable;
     bool sessionStarted;
 
@@ -145,6 +168,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       iqManager(qq, streamAckManager),
       nextSrvRecordIdx(0),
       redirectPort(0),
+      bindManager(socket),
       bindModeAvailable(false),
       sessionStarted(false),
       isAuthenticated(false),
@@ -315,6 +339,7 @@ void QXmppOutgoingClient::connectToHost()
 ///
 void QXmppOutgoingClient::disconnectFromHost()
 {
+    d->bindManager.reset();
     d->c2sStreamManager.onDisconnecting();
     d->streamAckManager.handleDisconnect();
     d->socket.disconnectFromHost();
@@ -392,6 +417,38 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
     }
 }
 
+void QXmppOutgoingClient::startResourceBinding()
+{
+    d->bindManager.bindAddress(d->config.resource()).then(this, [this](BindManager::Result r) {
+        if (auto *addr = std::get_if<BoundAddress>(&r)) {
+            d->config.setUser(addr->user);
+            d->config.setDomain(addr->domain);
+            d->config.setResource(addr->resource);
+
+            d->sessionStarted = true;
+
+            if (d->c2sStreamManager.canRequestEnable()) {
+                d->c2sStreamManager.requestEnable();
+            } else {
+                // we are connected now
+                Q_EMIT connected();
+            }
+        } else {
+            auto err = std::get<QXmppError>(std::move(r));
+
+            if (auto stanzaError = err.value<QXmppStanza::Error>()) {
+                d->xmppStreamError = stanzaError->condition();
+            } else {
+                d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+            }
+
+            Q_EMIT error(QXmppClient::XmppStreamError);
+            warning(QStringLiteral("Resource binding failed: ") + err.description);
+            disconnectFromHost();
+        }
+    });
+}
+
 void QXmppOutgoingClient::onSMResumeFinished()
 {
     if (d->c2sStreamManager.streamResumed()) {
@@ -400,7 +457,7 @@ void QXmppOutgoingClient::onSMResumeFinished()
     } else {
         // check whether bind is available
         if (d->bindModeAvailable) {
-            d->sendBind();
+            startResourceBinding();
             return;
         }
 
@@ -445,7 +502,6 @@ void QXmppOutgoingClient::handleStart()
     }
 
     // reset session information
-    d->bindId.clear();
     d->sessionStarted = false;
 
     d->c2sStreamManager.onStreamStart();
@@ -588,7 +644,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
         // check whether bind is available
         if (d->bindModeAvailable) {
-            d->sendBind();
+            startResourceBinding();
             return;
         }
 
@@ -656,7 +712,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             disconnectFromHost();
         }
     } else if (ns == ns_client) {
-
         if (nodeRecv.tagName() == u"iq") {
             QDomElement element = nodeRecv.firstChildElement();
             QString id = nodeRecv.attribute(QStringLiteral("id"));
@@ -665,40 +720,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 warning(QStringLiteral("QXmppStream: iq type can't be empty"));
             }
 
-            if (QXmppBindIq::isBindIq(nodeRecv) && id == d->bindId) {
-                QXmppBindIq bind;
-                bind.parse(nodeRecv);
-
-                // bind result
-                if (bind.type() == QXmppIq::Result) {
-                    if (!bind.jid().isEmpty()) {
-                        static const QRegularExpression jidRegex(QStringLiteral("^([^@/]+)@([^@/]+)/(.+)$"));
-
-                        if (const auto match = jidRegex.match(bind.jid()); match.hasMatch()) {
-                            configuration().setUser(match.captured(1));
-                            configuration().setDomain(match.captured(2));
-                            configuration().setResource(match.captured(3));
-                        } else {
-                            warning(QStringLiteral("Bind IQ received with invalid JID: ") + bind.jid());
-                        }
-                    }
-
-                    d->sessionStarted = true;
-                    if (d->c2sStreamManager.canRequestEnable()) {
-                        d->c2sStreamManager.requestEnable();
-                    } else {
-                        // we are connected now
-                        Q_EMIT connected();
-                    }
-                } else if (bind.type() == QXmppIq::Error) {
-                    d->xmppStreamError = bind.error().condition();
-                    Q_EMIT error(QXmppClient::XmppStreamError);
-                    warning(QStringLiteral("Resource binding error received: ") + bind.error().text());
-                    disconnectFromHost();
-                }
+            if (d->bindManager.handleElement(nodeRecv)) {
+                // continue
             }
-            // extensions
-
             // XEP-0078: Non-SASL Authentication
             else if (id == d->nonSASLAuthId && type == u"result") {
                 // successful Non-SASL Authentication
@@ -800,7 +824,7 @@ void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
     authQuery.setResource(q->configuration().resource());
     nonSASLAuthId = authQuery.id();
 
-    streamAckManager.send(std::move(authQuery));
+    streamAckManager.send(authQuery);
 }
 
 void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
@@ -812,17 +836,7 @@ void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
     // not attempt to guess the required fields?
     authQuery.setUsername(q->configuration().user());
 
-    streamAckManager.send(std::move(authQuery));
-}
-
-void QXmppOutgoingClientPrivate::sendBind()
-{
-    QXmppBindIq bind;
-    bind.setType(QXmppIq::Set);
-    bind.setResource(q->configuration().resource());
-    bindId = bind.id();
-
-    streamAckManager.send(std::move(bind));
+    streamAckManager.send(authQuery);
 }
 
 /// Returns the type of the last XMPP stream error that occurred.
@@ -832,6 +846,71 @@ QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 }
 
 namespace QXmpp::Private {
+
+void BindManager::reset()
+{
+    m_iqId.clear();
+    m_promise.reset();
+}
+
+QXmppTask<BindManager::Result> BindManager::bindAddress(const QString &resource)
+{
+    Q_ASSERT(!m_promise);
+    Q_ASSERT(m_iqId.isNull());
+
+    m_promise = QXmppPromise<Result>();
+
+    const auto iq = QXmppBindIq::bindAddressIq(resource);
+    m_iqId = iq.id();
+    m_socket.sendData(serializeNonza(iq));
+
+    return m_promise->task();
+}
+
+bool BindManager::handleElement(const QDomElement &el)
+{
+    auto process = [](QXmppBindIq &&iq) -> Result {
+        if (iq.type() == QXmppIq::Result) {
+            if (iq.jid().isEmpty()) {
+                return QXmppError { QStringLiteral("Server did not return JID upon resource binding."), {} };
+            }
+
+            static const QRegularExpression jidRegex(QStringLiteral("^([^@/]+)@([^@/]+)/(.+)$"));
+            if (const auto match = jidRegex.match(iq.jid()); match.hasMatch()) {
+                return BoundAddress {
+                    match.captured(1),
+                    match.captured(2),
+                    match.captured(3),
+                };
+            }
+
+            return QXmppError { QStringLiteral("Bind IQ received with invalid JID"), {} };
+        }
+
+        auto error = iq.error();
+        return QXmppError { error.text(), error };
+    };
+
+    if (QXmppBindIq::isBindIq(el) && el.attribute(QStringLiteral("id")) == m_iqId) {
+        Q_ASSERT(m_promise.has_value());
+
+        auto p = std::move(*m_promise);
+        reset();
+
+        QXmppBindIq bind;
+        bind.parse(el);
+
+        // do not accept other IQ types than result and error
+        if (bind.type() != QXmppIq::Result && bind.type() != QXmppIq::Error) {
+            return false;
+        }
+
+        // report result
+        p.finish(process(std::move(bind)));
+        return true;
+    }
+    return false;
+}
 
 PingManager::PingManager(QXmppOutgoingClient *q)
     : q(q),

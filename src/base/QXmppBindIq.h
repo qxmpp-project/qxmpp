@@ -16,6 +16,8 @@
 class QXMPP_EXPORT QXmppBindIq : public QXmppIq
 {
 public:
+    static QXmppBindIq bindAddressIq(const QString &resource);
+
     QString jid() const;
     void setJid(const QString &);
 

@@ -14,6 +14,15 @@
 
 using namespace QXmpp::Private;
 
+/// Creates a Bind IQ of type set with the specified resource.
+QXmppBindIq QXmppBindIq::bindAddressIq(const QString &resource)
+{
+    QXmppBindIq iq;
+    iq.setType(QXmppIq::Set);
+    iq.setResource(resource);
+    return iq;
+}
+
 /// Returns the bound JID.
 QString QXmppBindIq::jid() const
 {
