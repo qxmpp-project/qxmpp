@@ -60,7 +60,7 @@ public:
     /// Empty result containing QXmpp::Success or a QXmppError
     using Result = std::variant<QXmpp::Success, QXmppError>;
 
-    QXmppRosterManager(QXmppClient *stream);
+    explicit QXmppRosterManager(QXmppClient *stream);
     ~QXmppRosterManager() override;
 
     bool isRosterReceived() const;
