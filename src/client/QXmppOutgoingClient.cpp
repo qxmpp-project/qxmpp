@@ -150,7 +150,7 @@ public:
     // Authentication
     bool isAuthenticated;
     QString nonSASLAuthId;
-    QXmppSaslClient *saslClient;
+    std::unique_ptr<QXmppSaslClient> saslClient;
 
     // Client State Indication
     bool clientStateIndicationEnabled;
@@ -172,7 +172,6 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       bindModeAvailable(false),
       sessionStarted(false),
       isAuthenticated(false),
-      saslClient(nullptr),
       clientStateIndicationEnabled(false),
       c2sStreamManager(qq),
       pingManager(qq),
@@ -496,10 +495,7 @@ void QXmppOutgoingClient::handleStart()
     d->streamVersion.clear();
 
     // reset authentication step
-    if (d->saslClient) {
-        delete d->saslClient;
-        d->saslClient = nullptr;
-    }
+    d->saslClient.reset();
 
     // reset session information
     d->sessionStarted = false;
@@ -596,7 +592,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 usedMechanism = commonMechanisms.first();
             }
 
-            d->saslClient = QXmppSaslClient::create(usedMechanism, this);
+            d->saslClient.reset(QXmppSaslClient::create(usedMechanism, this));
             if (!d->saslClient) {
                 warning(QStringLiteral("SASL mechanism negotiation failed"));
                 disconnectFromHost();
