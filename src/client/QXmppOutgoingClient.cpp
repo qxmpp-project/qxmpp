@@ -42,6 +42,7 @@
 #include <QTimer>
 #include <QXmlStreamWriter>
 
+using namespace QXmpp;
 using namespace QXmpp::Private;
 
 namespace QXmpp::Private {
@@ -90,6 +91,40 @@ private:
     std::optional<QXmppPromise<Result>> m_promise;
 };
 
+struct NonSaslAuthOptions {
+    bool plain;
+    bool digest;
+};
+
+// Authentication using Non-SASL auth
+class NonSaslAuthManager
+{
+public:
+    using OptionsResult = std::variant<NonSaslAuthOptions, QXmppError>;
+    using AuthResult = std::variant<Success, QXmppError>;
+
+    explicit NonSaslAuthManager(XmppSocket &socket) : m_socket(socket) { }
+
+    void reset();
+    QXmppTask<OptionsResult> queryOptions(const QString &streamFrom, const QString &username);
+    QXmppTask<AuthResult> authenticate(bool plainText, const QString &username, const QString &password, const QString &resource, const QString &streamId);
+    bool handleElement(const QDomElement &el);
+
+private:
+    struct NoQuery {
+    };
+    struct OptionsQuery {
+        QXmppPromise<OptionsResult> p;
+    };
+    struct AuthQuery {
+        QXmppPromise<AuthResult> p;
+        QString id;
+    };
+
+    XmppSocket &m_socket;
+    std::variant<NoQuery, OptionsQuery, AuthQuery> m_query;
+};
+
 // XEP-0199: XMPP Ping
 class PingManager
 {
@@ -115,9 +150,6 @@ public:
     explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
     void connectToHost(const QString &host, quint16 port);
     void connectToNextDNSHost();
-
-    void sendNonSASLAuth(bool plaintext);
-    void sendNonSASLAuthQuery();
 
     // This object provides the configuration
     // required for connecting to the XMPP server.
@@ -149,7 +181,7 @@ public:
 
     // Authentication
     bool isAuthenticated;
-    QString nonSASLAuthId;
+    NonSaslAuthManager nonSaslAuthManager;
     std::unique_ptr<QXmppSaslClient> saslClient;
 
     // Client State Indication
@@ -172,6 +204,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       bindModeAvailable(false),
       sessionStarted(false),
       isAuthenticated(false),
+      nonSaslAuthManager(socket),
       clientStateIndicationEnabled(false),
       c2sStreamManager(qq),
       pingManager(qq),
@@ -416,6 +449,52 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
     }
 }
 
+void QXmppOutgoingClient::startNonSaslAuth()
+{
+    d->nonSaslAuthManager.queryOptions(d->streamFrom, d->config.user()).then(this, [this](auto result) {
+        if (auto *options = std::get_if<NonSaslAuthOptions>(&result)) {
+            bool plainText = false;
+
+            if (options->plain && options->digest) {
+                plainText = (d->config.nonSASLAuthMechanism() != QXmppConfiguration::NonSASLDigest);
+            } else if (options->plain) {
+                plainText = true;
+            } else if (options->digest) {
+                plainText = false;
+            } else {
+                // TODO: errors: should trigger error signal
+                warning(QStringLiteral("No supported Non-SASL Authentication mechanism available"));
+                disconnectFromHost();
+                return;
+            }
+
+            auto task = d->nonSaslAuthManager.authenticate(plainText, d->config.user(), d->config.password(), d->config.resource(), d->streamId);
+            task.then(this, [this](auto result) {
+                if (std::holds_alternative<Success>(result)) {
+                    // successful Non-SASL Authentication
+                    debug(QStringLiteral("Authenticated (Non-SASL)"));
+                    d->isAuthenticated = true;
+
+                    // xmpp connection made
+                    d->sessionStarted = true;
+                    Q_EMIT connected();
+                } else {
+                    // TODO: errors: should trigger error signal
+                    auto &error = std::get<QXmppError>(result);
+                    warning(QStringLiteral("Could not authenticate using Non-SASL Authentication: ") + error.description);
+                    disconnectFromHost();
+                    return;
+                }
+            });
+        } else {
+            // TODO: errors: should trigger error signal
+            auto &error = std::get<QXmppError>(result);
+            warning(QStringLiteral("Couldn't list Non-SASL Authentication mechanisms: ") + error.description);
+            disconnectFromHost();
+        }
+    });
+}
+
 void QXmppOutgoingClient::startResourceBinding()
 {
     d->bindManager.bindAddress(d->config.resource()).then(this, [this](BindManager::Result r) {
@@ -495,6 +574,7 @@ void QXmppOutgoingClient::handleStart()
     d->streamVersion.clear();
 
     // reset authentication step
+    d->nonSaslAuthManager.reset();
     d->saslClient.reset();
 
     // reset session information
@@ -523,7 +603,7 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
         // no version specified, signals XMPP Version < 1.0.
         // switch to old auth mechanism if enabled
         if (d->streamVersion.isEmpty() && configuration().useNonSASLAuthentication()) {
-            d->sendNonSASLAuthQuery();
+            startNonSaslAuth();
         }
     }
 }
@@ -624,7 +704,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
             d->streamAckManager.send(QXmppSaslAuth(d->saslClient->mechanism(), response));
             return;
         } else if (nonSaslAvailable && configuration().useNonSASLAuthentication()) {
-            d->sendNonSASLAuthQuery();
+            startNonSaslAuth();
             return;
         }
 
@@ -709,50 +789,14 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
     } else if (ns == ns_client) {
         if (nodeRecv.tagName() == u"iq") {
-            QDomElement element = nodeRecv.firstChildElement();
-            QString id = nodeRecv.attribute(QStringLiteral("id"));
             QString type = nodeRecv.attribute(QStringLiteral("type"));
             if (type.isEmpty()) {
                 warning(QStringLiteral("QXmppStream: iq type can't be empty"));
             }
 
-            if (d->bindManager.handleElement(nodeRecv)) {
-                // continue
-            }
-            // XEP-0078: Non-SASL Authentication
-            else if (id == d->nonSASLAuthId && type == u"result") {
-                // successful Non-SASL Authentication
-                debug(QStringLiteral("Authenticated (Non-SASL)"));
-                d->isAuthenticated = true;
-
-                // xmpp connection made
-                d->sessionStarted = true;
-                Q_EMIT connected();
-            } else if (QXmppNonSASLAuthIq::isNonSASLAuthIq(nodeRecv)) {
-                if (type == u"result") {
-                    bool digest = !firstChildElement(firstChildElement(nodeRecv, u"query"), u"digest").isNull();
-                    bool plain = !firstChildElement(firstChildElement(nodeRecv, u"query"), u"password").isNull();
-                    bool plainText = false;
-
-                    if (plain && digest) {
-                        if (configuration().nonSASLAuthMechanism() ==
-                            QXmppConfiguration::NonSASLDigest) {
-                            plainText = false;
-                        } else {
-                            plainText = true;
-                        }
-                    } else if (plain) {
-                        plainText = true;
-                    } else if (digest) {
-                        plainText = false;
-                    } else {
-                        warning(QStringLiteral("No supported Non-SASL Authentication mechanism available"));
-                        disconnectFromHost();
-                        return;
-                    }
-                    d->sendNonSASLAuth(plainText);
-                }
-            } else if (d->pingManager.handleIq(nodeRecv)) {
+            if (d->bindManager.handleElement(nodeRecv) ||
+                d->nonSaslAuthManager.handleElement(nodeRecv) ||
+                d->pingManager.handleIq(nodeRecv)) {
                 // handled in manager
             } else {
                 QXmppIq iqPacket;
@@ -805,34 +849,6 @@ void QXmppOutgoingClient::enableStreamManagement(bool resetSequenceNumber)
 bool QXmppOutgoingClient::handleIqResponse(const QDomElement &stanza)
 {
     return d->iqManager.handleStanza(stanza);
-}
-
-void QXmppOutgoingClientPrivate::sendNonSASLAuth(bool plainText)
-{
-    QXmppNonSASLAuthIq authQuery;
-    authQuery.setType(QXmppIq::Set);
-    authQuery.setUsername(q->configuration().user());
-    if (plainText) {
-        authQuery.setPassword(q->configuration().password());
-    } else {
-        authQuery.setDigest(streamId, q->configuration().password());
-    }
-    authQuery.setResource(q->configuration().resource());
-    nonSASLAuthId = authQuery.id();
-
-    streamAckManager.send(authQuery);
-}
-
-void QXmppOutgoingClientPrivate::sendNonSASLAuthQuery()
-{
-    QXmppNonSASLAuthIq authQuery;
-    authQuery.setType(QXmppIq::Get);
-    authQuery.setTo(streamFrom);
-    // FIXME : why are we setting the username, XEP-0078 states we should
-    // not attempt to guess the required fields?
-    authQuery.setUsername(q->configuration().user());
-
-    streamAckManager.send(authQuery);
 }
 
 /// Returns the type of the last XMPP stream error that occurred.
@@ -903,6 +919,102 @@ bool BindManager::handleElement(const QDomElement &el)
 
         // report result
         p.finish(process(std::move(bind)));
+        return true;
+    }
+    return false;
+}
+
+void NonSaslAuthManager::reset()
+{
+    m_query = {};
+}
+
+QXmppTask<NonSaslAuthManager::OptionsResult> NonSaslAuthManager::queryOptions(const QString &streamFrom, const QString &username)
+{
+    // no other running query
+    Q_ASSERT(std::holds_alternative<NoQuery>(m_query));
+
+    m_query = OptionsQuery();
+    auto &query = std::get<OptionsQuery>(m_query);
+
+    QXmppNonSASLAuthIq authQuery;
+    authQuery.setType(QXmppIq::Get);
+    authQuery.setTo(streamFrom);
+    // FIXME : why are we setting the username, XEP-0078 states we should
+    // not attempt to guess the required fields?
+    authQuery.setUsername(username);
+
+    m_socket.sendData(serializeNonza(authQuery));
+
+    return query.p.task();
+}
+
+QXmppTask<NonSaslAuthManager::AuthResult> NonSaslAuthManager::authenticate(bool plainText, const QString &username, const QString &password, const QString &resource, const QString &streamId)
+{
+    // no other running query
+    Q_ASSERT(std::holds_alternative<NoQuery>(m_query));
+
+    m_query = AuthQuery();
+    auto &query = std::get<AuthQuery>(m_query);
+
+    QXmppNonSASLAuthIq authQuery;
+    authQuery.setType(QXmppIq::Set);
+    authQuery.setUsername(username);
+    if (plainText) {
+        authQuery.setPassword(password);
+    } else {
+        authQuery.setDigest(streamId, password);
+    }
+    authQuery.setResource(resource);
+    query.id = authQuery.id();
+
+    m_socket.sendData(serializeNonza(authQuery));
+    return query.p.task();
+}
+
+bool NonSaslAuthManager::handleElement(const QDomElement &el)
+{
+    if (std::holds_alternative<OptionsQuery>(m_query)) {
+        auto query = std::get<OptionsQuery>(std::move(m_query));
+        m_query = {};
+
+        if (QXmppNonSASLAuthIq::isNonSASLAuthIq(el) && el.attribute(QStringLiteral("type")) == u"result") {
+            auto queryEl = firstChildElement(el, u"query");
+
+            bool digest = !firstChildElement(queryEl, u"digest").isNull();
+            bool plain = !firstChildElement(queryEl, u"password").isNull();
+
+            query.p.finish(NonSaslAuthOptions { plain, digest });
+        } else {
+            QXmppIq iq;
+            iq.parse(el);
+
+            query.p.finish(QXmppError { iq.error().text(), iq.error() });
+        }
+        return true;
+    }
+
+    if (std::holds_alternative<AuthQuery>(m_query)) {
+        auto query = std::get<AuthQuery>(std::move(m_query));
+        m_query = {};
+
+        const auto id = el.attribute(QStringLiteral("id"));
+        const auto type = el.attribute(QStringLiteral("type"));
+
+        if (id == query.id) {
+            if (type == u"result") {
+                query.p.finish(Success());
+            } else if (type == u"error") {
+                QXmppIq iq;
+                iq.parse(el);
+
+                query.p.finish(QXmppError { iq.error().text(), iq.error() });
+            } else {
+                query.p.finish(QXmppError { QStringLiteral("Received unexpected IQ response."), {} });
+            }
+        } else {
+            query.p.finish(QXmppError { QStringLiteral("Received IQ response with wrong ID."), {} });
+        }
         return true;
     }
     return false;
