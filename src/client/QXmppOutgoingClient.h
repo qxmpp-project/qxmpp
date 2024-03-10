@@ -92,6 +92,7 @@ private:
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError> &);
 
+    void startNonSaslAuth();
     void startResourceBinding();
     void onSMResumeFinished();
     void onSMEnableFinished();
