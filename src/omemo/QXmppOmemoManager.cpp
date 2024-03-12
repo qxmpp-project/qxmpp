@@ -251,9 +251,11 @@ void QXmppOmemoDevice::setTrustLevel(TrustLevel trustLevel)
 /// client->addNewExtension<QXmppAtmManager>(trustStorage);
 /// \endcode
 ///
-/// Afterwards, the OMEMO manager using its storage must be added to the client:
+/// Afterwards, the OMEMO manager using its storage must be added to the client and activated to be
+/// used for encryption:
 /// \code
 /// auto *manager = client->addNewExtension<QXmppOmemoManager>(omemoStorage);
+/// client->setEncryptionExtension(manager);
 /// \endcode
 ///
 /// You can set a security policy used by OMEMO.
