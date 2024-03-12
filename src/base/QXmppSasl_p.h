@@ -17,6 +17,10 @@
 class QXmppSaslClientPrivate;
 class QXmppSaslServerPrivate;
 
+namespace QXmpp::Private {
+class SaslManager;
+}
+
 //
 //  W A R N I N G
 //  -------------
@@ -55,6 +59,8 @@ public:
     static QXmppSaslClient *create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
+    friend class QXmpp::Private::SaslManager;
+
     const std::unique_ptr<QXmppSaslClientPrivate> d;
 };
 

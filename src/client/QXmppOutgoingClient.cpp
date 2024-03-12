@@ -8,6 +8,7 @@
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
+#include "QXmppFutureUtils_p.h"
 #include "QXmppIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
@@ -125,6 +126,24 @@ private:
     std::variant<NoQuery, OptionsQuery, AuthQuery> m_query;
 };
 
+// Authentication using SASL
+class SaslManager
+{
+public:
+    using AuthResult = std::variant<Success, QXmppError>;
+
+    explicit SaslManager(XmppSocket &socket) : m_socket(socket) { }
+
+    void reset();
+    QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent);
+    bool handleElement(const QDomElement &el);
+
+private:
+    XmppSocket &m_socket;
+    std::unique_ptr<QXmppSaslClient> m_saslClient;
+    std::optional<QXmppPromise<AuthResult>> m_promise;
+};
+
 // XEP-0199: XMPP Ping
 class PingManager
 {
@@ -182,7 +201,7 @@ public:
     // Authentication
     bool isAuthenticated;
     NonSaslAuthManager nonSaslAuthManager;
-    std::unique_ptr<QXmppSaslClient> saslClient;
+    SaslManager saslManager;
 
     // Client State Indication
     bool clientStateIndicationEnabled;
@@ -205,6 +224,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       sessionStarted(false),
       isAuthenticated(false),
       nonSaslAuthManager(socket),
+      saslManager(socket),
       clientStateIndicationEnabled(false),
       c2sStreamManager(qq),
       pingManager(qq),
@@ -575,7 +595,7 @@ void QXmppOutgoingClient::handleStart()
 
     // reset authentication step
     d->nonSaslAuthManager.reset();
-    d->saslClient.reset();
+    d->saslManager.reset();
 
     // reset session information
     d->sessionStarted = false;
@@ -639,69 +659,30 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
         const bool saslAvailable = !features.authMechanisms().isEmpty();
         if (saslAvailable && configuration().useSASLAuthentication()) {
-            // supported and preferred SASL auth mechanisms
-            const QString preferredMechanism = configuration().saslAuthMechanism();
-            QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
-            if (supportedMechanisms.contains(preferredMechanism)) {
-                supportedMechanisms.removeAll(preferredMechanism);
-                supportedMechanisms.prepend(preferredMechanism);
-            }
-            if (configuration().facebookAppId().isEmpty() || configuration().facebookAccessToken().isEmpty()) {
-                supportedMechanisms.removeAll(QStringLiteral("X-FACEBOOK-PLATFORM"));
-            }
-            if (configuration().windowsLiveAccessToken().isEmpty()) {
-                supportedMechanisms.removeAll(QStringLiteral("X-MESSENGER-OAUTH2"));
-            }
-            if (configuration().googleAccessToken().isEmpty()) {
-                supportedMechanisms.removeAll(QStringLiteral("X-OAUTH2"));
-            }
+            d->saslManager.authenticate(d->config, features, this).then(this, [this](auto result) {
+                if (std::holds_alternative<Success>(result)) {
+                    debug(QStringLiteral("Authenticated"));
+                    d->isAuthenticated = true;
+                    handleStart();
+                } else {
+                    QXmppError err = std::get<QXmppError>(std::move(result));
 
-            // determine SASL Authentication mechanism to use
-            QStringList commonMechanisms;
-            QString usedMechanism;
-            for (const auto &mechanism : std::as_const(supportedMechanisms)) {
-                if (features.authMechanisms().contains(mechanism)) {
-                    commonMechanisms << mechanism;
+                    if (auto failure = err.value<QXmppSaslFailure>()) {
+                        // RFC3920 defines the error condition as "not-authorized", but
+                        // some broken servers use "bad-auth" instead. We tolerate this
+                        // by remapping the error to "not-authorized".
+                        if (failure->condition() == u"not-authorized" || failure->condition() == u"bad-auth") {
+                            d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+                        } else {
+                            d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                        }
+                        Q_EMIT error(QXmppClient::XmppStreamError);
+                    }
+
+                    warning(QStringLiteral("Could not authenticate using SASL: ") + err.description);
+                    disconnectFromHost();
                 }
-            }
-            if (commonMechanisms.isEmpty()) {
-                warning(QStringLiteral("No supported SASL Authentication mechanism available"));
-                disconnectFromHost();
-                return;
-            } else {
-                usedMechanism = commonMechanisms.first();
-            }
-
-            d->saslClient.reset(QXmppSaslClient::create(usedMechanism, this));
-            if (!d->saslClient) {
-                warning(QStringLiteral("SASL mechanism negotiation failed"));
-                disconnectFromHost();
-                return;
-            }
-            info(QStringLiteral("SASL mechanism '%1' selected").arg(d->saslClient->mechanism()));
-            d->saslClient->setHost(d->config.domain());
-            d->saslClient->setServiceType(QStringLiteral("xmpp"));
-            if (d->saslClient->mechanism() == u"X-FACEBOOK-PLATFORM") {
-                d->saslClient->setUsername(configuration().facebookAppId());
-                d->saslClient->setPassword(configuration().facebookAccessToken());
-            } else if (d->saslClient->mechanism() == u"X-MESSENGER-OAUTH2") {
-                d->saslClient->setPassword(configuration().windowsLiveAccessToken());
-            } else if (d->saslClient->mechanism() == u"X-OAUTH2") {
-                d->saslClient->setUsername(configuration().user());
-                d->saslClient->setPassword(configuration().googleAccessToken());
-            } else {
-                d->saslClient->setUsername(configuration().user());
-                d->saslClient->setPassword(configuration().password());
-            }
-
-            // send SASL auth request
-            QByteArray response;
-            if (!d->saslClient->respond(QByteArray(), response)) {
-                warning(QStringLiteral("SASL initial response failed"));
-                disconnectFromHost();
-                return;
-            }
-            d->streamAckManager.send(QXmppSaslAuth(d->saslClient->mechanism(), response));
+            });
             return;
         } else if (nonSaslAvailable && configuration().useNonSASLAuthentication()) {
             startNonSaslAuth();
@@ -751,41 +732,9 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         }
         Q_EMIT error(QXmppClient::XmppStreamError);
     } else if (ns == ns_sasl) {
-        if (!d->saslClient) {
-            warning(QStringLiteral("SASL stanza received, but no mechanism selected"));
+        if (!d->saslManager.handleElement(nodeRecv)) {
+            warning(QStringLiteral("Unexpected SASL stanza received"));
             return;
-        }
-        if (nodeRecv.tagName() == u"success") {
-            debug(QStringLiteral("Authenticated"));
-            d->isAuthenticated = true;
-            handleStart();
-        } else if (nodeRecv.tagName() == u"challenge") {
-            QXmppSaslChallenge challenge;
-            challenge.parse(nodeRecv);
-
-            QByteArray response;
-            if (d->saslClient->respond(challenge.value(), response)) {
-                d->streamAckManager.send(QXmppSaslResponse(response));
-            } else {
-                warning(QStringLiteral("Could not respond to SASL challenge"));
-                disconnectFromHost();
-            }
-        } else if (nodeRecv.tagName() == u"failure") {
-            QXmppSaslFailure failure;
-            failure.parse(nodeRecv);
-
-            // RFC3920 defines the error condition as "not-authorized", but
-            // some broken servers use "bad-auth" instead. We tolerate this
-            // by remapping the error to "not-authorized".
-            if (failure.condition() == u"not-authorized" || failure.condition() == u"bad-auth") {
-                d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-            } else {
-                d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
-            }
-            Q_EMIT error(QXmppClient::XmppStreamError);
-
-            warning(QStringLiteral("Authentication failure"));
-            disconnectFromHost();
         }
     } else if (ns == ns_client) {
         if (nodeRecv.tagName() == u"iq") {
@@ -1018,6 +967,118 @@ bool NonSaslAuthManager::handleElement(const QDomElement &el)
         return true;
     }
     return false;
+}
+
+void SaslManager::reset()
+{
+    m_saslClient.reset();
+    m_promise.reset();
+}
+
+QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent)
+{
+    Q_ASSERT(!m_promise.has_value());
+
+    // supported and preferred SASL auth mechanisms
+    const QString preferredMechanism = config.saslAuthMechanism();
+    QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
+    if (supportedMechanisms.contains(preferredMechanism)) {
+        supportedMechanisms.removeAll(preferredMechanism);
+        supportedMechanisms.prepend(preferredMechanism);
+    }
+    if (config.facebookAppId().isEmpty() || config.facebookAccessToken().isEmpty()) {
+        supportedMechanisms.removeAll(QStringLiteral("X-FACEBOOK-PLATFORM"));
+    }
+    if (config.windowsLiveAccessToken().isEmpty()) {
+        supportedMechanisms.removeAll(QStringLiteral("X-MESSENGER-OAUTH2"));
+    }
+    if (config.googleAccessToken().isEmpty()) {
+        supportedMechanisms.removeAll(QStringLiteral("X-OAUTH2"));
+    }
+
+    // determine SASL Authentication mechanism to use
+    QStringList commonMechanisms;
+    QString usedMechanism;
+    for (const auto &mechanism : std::as_const(supportedMechanisms)) {
+        if (features.authMechanisms().contains(mechanism)) {
+            commonMechanisms << mechanism;
+        }
+    }
+    if (commonMechanisms.isEmpty()) {
+        return makeReadyTask<AuthResult>(QXmppError { QStringLiteral("No supported SASL Authentication mechanism available"), {} });
+    }
+    usedMechanism = commonMechanisms.first();
+
+    m_saslClient.reset(QXmppSaslClient::create(usedMechanism, parent));
+    if (!m_saslClient) {
+        return makeReadyTask<AuthResult>(QXmppError {
+            QStringLiteral("SASL mechanism negotiation failed"),
+            {},
+        });
+    }
+    m_saslClient->info(QStringLiteral("SASL mechanism '%1' selected").arg(m_saslClient->mechanism()));
+    m_saslClient->setHost(config.domain());
+    m_saslClient->setServiceType(QStringLiteral("xmpp"));
+    if (m_saslClient->mechanism() == u"X-FACEBOOK-PLATFORM") {
+        m_saslClient->setUsername(config.facebookAppId());
+        m_saslClient->setPassword(config.facebookAccessToken());
+    } else if (m_saslClient->mechanism() == u"X-MESSENGER-OAUTH2") {
+        m_saslClient->setPassword(config.windowsLiveAccessToken());
+    } else if (m_saslClient->mechanism() == u"X-OAUTH2") {
+        m_saslClient->setUsername(config.user());
+        m_saslClient->setPassword(config.googleAccessToken());
+    } else {
+        m_saslClient->setUsername(config.user());
+        m_saslClient->setPassword(config.password());
+    }
+
+    // send SASL auth request
+    QByteArray response;
+    if (!m_saslClient->respond(QByteArray(), response)) {
+        return makeReadyTask<AuthResult>(QXmppError {
+            QStringLiteral("SASL initial response failed"),
+            {},
+        });
+    }
+    m_socket.sendData(serializeNonza(QXmppSaslAuth(m_saslClient->mechanism(), response)));
+
+    m_promise = QXmppPromise<AuthResult>();
+    return m_promise->task();
+}
+
+bool SaslManager::handleElement(const QDomElement &el)
+{
+    auto finish = [this](auto &&value) {
+        auto p = std::move(*m_promise);
+        m_promise.reset();
+        p.finish(value);
+    };
+
+    if (!m_promise.has_value() || el.namespaceURI() != ns_sasl) {
+        return false;
+    }
+
+    if (el.tagName() == u"success") {
+        finish(Success());
+    } else if (el.tagName() == u"challenge") {
+        QXmppSaslChallenge challenge;
+        challenge.parse(el);
+
+        QByteArray response;
+        if (m_saslClient->respond(challenge.value(), response)) {
+            m_socket.sendData(serializeNonza(QXmppSaslResponse(response)));
+        } else {
+            finish(QXmppError { QStringLiteral("Could not respond to SASL challenge"), {} });
+        }
+    } else if (el.tagName() == u"failure") {
+        QXmppSaslFailure failure;
+        failure.parse(el);
+
+        finish(QXmppError { QStringLiteral("Authentication failure"), std::move(failure) });
+    } else {
+        return false;
+    }
+    return true;
 }
 
 PingManager::PingManager(QXmppOutgoingClient *q)
