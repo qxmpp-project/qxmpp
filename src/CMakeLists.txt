@@ -227,8 +227,6 @@ set(SOURCE_FILES
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
     base/compat/removed_api.cpp
-    base/compat/QXmppPubSubIq.cpp
-    base/compat/QXmppPubSubItem.cpp
 
     # Client
     client/QXmppArchiveManager.cpp
