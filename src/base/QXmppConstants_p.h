@@ -26,6 +26,7 @@ inline constexpr QStringView ns_tls = u"urn:ietf:params:xml:ns:xmpp-tls";
 inline constexpr QStringView ns_sasl = u"urn:ietf:params:xml:ns:xmpp-sasl";
 inline constexpr QStringView ns_bind = u"urn:ietf:params:xml:ns:xmpp-bind";
 inline constexpr QStringView ns_xmpp_sasl = u"urn:ietf:params:xml:ns:xmpp-sasl";
+inline constexpr QStringView ns_stream_error = u"urn:ietf:params:xml:ns:xmpp-streams";
 inline constexpr QStringView ns_session = u"urn:ietf:params:xml:ns:xmpp-session";
 inline constexpr QStringView ns_stanza = u"urn:ietf:params:xml:ns:xmpp-stanzas";
 inline constexpr QStringView ns_pre_approval = u"urn:xmpp:features:pre-approval";
