@@ -717,19 +717,6 @@ QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
     return NoStreamManagement;
 }
 
-/// Returns the reference to QXmppRosterManager object of the client.
-///
-/// \return Reference to the roster object of the connected client. Use this to
-/// get the list of friends in the roster and their presence information.
-///
-/// \deprecated This method is deprecated since QXmpp 1.1. Use
-/// \c QXmppClient::findExtension<QXmppRosterManager>() instead.
-
-QXmppRosterManager &QXmppClient::rosterManager()
-{
-    return *findExtension<QXmppRosterManager>();
-}
-
 /// Utility function to send message to all the resources associated with the
 /// specified bareJid. If there are no resources available, that is the contact
 /// is offline or not present in the roster, it will still send a message to
@@ -838,30 +825,6 @@ QString QXmppClient::socketErrorString() const
 QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 {
     return d->stream->xmppStreamError();
-}
-
-///
-/// Returns the reference to QXmppVCardManager, implementation of \xep{0054}.
-/// http://xmpp.org/extensions/xep-0054.html
-///
-/// \deprecated This method is deprecated since QXmpp 1.1. Use
-/// \c QXmppClient::findExtension<QXmppVCardManager>() instead.
-///
-QXmppVCardManager &QXmppClient::vCardManager()
-{
-    return *findExtension<QXmppVCardManager>();
-}
-
-///
-/// Returns the reference to QXmppVersionManager, implementation of \xep{0092}.
-/// http://xmpp.org/extensions/xep-0092.html
-///
-/// \deprecated This method is deprecated since QXmpp 1.1. Use
-/// \c QXmppClient::findExtension<QXmppVersionManager>() instead.
-///
-QXmppVersionManager &QXmppClient::versionManager()
-{
-    return *findExtension<QXmppVersionManager>();
 }
 
 void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata)

@@ -36,27 +36,6 @@ QList<QXmppDiscoveryIq::Identity> QXmppClientExtension::discoveryIdentities() co
 /// \brief You need to implement this method to process incoming XMPP
 /// stanzas.
 ///
-/// You should return true if the stanza was handled and no further
-/// processing should occur, or false to let other extensions process
-/// the stanza.
-///
-/// End-to-end encrypted stanzas are not passed to this overload, for that
-/// purpose use the new overload instead.
-///
-/// \deprecated This is deprecated since QXmpp 1.5. Please use
-/// QXmppClientExtension::handleStanza(const QDomElement &stanza,
-/// const std::optional<QXmppE2eeMetadata> &e2eeMetadata).
-/// Currently both methods are called by the client, so only implement one!
-///
-bool QXmppClientExtension::handleStanza(const QDomElement &)
-{
-    return false;
-}
-
-///
-/// \brief You need to implement this method to process incoming XMPP
-/// stanzas.
-///
 /// \param stanza The DOM element to be handled.
 /// \param e2eeMetadata If the element has been decrypted this contains metadata
 /// about the encryption.

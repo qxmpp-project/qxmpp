@@ -274,6 +274,7 @@ set(SOURCE_FILES
     client/QXmppUserTuneManager.cpp
     client/QXmppVCardManager.cpp
     client/QXmppVersionManager.cpp
+    client/compat/removed_api.cpp
 
     # Server
     server/QXmppDialback.cpp
