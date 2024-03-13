@@ -6,11 +6,14 @@
 
 #include "QXmppStream.h"
 
+#include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppIq.h"
 #include "QXmppPacket_p.h"
+#include "QXmppStreamError_p.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include <QDomDocument>
 #include <QHostAddress>
@@ -19,6 +22,8 @@
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
+
+constexpr quint16 XMPP_PORT_FALLBACK = 5222;
 
 class QXmppStreamPrivate
 {
@@ -166,6 +171,67 @@ void QXmppStream::onStanzaReceived(const QDomElement &stanza)
 }
 
 namespace QXmpp::Private {
+
+constexpr auto STREAM_ERROR_CONDITIONS = to_array<QStringView>({
+    u"bad-format",
+    u"bad-namespace-prefix",
+    u"conflict",
+    u"connection-timeout",
+    u"host-gone",
+    u"host-unknown",
+    u"improper-addressing",
+    u"internal-server-error",
+    u"invalid-from",
+    u"invalid-id",
+    u"invalid-namespace",
+    u"invalid-xml",
+    u"not-authorized",
+    u"not-well-formed",
+    u"policy-violation",
+    u"remote-connection-failed",
+    u"reset",
+    u"resource-constraint",
+    u"restricted-xml",
+    u"system-shutdown",
+    u"undefined-condition",
+    u"unsupported-encoding",
+    u"unsupported-stanza-type",
+    u"unsupported-version",
+});
+
+/// \cond
+std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"error" || el.namespaceURI() != ns_stream) {
+        return QXmppError { QStringLiteral("Invalid dom element."), {} };
+    }
+
+    std::optional<StreamErrorElement::Condition> condition;
+    QString errorText;
+
+    for (const auto &subEl : iterChildElements(el, {}, ns_stream_error)) {
+        auto tagName = subEl.tagName();
+        if (tagName == u"text") {
+            errorText = subEl.text();
+        } else if (auto conditionEnum = enumFromString<StreamError>(STREAM_ERROR_CONDITIONS, tagName)) {
+            condition = conditionEnum;
+        } else if (tagName == u"see-other-host") {
+            if (auto [host, port] = parseHostAddress(subEl.text()); !host.isEmpty()) {
+                condition = SeeOtherHost { host, port > 0 ? quint16(port) : XMPP_PORT_FALLBACK };
+            }
+        }
+    }
+
+    if (!condition) {
+        return QXmppError { QStringLiteral("Stream error is missing valid error condition."), {} };
+    }
+
+    return StreamErrorElement {
+        std::move(*condition),
+        std::move(errorText),
+    };
+}
+/// \endcond
 
 XmppSocket::XmppSocket(QObject *parent)
     : QXmppLoggable(parent)
