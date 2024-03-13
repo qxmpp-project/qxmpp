@@ -77,6 +77,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppStanza.h
     base/QXmppStartTlsPacket.h
     base/QXmppStream.h
+    base/QXmppStreamError.h
     base/QXmppStreamFeatures.h
     base/QXmppStun.h
     base/QXmppTask.h
