@@ -9,6 +9,7 @@
 #include "QXmppGlobal.h"
 
 #include <array>
+#include <optional>
 #include <stdint.h>
 
 #include <QByteArray>
@@ -60,6 +61,17 @@ inline auto toString65(QStringView s)
 #else
 #define QSL65(text) QStringLiteral(text)
 #endif
+
+// Enum parsing
+template<typename Enum, std::size_t N>
+std::optional<Enum> enumFromString(const std::array<QStringView, N> &values, QStringView str)
+{
+    auto itr = std::find(values.begin(), values.end(), str);
+    if (itr != values.end()) {
+        return Enum(std::distance(values.begin(), itr));
+    }
+    return {};
+}
 
 // XML streams
 void writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name, QStringView value);
