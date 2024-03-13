@@ -16,6 +16,7 @@
 #include "QXmppPresence.h"
 #include "QXmppPromise.h"
 #include "QXmppSasl_p.h"
+#include "QXmppStreamError_p.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppTask.h"
@@ -43,6 +44,7 @@
 #include <QTimer>
 #include <QXmlStreamWriter>
 
+using std::visit;
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
@@ -190,8 +192,7 @@ public:
     QString streamVersion;
 
     // Redirection
-    QString redirectHost;
-    quint16 redirectPort = 0;
+    std::optional<StreamErrorElement::SeeOtherHost> redirect;
 
     // Session
     BindManager bindManager;
@@ -437,10 +438,9 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug(QStringLiteral("Socket disconnected"));
     d->isAuthenticated = false;
-    if (!d->redirectHost.isEmpty() && d->redirectPort > 0) {
-        d->connectToHost(d->redirectHost, d->redirectPort);
-        d->redirectHost = QString();
-        d->redirectPort = 0;
+    if (d->redirect) {
+        d->connectToHost(d->redirect->host, d->redirect->port);
+        d->redirect.reset();
     } else {
         Q_EMIT disconnected();
     }
@@ -703,28 +703,38 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         d->sessionStarted = true;
         Q_EMIT connected();
     } else if (ns == ns_stream && nodeRecv.tagName() == u"error") {
-        // handle redirects
-        const auto otherHost = firstChildElement(nodeRecv, u"see-other-host");
-        if (!otherHost.isNull()) {
-            // try to parse address
-            if (auto [host, port] = parseHostAddress(otherHost.text()); !host.isEmpty()) {
-                d->redirectHost = host;
-                d->redirectPort = port > 0 ? port : 5222;
+        visit(
+            overloaded {
+                [&](StreamErrorElement streamError) {
+                    if (auto *redirect = std::get_if<StreamErrorElement::SeeOtherHost>(&streamError.condition)) {
+                        d->redirect = std::move(*redirect);
 
-                // only disconnect socket (so stream mangement can resume state is not reset)
-                d->socket.disconnectFromHost();
-                return;
-            }
-        }
+                        // only disconnect socket (so stream mangement can resume state is not reset)
+                        d->socket.disconnectFromHost();
+                    } else {
+                        auto condition = std::get<StreamError>(streamError.condition);
 
-        if (!firstChildElement(nodeRecv, u"conflict").isNull()) {
-            d->xmppStreamError = QXmppStanza::Error::Conflict;
-        } else if (!firstChildElement(nodeRecv, u"not-authorized").isNull()) {
-            d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-        } else {
-            d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
-        }
-        Q_EMIT error(QXmppClient::XmppStreamError);
+                        // backwards compat
+                        switch (condition) {
+                        case StreamError::Conflict:
+                            d->xmppStreamError = QXmppStanza::Error::Conflict;
+                            break;
+                        case StreamError::NotAuthorized:
+                            d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+                            break;
+                        default:
+                            d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                        }
+                        Q_EMIT error(QXmppClient::XmppStreamError);
+                    }
+                },
+                [&](QXmppError) {
+                    // invalid stream error element received
+                    d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+                    Q_EMIT error(QXmppClient::XmppStreamError);
+                },
+            },
+            StreamErrorElement::fromDom(nodeRecv));
     } else if (ns == ns_sasl) {
         if (!d->saslManager.handleElement(nodeRecv)) {
             warning(QStringLiteral("Unexpected SASL stanza received"));
