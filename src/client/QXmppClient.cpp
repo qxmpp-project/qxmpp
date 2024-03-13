@@ -26,10 +26,13 @@
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
+#include <chrono>
+
 #include <QDomElement>
 #include <QSslSocket>
 #include <QTimer>
 
+using namespace std::chrono_literals;
 using namespace QXmpp::Private;
 using MessageEncryptResult = QXmppE2eeExtension::MessageEncryptResult;
 using IqEncryptResult = QXmppE2eeExtension::IqEncryptResult;
@@ -65,16 +68,16 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence &presence)
     }
 }
 
-int QXmppClientPrivate::getNextReconnectTime() const
+std::chrono::milliseconds QXmppClientPrivate::getNextReconnectTime() const
 {
     if (reconnectionTries < 5) {
-        return 10 * 1000;
+        return 10s;
     } else if (reconnectionTries < 10) {
-        return 20 * 1000;
+        return 20s;
     } else if (reconnectionTries < 15) {
-        return 40 * 1000;
+        return 40s;
     } else {
-        return 60 * 1000;
+        return 60s;
     }
 }
 
@@ -961,7 +964,7 @@ void QXmppClient::_q_streamError(QXmppClient::Error err)
             d->reconnectionTimer->start(d->getNextReconnectTime());
         } else if (err == QXmppClient::KeepAliveError) {
             // if we got a keepalive error, reconnect in one second
-            d->reconnectionTimer->start(1000);
+            d->reconnectionTimer->start(1s);
         }
     }
 

@@ -20,6 +20,8 @@
 
 #include "QXmppPresence.h"
 
+#include <chrono>
+
 class QXmppClient;
 class QXmppClientExtension;
 class QXmppE2eeExtension;
@@ -50,7 +52,7 @@ public:
     bool isActive;
 
     void addProperCapability(QXmppPresence &presence);
-    int getNextReconnectTime() const;
+    std::chrono::milliseconds getNextReconnectTime() const;
 
     static QStringList discoveryFeatures();
 
