@@ -182,7 +182,7 @@ public:
 
     // DNS
     QList<QDnsServiceRecord> srvRecords;
-    int nextSrvRecordIdx;
+    int nextSrvRecordIdx = 0;
 
     // Stream
     QString streamId;
@@ -191,20 +191,20 @@ public:
 
     // Redirection
     QString redirectHost;
-    quint16 redirectPort;
+    quint16 redirectPort = 0;
 
     // Session
     BindManager bindManager;
-    bool bindModeAvailable;
-    bool sessionStarted;
+    bool bindModeAvailable = false;
+    bool sessionStarted = false;
 
     // Authentication
-    bool isAuthenticated;
+    bool isAuthenticated = false;
     NonSaslAuthManager nonSaslAuthManager;
     SaslManager saslManager;
 
     // Client State Indication
-    bool clientStateIndicationEnabled;
+    bool clientStateIndicationEnabled = false;
 
     C2sStreamManager c2sStreamManager;
     PingManager pingManager;
@@ -217,15 +217,9 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : socket(qq),
       streamAckManager(socket),
       iqManager(qq, streamAckManager),
-      nextSrvRecordIdx(0),
-      redirectPort(0),
       bindManager(socket),
-      bindModeAvailable(false),
-      sessionStarted(false),
-      isAuthenticated(false),
       nonSaslAuthManager(socket),
       saslManager(socket),
-      clientStateIndicationEnabled(false),
       c2sStreamManager(qq),
       pingManager(qq),
       q(qq)
