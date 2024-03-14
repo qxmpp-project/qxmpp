@@ -26,6 +26,7 @@ struct StreamErrorElement {
 
     using Condition = std::variant<StreamError, SeeOtherHost>;
 
+    static QString streamErrorToString(StreamError);
     static std::variant<StreamErrorElement, QXmppError> fromDom(const QDomElement &);
 
     Condition condition;
