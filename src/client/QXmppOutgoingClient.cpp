@@ -669,18 +669,13 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 } else {
                     auto [text, err] = std::get<SaslManager::AuthError>(std::move(result));
 
-                    // fallback
                     d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     try {
-                        auto &failure = std::any_cast<QXmppSaslFailure &>(err.details);
-
-                        // RFC3920 defines the error condition as "not-authorized", but
-                        // some broken servers use "bad-auth" instead. We tolerate this
-                        // by remapping the error to "not-authorized".
-                        if (failure.condition == u"not-authorized" || failure.condition == u"bad-auth") {
+                        if (std::any_cast<QXmppSaslFailure &>(err.details).condition == SaslErrorCondition::NotAuthorized) {
                             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
                         }
                     } catch (std::bad_any_cast) {
+                        // fallback to UndefinedCondition set above
                     }
 
                     Q_EMIT errorOccurred(text, err, QXmppClient::XmppStreamError);

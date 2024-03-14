@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -10,6 +11,8 @@
 #include "QXmppGlobal.h"
 #include "QXmppLogger.h"
 #include "QXmppNonza.h"
+
+#include <optional>
 
 #include <QCryptographicHash>
 #include <QMap>
@@ -35,6 +38,24 @@ class SaslManager;
 //
 // We mean it.
 //
+
+namespace QXmpp::Private {
+
+enum class SaslErrorCondition {
+    Aborted,
+    AccountDisabled,
+    CredentialsExpired,
+    EncryptionRequired,
+    IncorrectEncoding,
+    InvalidAuthzid,
+    InvalidMechanism,
+    MalformedRequest,
+    MechanismTooWeak,
+    NotAuthorized,
+    TemporaryAuthFailure,
+};
+
+}
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
@@ -136,9 +157,9 @@ public:
 class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppNonza
 {
 public:
-    QXmppSaslFailure(QString condition = {}, QString text = {}) : condition(condition), text(text) { }
+    QXmppSaslFailure(std::optional<QXmpp::Private::SaslErrorCondition> condition = {}, QString text = {}) : condition(condition), text(text) { }
 
-    QString condition;
+    std::optional<QXmpp::Private::SaslErrorCondition> condition;
     QString text;
 
     void parse(const QDomElement &element) override;
