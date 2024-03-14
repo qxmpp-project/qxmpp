@@ -99,6 +99,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppAtmTrustMemoryStorage.h
     client/QXmppAtmTrustStorage.h
     client/QXmppAttentionManager.h
+    client/QXmppAuthenticationError.h
     client/QXmppBlockingManager.h
     client/QXmppBookmarkManager.h
     client/QXmppCallInviteManager.h
