@@ -157,6 +157,8 @@ public:
 class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppNonza
 {
 public:
+    static QString conditionToString(QXmpp::Private::SaslErrorCondition condition);
+
     QXmppSaslFailure(std::optional<QXmpp::Private::SaslErrorCondition> condition = {}, QString text = {}) : condition(condition), text(text) { }
 
     std::optional<QXmpp::Private::SaslErrorCondition> condition;
