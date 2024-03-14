@@ -13,6 +13,7 @@
 #include <QMessageAuthenticationCode>
 #include <QStringBuilder>
 #include <QUrlQuery>
+#include <QXmlStreamWriter>
 #include <QtEndian>
 
 using namespace QXmpp::Private;

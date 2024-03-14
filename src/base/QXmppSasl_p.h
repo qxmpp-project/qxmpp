@@ -9,12 +9,13 @@
 
 #include "QXmppGlobal.h"
 #include "QXmppLogger.h"
-#include "QXmppStanza.h"
+#include "QXmppNonza.h"
 
-#include <QByteArray>
 #include <QCryptographicHash>
 #include <QMap>
 
+class QDomElement;
+class QXmlStreamWriter;
 class QXmppSaslClientPrivate;
 class QXmppSaslServerPrivate;
 
