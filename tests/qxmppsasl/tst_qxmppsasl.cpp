@@ -89,8 +89,8 @@ void tst_QXmppSasl::testAuth()
     // no condition
     QXmppSaslAuth auth;
     parsePacket(auth, xml);
-    QCOMPARE(auth.mechanism(), mechanism);
-    QCOMPARE(auth.value(), value);
+    QCOMPARE(auth.mechanism, mechanism);
+    QCOMPARE(auth.value, value);
     serializePacket(auth, xml);
 }
 
@@ -116,7 +116,7 @@ void tst_QXmppSasl::testChallenge()
     // no condition
     QXmppSaslChallenge challenge;
     parsePacket(challenge, xml);
-    QCOMPARE(challenge.value(), value);
+    QCOMPARE(challenge.value, value);
     serializePacket(challenge, xml);
 }
 
@@ -126,15 +126,15 @@ void tst_QXmppSasl::testFailure()
     const QByteArray xml = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>";
     QXmppSaslFailure failure;
     parsePacket(failure, xml);
-    QCOMPARE(failure.condition(), QString());
-    QVERIFY(failure.text().isEmpty());
+    QCOMPARE(failure.condition, QString());
+    QVERIFY(failure.text.isEmpty());
     serializePacket(failure, xml);
 
     // not authorized
     const QByteArray xml2 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><not-authorized/></failure>";
     QXmppSaslFailure failure2;
     parsePacket(failure2, xml2);
-    QCOMPARE(failure2.condition(), QLatin1String("not-authorized"));
+    QCOMPARE(failure2.condition, QLatin1String("not-authorized"));
     serializePacket(failure2, xml2);
 
     // email verification required
@@ -145,14 +145,13 @@ void tst_QXmppSasl::testFailure()
 
     QXmppSaslFailure failure3;
     parsePacket(failure3, xml3);
-    QCOMPARE(failure3.condition(), QLatin1String("account-disabled"));
-    QCOMPARE(failure3.text(), QStringLiteral("Your account has not been activated yet. Please check your email inbox for an activation link"));
+    QCOMPARE(failure3.condition, QLatin1String("account-disabled"));
+    QCOMPARE(failure3.text, "Your account has not been activated yet. Please check your email inbox for an activation link");
     serializePacket(failure3, xml3);
 
     QXmppSaslFailure failure4;
-    failure4.setCondition(QStringLiteral("account-disabled"));
-    failure4.setText("Your account has not been activated yet. Please check your email inbox for an activation link");
-    QCOMPARE(failure4.text(), QStringLiteral("Your account has not been activated yet. Please check your email inbox for an activation link"));
+    failure4.condition = QStringLiteral("account-disabled");
+    failure4.text = "Your account has not been activated yet. Please check your email inbox for an activation link";
     serializePacket(failure4, xml3);
 }
 
@@ -178,7 +177,7 @@ void tst_QXmppSasl::testResponse()
     // no condition
     QXmppSaslResponse response;
     parsePacket(response, xml);
-    QCOMPARE(response.value(), value);
+    QCOMPARE(response.value, value);
     serializePacket(response, xml);
 }
 

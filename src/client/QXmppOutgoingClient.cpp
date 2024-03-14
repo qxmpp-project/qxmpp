@@ -677,7 +677,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         // RFC3920 defines the error condition as "not-authorized", but
                         // some broken servers use "bad-auth" instead. We tolerate this
                         // by remapping the error to "not-authorized".
-                        if (failure.condition() == u"not-authorized" || failure.condition() == u"bad-auth") {
+                        if (failure.condition == u"not-authorized" || failure.condition == u"bad-auth") {
                             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
                         }
                     } catch (std::bad_any_cast) {
@@ -1089,7 +1089,7 @@ bool SaslManager::handleElement(const QDomElement &el)
         challenge.parse(el);
 
         QByteArray response;
-        if (m_saslClient->respond(challenge.value(), response)) {
+        if (m_saslClient->respond(challenge.value, response)) {
             m_socket.sendData(serializeNonza(QXmppSaslResponse(response)));
         } else {
             finish(AuthError {
@@ -1104,7 +1104,7 @@ bool SaslManager::handleElement(const QDomElement &el)
         // TODO: Properly map SASL failure conditions to AuthenticationError::Types
         finish(AuthError {
             QStringLiteral("Authentication failure"),
-            AuthenticationError { AuthenticationError::NotAuthorized, failure.text(), std::move(failure) },
+            AuthenticationError { AuthenticationError::NotAuthorized, failure.text, std::move(failure) },
         });
     } else {
         return false;

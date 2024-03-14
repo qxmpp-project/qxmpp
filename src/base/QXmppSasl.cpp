@@ -96,176 +96,87 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
     return map;
 }
 
-QXmppSaslAuth::QXmppSaslAuth(const QString &mechanism, const QByteArray &value)
-    : m_mechanism(mechanism), m_value(value)
-{
-}
-
-QString QXmppSaslAuth::mechanism() const
-{
-    return m_mechanism;
-}
-
-void QXmppSaslAuth::setMechanism(const QString &mechanism)
-{
-    m_mechanism = mechanism;
-}
-
-QByteArray QXmppSaslAuth::value() const
-{
-    return m_value;
-}
-
-void QXmppSaslAuth::setValue(const QByteArray &value)
-{
-    m_value = value;
-}
-
 void QXmppSaslAuth::parse(const QDomElement &element)
 {
-    m_mechanism = element.attribute(QStringLiteral("mechanism"));
-    m_value = QByteArray::fromBase64(element.text().toLatin1());
+    mechanism = element.attribute(QStringLiteral("mechanism"));
+    value = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("auth"));
     writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
-    writer->writeAttribute(QSL65("mechanism"), m_mechanism);
-    if (!m_value.isEmpty()) {
+    writer->writeAttribute(QSL65("mechanism"), mechanism);
+    if (!value.isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        writer->writeCharacters(m_value.toBase64());
+        writer->writeCharacters(value.toBase64());
 #else
-        writer->writeCharacters(QString::fromUtf8(m_value.toBase64()));
+        writer->writeCharacters(QString::fromUtf8(value.toBase64()));
 #endif
     }
     writer->writeEndElement();
 }
 
-QXmppSaslChallenge::QXmppSaslChallenge(const QByteArray &value)
-    : m_value(value)
-{
-}
-
-QByteArray QXmppSaslChallenge::value() const
-{
-    return m_value;
-}
-
-void QXmppSaslChallenge::setValue(const QByteArray &value)
-{
-    m_value = value;
-}
-
 void QXmppSaslChallenge::parse(const QDomElement &element)
 {
-    m_value = QByteArray::fromBase64(element.text().toLatin1());
+    value = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("challenge"));
     writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
-    if (!m_value.isEmpty()) {
+    if (!value.isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        writer->writeCharacters(m_value.toBase64());
+        writer->writeCharacters(value.toBase64());
 #else
-        writer->writeCharacters(QString::fromUtf8(m_value.toBase64()));
+        writer->writeCharacters(QString::fromUtf8(value.toBase64()));
 #endif
     }
     writer->writeEndElement();
 }
 
-QXmppSaslFailure::QXmppSaslFailure(const QString &condition)
-    : m_condition(condition)
-{
-}
-
-QString QXmppSaslFailure::condition() const
-{
-    return m_condition;
-}
-
-void QXmppSaslFailure::setCondition(const QString &condition)
-{
-    m_condition = condition;
-}
-
-QString QXmppSaslFailure::text() const
-{
-    return m_text;
-}
-
-void QXmppSaslFailure::setText(const QString &text)
-{
-    m_text = text;
-}
-
 void QXmppSaslFailure::parse(const QDomElement &element)
 {
-    m_condition = element.firstChildElement().tagName();
-    m_text = element.firstChildElement(QStringLiteral("text")).text();
+    condition = element.firstChildElement().tagName();
+    text = element.firstChildElement(QStringLiteral("text")).text();
 }
 
 void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("failure"));
     writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
-    if (!m_condition.isEmpty()) {
-        writer->writeEmptyElement(m_condition);
+    if (!condition.isEmpty()) {
+        writer->writeEmptyElement(condition);
     }
 
-    if (!m_text.isEmpty()) {
+    if (!text.isEmpty()) {
         writer->writeStartElement(QStringLiteral("text"));
         writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
-        writer->writeCharacters(m_text);
+        writer->writeCharacters(text);
         writer->writeEndElement();
     }
 
     writer->writeEndElement();
 }
 
-QXmppSaslResponse::QXmppSaslResponse(const QByteArray &value)
-    : m_value(value)
-{
-}
-
-QByteArray QXmppSaslResponse::value() const
-{
-    return m_value;
-}
-
-void QXmppSaslResponse::setValue(const QByteArray &value)
-{
-    m_value = value;
-}
-
 void QXmppSaslResponse::parse(const QDomElement &element)
 {
-    m_value = QByteArray::fromBase64(element.text().toLatin1());
+    value = QByteArray::fromBase64(element.text().toLatin1());
 }
 
 void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("response"));
     writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
-    if (!m_value.isEmpty()) {
+    if (!value.isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        writer->writeCharacters(m_value.toBase64());
+        writer->writeCharacters(value.toBase64());
 #else
-        writer->writeCharacters(QString::fromUtf8(m_value.toBase64()));
+        writer->writeCharacters(QString::fromUtf8(value.toBase64()));
 #endif
     }
     writer->writeEndElement();
-}
-
-QXmppSaslSuccess::QXmppSaslSuccess()
-{
-}
-
-void QXmppSaslSuccess::parse(const QDomElement &element)
-{
-    Q_UNUSED(element);
 }
 
 void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
