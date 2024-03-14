@@ -232,7 +232,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             QXmppSaslAuth auth;
             auth.parse(nodeRecv);
 
-            d->saslServer = QXmppSaslServer::create(auth.mechanism(), this);
+            d->saslServer = QXmppSaslServer::create(auth.mechanism, this);
             if (!d->saslServer) {
                 sendPacket(QXmppSaslFailure(QStringLiteral("invalid-mechanism")));
                 disconnectFromHost();
@@ -242,11 +242,11 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             d->saslServer->setRealm(d->domain);
 
             QByteArray challenge;
-            QXmppSaslServer::Response result = d->saslServer->respond(auth.value(), challenge);
+            QXmppSaslServer::Response result = d->saslServer->respond(auth.value, challenge);
 
             if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                d->checkCredentials(auth.value());
+                d->checkCredentials(auth.value);
             } else if (result == QXmppSaslServer::Challenge) {
                 sendPacket(QXmppSaslChallenge(challenge));
             } else {
@@ -267,10 +267,10 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             }
 
             QByteArray challenge;
-            QXmppSaslServer::Response result = d->saslServer->respond(response.value(), challenge);
+            QXmppSaslServer::Response result = d->saslServer->respond(response.value, challenge);
             if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                d->checkCredentials(response.value());
+                d->checkCredentials(response.value);
             } else if (result == QXmppSaslServer::Succeeded) {
                 // authentication succeeded
                 d->jid = QStringLiteral("%1@%2").arg(d->saslServer->username(), d->domain);

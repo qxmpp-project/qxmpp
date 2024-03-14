@@ -113,88 +113,54 @@ public:
 class QXMPP_AUTOTEST_EXPORT QXmppSaslAuth : public QXmppNonza
 {
 public:
-    QXmppSaslAuth(const QString &mechanism = QString(), const QByteArray &value = QByteArray());
+    QXmppSaslAuth(QString mechanism = {}, QByteArray value = {}) : mechanism(mechanism), value(value) { }
 
-    QString mechanism() const;
-    void setMechanism(const QString &mechanism);
+    QString mechanism;
+    QByteArray value;
 
-    QByteArray value() const;
-    void setValue(const QByteArray &value);
-
-    /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
-
-private:
-    QString m_mechanism;
-    QByteArray m_value;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslChallenge : public QXmppNonza
 {
 public:
-    QXmppSaslChallenge(const QByteArray &value = QByteArray());
+    QXmppSaslChallenge(QByteArray value = {}) : value(value) { }
 
-    QByteArray value() const;
-    void setValue(const QByteArray &value);
+    QByteArray value;
 
-    /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
-
-private:
-    QByteArray m_value;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppNonza
 {
 public:
-    QXmppSaslFailure(const QString &condition = QString());
+    QXmppSaslFailure(QString condition = {}, QString text = {}) : condition(condition), text(text) { }
 
-    QString condition() const;
-    void setCondition(const QString &condition);
+    QString condition;
+    QString text;
 
-    QString text() const;
-    void setText(const QString &text);
-
-    /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
-
-private:
-    QString m_condition;
-    QString m_text;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslResponse : public QXmppNonza
 {
 public:
-    QXmppSaslResponse(const QByteArray &value = QByteArray());
+    QXmppSaslResponse(QByteArray value = {}) : value(value) { }
 
-    QByteArray value() const;
-    void setValue(const QByteArray &value);
+    QByteArray value;
 
-    /// \cond
     void parse(const QDomElement &element) override;
     void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
-
-private:
-    QByteArray m_value;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslSuccess : public QXmppNonza
 {
 public:
-    QXmppSaslSuccess();
-
-    /// \cond
-    void parse(const QDomElement &element) override;
+    void parse(const QDomElement &) override { }
     void toXml(QXmlStreamWriter *writer) const override;
-    /// \endcond
 };
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient
