@@ -33,10 +33,7 @@ class PingManager;
 class C2sStreamManager;
 }  // namespace QXmpp::Private
 
-///
-/// \brief The QXmppOutgoingClient class represents an outgoing XMPP stream
-/// to an XMPP server.
-///
+// The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
 class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
 {
     Q_OBJECT
