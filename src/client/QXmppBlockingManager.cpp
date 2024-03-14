@@ -124,8 +124,7 @@ public:
 };
 
 // Manager data
-struct QXmppBlockingManagerPrivate
-{
+struct QXmppBlockingManagerPrivate {
     std::optional<QVector<QString>> blocklist;
     std::vector<QXmppPromise<QXmppBlockingManager::BlocklistResult>> openFetchBlocklistPromises;
 };

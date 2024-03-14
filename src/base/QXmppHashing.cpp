@@ -216,8 +216,7 @@ HashingResult calculateHashesSync(std::unique_ptr<QIODevice> data, std::vector<Q
     return { std::move(results), std::move(data) };
 }
 
-struct BufferReader : public QRunnable
-{
+struct BufferReader : public QRunnable {
     BufferReader(HashGenerator &creator)
         : generator(creator)
     {
@@ -230,8 +229,7 @@ struct BufferReader : public QRunnable
     HashGenerator &generator;
 };
 
-struct HashProcessor : public QRunnable
-{
+struct HashProcessor : public QRunnable {
     HashProcessor(HashGenerator *generator, QCryptographicHash::Algorithm algorithm)
         : generator(generator),
           hash(std::make_unique<QCryptographicHash>(algorithm)),

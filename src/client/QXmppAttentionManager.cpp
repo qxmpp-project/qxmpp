@@ -57,8 +57,7 @@
 /// rate limiter.
 ///
 
-struct PastRequest
-{
+struct PastRequest {
     QString bareJid;
     QDateTime timestamp;
 };

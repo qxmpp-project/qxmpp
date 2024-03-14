@@ -14,8 +14,7 @@ class QFileDevice;
 class QIODevice;
 class QNetworkReply;
 
-struct QXMPP_EXPORT QXmppError
-{
+struct QXMPP_EXPORT QXmppError {
     QString description;
     std::any error;
 

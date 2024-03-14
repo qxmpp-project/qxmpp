@@ -434,20 +434,10 @@ public:
         Responder
     };
 
-    struct RtpSessionStateActive
-    {
-    };
-
-    struct RtpSessionStateHold
-    {
-    };
-
-    struct RtpSessionStateUnhold
-    {
-    };
-
-    struct RtpSessionStateMuting
-    {
+    struct RtpSessionStateActive { };
+    struct RtpSessionStateHold { };
+    struct RtpSessionStateUnhold { };
+    struct RtpSessionStateMuting {
         /// True when temporarily not sending media to the other party but continuing to accept
         /// media from it, false for ending mute state
         bool isMute = true;
@@ -456,10 +446,7 @@ public:
         /// Session to be muted (e.g., only audio or video)
         QString name;
     };
-
-    struct RtpSessionStateRinging
-    {
-    };
+    struct RtpSessionStateRinging { };
 
     using RtpSessionState = std::variant<RtpSessionStateActive, RtpSessionStateHold, RtpSessionStateUnhold, RtpSessionStateMuting, RtpSessionStateRinging>;
 
@@ -670,8 +657,7 @@ public:
         Left
     };
 
-    struct Jingle
-    {
+    struct Jingle {
         QString sid;
         std::optional<QString> jid;
 
@@ -681,8 +667,7 @@ public:
         void toXml(QXmlStreamWriter *writer) const;
     };
 
-    struct External
-    {
+    struct External {
         QString uri;
 
         bool operator==(const External &other) const { return other.uri == uri; }

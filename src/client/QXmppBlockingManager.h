@@ -9,25 +9,21 @@
 #include "QXmppError.h"
 #include "QXmppTask.h"
 
-#include <QVector>
-
 #include <variant>
+
+#include <QVector>
 
 struct QXmppBlockingManagerPrivate;
 
 class QXMPP_EXPORT QXmppBlocklist
 {
 public:
-    struct NotBlocked
-    {
-    };
-    struct Blocked
-    {
+    struct NotBlocked { };
+    struct Blocked {
         QVector<QString> blockingEntries;
         QVector<QString> partiallyBlockingEntries;
     };
-    struct PartiallyBlocked
-    {
+    struct PartiallyBlocked {
         QVector<QString> partiallyBlockingEntries;
     };
 

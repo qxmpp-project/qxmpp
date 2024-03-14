@@ -21,8 +21,7 @@ class QXmppHash;
 
 namespace QXmpp::Private {
 
-struct HashingResult
-{
+struct HashingResult {
     using Result = std::variant<std::vector<QXmppHash>, Cancelled, QXmppError>;
 
     HashingResult(Result result, std::unique_ptr<QIODevice> data)
@@ -34,17 +33,10 @@ struct HashingResult
     std::unique_ptr<QIODevice> data;
 };
 
-struct HashVerificationResult
-{
-    struct NoStrongHashes
-    {
-    };
-    struct NotMatching
-    {
-    };
-    struct Verified
-    {
-    };
+struct HashVerificationResult {
+    struct NoStrongHashes { };
+    struct NotMatching { };
+    struct Verified { };
     using Result = std::variant<NoStrongHashes, NotMatching, Verified, Cancelled, QXmppError>;
 
     HashVerificationResult(Result result, std::unique_ptr<QIODevice> data)

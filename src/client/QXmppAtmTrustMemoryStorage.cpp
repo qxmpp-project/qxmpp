@@ -22,8 +22,7 @@ using namespace QXmpp::Private;
 /// \since QXmpp 1.5
 ///
 
-struct UnprocessedKey
-{
+struct UnprocessedKey {
     QByteArray id;
     QString ownerJid;
     QByteArray senderKeyId;

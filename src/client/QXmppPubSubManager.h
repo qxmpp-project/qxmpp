@@ -41,13 +41,10 @@ public:
     ///
     /// Used to indicate a service type mismatch.
     ///
-    struct InvalidServiceType
-    {
-    };
+    struct InvalidServiceType { };
 
     template<typename T>
-    struct Items
-    {
+    struct Items {
         QVector<T> items;
         std::optional<QXmppResultSetReply> continuation;
     };

@@ -30,8 +30,7 @@ enum class SendError : uint8_t {
 ///
 /// \since QXmpp 1.5
 ///
-struct SendSuccess
-{
+struct SendSuccess {
     /// Indicates whether the packet has been acknowledged by the other peer.
     bool acknowledged = false;
 };

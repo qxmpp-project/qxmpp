@@ -51,8 +51,7 @@ public:
     uint m_events = 0;
 };
 
-struct Client
-{
+struct Client {
     Client() { }
     Client(const QString &jid)
     {

@@ -38,8 +38,7 @@ auto sum(const T &c)
     return std::accumulate(c.begin(), c.end(), 0);
 }
 
-struct MamMessage
-{
+struct MamMessage {
     QDomElement element;
     std::optional<QDateTime> delay;
 };
@@ -87,8 +86,7 @@ std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomE
     return { { MamMessage { messageElement, parseDelay(forwardedElement) }, queryId } };
 }
 
-struct RetrieveRequestState
-{
+struct RetrieveRequestState {
     QXmppPromise<QXmppMamManager::RetrieveResult> promise;
     QXmppMamResultIq iq;
     QVector<MamMessage> messages;

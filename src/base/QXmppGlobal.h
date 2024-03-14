@@ -168,18 +168,14 @@ enum Cipher {
 ///
 /// \since QXmpp 1.5
 ///
-struct Success
-{
-};
+struct Success { };
 
 ///
 /// Unit struct used to indicate that a process has been cancelled.
 ///
 /// \since QXmpp 1.5
 ///
-struct Cancelled
-{
-};
+struct Cancelled { };
 
 }  // namespace QXmpp
 

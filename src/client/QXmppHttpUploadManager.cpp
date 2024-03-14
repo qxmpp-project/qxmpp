@@ -20,8 +20,7 @@
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
-struct QXmppHttpUploadPrivate
-{
+struct QXmppHttpUploadPrivate {
     explicit QXmppHttpUploadPrivate(QXmppHttpUpload *q) : q(q) { }
 
     QUrl getUrl;
@@ -205,8 +204,7 @@ QXmppHttpUpload::QXmppHttpUpload()
 {
 }
 
-struct QXmppHttpUploadManagerPrivate
-{
+struct QXmppHttpUploadManagerPrivate {
     explicit QXmppHttpUploadManagerPrivate(QNetworkAccessManager *netManager)
         : netManager(netManager)
     {

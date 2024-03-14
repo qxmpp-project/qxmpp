@@ -24,8 +24,7 @@
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
-struct OmemoUser
-{
+struct OmemoUser {
     QXmppClient client;
     QXmppLogger logger;
     QXmppOmemoManager *manager;

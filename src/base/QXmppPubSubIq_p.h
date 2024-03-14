@@ -7,13 +7,12 @@
 #define QXMPPPUBSUBIQ_H
 
 #include "QXmppIq.h"
+#include "QXmppPubSubBaseItem.h"
 
 #include <optional>
 
 #include <QDomElement>
 #include <QSharedDataPointer>
-
-#include "QXmppPubSubBaseItem.h"
 
 class QXmppDataForm;
 class QXmppPubSubSubscription;

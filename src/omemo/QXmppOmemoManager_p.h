@@ -100,20 +100,17 @@ constexpr uint32_t PAYLOAD_AUTHENTICATION_KEY_SIZE = 32;
 constexpr uint32_t SCE_RPAD_SIZE_MIN = 0;
 constexpr uint32_t SCE_RPAD_SIZE_MAX = 200;
 
-struct PayloadEncryptionResult
-{
+struct PayloadEncryptionResult {
     QCA::SecureArray decryptionData;
     QByteArray encryptedPayload;
 };
 
-struct DecryptionResult
-{
+struct DecryptionResult {
     QDomElement sceContent;
     QXmppE2eeMetadata e2eeMetadata;
 };
 
-struct IqDecryptionResult
-{
+struct IqDecryptionResult {
     QDomElement iq;
     QXmppE2eeMetadata e2eeMetadata;
 };

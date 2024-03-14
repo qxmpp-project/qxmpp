@@ -40,7 +40,7 @@ void tst_QXmppEntityTimeManager::testSendRequest()
 
     QCOMPARE(spy.size(), 1);
     auto time = spy.at(0).at(0).value<QXmppEntityTimeIq>();
-    QCOMPARE(time.utc(), QDateTime({2006, 12, 19}, {17, 58, 35}, Qt::UTC));
+    QCOMPARE(time.utc(), QDateTime({ 2006, 12, 19 }, { 17, 58, 35 }, Qt::UTC));
     QCOMPARE(time.tzo(), -6 * 60 * 60);
 }
 
@@ -59,7 +59,7 @@ void tst_QXmppEntityTimeManager::testHandleRequest()
     QVERIFY(QXmppEntityTimeIq::isEntityTimeIq(packet));
     QXmppEntityTimeIq resp;
     resp.parse(packet);
-    
+
     QCOMPARE(resp.id(), QStringLiteral("time_1"));
     QCOMPARE(resp.type(), QXmppIq::Result);
 }

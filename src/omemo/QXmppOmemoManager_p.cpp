@@ -3104,8 +3104,7 @@ QXmppTask<QVector<Manager::DevicesResult>> ManagerPrivate::unsubscribeFromDevice
         return makeReadyTask(QVector<Manager::DevicesResult>());
     }
 
-    struct State
-    {
+    struct State {
         int processed = 0;
         int jidsCount = 0;
         QXmppPromise<QVector<Manager::DevicesResult>> interface;

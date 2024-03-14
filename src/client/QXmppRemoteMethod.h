@@ -12,8 +12,7 @@
 
 class QXmppClient;
 
-struct QXmppRemoteMethodResult
-{
+struct QXmppRemoteMethodResult {
     QXmppRemoteMethodResult() : hasError(false), code(0) { }
     bool hasError;
     int code;

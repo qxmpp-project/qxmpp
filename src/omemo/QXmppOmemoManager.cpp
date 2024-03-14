@@ -570,8 +570,7 @@ void Manager::setMaximumDevicesPerStanza(int maximum)
 QXmppTask<QVector<Manager::DevicesResult>> Manager::requestDeviceLists(const QList<QString> &jids)
 {
     if (const auto jidsCount = jids.size()) {
-        struct State
-        {
+        struct State {
             int processed = 0;
             int jidsCount = 0;
             QXmppPromise<QVector<Manager::DevicesResult>> interface;
@@ -618,8 +617,7 @@ QXmppTask<QVector<Manager::DevicesResult>> Manager::requestDeviceLists(const QLi
 QXmppTask<QVector<Manager::DevicesResult>> Manager::subscribeToDeviceLists(const QList<QString> &jids)
 {
     if (const auto jidsCount = jids.size()) {
-        struct State
-        {
+        struct State {
             int processed = 0;
             int jidsCount = 0;
             QXmppPromise<QVector<Manager::DevicesResult>> interface;

@@ -15,12 +15,8 @@ class QXmppPubSubMetadataPrivate;
 class QXMPP_EXPORT QXmppPubSubMetadata : public QXmppExtensibleDataFormBase
 {
 public:
-    struct Unset
-    {
-    };
-    struct Max
-    {
-    };
+    struct Unset { };
+    struct Max { };
     using ItemLimit = std::variant<Unset, quint64, Max>;
 
     QXmppPubSubMetadata();

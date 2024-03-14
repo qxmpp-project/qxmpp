@@ -72,17 +72,13 @@ bool isIqType(const QDomElement &, QStringView tagName, QStringView xmlns);
 QDomElement firstChildElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
 QDomElement nextSiblingElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
 
-struct DomChildElements
-{
+struct DomChildElements {
     QDomElement parent;
     QStringView tagName;
     QStringView namespaceUri;
 
-    struct EndIterator
-    {
-    };
-    struct Iterator
-    {
+    struct EndIterator { };
+    struct Iterator {
         Iterator operator++()
         {
             el = nextSiblingElement(el, tagName, namespaceUri);

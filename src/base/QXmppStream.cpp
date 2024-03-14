@@ -29,8 +29,7 @@
 
 using namespace QXmpp::Private;
 
-struct IqState
-{
+struct IqState {
     QXmppPromise<QXmppStream::IqResult> interface;
     QString jid;
 };

@@ -22,8 +22,7 @@ using namespace QXmpp::Private;
 /// \since QXmpp 1.5
 ///
 
-struct Key
-{
+struct Key {
     QByteArray id;
     QString ownerJid;
     TrustLevel trustLevel;

@@ -2,8 +2,8 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppVersionManager.h"
 #include "QXmppVersionIq.h"
+#include "QXmppVersionManager.h"
 
 #include "TestClient.h"
 

@@ -20,15 +20,9 @@ class QXMPP_EXPORT QXmppCallInvite : public QObject
 {
     Q_OBJECT
 public:
-    struct Rejected
-    {
-    };
-    struct Retracted
-    {
-    };
-    struct Left
-    {
-    };
+    struct Rejected { };
+    struct Retracted { };
+    struct Left { };
 
     using Result = std::variant<Rejected, Retracted, Left, QXmppError>;
 

@@ -21,20 +21,17 @@ class QXMPP_EXPORT QXmppJingleMessageInitiation : public QObject
 {
     Q_OBJECT
 public:
-    struct Rejected
-    {
+    struct Rejected {
         std::optional<QXmppJingleReason> reason;
         bool containsTieBreak;
     };
 
-    struct Retracted
-    {
+    struct Retracted {
         std::optional<QXmppJingleReason> reason;
         bool containsTieBreak;
     };
 
-    struct Finished
-    {
+    struct Finished {
         std::optional<QXmppJingleReason> reason;
         QString migratedTo;
     };

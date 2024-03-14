@@ -29,8 +29,7 @@ namespace QXmpp::Private {
 
 // helper for std::visit
 template<class... Ts>
-struct overloaded : Ts...
-{
+struct overloaded : Ts... {
     using Ts::operator()...;
 };
 // explicit deduction guide (not needed as of C++20)
@@ -59,8 +58,7 @@ template<typename F, typename Ret, typename A, typename... Rest>
 A lambda_helper(Ret (F::*)(A, Rest...) const);
 
 template<typename F>
-struct first_argument
-{
+struct first_argument {
     using type = decltype(lambda_helper(&F::operator()));
 };
 

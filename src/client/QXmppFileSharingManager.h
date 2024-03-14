@@ -34,8 +34,7 @@ class QXMPP_EXPORT QXmppFileUpload : public QObject
     /// Progress of the file upload between 0.0 and 1.0.
     Q_PROPERTY(float progress READ progress NOTIFY progressChanged)
 public:
-    struct FileResult
-    {
+    struct FileResult {
         QXmppFileShare fileShare;
         QXmppBitsOfBinaryDataList dataBlobs;
     };
@@ -85,8 +84,7 @@ public:
         HashVerified,
     };
 
-    struct Downloaded
-    {
+    struct Downloaded {
         HashVerificationResult hashVerificationResult;
     };
 
@@ -120,16 +118,14 @@ Q_DECLARE_METATYPE(QXmppFileDownload::Result);
 class QXMPP_EXPORT QXmppFileSharingManager : public QXmppClientExtension
 {
 public:
-    struct MetadataThumbnail
-    {
+    struct MetadataThumbnail {
         uint32_t width;
         uint32_t height;
         QByteArray data;
         QMimeType mimeType;
     };
 
-    struct MetadataGeneratorResult
-    {
+    struct MetadataGeneratorResult {
         std::optional<QSize> dimensions;
         std::optional<uint32_t> length;
         QVector<MetadataThumbnail> thumbnails;

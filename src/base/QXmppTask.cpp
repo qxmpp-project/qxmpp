@@ -8,8 +8,7 @@
 
 namespace QXmpp::Private {
 
-struct TaskData
-{
+struct TaskData {
     QPointer<QObject> context;
     std::function<void(TaskPrivate &, void *)> continuation;
     void *result = nullptr;

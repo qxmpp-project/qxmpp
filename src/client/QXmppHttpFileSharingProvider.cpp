@@ -51,8 +51,7 @@ auto QXmppHttpFileSharingProvider::downloadFile(const std::any &source,
                                                 std::function<void(DownloadResult)> reportFinished)
     -> std::shared_ptr<Download>
 {
-    struct State : Download
-    {
+    struct State : Download {
         ~State() override = default;
 
         std::unique_ptr<QIODevice> output;
@@ -135,8 +134,7 @@ auto QXmppHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
                                               std::function<void(UploadResult)> reportFinished)
     -> std::shared_ptr<Upload>
 {
-    struct State : Upload
-    {
+    struct State : Upload {
         ~State() override = default;
 
         std::shared_ptr<QXmppHttpUpload> upload;

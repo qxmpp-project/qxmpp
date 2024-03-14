@@ -19,8 +19,7 @@ public:
     ///
     /// Contains the data of this client instance's OMEMO device.
     ///
-    struct OwnDevice
-    {
+    struct OwnDevice {
         ///
         /// ID used to identify a device and fetch its bundle
         ///
@@ -68,8 +67,7 @@ public:
     /// That includes another own device (i.e., not this client instance's one)
     /// or a contact's device.
     ///
-    struct Device
-    {
+    struct Device {
         ///
         /// Human-readable string used to identify the device by users
         ///
@@ -113,8 +111,7 @@ public:
     ///
     /// Contains the data needed to manage an OMEMO signed pre key pair.
     ///
-    struct SignedPreKeyPair
-    {
+    struct SignedPreKeyPair {
         ///
         /// Date when the signed pre key pair was created
         ///
@@ -129,8 +126,7 @@ public:
     ///
     /// Contains all OMEMO data.
     ///
-    struct OmemoData
-    {
+    struct OmemoData {
         ///
         /// Device of this client instance
         ///

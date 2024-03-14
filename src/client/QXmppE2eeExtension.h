@@ -22,9 +22,7 @@ class QXmppTask;
 class QXmppE2eeExtension : public QXmppExtension
 {
 public:
-    struct NotEncrypted
-    {
-    };
+    struct NotEncrypted { };
 
     using MessageEncryptResult = std::variant<std::unique_ptr<QXmppMessage>, QXmppError>;
     using MessageDecryptResult = std::variant<QXmppMessage, NotEncrypted, QXmppError>;

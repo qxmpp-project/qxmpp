@@ -15,12 +15,8 @@ class QXmppPubSubNodeConfigPrivate;
 class QXMPP_EXPORT QXmppPubSubNodeConfig : public QXmppExtensibleDataFormBase
 {
 public:
-    struct Unset
-    {
-    };
-    struct Max
-    {
-    };
+    struct Unset { };
+    struct Max { };
     using ItemLimit = std::variant<Unset, uint64_t, Max>;
 
     enum AccessModel : uint8_t {
