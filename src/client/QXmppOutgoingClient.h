@@ -7,9 +7,14 @@
 #ifndef QXMPPOUTGOINGCLIENT_H
 #define QXMPPOUTGOINGCLIENT_H
 
+#include "QXmppAuthenticationError.h"
+#include "QXmppBindError.h"
 #include "QXmppClient.h"
 #include "QXmppStanza.h"
 #include "QXmppStream.h"
+#include "QXmppStreamError.h"
+
+#include <QAbstractSocket>
 
 class QDomElement;
 class QSslError;
@@ -37,6 +42,8 @@ class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
     Q_OBJECT
 
 public:
+    using ConnectionError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmpp::StreamError, QXmpp::AuthenticationError, QXmpp::BindError>;
+
     explicit QXmppOutgoingClient(QObject *parent);
     ~QXmppOutgoingClient() override;
 
@@ -65,7 +72,7 @@ public:
     Q_SIGNAL void disconnected();
 
     /// This signal is emitted when an error is encountered.
-    Q_SIGNAL void error(QXmppClient::Error);
+    Q_SIGNAL void errorOccurred(const QString &text, const ConnectionError &details, QXmppClient::Error oldError);
 
     /// This signal is emitted when an element is received.
     Q_SIGNAL void elementReceived(const QDomElement &element, bool &handled);

@@ -534,14 +534,17 @@ void QXmppOutgoingClient::startResourceBinding()
         } else if (auto *protocolError = std::get_if<ProtocolError>(&r)) {
             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
 
-            Q_EMIT error(QXmppClient::XmppStreamError);
-            warning(QStringLiteral("Resource binding failed: ") + protocolError->text);
+            auto text = QStringLiteral("Resource binding failed: ") + protocolError->text;
+
+            Q_EMIT errorOccurred(text, StreamError::UndefinedCondition, QXmppClient::XmppStreamError);
+            warning(text);
             disconnectFromHost();
         } else if (auto *stanzaError = std::get_if<QXmppStanza::Error>(&r)) {
             d->xmppStreamError = stanzaError->condition();
 
-            Q_EMIT error(QXmppClient::XmppStreamError);
-            warning(QStringLiteral("Resource binding failed: ") + stanzaError->text());
+            auto text = QStringLiteral("Resource binding failed: ") + stanzaError->text();
+            Q_EMIT errorOccurred(text, BindError { *stanzaError }, QXmppClient::XmppStreamError);
+            warning(text);
             disconnectFromHost();
         }
     });
@@ -574,13 +577,12 @@ void QXmppOutgoingClient::onSMEnableFinished()
 
 void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 {
-    Q_UNUSED(socketError);
     if (!d->sessionStarted &&
         (d->srvRecords.count() > d->nextSrvRecordIdx)) {
         // some network error occurred during startup -> try next available SRV record server
         d->connectToNextDNSHost();
     } else {
-        Q_EMIT error(QXmppClient::SocketError);
+        Q_EMIT errorOccurred(d->socket.socket()->errorString(), socketError, QXmppClient::SocketError);
     }
 }
 
@@ -667,6 +669,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 } else {
                     auto [text, err] = std::get<SaslManager::AuthError>(std::move(result));
 
+                    // fallback
+                    d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     try {
                         auto &failure = std::any_cast<QXmppSaslFailure &>(err.details);
 
@@ -675,13 +679,11 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         // by remapping the error to "not-authorized".
                         if (failure.condition() == u"not-authorized" || failure.condition() == u"bad-auth") {
                             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
-                        } else {
-                            d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                         }
-                        Q_EMIT error(QXmppClient::XmppStreamError);
                     } catch (std::bad_any_cast) {
                     }
 
+                    Q_EMIT errorOccurred(text, err, QXmppClient::XmppStreamError);
                     warning(QStringLiteral("Could not authenticate using SASL: ") + text);
                     disconnectFromHost();
                 }
@@ -736,17 +738,17 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                         default:
                             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                         }
-                        Q_EMIT error(QXmppClient::XmppStreamError);
                         auto text = QStringLiteral("Received stream error (%1): %2")
                                         .arg(StreamErrorElement::streamErrorToString(condition), streamError.text);
+                        Q_EMIT errorOccurred(text, condition, QXmppClient::XmppStreamError);
                         warning(text);
                     }
                 },
                 [&](QXmppError &&err) {
                     // invalid stream error element received
                     d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
-                    Q_EMIT error(QXmppClient::XmppStreamError);
                     auto text = QStringLiteral("Received invalid stream error (%1)").arg(err.description);
+                    Q_EMIT errorOccurred(text, StreamError::UndefinedCondition, QXmppClient::XmppStreamError);
                     warning(text);
                 },
             },
@@ -807,7 +809,7 @@ void QXmppOutgoingClient::throwKeepAliveError()
 {
     warning(QStringLiteral("Ping timeout"));
     disconnectFromHost();
-    Q_EMIT error(QXmppClient::KeepAliveError);
+    Q_EMIT errorOccurred(QStringLiteral("Ping timeout"), TimeoutError(), QXmppClient::KeepAliveError);
 }
 
 void QXmppOutgoingClient::enableStreamManagement(bool resetSequenceNumber)

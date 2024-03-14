@@ -177,6 +177,13 @@ struct Success { };
 ///
 struct Cancelled { };
 
+///
+/// Unit struct indicating a timeout (or keep-alive) error.
+///
+/// \since QXmpp 1.7
+///
+struct TimeoutError { };
+
 }  // namespace QXmpp
 
 #endif  // QXMPPGLOBAL_H

@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -16,7 +17,6 @@
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
 #include "QXmppMessageHandler.h"
-#include "QXmppOutgoingClient.h"
 #include "QXmppPacket_p.h"
 #include "QXmppPromise.h"
 #include "QXmppRosterManager.h"
@@ -120,6 +120,31 @@ QStringList QXmppClientPrivate::discoveryFeatures()
         // XEP-0444: Message Reactions
         ns_reactions.toString(),
     };
+}
+
+void QXmppClientPrivate::onErrorOccurred(const QString &text, const QXmppOutgoingClient::ConnectionError &err, QXmppClient::Error oldError)
+{
+    if (q->configuration().autoReconnectionEnabled()) {
+        if (oldError == QXmppClient::XmppStreamError) {
+            // if we receive a resource conflict, inhibit reconnection
+            if (stream->xmppStreamError() == QXmppStanza::Error::Conflict) {
+                receivedConflict = true;
+            }
+        } else if (oldError == QXmppClient::SocketError && !receivedConflict) {
+            // schedule reconnect
+            reconnectionTimer->start(getNextReconnectTime());
+        } else if (oldError == QXmppClient::KeepAliveError) {
+            // if we got a keepalive error, reconnect in one second
+            reconnectionTimer->start(1s);
+        }
+    }
+
+    // notify managers
+    Q_EMIT q->error(oldError);
+    Q_EMIT q->errorOccurred(QXmppError {
+        text,
+        visit([](const auto &value) { return std::any(value); }, err),
+    });
 }
 /// \endcond
 
@@ -231,8 +256,9 @@ QXmppClient::QXmppClient(InitialExtensions initialExtensions, QObject *parent)
     connect(d->stream, &QXmppOutgoingClient::disconnected,
             this, &QXmppClient::_q_streamDisconnected);
 
-    connect(d->stream, &QXmppOutgoingClient::error,
-            this, &QXmppClient::_q_streamError);
+    connect(d->stream, &QXmppOutgoingClient::errorOccurred, this, [this](const auto &text, const auto &error, auto oldError) {
+        d->onErrorOccurred(text, error, oldError);
+    });
 
     // reconnection
     d->reconnectionTimer = new QTimer(this);
@@ -793,22 +819,18 @@ void QXmppClient::setClientPresence(const QXmppPresence &presence)
 }
 
 /// Returns the socket error if error() is QXmppClient::SocketError.
-///
-
 QAbstractSocket::SocketError QXmppClient::socketError()
 {
     return d->stream->socket()->error();
 }
 
 /// Returns the human-readable description of the last socket error if error() is QXmppClient::SocketError.
-
 QString QXmppClient::socketErrorString() const
 {
     return d->stream->socket()->errorString();
 }
 
 /// Returns the XMPP stream error if QXmppClient::Error is QXmppClient::XmppStreamError.
-
 QXmppStanza::Error::Condition QXmppClient::xmppStreamError()
 {
     return d->stream->xmppStreamError();
@@ -900,34 +922,12 @@ void QXmppClient::_q_streamDisconnected()
     Q_EMIT stateChanged(QXmppClient::DisconnectedState);
 }
 
-void QXmppClient::_q_streamError(QXmppClient::Error err)
-{
-    if (d->stream->configuration().autoReconnectionEnabled()) {
-        if (err == QXmppClient::XmppStreamError) {
-            // if we receive a resource conflict, inhibit reconnection
-            if (d->stream->xmppStreamError() == QXmppStanza::Error::Conflict) {
-                d->receivedConflict = true;
-            }
-        } else if (err == QXmppClient::SocketError && !d->receivedConflict) {
-            // schedule reconnect
-            d->reconnectionTimer->start(d->getNextReconnectTime());
-        } else if (err == QXmppClient::KeepAliveError) {
-            // if we got a keepalive error, reconnect in one second
-            d->reconnectionTimer->start(1s);
-        }
-    }
-
-    // notify managers
-    Q_EMIT error(err);
-}
-
 QXmppLogger *QXmppClient::logger() const
 {
     return d->logger;
 }
 
 /// Sets the QXmppLogger associated with the current QXmppClient.
-
 void QXmppClient::setLogger(QXmppLogger *logger)
 {
     if (logger != d->logger) {

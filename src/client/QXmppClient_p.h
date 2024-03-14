@@ -18,6 +18,7 @@
 #ifndef QXMPPCLIENT_P_H
 #define QXMPPCLIENT_P_H
 
+#include "QXmppOutgoingClient.h"
 #include "QXmppPresence.h"
 
 #include <chrono>
@@ -26,7 +27,6 @@ class QXmppClient;
 class QXmppClientExtension;
 class QXmppE2eeExtension;
 class QXmppLogger;
-class QXmppOutgoingClient;
 class QTimer;
 
 class QXmppClientPrivate
@@ -55,6 +55,7 @@ public:
     std::chrono::milliseconds getNextReconnectTime() const;
 
     static QStringList discoveryFeatures();
+    void onErrorOccurred(const QString &text, const QXmppOutgoingClient::ConnectionError &err, QXmppClient::Error oldError);
 
 private:
     QXmppClient *q;
