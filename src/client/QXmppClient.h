@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -281,6 +282,18 @@ Q_SIGNALS:
     /// know the error.
     void error(QXmppClient::Error);
 
+    /// This signal is emitted when the XMPP connection encounters any fatal error.
+    ///
+    /// \param error Detailed error object with a description. It may contain
+    ///  * QAbstractSocket::SocketError
+    ///  * QXmpp::TimeoutError
+    ///  * QXmpp::StreamError
+    ///  * QXmpp::AuthenticationError
+    ///  * QXmpp::BindError
+    ///
+    /// \since QXmpp 1.7
+    Q_SIGNAL void errorOccurred(const QXmppError &error);
+
     /// This signal is emitted when the logger changes.
     void loggerChanged(QXmppLogger *logger);
 
@@ -331,7 +344,6 @@ private Q_SLOTS:
     void _q_socketStateChanged(QAbstractSocket::SocketState state);
     void _q_streamConnected();
     void _q_streamDisconnected();
-    void _q_streamError(QXmppClient::Error error);
 
 private:
     const std::unique_ptr<QXmppClientPrivate> d;
