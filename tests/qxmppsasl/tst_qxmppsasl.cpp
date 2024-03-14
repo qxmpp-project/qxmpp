@@ -8,6 +8,8 @@
 #include "util.h"
 #include <QObject>
 
+using namespace QXmpp::Private;
+
 class tst_QXmppSasl : public QObject
 {
     Q_OBJECT
@@ -126,7 +128,7 @@ void tst_QXmppSasl::testFailure()
     const QByteArray xml = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>";
     QXmppSaslFailure failure;
     parsePacket(failure, xml);
-    QCOMPARE(failure.condition, QString());
+    QVERIFY(!failure.condition.has_value());
     QVERIFY(failure.text.isEmpty());
     serializePacket(failure, xml);
 
@@ -134,7 +136,7 @@ void tst_QXmppSasl::testFailure()
     const QByteArray xml2 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><not-authorized/></failure>";
     QXmppSaslFailure failure2;
     parsePacket(failure2, xml2);
-    QCOMPARE(failure2.condition, QLatin1String("not-authorized"));
+    QCOMPARE(failure2.condition, SaslErrorCondition::NotAuthorized);
     serializePacket(failure2, xml2);
 
     // email verification required
@@ -145,12 +147,12 @@ void tst_QXmppSasl::testFailure()
 
     QXmppSaslFailure failure3;
     parsePacket(failure3, xml3);
-    QCOMPARE(failure3.condition, QLatin1String("account-disabled"));
+    QCOMPARE(failure3.condition, SaslErrorCondition::AccountDisabled);
     QCOMPARE(failure3.text, "Your account has not been activated yet. Please check your email inbox for an activation link");
     serializePacket(failure3, xml3);
 
     QXmppSaslFailure failure4;
-    failure4.condition = QStringLiteral("account-disabled");
+    failure4.condition = SaslErrorCondition::AccountDisabled;
     failure4.text = "Your account has not been activated yet. Please check your email inbox for an activation link";
     serializePacket(failure4, xml3);
 }

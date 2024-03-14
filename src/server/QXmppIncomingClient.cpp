@@ -223,7 +223,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     } else if (ns == ns_sasl) {
         if (!d->passwordChecker) {
             warning(QStringLiteral("Cannot perform authentication, no password checker"));
-            sendPacket(QXmppSaslFailure(QStringLiteral("temporary-auth-failure")));
+            sendPacket(QXmppSaslFailure(SaslErrorCondition::TemporaryAuthFailure));
             disconnectFromHost();
             return;
         }
@@ -234,7 +234,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
             d->saslServer = QXmppSaslServer::create(auth.mechanism, this);
             if (!d->saslServer) {
-                sendPacket(QXmppSaslFailure(QStringLiteral("invalid-mechanism")));
+                sendPacket(QXmppSaslFailure(SaslErrorCondition::InvalidMechanism));
                 disconnectFromHost();
                 return;
             }
@@ -364,7 +364,7 @@ void QXmppIncomingClient::onDigestReply()
     if (reply->error() == QXmppPasswordReply::TemporaryError) {
         warning(QStringLiteral("Temporary authentication failure for '%1' from %2").arg(d->saslServer->username(), d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.temporary-auth-failure"));
-        sendPacket(QXmppSaslFailure(QStringLiteral("temporary-auth-failure")));
+        sendPacket(QXmppSaslFailure(SaslErrorCondition::TemporaryAuthFailure));
         disconnectFromHost();
         return;
     }
@@ -376,7 +376,7 @@ void QXmppIncomingClient::onDigestReply()
     if (result != QXmppSaslServer::Challenge) {
         warning(QStringLiteral("Authentication failed for '%1' from %2").arg(d->saslServer->username(), d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.not-authorized"));
-        sendPacket(QXmppSaslFailure(QStringLiteral("not-authorized")));
+        sendPacket(QXmppSaslFailure(SaslErrorCondition::NotAuthorized));
         disconnectFromHost();
         return;
     }
@@ -405,13 +405,13 @@ void QXmppIncomingClient::onPasswordReply()
     case QXmppPasswordReply::AuthorizationError:
         warning(QStringLiteral("Authentication failed for '%1' from %2").arg(jid, d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.not-authorized"));
-        sendPacket(QXmppSaslFailure(QStringLiteral("not-authorized")));
+        sendPacket(QXmppSaslFailure(SaslErrorCondition::NotAuthorized));
         disconnectFromHost();
         break;
     case QXmppPasswordReply::TemporaryError:
         warning(QStringLiteral("Temporary authentication failure for '%1' from %2").arg(jid, d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.temporary-auth-failure"));
-        sendPacket(QXmppSaslFailure(QStringLiteral("temporary-auth-failure")));
+        sendPacket(QXmppSaslFailure(SaslErrorCondition::TemporaryAuthFailure));
         disconnectFromHost();
         break;
     }

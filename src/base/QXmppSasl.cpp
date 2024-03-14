@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2012 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2012 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2020 Linus Jahn <lnj@kaidan.im>
 // SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
@@ -19,6 +20,20 @@
 using namespace QXmpp::Private;
 
 static QByteArray forcedNonce;
+
+constexpr auto SASL_ERROR_CONDITIONS = to_array<QStringView>({
+    u"aborted",
+    u"account-disabled",
+    u"credentials-expired",
+    u"encryption-required",
+    u"incorrect-encoding",
+    u"invalid-authzid",
+    u"invalid-mechanism",
+    u"malformed-request",
+    u"mechanism-too-weak",
+    u"not-authorized",
+    u"temporary-auth-failure",
+});
 
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
 static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
@@ -138,7 +153,16 @@ void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 
 void QXmppSaslFailure::parse(const QDomElement &element)
 {
-    condition = element.firstChildElement().tagName();
+    auto errorConditionString = element.firstChildElement().tagName();
+    condition = enumFromString<SaslErrorCondition>(SASL_ERROR_CONDITIONS, errorConditionString);
+
+    // RFC3920 defines the error condition as "not-authorized", but
+    // some broken servers use "bad-auth" instead. We tolerate this
+    // by remapping the error to "not-authorized".
+    if (!condition && errorConditionString == u"bad-auth") {
+        condition = SaslErrorCondition::NotAuthorized;
+    }
+
     text = element.firstChildElement(QStringLiteral("text")).text();
 }
 
@@ -146,8 +170,8 @@ void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("failure"));
     writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
-    if (!condition.isEmpty()) {
-        writer->writeEmptyElement(condition);
+    if (condition) {
+        writer->writeEmptyElement(toString65(SASL_ERROR_CONDITIONS.at(size_t(*condition))));
     }
 
     if (!text.isEmpty()) {
