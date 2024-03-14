@@ -51,6 +51,10 @@ using namespace QXmpp::Private;
 
 namespace QXmpp::Private {
 
+struct ProtocolError {
+    QString text;
+};
+
 using DnsRecordsResult = std::variant<QList<QDnsServiceRecord>, QXmppError>;
 
 QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObject *context)
@@ -81,7 +85,7 @@ struct BoundAddress {
 class BindManager
 {
 public:
-    using Result = std::variant<BoundAddress, QXmppError>;
+    using Result = std::variant<BoundAddress, QXmppStanza::Error, ProtocolError>;
 
     explicit BindManager(XmppSocket &socket) : m_socket(socket) { }
 
@@ -527,17 +531,17 @@ void QXmppOutgoingClient::startResourceBinding()
                 // we are connected now
                 Q_EMIT connected();
             }
-        } else {
-            auto err = std::get<QXmppError>(std::move(r));
-
-            if (auto stanzaError = err.value<QXmppStanza::Error>()) {
-                d->xmppStreamError = stanzaError->condition();
-            } else {
-                d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
-            }
+        } else if (auto *protocolError = std::get_if<ProtocolError>(&r)) {
+            d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
 
             Q_EMIT error(QXmppClient::XmppStreamError);
-            warning(QStringLiteral("Resource binding failed: ") + err.description);
+            warning(QStringLiteral("Resource binding failed: ") + protocolError->text);
+            disconnectFromHost();
+        } else if (auto *stanzaError = std::get_if<QXmppStanza::Error>(&r)) {
+            d->xmppStreamError = stanzaError->condition();
+
+            Q_EMIT error(QXmppClient::XmppStreamError);
+            warning(QStringLiteral("Resource binding failed: ") + stanzaError->text());
             disconnectFromHost();
         }
     });
@@ -849,7 +853,7 @@ bool BindManager::handleElement(const QDomElement &el)
     auto process = [](QXmppBindIq &&iq) -> Result {
         if (iq.type() == QXmppIq::Result) {
             if (iq.jid().isEmpty()) {
-                return QXmppError { QStringLiteral("Server did not return JID upon resource binding."), {} };
+                return ProtocolError { QStringLiteral("Server did not return JID upon resource binding.") };
             }
 
             static const QRegularExpression jidRegex(QStringLiteral("^([^@/]+)@([^@/]+)/(.+)$"));
@@ -861,11 +865,10 @@ bool BindManager::handleElement(const QDomElement &el)
                 };
             }
 
-            return QXmppError { QStringLiteral("Bind IQ received with invalid JID"), {} };
+            return ProtocolError { QStringLiteral("Bind IQ received with invalid JID") };
         }
 
-        auto error = iq.error();
-        return QXmppError { error.text(), error };
+        return iq.error();
     };
 
     if (QXmppBindIq::isBindIq(el) && el.attribute(QStringLiteral("id")) == m_iqId) {
