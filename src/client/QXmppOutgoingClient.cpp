@@ -147,6 +147,8 @@ public:
     bool handleElement(const QDomElement &el);
 
 private:
+    static AuthenticationError::Type mapSaslCondition(const std::optional<SaslErrorCondition> &condition);
+
     XmppSocket &m_socket;
     std::unique_ptr<QXmppSaslClient> m_saslClient;
     std::optional<QXmppPromise<AuthResult>> m_promise;
@@ -1099,12 +1101,38 @@ bool SaslManager::handleElement(const QDomElement &el)
         // TODO: Properly map SASL failure conditions to AuthenticationError::Types
         finish(AuthError {
             QStringLiteral("Authentication failure"),
-            AuthenticationError { AuthenticationError::NotAuthorized, failure.text, std::move(failure) },
+            AuthenticationError { mapSaslCondition(failure.condition), failure.text, std::move(failure) },
         });
     } else {
         return false;
     }
     return true;
+}
+
+AuthenticationError::Type SaslManager::mapSaslCondition(const std::optional<SaslErrorCondition> &condition)
+{
+    using Auth = AuthenticationError;
+    using Sasl = SaslErrorCondition;
+
+    switch (condition.value_or(Sasl::NotAuthorized)) {
+    case Sasl::AccountDisabled:
+        return Auth::AccountDisabled;
+    case Sasl::CredentialsExpired:
+        return Auth::CredentialsExpired;
+    case Sasl::EncryptionRequired:
+        return Auth::EncryptionRequired;
+    case Sasl::IncorrectEncoding:
+    case Sasl::InvalidAuthzid:
+    case Sasl::InvalidMechanism:
+    case Sasl::MalformedRequest:
+    case Sasl::MechanismTooWeak:
+        return Auth::ProcessingError;
+    case Sasl::Aborted:
+    case Sasl::NotAuthorized:
+    case Sasl::TemporaryAuthFailure:
+        return Auth::NotAuthorized;
+    }
+    return Auth::NotAuthorized;
 }
 
 PingManager::PingManager(QXmppOutgoingClient *q)
