@@ -6,6 +6,7 @@
 
 #include "QXmppOutgoingClient.h"
 
+#include "QXmppAuthenticationError.h"
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
@@ -132,7 +133,8 @@ private:
 class SaslManager
 {
 public:
-    using AuthResult = std::variant<Success, QXmppError>;
+    using AuthError = std::pair<QString, AuthenticationError>;
+    using AuthResult = std::variant<Success, AuthError>;
 
     explicit SaslManager(XmppSocket &socket) : m_socket(socket) { }
 
@@ -659,21 +661,24 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     d->isAuthenticated = true;
                     handleStart();
                 } else {
-                    QXmppError err = std::get<QXmppError>(std::move(result));
+                    auto [text, err] = std::get<SaslManager::AuthError>(std::move(result));
 
-                    if (auto failure = err.value<QXmppSaslFailure>()) {
+                    try {
+                        auto &failure = std::any_cast<QXmppSaslFailure &>(err.details);
+
                         // RFC3920 defines the error condition as "not-authorized", but
                         // some broken servers use "bad-auth" instead. We tolerate this
                         // by remapping the error to "not-authorized".
-                        if (failure->condition() == u"not-authorized" || failure->condition() == u"bad-auth") {
+                        if (failure.condition() == u"not-authorized" || failure.condition() == u"bad-auth") {
                             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
                         } else {
                             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                         }
                         Q_EMIT error(QXmppClient::XmppStreamError);
+                    } catch (std::bad_any_cast) {
                     }
 
-                    warning(QStringLiteral("Could not authenticate using SASL: ") + err.description);
+                    warning(QStringLiteral("Could not authenticate using SASL: ") + text);
                     disconnectFromHost();
                 }
             });
@@ -1016,15 +1021,18 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
         }
     }
     if (commonMechanisms.isEmpty()) {
-        return makeReadyTask<AuthResult>(QXmppError { QStringLiteral("No supported SASL Authentication mechanism available"), {} });
+        return makeReadyTask<AuthResult>(AuthError {
+            QStringLiteral("No supported SASL Authentication mechanism available"),
+            AuthenticationError { AuthenticationError::MechanismMismatch, {}, {} },
+        });
     }
     usedMechanism = commonMechanisms.first();
 
     m_saslClient.reset(QXmppSaslClient::create(usedMechanism, parent));
     if (!m_saslClient) {
-        return makeReadyTask<AuthResult>(QXmppError {
+        return makeReadyTask<AuthResult>(AuthError {
             QStringLiteral("SASL mechanism negotiation failed"),
-            {},
+            AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
         });
     }
     m_saslClient->info(QStringLiteral("SASL mechanism '%1' selected").arg(m_saslClient->mechanism()));
@@ -1046,9 +1054,9 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
     // send SASL auth request
     QByteArray response;
     if (!m_saslClient->respond(QByteArray(), response)) {
-        return makeReadyTask<AuthResult>(QXmppError {
+        return makeReadyTask<AuthResult>(AuthError {
             QStringLiteral("SASL initial response failed"),
-            {},
+            AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
         });
     }
     m_socket.sendData(serializeNonza(QXmppSaslAuth(m_saslClient->mechanism(), response)));
@@ -1079,13 +1087,20 @@ bool SaslManager::handleElement(const QDomElement &el)
         if (m_saslClient->respond(challenge.value(), response)) {
             m_socket.sendData(serializeNonza(QXmppSaslResponse(response)));
         } else {
-            finish(QXmppError { QStringLiteral("Could not respond to SASL challenge"), {} });
+            finish(AuthError {
+                QStringLiteral("Could not respond to SASL challenge"),
+                AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
+            });
         }
     } else if (el.tagName() == u"failure") {
         QXmppSaslFailure failure;
         failure.parse(el);
 
-        finish(QXmppError { QStringLiteral("Authentication failure"), std::move(failure) });
+        // TODO: Properly map SASL failure conditions to AuthenticationError::Types
+        finish(AuthError {
+            QStringLiteral("Authentication failure"),
+            AuthenticationError { AuthenticationError::NotAuthorized, failure.text(), std::move(failure) },
+        });
     } else {
         return false;
     }
