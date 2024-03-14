@@ -151,6 +151,11 @@ void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+QString QXmppSaslFailure::conditionToString(QXmpp::Private::SaslErrorCondition condition)
+{
+    return SASL_ERROR_CONDITIONS.at(size_t(condition)).toString();
+}
+
 void QXmppSaslFailure::parse(const QDomElement &element)
 {
     auto errorConditionString = element.firstChildElement().tagName();

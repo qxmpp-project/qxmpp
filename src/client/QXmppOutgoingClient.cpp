@@ -1098,9 +1098,12 @@ bool SaslManager::handleElement(const QDomElement &el)
         QXmppSaslFailure failure;
         failure.parse(el);
 
-        // TODO: Properly map SASL failure conditions to AuthenticationError::Types
+        auto text = failure.text.isEmpty()
+            ? QXmppSaslFailure::conditionToString(failure.condition.value_or(SaslErrorCondition::NotAuthorized))
+            : failure.text;
+
         finish(AuthError {
-            QStringLiteral("Authentication failure"),
+            QStringLiteral("Authentication failed: %1").arg(text),
             AuthenticationError { mapSaslCondition(failure.condition), failure.text, std::move(failure) },
         });
     } else {
