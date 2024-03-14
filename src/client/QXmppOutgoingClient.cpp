@@ -711,6 +711,8 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
                         // only disconnect socket (so stream mangement can resume state is not reset)
                         d->socket.disconnectFromHost();
+                        debug(QStringLiteral("Received redirect to '%1:%2'")
+                                  .arg(redirect->host, redirect->port));
                     } else {
                         auto condition = std::get<StreamError>(streamError.condition);
 
@@ -726,12 +728,17 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                         }
                         Q_EMIT error(QXmppClient::XmppStreamError);
+                        auto text = QStringLiteral("Received stream error (%1): %2")
+                                        .arg(StreamErrorElement::streamErrorToString(condition), streamError.text);
+                        warning(text);
                     }
                 },
-                [&](QXmppError) {
+                [&](QXmppError &&err) {
                     // invalid stream error element received
                     d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     Q_EMIT error(QXmppClient::XmppStreamError);
+                    auto text = QStringLiteral("Received invalid stream error (%1)").arg(err.description);
+                    warning(text);
                 },
             },
             StreamErrorElement::fromDom(nodeRecv));
