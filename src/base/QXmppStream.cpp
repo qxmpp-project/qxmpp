@@ -200,6 +200,11 @@ constexpr auto STREAM_ERROR_CONDITIONS = to_array<QStringView>({
 });
 
 /// \cond
+QString StreamErrorElement::streamErrorToString(StreamError e)
+{
+    return STREAM_ERROR_CONDITIONS.at(size_t(e)).toString();
+}
+
 std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const QDomElement &el)
 {
     if (el.tagName() != u"error" || el.namespaceURI() != ns_stream) {
