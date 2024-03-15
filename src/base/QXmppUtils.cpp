@@ -325,6 +325,13 @@ void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, QStringView n
     }
 }
 
+void QXmpp::Private::writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView value)
+{
+    if (!value.isEmpty()) {
+        writer->writeTextElement(toString65(name), toString65(value));
+    }
+}
+
 bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, QStringView xmlns)
 {
     // IQs must have only one child element, so we do not need to iterate over the child elements.
