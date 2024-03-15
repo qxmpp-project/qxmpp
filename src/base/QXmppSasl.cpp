@@ -211,6 +211,208 @@ void StreamFeature::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+std::optional<UserAgent> UserAgent::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"user-agent" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    return UserAgent {
+        QUuid::fromString(el.attribute(QStringLiteral("id"))),
+        firstChildElement(el, u"software", ns_sasl_2).text(),
+        firstChildElement(el, u"device", ns_sasl_2).text(),
+    };
+}
+
+void UserAgent::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("user-agent"));
+    if (!id.isNull()) {
+        writer->writeAttribute(QSL65("id"), id.toString(QUuid::WithoutBraces));
+    }
+    writeOptionalXmlTextElement(writer, u"software", software);
+    writeOptionalXmlTextElement(writer, u"device", device);
+    writer->writeEndElement();
+}
+
+std::optional<Authenticate> Authenticate::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"authenticate" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+    return Authenticate {
+        el.attribute(QStringLiteral("mechanism")),
+        parseBase64(firstChildElement(el, u"initial-response", ns_sasl_2).text()).value_or(QByteArray()),
+        UserAgent::fromDom(firstChildElement(el, u"user-agent", ns_sasl_2)),
+    };
+}
+
+void Authenticate::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("authenticate"));
+    writer->writeDefaultNamespace(toString65(ns_sasl_2));
+    writer->writeAttribute(QSL65("mechanism"), mechanism);
+    writeOptionalXmlTextElement(writer, u"initial-response", QString::fromUtf8(initialResponse.toBase64()));
+    if (userAgent) {
+        userAgent->toXml(writer);
+    }
+    writer->writeEndElement();
+}
+
+std::optional<Challenge> Challenge::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"challenge" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    if (auto result = parseBase64(el.text())) {
+        return Challenge { *result };
+    }
+    return {};
+}
+
+void Challenge::toXml(QXmlStreamWriter *writer) const
+{
+    writeXmlTextElement(writer, u"challenge", ns_sasl_2, serializeBase64(data));
+}
+
+std::optional<Response> Response::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"response" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    if (auto result = parseBase64(el.text())) {
+        return Response { *result };
+    }
+    return {};
+}
+
+void Response::toXml(QXmlStreamWriter *writer) const
+{
+    writeXmlTextElement(writer, u"response", ns_sasl_2, serializeBase64(data));
+}
+
+std::optional<Success> Success::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"success" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    Success output;
+
+    if (auto subEl = firstChildElement(el, u"additional-data", ns_sasl_2); !subEl.isNull()) {
+        if (auto result = parseBase64(subEl.text())) {
+            output.additionalData = *result;
+        } else {
+            // invalid base64 data
+            return {};
+        }
+    }
+
+    output.authorizationIdentifier = firstChildElement(el, u"authorization-identifier", ns_sasl_2).text();
+
+    return output;
+}
+
+void Success::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("success"));
+    writer->writeDefaultNamespace(toString65(ns_sasl_2));
+    if (additionalData) {
+        writer->writeTextElement(QSL65("additional-data"), serializeBase64(*additionalData));
+    }
+    writeXmlTextElement(writer, u"authorization-identifier", authorizationIdentifier);
+    writer->writeEndElement();
+}
+
+std::optional<Failure> Failure::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"failure" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    // SASL error condition
+    auto condition = Sasl::errorConditionFromString(firstChildElement(el, {}, ns_sasl).tagName());
+    if (!condition) {
+        return {};
+    }
+
+    return Failure {
+        condition.value(),
+        firstChildElement(el, u"text", ns_sasl_2).text(),
+    };
+}
+
+void Failure::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("failure"));
+    writer->writeDefaultNamespace(toString65(ns_sasl_2));
+    writeEmptyElement(writer, Sasl::errorConditionToString(condition), ns_sasl);
+    writeOptionalXmlTextElement(writer, u"text", text);
+    writer->writeEndElement();
+}
+
+std::optional<Continue> Continue::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"continue" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    Continue output;
+
+    if (auto subEl = firstChildElement(el, u"additional-data", ns_sasl_2); !subEl.isNull()) {
+        if (auto result = parseBase64(subEl.text())) {
+            output.additionalData = *result;
+        } else {
+            // invalid base64 data
+            return {};
+        }
+    }
+
+    for (const auto &taskEl : iterChildElements(firstChildElement(el, u"tasks", ns_sasl_2))) {
+        output.tasks.push_back(taskEl.text());
+    }
+    // tasks are mandatory
+    if (output.tasks.empty()) {
+        return {};
+    }
+
+    output.text = firstChildElement(el, u"text", ns_sasl_2).text();
+
+    return output;
+}
+
+void Continue::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("continue"));
+    writer->writeDefaultNamespace(toString65(ns_sasl_2));
+    writeOptionalXmlTextElement(writer, u"additional-data", serializeBase64(additionalData));
+    writer->writeStartElement(QSL65("tasks"));
+    for (const auto &task : tasks) {
+        writer->writeTextElement(QSL65("task"), task);
+    }
+    writer->writeEndElement();
+    writeOptionalXmlTextElement(writer, u"text", text);
+    writer->writeEndElement();
+}
+
+std::optional<Abort> Abort::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"abort" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+    return Abort { firstChildElement(el, u"text", ns_sasl_2).text() };
+}
+
+void Abort::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("abort"));
+    writer->writeDefaultNamespace(toString65(ns_sasl_2));
+    writeOptionalXmlTextElement(writer, u"text", text);
+    writer->writeEndElement();
+}
+
 }  // namespace QXmpp::Private::Sasl2
 
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().

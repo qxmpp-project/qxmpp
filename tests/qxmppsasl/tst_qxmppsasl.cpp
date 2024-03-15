@@ -3,6 +3,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppConstants_p.h"
 #include "QXmppSasl_p.h"
 
 #include "util.h"
@@ -29,6 +30,14 @@ private:
 
     // SASL 2 parsing
     Q_SLOT void sasl2StreamFeature();
+    Q_SLOT void sasl2UserAgent();
+    Q_SLOT void sasl2Authenticate();
+    Q_SLOT void sasl2Challenge();
+    Q_SLOT void sasl2Response();
+    Q_SLOT void sasl2Success();
+    Q_SLOT void sasl2Failure();
+    Q_SLOT void sasl2ContinueElement();
+    Q_SLOT void sasl2Abort();
 
     // client
     Q_SLOT void testClientAvailableMechanisms();
@@ -209,6 +218,138 @@ void tst_QXmppSasl::sasl2StreamFeature()
     QCOMPARE(feature->streamResumptionAvailable, true);
     QCOMPARE(feature->bind2Available, true);
     serializePacket(*feature, xml);
+}
+
+void tst_QXmppSasl::sasl2UserAgent()
+{
+    auto xml =
+        "<user-agent id='d4565fa7-4d72-4749-b3d3-740edbf87770'>"
+        "<software>AwesomeXMPP</software>"
+        "<device>Kiva&apos;s Phone</device>"
+        "</user-agent>";
+    auto namespaceWrapper = QStringLiteral("<authenticate xmlns='%1'>%2</authenticate>");
+
+    auto userAgentDom = xmlToDom(namespaceWrapper.arg(ns_sasl_2, xml)).firstChildElement();
+    auto userAgent = Sasl2::UserAgent::fromDom(userAgentDom);
+    QVERIFY(userAgent.has_value());
+    QCOMPARE(userAgent->id, QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")));
+    QVERIFY(!userAgent->id.isNull());
+    QCOMPARE(userAgent->software, "AwesomeXMPP");
+    QCOMPARE(userAgent->device, "Kiva's Phone");
+
+    serializePacket(*userAgent, xml);
+}
+
+void tst_QXmppSasl::sasl2Authenticate()
+{
+    auto xml =
+        "<authenticate xmlns='urn:xmpp:sasl:2' mechanism='SCRAM-SHA-1-PLUS'>"
+        "<initial-response>cD10bHMtZXhwb3J0ZXIsLG49dXNlcixyPTEyQzRDRDVDLUUzOEUtNEE5OC04RjZELTE1QzM4RjUxQ0NDNg==</initial-response>"
+        "<user-agent id='d4565fa7-4d72-4749-b3d3-740edbf87770'>"
+        "<software>AwesomeXMPP</software>"
+        "<device>Kiva&apos;s Phone</device>"
+        "</user-agent>"
+        "</authenticate>";
+
+    auto auth = Sasl2::Authenticate::fromDom(xmlToDom(xml));
+    QVERIFY(auth);
+    QCOMPARE(auth->mechanism, "SCRAM-SHA-1-PLUS");
+    QCOMPARE(auth->initialResponse, "p=tls-exporter,,n=user,r=12C4CD5C-E38E-4A98-8F6D-15C38F51CCC6");
+    QVERIFY(auth->userAgent);
+    QCOMPARE(auth->userAgent->id, QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")));
+    QCOMPARE(auth->userAgent->software, "AwesomeXMPP");
+    QCOMPARE(auth->userAgent->device, "Kiva's Phone");
+    serializePacket(*auth, xml);
+}
+
+void tst_QXmppSasl::sasl2Challenge()
+{
+    auto xml =
+        "<challenge xmlns='urn:xmpp:sasl:2'>"
+        "cj0xMkM0Q0Q1Qy1FMzhFLTRBOTgtOEY2RC0xNUMzOEY1MUNDQzZhMDkxMTdhNi1hYzUwLTRmMmYtOTNmMS05Mzc5OWMyYmRkZjYscz1RU1hDUitRNnNlazhiZjkyLGk9NDA5Ng=="
+        "</challenge>";
+
+    auto challenge = Sasl2::Challenge::fromDom(xmlToDom(xml));
+    QVERIFY(challenge.has_value());
+    QCOMPARE(challenge->data, "r=12C4CD5C-E38E-4A98-8F6D-15C38F51CCC6a09117a6-ac50-4f2f-93f1-93799c2bddf6,s=QSXCR+Q6sek8bf92,i=4096");
+    serializePacket(*challenge, xml);
+}
+
+void tst_QXmppSasl::sasl2Response()
+{
+    auto xml =
+        "<response xmlns='urn:xmpp:sasl:2'>"
+        "Yz1jRDEwYkhNdFpYaHdiM0owWlhJc0xNY29Rdk9kQkRlUGQ0T3N3bG1BV1YzZGcxYTFXaDF0WVBUQndWaWQxMFZVLHI9MTJDNENENUMtRTM4RS00QTk4LThGNkQtMTVDMzhGNTFDQ0M2YTA5MTE3YTYtYWM1MC00ZjJmLTkzZjEtOTM3OTljMmJkZGY2LHA9VUFwbzd4bzZQYTlKK1ZhZWpmei9kRzdCb21VPQ=="
+        "</response>";
+
+    auto response = Sasl2::Response::fromDom(xmlToDom(xml));
+    QVERIFY(response);
+    QCOMPARE(response->data, "c=cD10bHMtZXhwb3J0ZXIsLMcoQvOdBDePd4OswlmAWV3dg1a1Wh1tYPTBwVid10VU,r=12C4CD5C-E38E-4A98-8F6D-15C38F51CCC6a09117a6-ac50-4f2f-93f1-93799c2bddf6,p=UApo7xo6Pa9J+Vaejfz/dG7BomU=");
+    serializePacket(*response, xml);
+}
+
+void tst_QXmppSasl::sasl2Success()
+{
+    auto xml =
+        "<success xmlns='urn:xmpp:sasl:2'>"
+        "<additional-data>"
+        "dj1tc1ZIcy9CeklPSERxWGVWSDdFbW1EdTlpZDg9"
+        "</additional-data>"
+        "<authorization-identifier>user@example.org</authorization-identifier>"
+        "</success>";
+
+    auto success = Sasl2::Success::fromDom(xmlToDom(xml));
+    QVERIFY(success.has_value());
+    QCOMPARE(success->additionalData, "v=msVHs/BzIOHDqXeVH7EmmDu9id8=");
+    QCOMPARE(success->authorizationIdentifier, "user@example.org");
+    serializePacket(*success, xml);
+}
+
+void tst_QXmppSasl::sasl2Failure()
+{
+    auto xml =
+        "<failure xmlns='urn:xmpp:sasl:2'>"
+        "<aborted xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>"
+        "<text>This is a terrible example.</text>"
+        "</failure>";
+
+    auto failure = Sasl2::Failure::fromDom(xmlToDom(xml));
+    QVERIFY(failure.has_value());
+    QCOMPARE(failure->condition, Sasl::ErrorCondition::Aborted);
+    QCOMPARE(failure->text, "This is a terrible example.");
+    serializePacket(*failure, xml);
+}
+
+void tst_QXmppSasl::sasl2ContinueElement()
+{
+    auto xml =
+        "<continue xmlns='urn:xmpp:sasl:2'>"
+        "<additional-data>"
+        "SSdtIGJvcmVkIG5vdy4="
+        "</additional-data>"
+        "<tasks>"
+        "<task>HOTP-EXAMPLE</task>"
+        "<task>TOTP-EXAMPLE</task>"
+        "</tasks>"
+        "<text>This account requires 2FA</text>"
+        "</continue>";
+
+    auto cont = Sasl2::Continue::fromDom(xmlToDom(xml));
+    QVERIFY(cont.has_value());
+    QCOMPARE(cont->additionalData, "I'm bored now.");
+    QCOMPARE(cont->tasks, (std::vector<QString> { "HOTP-EXAMPLE", "TOTP-EXAMPLE" }));
+    QCOMPARE(cont->text, "This account requires 2FA");
+    serializePacket(*cont, xml);
+}
+
+void tst_QXmppSasl::sasl2Abort()
+{
+    auto xml = "<abort xmlns='urn:xmpp:sasl:2'><text>I changed my mind.</text></abort>";
+
+    auto abort = Sasl2::Abort::fromDom(xmlToDom(xml));
+    QVERIFY(abort);
+    QCOMPARE(abort->text, "I changed my mind.");
+    serializePacket(*abort, xml);
 }
 
 void tst_QXmppSasl::testClientAvailableMechanisms()
