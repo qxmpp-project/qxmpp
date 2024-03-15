@@ -65,11 +65,12 @@ QXmppDiscoveryManager::QXmppDiscoveryManager()
 
 QXmppDiscoveryManager::~QXmppDiscoveryManager() = default;
 
+///
 /// Requests information from the specified XMPP entity.
 ///
 /// \param jid  The target entity's JID.
 /// \param node The target node (optional).
-
+///
 QString QXmppDiscoveryManager::requestInfo(const QString &jid, const QString &node)
 {
     QXmppDiscoveryIq request;
@@ -86,11 +87,12 @@ QString QXmppDiscoveryManager::requestInfo(const QString &jid, const QString &no
     }
 }
 
+///
 /// Requests items from the specified XMPP entity.
 ///
 /// \param jid  The target entity's JID.
 /// \param node The target node (optional).
-
+///
 QString QXmppDiscoveryManager::requestItems(const QString &jid, const QString &node)
 {
     QXmppDiscoveryIq request;
@@ -204,96 +206,100 @@ QXmppDiscoveryIq QXmppDiscoveryManager::capabilities()
     return iq;
 }
 
+///
 /// Sets the capabilities node of the local XMPP client.
 ///
 /// \param node
-
+///
 void QXmppDiscoveryManager::setClientCapabilitiesNode(const QString &node)
 {
     d->clientCapabilitiesNode = node;
 }
 
+///
 /// Sets the category of the local XMPP client.
 ///
 /// You can find a list of valid categories at:
 /// http://xmpp.org/registrar/disco-categories.html
 ///
 /// \param category
-
+///
 void QXmppDiscoveryManager::setClientCategory(const QString &category)
 {
     d->clientCategory = category;
 }
 
+///
 /// Sets the type of the local XMPP client.
 ///
 /// You can find a list of valid types at:
 /// http://xmpp.org/registrar/disco-categories.html
 ///
-/// \param type
-
 void QXmppDiscoveryManager::setClientType(const QString &type)
 {
     d->clientType = type;
 }
 
 /// Sets the name of the local XMPP client.
-///
-/// \param name
-
 void QXmppDiscoveryManager::setClientName(const QString &name)
 {
     d->clientName = name;
 }
 
+///
 /// Returns the capabilities node of the local XMPP client.
 ///
 /// By default this is "https://github.com/qxmpp-project/qxmpp".
-
+///
 QString QXmppDiscoveryManager::clientCapabilitiesNode() const
 {
     return d->clientCapabilitiesNode;
 }
 
+///
 /// Returns the category of the local XMPP client.
 ///
 /// By default this is "client".
-
+///
 QString QXmppDiscoveryManager::clientCategory() const
 {
     return d->clientCategory;
 }
 
+///
 /// Returns the type of the local XMPP client.
 ///
 /// With Qt builds for Android, Blackberry, iOS or Windows Phone this is set to
 /// "phone", otherwise it defaults to "pc".
-
+///
 QString QXmppDiscoveryManager::clientType() const
 {
     return d->clientType;
 }
 
+///
 /// Returns the name of the local XMPP client.
 ///
 /// By default this is "Based on QXmpp x.y.z".
-
+///
 QString QXmppDiscoveryManager::clientName() const
 {
     return d->clientName;
 }
 
+///
 /// Returns the client's extended information form, as defined
-/// by \xep{0128}: Service Discovery Extensions.
-
+/// by \xep{0128, Service Discovery Extensions}.
+///
 QXmppDataForm QXmppDiscoveryManager::clientInfoForm() const
 {
     return d->clientInfoForm;
 }
 
+///
 /// Sets the client's extended information form, as defined
-/// by \xep{0128}: Service Discovery Extensions.
-
+/// by \xep{0128, Service Discovery Extensions}.
+///
 void QXmppDiscoveryManager::setClientInfoForm(const QXmppDataForm &form)
 {
     d->clientInfoForm = form;

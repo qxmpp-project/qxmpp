@@ -54,6 +54,7 @@ QXmppRegisterIq &QXmppRegisterIq::operator=(const QXmppRegisterIq &other) = defa
 /// Default move-assignment operator
 QXmppRegisterIq &QXmppRegisterIq::operator=(QXmppRegisterIq &&) = default;
 
+///
 /// Constructs a regular change password request.
 ///
 /// \param username The username of the account of which the password should be
@@ -63,7 +64,7 @@ QXmppRegisterIq &QXmppRegisterIq::operator=(QXmppRegisterIq &&) = default;
 /// IQ is automatically addressed to the local server.
 ///
 /// \since QXmpp 1.2
-
+///
 QXmppRegisterIq QXmppRegisterIq::createChangePasswordRequest(const QString &username, const QString &newPassword, const QString &to)
 {
     QXmppRegisterIq iq;
@@ -74,13 +75,14 @@ QXmppRegisterIq QXmppRegisterIq::createChangePasswordRequest(const QString &user
     return iq;
 }
 
+///
 /// Constructs a regular unregistration request.
 ///
 /// \param to Optional JID of the registration service. If this is omitted, the
 /// IQ is automatically addressed to the local server.
 ///
 /// \since QXmpp 1.2
-
+///
 QXmppRegisterIq QXmppRegisterIq::createUnregistrationRequest(const QString &to)
 {
     QXmppRegisterIq iq;
@@ -91,72 +93,60 @@ QXmppRegisterIq QXmppRegisterIq::createUnregistrationRequest(const QString &to)
 }
 
 /// Returns the email for this registration IQ.
-
 QString QXmppRegisterIq::email() const
 {
     return d->email;
 }
 
 /// Sets the \a email for this registration IQ.
-
 void QXmppRegisterIq::setEmail(const QString &email)
 {
     d->email = email;
 }
 
 /// Returns the QXmppDataForm for this registration IQ.
-
 QXmppDataForm QXmppRegisterIq::form() const
 {
     return d->form;
 }
 
 /// Sets the QXmppDataForm for this registration IQ.
-///
-/// \param form
-
 void QXmppRegisterIq::setForm(const QXmppDataForm &form)
 {
     d->form = form;
 }
 
 /// Returns the instructions for this registration IQ.
-
 QString QXmppRegisterIq::instructions() const
 {
     return d->instructions;
 }
 
 /// Sets the \a instructions for this registration IQ.
-
 void QXmppRegisterIq::setInstructions(const QString &instructions)
 {
     d->instructions = instructions;
 }
 
 /// Returns the password for this registration IQ.
-
 QString QXmppRegisterIq::password() const
 {
     return d->password;
 }
 
 /// Sets the \a password for this registration IQ.
-
 void QXmppRegisterIq::setPassword(const QString &password)
 {
     d->password = password;
 }
 
 /// Returns the username for this registration IQ.
-
 QString QXmppRegisterIq::username() const
 {
     return d->username;
 }
 
 /// Sets the \a username for this registration IQ.
-
 void QXmppRegisterIq::setUsername(const QString &username)
 {
     d->username = username;

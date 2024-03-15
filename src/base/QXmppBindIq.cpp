@@ -15,34 +15,24 @@
 using namespace QXmpp::Private;
 
 /// Returns the bound JID.
-///
-
 QString QXmppBindIq::jid() const
 {
     return m_jid;
 }
 
 /// Sets the bound JID.
-///
-/// \param jid
-
 void QXmppBindIq::setJid(const QString &jid)
 {
     m_jid = jid;
 }
 
 /// Returns the requested resource.
-///
-
 QString QXmppBindIq::resource() const
 {
     return m_resource;
 }
 
 /// Sets the requested resource.
-///
-/// \param resource
-
 void QXmppBindIq::setResource(const QString &resource)
 {
     m_resource = resource;

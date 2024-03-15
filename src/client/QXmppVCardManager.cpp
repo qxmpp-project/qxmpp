@@ -24,6 +24,7 @@ QXmppVCardManager::QXmppVCardManager()
 
 QXmppVCardManager::~QXmppVCardManager() = default;
 
+///
 /// This function requests the server for vCard of the specified jid.
 /// Once received the signal vCardReceived() is emitted.
 ///
@@ -40,18 +41,12 @@ QString QXmppVCardManager::requestVCard(const QString &jid)
 }
 
 /// Returns the vCard of the connected client.
-///
-/// \return QXmppVCard
-///
 const QXmppVCardIq &QXmppVCardManager::clientVCard() const
 {
     return d->clientVCard;
 }
 
 /// Sets the vCard of the connected client.
-///
-/// \param clientVCard QXmppVCard
-///
 void QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
 {
     d->clientVCard = clientVCard;
@@ -61,19 +56,17 @@ void QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
     client()->sendPacket(d->clientVCard);
 }
 
+///
 /// This function requests the server for vCard of the connected user itself.
 /// Once received the signal clientVCardReceived() is emitted. Received vCard
 /// can be get using clientVCard().
+///
 QString QXmppVCardManager::requestClientVCard()
 {
     return requestVCard();
 }
 
-/// Returns true if vCard of the connected client has been
-/// received else false.
-///
-/// \return bool
-///
+/// Returns true if vCard of the connected client has been received else false.
 bool QXmppVCardManager::isClientVCardReceived() const
 {
     return d->isClientVCardReceived;

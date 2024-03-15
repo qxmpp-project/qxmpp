@@ -18,7 +18,6 @@ QXmppMucItem::QXmppMucItem()
 }
 
 /// Returns true if the current item is null.
-
 bool QXmppMucItem::isNull() const
 {
     return m_actor.isEmpty() &&
@@ -31,7 +30,6 @@ bool QXmppMucItem::isNull() const
 
 /// Returns the actor for this item, for instance the admin who kicked
 /// a user out of a room.
-
 QString QXmppMucItem::actor() const
 {
     return m_actor;
@@ -39,14 +37,12 @@ QString QXmppMucItem::actor() const
 
 /// Sets the \a actor for this item, for instance the admin who kicked
 /// a user out of a room.
-
 void QXmppMucItem::setActor(const QString &actor)
 {
     m_actor = actor;
 }
 
 /// Returns the user's affiliation, i.e. long-lived permissions.
-
 QXmppMucItem::Affiliation QXmppMucItem::affiliation() const
 {
     return m_affiliation;
@@ -90,41 +86,30 @@ QString QXmppMucItem::affiliationToString(Affiliation affiliation)
 /// \endcond
 
 /// Sets the user's affiliation, i.e. long-lived permissions.
-///
-/// \param affiliation
-
 void QXmppMucItem::setAffiliation(Affiliation affiliation)
 {
     m_affiliation = affiliation;
 }
 
 /// Returns the user's real JID.
-
 QString QXmppMucItem::jid() const
 {
     return m_jid;
 }
 
 /// Sets the user's real JID.
-///
-/// \param jid
-
 void QXmppMucItem::setJid(const QString &jid)
 {
     m_jid = jid;
 }
 
 /// Returns the user's nickname.
-
 QString QXmppMucItem::nick() const
 {
     return m_nick;
 }
 
 /// Sets the user's nickname.
-///
-/// \param nick
-
 void QXmppMucItem::setNick(const QString &nick)
 {
     m_nick = nick;
@@ -132,7 +117,6 @@ void QXmppMucItem::setNick(const QString &nick)
 
 /// Returns the reason for this item, for example the reason for kicking
 /// a user out of a room.
-
 QString QXmppMucItem::reason() const
 {
     return m_reason;
@@ -140,14 +124,12 @@ QString QXmppMucItem::reason() const
 
 /// Sets the \a reason for this item, for example the reason for kicking
 /// a user out of a room.
-
 void QXmppMucItem::setReason(const QString &reason)
 {
     m_reason = reason;
 }
 
 /// Returns the user's role, i.e. short-lived permissions.
-
 QXmppMucItem::Role QXmppMucItem::role() const
 {
     return m_role;
@@ -187,9 +169,6 @@ QString QXmppMucItem::roleToString(Role role)
 /// \endcond
 
 /// Sets the user's role, i.e. short-lived permissions.
-///
-/// \param role
-
 void QXmppMucItem::setRole(Role role)
 {
     m_role = role;
@@ -226,16 +205,12 @@ void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
 /// \endcond
 
 /// Returns the IQ's items.
-
 QList<QXmppMucItem> QXmppMucAdminIq::items() const
 {
     return m_items;
 }
 
 /// Sets the IQ's items.
-///
-/// \param items
-
 void QXmppMucAdminIq::setItems(const QList<QXmppMucItem> &items)
 {
     m_items = items;
@@ -270,16 +245,12 @@ void QXmppMucAdminIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 /// \endcond
 
 /// Returns the IQ's data form.
-
 QXmppDataForm QXmppMucOwnerIq::form() const
 {
     return m_form;
 }
 
 /// Sets the IQ's data form.
-///
-/// \param form
-
 void QXmppMucOwnerIq::setForm(const QXmppDataForm &form)
 {
     m_form = form;

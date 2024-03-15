@@ -116,105 +116,93 @@ bool QXmppPresence::isXmppStanza() const
     return true;
 }
 
+///
 /// Returns the availability status type, for instance busy or away.
 ///
 /// This will not tell you whether a contact is connected, check whether
 /// type() is QXmppPresence::Available instead.
-
+///
 QXmppPresence::AvailableStatusType QXmppPresence::availableStatusType() const
 {
     return d->availableStatusType;
 }
 
 /// Sets the availability status type, for instance busy or away.
-
 void QXmppPresence::setAvailableStatusType(AvailableStatusType type)
 {
     d->availableStatusType = type;
 }
 
 /// Returns the priority level of the resource.
-
 int QXmppPresence::priority() const
 {
     return d->priority;
 }
 
 /// Sets the \a priority level of the resource.
-
 void QXmppPresence::setPriority(int priority)
 {
     d->priority = priority;
 }
 
 /// Returns the status text, a textual description of the user's status.
-
 QString QXmppPresence::statusText() const
 {
     return d->statusText;
 }
 
+///
 /// Sets the status text, a textual description of the user's status.
 ///
 /// \param statusText The status text, for example "Gone fishing".
-
+///
 void QXmppPresence::setStatusText(const QString &statusText)
 {
     d->statusText = statusText;
 }
 
+///
 /// Returns the presence type.
 ///
 /// You can use this method to determine the action which needs to be
 /// taken in response to receiving the presence. For instance, if the type is
 /// QXmppPresence::Available or QXmppPresence::Unavailable, you could update
 /// the icon representing a contact's availability.
-
+///
 QXmppPresence::Type QXmppPresence::type() const
 {
     return d->type;
 }
 
 /// Sets the presence type.
-///
-/// \param type
-
 void QXmppPresence::setType(QXmppPresence::Type type)
 {
     d->type = type;
 }
 
 /// Returns the photo-hash of the VCardUpdate.
-///
-/// \return QByteArray
-
 QByteArray QXmppPresence::photoHash() const
 {
     return d->photoHash;
 }
 
+///
 /// Sets the photo-hash of the VCardUpdate.
 ///
 /// \param photoHash as QByteArray
-
+///
 void QXmppPresence::setPhotoHash(const QByteArray &photoHash)
 {
     d->photoHash = photoHash;
 }
 
 /// Returns the type of VCardUpdate
-///
-/// \return VCardUpdateType
-
 QXmppPresence::VCardUpdateType QXmppPresence::vCardUpdateType() const
 {
     return d->vCardUpdateType;
 }
 
 /// Sets the type of VCardUpdate
-///
-/// \param type VCardUpdateType
-
 void QXmppPresence::setVCardUpdateType(VCardUpdateType type)
 {
     d->vCardUpdateType = type;
@@ -311,60 +299,48 @@ void QXmppPresence::setMujiContents(const QVector<QXmppJingleIq::Content> &mujiC
 }
 
 /// Returns the MUC item.
-
 QXmppMucItem QXmppPresence::mucItem() const
 {
     return d->mucItem;
 }
 
 /// Sets the MUC item.
-///
-/// \param item
-
 void QXmppPresence::setMucItem(const QXmppMucItem &item)
 {
     d->mucItem = item;
 }
 
 /// Returns the password used to join a MUC room.
-
 QString QXmppPresence::mucPassword() const
 {
     return d->mucPassword;
 }
 
 /// Sets the password used to join a MUC room.
-
 void QXmppPresence::setMucPassword(const QString &password)
 {
     d->mucPassword = password;
 }
 
 /// Returns the MUC status codes.
-
 QList<int> QXmppPresence::mucStatusCodes() const
 {
     return d->mucStatusCodes;
 }
 
 /// Sets the MUC status codes.
-///
-/// \param codes
-
 void QXmppPresence::setMucStatusCodes(const QList<int> &codes)
 {
     d->mucStatusCodes = codes;
 }
 
 /// Returns true if the sender has indicated MUC support.
-
 bool QXmppPresence::isMucSupported() const
 {
     return d->mucSupported;
 }
 
 /// Sets whether MUC is \a supported.
-
 void QXmppPresence::setMucSupported(bool supported)
 {
     d->mucSupported = supported;
@@ -392,37 +368,41 @@ void QXmppPresence::setLastUserInteraction(const QDateTime &lastUserInteraction)
     d->lastUserInteraction = lastUserInteraction;
 }
 
+///
 /// Returns the actual (full) JID of the MIX channel participant.
 ///
 /// \since QXmpp 1.1
-
+///
 QString QXmppPresence::mixUserJid() const
 {
     return d->mixUserJid;
 }
 
+///
 /// Sets the actual (full) JID of the MIX channel participant.
 ///
 /// \since QXmpp 1.1
-
+///
 void QXmppPresence::setMixUserJid(const QString &mixUserJid)
 {
     d->mixUserJid = mixUserJid;
 }
 
+///
 /// Returns the MIX participant's nickname.
 ///
 /// \since QXmpp 1.1
-
+///
 QString QXmppPresence::mixUserNick() const
 {
     return d->mixUserNick;
 }
 
+///
 /// Sets the MIX participant's nickname.
 ///
 /// \since QXmpp 1.1
-
+///
 void QXmppPresence::setMixUserNick(const QString &mixUserNick)
 {
     d->mixUserNick = mixUserNick;

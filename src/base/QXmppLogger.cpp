@@ -136,9 +136,6 @@ QXmppLogger::LoggingType QXmppLogger::loggingType()
 }
 
 /// Sets the handler for logging messages.
-///
-/// \param type
-
 void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
 {
     if (d->loggingType != type) {
@@ -153,19 +150,12 @@ QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 }
 
 /// Sets the types of messages to log.
-///
-/// \param types
-
 void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 {
     d->messageTypes = types;
 }
 
 /// Add a logging message.
-///
-/// \param type
-/// \param text
-
 void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
 {
     // filter messages
@@ -192,20 +182,22 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
     }
 }
 
+///
 /// Sets the given \a gauge to \a value.
 ///
 /// NOTE: the base implementation does nothing.
-
+///
 void QXmppLogger::setGauge(const QString &gauge, double value)
 {
     Q_UNUSED(gauge);
     Q_UNUSED(value);
 }
 
+///
 /// Updates the given \a counter by \a amount.
 ///
 /// NOTE: the base implementation does nothing.
-
+///
 void QXmppLogger::updateCounter(const QString &counter, qint64 amount)
 {
     Q_UNUSED(counter);
@@ -217,12 +209,13 @@ QString QXmppLogger::logFilePath()
     return d->logFilePath;
 }
 
+///
 /// Sets the path to which logging messages should be written.
 ///
 /// \param path
 ///
 /// \sa setLoggingType()
-
+///
 void QXmppLogger::setLogFilePath(const QString &path)
 {
     if (d->logFilePath != path) {
@@ -232,8 +225,6 @@ void QXmppLogger::setLogFilePath(const QString &path)
 }
 
 /// If logging to a file, causes the file to be re-opened.
-///
-
 void QXmppLogger::reopen()
 {
     if (d->logFile) {

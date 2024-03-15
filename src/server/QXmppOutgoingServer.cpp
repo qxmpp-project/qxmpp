@@ -208,34 +208,24 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 /// \endcond
 
 /// Returns true if the socket is connected and authentication succeeded.
-///
-
 bool QXmppOutgoingServer::isConnected() const
 {
     return QXmppStream::isConnected() && d->ready;
 }
 
 /// Returns the stream's local dialback key.
-
 QString QXmppOutgoingServer::localStreamKey() const
 {
     return d->localStreamKey;
 }
 
 /// Sets the stream's local dialback key.
-///
-/// \param key
-
 void QXmppOutgoingServer::setLocalStreamKey(const QString &key)
 {
     d->localStreamKey = key;
 }
 
 /// Sets the stream's verification information.
-///
-/// \param id
-/// \param key
-
 void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 {
     d->verifyId = id;
@@ -243,9 +233,6 @@ void QXmppOutgoingServer::setVerify(const QString &id, const QString &key)
 }
 
 /// Sends or queues data until connected.
-///
-/// \param data
-
 void QXmppOutgoingServer::queueData(const QByteArray &data)
 {
     if (isConnected()) {
@@ -256,7 +243,6 @@ void QXmppOutgoingServer::queueData(const QByteArray &data)
 }
 
 /// Returns the remote server's domain.
-
 QString QXmppOutgoingServer::remoteDomain() const
 {
     return d->remoteDomain;

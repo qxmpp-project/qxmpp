@@ -196,51 +196,36 @@ QXmppRpcResponseIq::QXmppRpcResponseIq()
 }
 
 /// Returns the fault code.
-///
-
 int QXmppRpcResponseIq::faultCode() const
 {
     return m_faultCode;
 }
 
 /// Sets the fault code.
-///
-/// \param faultCode
-
 void QXmppRpcResponseIq::setFaultCode(int faultCode)
 {
     m_faultCode = faultCode;
 }
 
 /// Returns the fault string.
-///
-
 QString QXmppRpcResponseIq::faultString() const
 {
     return m_faultString;
 }
 
 /// Sets the fault string.
-///
-/// \param faultString
-
 void QXmppRpcResponseIq::setFaultString(const QString &faultString)
 {
     m_faultString = faultString;
 }
 
 /// Returns the response values.
-///
-
 QVariantList QXmppRpcResponseIq::values() const
 {
     return m_values;
 }
 
 /// Sets the response values.
-///
-/// \param values
-
 void QXmppRpcResponseIq::setValues(const QVariantList &values)
 {
     m_values = values;
@@ -316,17 +301,12 @@ QXmppRpcInvokeIq::QXmppRpcInvokeIq()
 }
 
 /// Returns the method arguments.
-///
-
 QVariantList QXmppRpcInvokeIq::arguments() const
 {
     return m_arguments;
 }
 
 /// Sets the method arguments.
-///
-/// \param arguments
-
 void QXmppRpcInvokeIq::setArguments(const QVariantList &arguments)
 {
     m_arguments = arguments;
@@ -341,9 +321,6 @@ QString QXmppRpcInvokeIq::method() const
 }
 
 /// Sets the method name.
-///
-/// \param method
-
 void QXmppRpcInvokeIq::setMethod(const QString &method)
 {
     m_method = method;

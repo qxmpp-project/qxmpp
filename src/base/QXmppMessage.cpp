@@ -271,48 +271,36 @@ void QXmppMessage::setE2eeFallbackBody(const QString &fallbackBody)
 }
 
 /// Returns the message's type.
-
 QXmppMessage::Type QXmppMessage::type() const
 {
     return d->type;
 }
 
 /// Sets the message's type.
-///
-/// \param type
-
 void QXmppMessage::setType(QXmppMessage::Type type)
 {
     d->type = type;
 }
 
 /// Returns the message's subject.
-
 QString QXmppMessage::subject() const
 {
     return d->subject;
 }
 
 /// Sets the message's subject.
-///
-/// \param subject
-
 void QXmppMessage::setSubject(const QString &subject)
 {
     d->subject = subject;
 }
 
 /// Returns the message's thread.
-
 QString QXmppMessage::thread() const
 {
     return d->thread;
 }
 
 /// Sets the message's thread.
-///
-/// \param thread
-
 void QXmppMessage::setThread(const QString &thread)
 {
     d->thread = thread;

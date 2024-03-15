@@ -10,19 +10,12 @@
 #include <qdebug.h>
 
 /// Constructs a QXmppInvokable with the specified \a parent.
-///
-/// \param parent
-
 QXmppInvokable::QXmppInvokable(QObject *parent)
     : QObject(parent)
 {
 }
 
-/// Destroys a QXmppInvokable.
-
-QXmppInvokable::~QXmppInvokable()
-{
-}
+QXmppInvokable::~QXmppInvokable() = default;
 
 QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant> &args)
 {

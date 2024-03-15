@@ -1222,46 +1222,36 @@ void QXmppJingleIq::setContents(const QList<QXmppJingleIq::Content> &contents)
 }
 
 /// Returns the session initiator.
-
 QString QXmppJingleIq::initiator() const
 {
     return d->initiator;
 }
 
 /// Sets the session initiator.
-///
-/// \param initiator
-
 void QXmppJingleIq::setInitiator(const QString &initiator)
 {
     d->initiator = initiator;
 }
 
 /// Returns a reference to the IQ's reason element.
-
 QXmppJingleReason &QXmppJingleIq::reason()
 {
     return d->reason;
 }
 
 /// Returns a const reference to the IQ's reason element.
-
 const QXmppJingleReason &QXmppJingleIq::reason() const
 {
     return d->reason;
 }
 
 /// Returns the session responder.
-
 QString QXmppJingleIq::responder() const
 {
     return d->responder;
 }
 
 /// Sets the session responder.
-///
-/// \param responder
-
 void QXmppJingleIq::setResponder(const QString &responder)
 {
     d->responder = responder;
@@ -1306,9 +1296,6 @@ QString QXmppJingleIq::sid() const
 }
 
 /// Sets the session ID.
-///
-/// \param sid
-
 void QXmppJingleIq::setSid(const QString &sid)
 {
     d->sid = sid;
@@ -1534,16 +1521,12 @@ QXmppJingleCandidate &QXmppJingleCandidate::operator=(const QXmppJingleCandidate
 QXmppJingleCandidate &QXmppJingleCandidate::operator=(QXmppJingleCandidate &&) = default;
 
 /// Returns the candidate's component ID.
-
 int QXmppJingleCandidate::component() const
 {
     return d->component;
 }
 
 /// Sets the candidates's component ID.
-///
-/// \param component
-
 void QXmppJingleCandidate::setComponent(int component)
 {
     d->component = component;
@@ -1602,119 +1585,84 @@ QHostAddress QXmppJingleCandidate::host() const
 }
 
 /// Sets the candidate's host address.
-///
-/// \param host
-
 void QXmppJingleCandidate::setHost(const QHostAddress &host)
 {
     d->host = host;
 }
 
 /// Returns the candidate's unique identifier.
-///
-
 QString QXmppJingleCandidate::id() const
 {
     return d->id;
 }
 
 /// Sets the candidate's unique identifier.
-///
-/// \param id
-
 void QXmppJingleCandidate::setId(const QString &id)
 {
     d->id = id;
 }
 
 /// Returns the network index (starting at 0) the candidate is on.
-///
-
 int QXmppJingleCandidate::network() const
 {
     return d->network;
 }
 
 /// Sets the network index (starting at 0) the candidate is on.
-///
-/// \param network
-
 void QXmppJingleCandidate::setNetwork(int network)
 {
     d->network = network;
 }
 
 /// Returns the candidate's port number.
-///
-
 quint16 QXmppJingleCandidate::port() const
 {
     return d->port;
 }
 
 /// Sets the candidate's port number.
-///
-/// \param port
-
 void QXmppJingleCandidate::setPort(quint16 port)
 {
     d->port = port;
 }
 
 /// Returns the candidate's priority.
-///
-
 int QXmppJingleCandidate::priority() const
 {
     return d->priority;
 }
 
 /// Sets the candidate's priority.
-///
-/// \param priority
-
 void QXmppJingleCandidate::setPriority(int priority)
 {
     d->priority = priority;
 }
 
 /// Returns the candidate's protocol (e.g. "udp").
-///
-
 QString QXmppJingleCandidate::protocol() const
 {
     return d->protocol;
 }
 
 /// Sets the candidate's protocol (e.g. "udp").
-///
-/// \param protocol
-
 void QXmppJingleCandidate::setProtocol(const QString &protocol)
 {
     d->protocol = protocol;
 }
 
 /// Returns the candidate type (e.g. "host").
-///
-
 QXmppJingleCandidate::Type QXmppJingleCandidate::type() const
 {
     return d->type;
 }
 
 /// Sets the candidate type (e.g. "host").
-///
-/// \param type
-
 void QXmppJingleCandidate::setType(QXmppJingleCandidate::Type type)
 {
     d->type = type;
 }
 
 /// Returns true if the host address or port are empty.
-///
-
 bool QXmppJingleCandidate::isNull() const
 {
     return d->host.isNull() || !d->port;
@@ -1825,9 +1773,6 @@ QXmppJinglePayloadType::QXmppJinglePayloadType()
 }
 
 /// Constructs a copy of other.
-///
-/// \param other
-
 QXmppJinglePayloadType::QXmppJinglePayloadType(const QXmppJinglePayloadType &other)
     : d(other.d)
 {
@@ -1838,50 +1783,36 @@ QXmppJinglePayloadType::~QXmppJinglePayloadType()
 }
 
 /// Returns the number of channels (e.g. 1 for mono, 2 for stereo).
-///
-
 unsigned char QXmppJinglePayloadType::channels() const
 {
     return d->channels;
 }
 
 /// Sets the number of channels (e.g. 1 for mono, 2 for stereo).
-///
-/// \param channels
-
 void QXmppJinglePayloadType::setChannels(unsigned char channels)
 {
     d->channels = channels;
 }
 
 /// Returns the clockrate in Hz, i.e. the number of samples per second.
-///
-
 unsigned int QXmppJinglePayloadType::clockrate() const
 {
     return d->clockrate;
 }
 
 /// Sets the clockrate in Hz, i.e. the number of samples per second.
-///
-/// \param clockrate
-
 void QXmppJinglePayloadType::setClockrate(unsigned int clockrate)
 {
     d->clockrate = clockrate;
 }
 
 /// Returns the payload type identifier.
-///
-
 unsigned char QXmppJinglePayloadType::id() const
 {
     return d->id;
 }
 
 /// Sets the payload type identifier.
-///
-
 void QXmppJinglePayloadType::setId(unsigned char id)
 {
     Q_ASSERT(id <= 127);
@@ -1889,65 +1820,48 @@ void QXmppJinglePayloadType::setId(unsigned char id)
 }
 
 /// Returns the maximum packet time in milliseconds.
-///
-
 unsigned int QXmppJinglePayloadType::maxptime() const
 {
     return d->maxptime;
 }
 
 /// Sets the maximum packet type in milliseconds.
-///
-/// \param maxptime
-
 void QXmppJinglePayloadType::setMaxptime(unsigned int maxptime)
 {
     d->maxptime = maxptime;
 }
 
 /// Returns the payload type name.
-///
-
 QString QXmppJinglePayloadType::name() const
 {
     return d->name;
 }
 
 /// Sets the payload type name.
-///
-/// \param name
-
 void QXmppJinglePayloadType::setName(const QString &name)
 {
     d->name = name;
 }
 
 /// Returns the payload parameters.
-
 QMap<QString, QString> QXmppJinglePayloadType::parameters() const
 {
     return d->parameters;
 }
 
 /// Sets the payload parameters.
-
 void QXmppJinglePayloadType::setParameters(const QMap<QString, QString> &parameters)
 {
     d->parameters = parameters;
 }
 
 /// Returns the packet time in milliseconds (20 by default).
-///
-
 unsigned int QXmppJinglePayloadType::ptime() const
 {
     return d->ptime ? d->ptime : 20;
 }
 
 /// Sets the packet time in milliseconds (20 by default).
-///
-/// \param ptime
-
 void QXmppJinglePayloadType::setPtime(unsigned int ptime)
 {
     d->ptime = ptime;

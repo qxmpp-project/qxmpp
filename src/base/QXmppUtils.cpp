@@ -154,14 +154,12 @@ QString QXmppUtils::timezoneOffsetToString(int secs)
 }
 
 /// Returns the domain for the given \a jid.
-
 QString QXmppUtils::jidToDomain(const QString &jid)
 {
     return jidToBareJid(jid).split(QStringLiteral("@")).last();
 }
 
 /// Returns the resource for the given \a jid.
-
 QString QXmppUtils::jidToResource(const QString &jid)
 {
     const int pos = jid.indexOf(u'/');
@@ -172,7 +170,6 @@ QString QXmppUtils::jidToResource(const QString &jid)
 }
 
 /// Returns the user for the given \a jid.
-
 QString QXmppUtils::jidToUser(const QString &jid)
 {
     const int pos = jid.indexOf(u'@');
@@ -183,7 +180,6 @@ QString QXmppUtils::jidToUser(const QString &jid)
 }
 
 /// Returns the bare jid (i.e. without resource) for the given \a jid.
-
 QString QXmppUtils::jidToBareJid(const QString &jid)
 {
     const int pos = jid.indexOf(u'/');
@@ -194,7 +190,6 @@ QString QXmppUtils::jidToBareJid(const QString &jid)
 }
 
 /// Calculates the CRC32 checksum for the given input.
-
 quint32 QXmppUtils::generateCrc32(const QByteArray &in)
 {
     quint32 result = 0xffffffff;

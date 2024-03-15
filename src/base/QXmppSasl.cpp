@@ -317,56 +317,48 @@ QXmppSaslClient *QXmppSaslClient::create(const QString &mechanism, QObject *pare
 }
 
 /// Returns the host.
-
 QString QXmppSaslClient::host() const
 {
     return d->host;
 }
 
 /// Sets the host.
-
 void QXmppSaslClient::setHost(const QString &host)
 {
     d->host = host;
 }
 
 /// Returns the service type, e.g. "xmpp".
-
 QString QXmppSaslClient::serviceType() const
 {
     return d->serviceType;
 }
 
 /// Sets the service type, e.g. "xmpp".
-
 void QXmppSaslClient::setServiceType(const QString &serviceType)
 {
     d->serviceType = serviceType;
 }
 
 /// Returns the username.
-
 QString QXmppSaslClient::username() const
 {
     return d->username;
 }
 
 /// Sets the username.
-
 void QXmppSaslClient::setUsername(const QString &username)
 {
     d->username = username;
 }
 
 /// Returns the password.
-
 QString QXmppSaslClient::password() const
 {
     return d->password;
 }
 
 /// Sets the password.
-
 void QXmppSaslClient::setPassword(const QString &password)
 {
     d->password = password;
@@ -673,7 +665,6 @@ QXmppSaslServer::~QXmppSaslServer()
 }
 
 /// Creates an SASL server for the given mechanism.
-
 QXmppSaslServer *QXmppSaslServer::create(const QString &mechanism, QObject *parent)
 {
     if (mechanism == QStringLiteral("PLAIN")) {
@@ -688,56 +679,48 @@ QXmppSaslServer *QXmppSaslServer::create(const QString &mechanism, QObject *pare
 }
 
 /// Returns the username.
-
 QString QXmppSaslServer::username() const
 {
     return d->username;
 }
 
 /// Sets the username.
-
 void QXmppSaslServer::setUsername(const QString &username)
 {
     d->username = username;
 }
 
 /// Returns the password.
-
 QString QXmppSaslServer::password() const
 {
     return d->password;
 }
 
 /// Sets the password.
-
 void QXmppSaslServer::setPassword(const QString &password)
 {
     d->password = password;
 }
 
 /// Returns the password digest.
-
 QByteArray QXmppSaslServer::passwordDigest() const
 {
     return d->passwordDigest;
 }
 
 /// Sets the password digest.
-
 void QXmppSaslServer::setPasswordDigest(const QByteArray &digest)
 {
     d->passwordDigest = digest;
 }
 
 /// Returns the realm.
-
 QString QXmppSaslServer::realm() const
 {
     return d->realm;
 }
 
 /// Sets the realm.
-
 void QXmppSaslServer::setRealm(const QString &realm)
 {
     d->realm = realm;

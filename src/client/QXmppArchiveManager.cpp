@@ -45,6 +45,7 @@ bool QXmppArchiveManager::handleStanza(const QDomElement &element)
 }
 /// \endcond
 
+///
 /// Retrieves the list of available collections. Once the results are
 /// received, the archiveListReceived() signal will be emitted.
 ///
@@ -65,6 +66,7 @@ void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &s
 }
 
 /// \overload
+///
 /// Retrieves the list of available collections. Once the results are
 /// received, the archiveListReceived() signal will be emitted.
 ///
@@ -80,6 +82,7 @@ void QXmppArchiveManager::listCollections(const QString &jid, const QDateTime &s
     listCollections(jid, start, end, rsm);
 }
 
+///
 /// Removes the specified collection(s).
 ///
 /// \param jid The JID of the collection
@@ -96,6 +99,7 @@ void QXmppArchiveManager::removeCollections(const QString &jid, const QDateTime 
     client()->sendPacket(packet);
 }
 
+///
 /// Retrieves the specified collection. Once the results are received,
 /// the archiveChatReceived() will be emitted.
 ///
@@ -113,6 +117,7 @@ void QXmppArchiveManager::retrieveCollection(const QString &jid, const QDateTime
 }
 
 /// \overload
+///
 /// Retrieves the specified collection. Once the results are received,
 /// the archiveChatReceived() will be emitted.
 ///

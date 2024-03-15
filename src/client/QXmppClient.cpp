@@ -280,19 +280,12 @@ QXmppClient::~QXmppClient() = default;
 ///
 
 /// Registers a new \a extension with the client.
-///
-/// \param extension
-
 bool QXmppClient::addExtension(QXmppClientExtension *extension)
 {
     return insertExtension(d->extensions.size(), extension);
 }
 
 /// Registers a new \a extension with the client at the given \a index.
-///
-/// \param index
-/// \param extension
-
 bool QXmppClient::insertExtension(int index, QXmppClientExtension *extension)
 {
     if (d->extensions.contains(extension)) {
@@ -344,16 +337,12 @@ void QXmppClient::setEncryptionExtension(QXmppE2eeExtension *extension)
 }
 
 /// Returns a list containing all the client's extensions.
-///
-
 QList<QXmppClientExtension *> QXmppClient::extensions()
 {
     return d->extensions;
 }
 
 /// Returns a modifiable reference to the current configuration of QXmppClient.
-/// \return Reference to the QXmppClient's configuration for the connection.
-
 QXmppConfiguration &QXmppClient::configuration()
 {
     return d->stream->configuration();
@@ -384,11 +373,12 @@ void QXmppClient::connectToServer(const QXmppConfiguration &config,
     d->stream->connectToHost();
 }
 
+///
 /// Overloaded function to simply connect to an XMPP server with a JID and password.
 ///
 /// \param jid JID for the account.
 /// \param password Password for the account.
-
+///
 void QXmppClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
@@ -632,6 +622,7 @@ QXmppTask<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq, con
     });
 }
 
+///
 /// Disconnects the client and the current presence of client changes to
 /// QXmppPresence::Unavailable and status text changes to "Logged out".
 ///
@@ -639,7 +630,6 @@ QXmppTask<QXmppClient::EmptyResult> QXmppClient::sendGenericIq(QXmppIq &&iq, con
 /// QXmppPresence::Available, if you are again calling connectToServer() after
 /// calling the disconnectFromServer() function.
 ///
-
 void QXmppClient::disconnectFromServer()
 {
     // cancel reconnection
@@ -655,15 +645,12 @@ void QXmppClient::disconnectFromServer()
 }
 
 /// Returns true if the client has authenticated with the XMPP server.
-
 bool QXmppClient::isAuthenticated() const
 {
     return d->stream->isAuthenticated();
 }
 
 /// Returns true if the client is connected to the XMPP server.
-///
-
 bool QXmppClient::isConnected() const
 {
     return d->stream->isConnected();
@@ -717,6 +704,7 @@ QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
     return NoStreamManagement;
 }
 
+///
 /// Utility function to send message to all the resources associated with the
 /// specified bareJid. If there are no resources available, that is the contact
 /// is offline or not present in the roster, it will still send a message to
@@ -730,7 +718,7 @@ QXmppClient::StreamManagementState QXmppClient::streamManagementState() const
 ///
 /// \param bareJid bareJid of the receiving entity
 /// \param message Message string to be sent.
-
+///
 void QXmppClient::sendMessage(const QString &bareJid, const QString &message)
 {
     QXmppRosterManager *rosterManager = findExtension<QXmppRosterManager>();
@@ -762,13 +750,12 @@ QXmppClient::State QXmppClient::state() const
 }
 
 /// Returns the client's current presence.
-///
-
 QXmppPresence QXmppClient::clientPresence() const
 {
     return d->clientPresence;
 }
 
+///
 /// Changes the presence of the connected client.
 ///
 /// The connection to the server will be updated accordingly:
@@ -781,7 +768,6 @@ QXmppPresence QXmppClient::clientPresence() const
 ///
 /// \param presence QXmppPresence object
 ///
-
 void QXmppClient::setClientPresence(const QXmppPresence &presence)
 {
     d->clientPresence = presence;
@@ -890,7 +876,6 @@ void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState
 }
 
 /// At connection establishment, send initial presence.
-
 void QXmppClient::_q_streamConnected()
 {
     d->receivedConflict = false;

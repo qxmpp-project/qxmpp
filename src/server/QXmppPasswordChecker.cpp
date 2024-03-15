@@ -16,48 +16,36 @@ QString QXmppPasswordRequest::domain() const
 }
 
 /// Sets the requested \a domain.
-///
-/// \param domain
-
 void QXmppPasswordRequest::setDomain(const QString &domain)
 {
     m_domain = domain;
 }
 
 /// Returns the given password.
-
 QString QXmppPasswordRequest::password() const
 {
     return m_password;
 }
 
 /// Sets the given \a password.
-
 void QXmppPasswordRequest::setPassword(const QString &password)
 {
     m_password = password;
 }
 
 /// Returns the requested username.
-
 QString QXmppPasswordRequest::username() const
 {
     return m_username;
 }
 
 /// Sets the requested \a username.
-///
-/// \param username
-
 void QXmppPasswordRequest::setUsername(const QString &username)
 {
     m_username = username;
 }
 
 /// Constructs a new QXmppPasswordReply.
-///
-/// \param parent
-
 QXmppPasswordReply::QXmppPasswordReply(QObject *parent)
     : QObject(parent),
       m_error(QXmppPasswordReply::NoError),
@@ -66,25 +54,22 @@ QXmppPasswordReply::QXmppPasswordReply(QObject *parent)
 }
 
 /// Returns the received MD5 digest.
-
 QByteArray QXmppPasswordReply::digest() const
 {
     return m_digest;
 }
 
 /// Sets the received MD5 digest.
-///
-/// \param digest
-
 void QXmppPasswordReply::setDigest(const QByteArray &digest)
 {
     m_digest = digest;
 }
 
+///
 /// Returns the error that was found during the processing of this request.
 ///
 /// If no error was found, returns NoError.
-
+///
 QXmppPasswordReply::Error QXmppPasswordReply::error() const
 {
     return m_error;
@@ -98,7 +83,6 @@ void QXmppPasswordReply::setError(QXmppPasswordReply::Error error)
 }
 
 /// Mark reply as finished.
-
 void QXmppPasswordReply::finish()
 {
     m_isFinished = true;
@@ -106,41 +90,34 @@ void QXmppPasswordReply::finish()
 }
 
 /// Delay marking reply as finished.
-
 void QXmppPasswordReply::finishLater()
 {
     QTimer::singleShot(0, this, &QXmppPasswordReply::finish);
 }
 
 /// Returns true when the reply has finished.
-
 bool QXmppPasswordReply::isFinished() const
 {
     return m_isFinished;
 }
 
 /// Returns the received password.
-
 QString QXmppPasswordReply::password() const
 {
     return m_password;
 }
 
 /// Sets the received password.
-///
-/// \param password
-
 void QXmppPasswordReply::setPassword(const QString &password)
 {
     m_password = password;
 }
 
+///
 /// Checks that the given credentials are valid.
 ///
 /// The base implementation requires that you reimplement getPassword().
 ///
-/// \param request
-
 QXmppPasswordReply *QXmppPasswordChecker::checkPassword(const QXmppPasswordRequest &request)
 {
     auto *reply = new QXmppPasswordReply;
@@ -160,13 +137,12 @@ QXmppPasswordReply *QXmppPasswordChecker::checkPassword(const QXmppPasswordReque
     return reply;
 }
 
+///
 /// Retrieves the MD5 digest for the given username.
 ///
 /// Reimplement this method if your backend natively supports
 /// retrieving MD5 digests.
 ///
-/// \param request
-
 QXmppPasswordReply *QXmppPasswordChecker::getDigest(const QXmppPasswordRequest &request)
 {
     auto *reply = new QXmppPasswordReply;
@@ -186,13 +162,11 @@ QXmppPasswordReply *QXmppPasswordChecker::getDigest(const QXmppPasswordRequest &
     return reply;
 }
 
+///
 /// Retrieves the password for the given username.
 ///
 /// The simplest way to write a password checker is to reimplement this method.
 ///
-/// \param request
-/// \param password
-
 QXmppPasswordReply::Error QXmppPasswordChecker::getPassword(const QXmppPasswordRequest &request, QString &password)
 {
     Q_UNUSED(request);
@@ -201,8 +175,6 @@ QXmppPasswordReply::Error QXmppPasswordChecker::getPassword(const QXmppPasswordR
 }
 
 /// Returns true if the getPassword() method is implemented.
-///
-
 bool QXmppPasswordChecker::hasGetPassword() const
 {
     return false;

@@ -17,81 +17,87 @@ QXmppResultSetQuery::QXmppResultSetQuery()
 {
 }
 
+///
 /// Returns the maximum number of results.
 ///
 /// \note -1 means no limit, 0 means no results are wanted.
 ///
-
 int QXmppResultSetQuery::max() const
 {
     return m_max;
 }
 
+///
 /// Sets the maximum number of results.
 ///
 /// \note -1 means no limit, 0 means no results are wanted.
-
+///
 void QXmppResultSetQuery::setMax(int max)
 {
     m_max = max;
 }
 
+///
 /// Returns the index for the first element in the page.
 ///
 /// This is used for retrieving pages out of order.
-
+///
 int QXmppResultSetQuery::index() const
 {
     return m_index;
 }
 
+///
 /// Sets the index for the first element in the page.
 ///
 /// This is used for retrieving pages out of order.
-
+///
 void QXmppResultSetQuery::setIndex(int index)
 {
     m_index = index;
 }
 
+///
 /// Returns the UID of the first result in the next page.
 ///
 /// This is used for for paging backwards through results.
-
+///
 QString QXmppResultSetQuery::before() const
 {
     return m_before;
 }
 
+///
 /// Sets the UID of the first result in the next page.
 ///
 /// This is used for for paging backwards through results.
-
+///
 void QXmppResultSetQuery::setBefore(const QString &before)
 {
     m_before = before;
 }
 
+///
 /// Returns the UID of the last result in the previous page.
 ///
 /// This is used for for paging forwards through results.
-
+///
 QString QXmppResultSetQuery::after() const
 {
     return m_after;
 }
 
+///
 /// Sets the UID of the last result in the previous page.
 ///
 /// This is used for for paging forwards through results.
-
+///
 void QXmppResultSetQuery::setAfter(const QString &after)
 {
     m_after = after;
 }
 
 /// Returns true if no result set information is present.
-
 bool QXmppResultSetQuery::isNull() const
 {
     return m_max == -1 && m_index == -1 && m_after.isNull() && m_before.isNull();
@@ -145,75 +151,74 @@ QXmppResultSetReply::QXmppResultSetReply()
 }
 
 /// Returns the UID of the first result in the page.
-
 QString QXmppResultSetReply::first() const
 {
     return m_first;
 }
 
 /// Sets the UID of the first result in the page.
-
 void QXmppResultSetReply::setFirst(const QString &first)
 {
     m_first = first;
 }
 
 /// Returns the UID of the last result in the page.
-
 QString QXmppResultSetReply::last() const
 {
     return m_last;
 }
 
 /// Sets the UID of the last result in the page.
-
 void QXmppResultSetReply::setLast(const QString &last)
 {
     m_last = last;
 }
 
+///
 /// Returns the total number of items in the set.
 ///
 /// \note This may be an approximate count.
-
+///
 int QXmppResultSetReply::count() const
 {
     return m_count;
 }
 
+///
 /// Sets the total number of items in the set.
 ///
 /// \note This may be an approximate count.
-
+///
 void QXmppResultSetReply::setCount(int count)
 {
     m_count = count;
 }
 
+///
 /// Returns the index for the first result in the page.
 ///
 /// This is used for retrieving pages out of order.
 ///
 /// \note This may be an approximate index.
-
+///
 int QXmppResultSetReply::index() const
 {
     return m_index;
 }
 
+///
 /// Sets the index for the first result in the page.
 ///
 /// This is used for retrieving pages out of order.
 ///
 /// \note This may be an approximate index.
-
+///
 void QXmppResultSetReply::setIndex(int index)
 {
     m_index = index;
 }
 
 /// Returns true if no result set information is present.
-
 bool QXmppResultSetReply::isNull() const
 {
     return m_count == -1 && m_index == -1 && m_first.isNull() && m_last.isNull();

@@ -18,10 +18,11 @@ const static QStringList STARTTLS_TYPES = {
     QStringLiteral("failure")
 };
 
+///
 /// Constructs a new QXmppStartTlsPacket
 ///
 /// \param type The type of the new QXmppStartTlsPacket.
-
+///
 QXmppStartTlsPacket::QXmppStartTlsPacket(Type type)
     : m_type(type)
 {
@@ -30,14 +31,12 @@ QXmppStartTlsPacket::QXmppStartTlsPacket(Type type)
 QXmppStartTlsPacket::~QXmppStartTlsPacket() = default;
 
 /// Returns the type of the STARTTLS packet
-
 QXmppStartTlsPacket::Type QXmppStartTlsPacket::type() const
 {
     return m_type;
 }
 
 /// Sets the type of the STARTTLS packet
-
 void QXmppStartTlsPacket::setType(QXmppStartTlsPacket::Type type)
 {
     m_type = type;
@@ -67,18 +66,20 @@ void QXmppStartTlsPacket::toXml(QXmlStreamWriter *writer) const
 }
 /// \endcond
 
+///
 /// Checks whether the given \p element is a STARTTLS packet according to
 /// <a href="https://xmpp.org/rfcs/rfc6120.html#tls-process-initiate">RFC6120</a>.
 ///
 /// \param element The element that should be checked for being a STARTTLS packet.
 ///
 /// \returns True, if the element is a STARTTLS packet.
-
+///
 bool QXmppStartTlsPacket::isStartTlsPacket(const QDomElement &element)
 {
     return element.namespaceURI() == ns_tls && STARTTLS_TYPES.contains(element.tagName());
 }
 
+///
 /// Checks whether the given \p element is a STARTTLS packet according to
 /// <a href="https://xmpp.org/rfcs/rfc6120.html#tls-process-initiate">RFC6120</a>
 /// and has the correct type.
@@ -87,7 +88,7 @@ bool QXmppStartTlsPacket::isStartTlsPacket(const QDomElement &element)
 /// \param type The type the element needs to have.
 ///
 /// \returns True, if the element is a STARTTLS packet and has the correct type.
-
+///
 bool QXmppStartTlsPacket::isStartTlsPacket(const QDomElement &element, Type type)
 {
     return element.namespaceURI() == ns_tls && element.tagName() == STARTTLS_TYPES.at(int(type));
