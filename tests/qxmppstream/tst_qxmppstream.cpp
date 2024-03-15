@@ -3,8 +3,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppStream.h"
+#include "QXmppStreamError_p.h"
 
 #include "util.h"
+
+using namespace QXmpp;
+using namespace QXmpp::Private;
 
 Q_DECLARE_METATYPE(QDomElement)
 
@@ -51,6 +55,9 @@ class tst_QXmppStream : public QObject
 private:
     Q_SLOT void initTestCase();
     Q_SLOT void testProcessData();
+#ifdef BUILD_INTERNAL_TESTS
+    Q_SLOT void testStreamError();
+#endif
 };
 
 void tst_QXmppStream::initTestCase()
@@ -122,6 +129,44 @@ void tst_QXmppStream::testProcessData()
 
     stream.processData(R"(</stream:stream>)");
 }
+
+#ifdef BUILD_INTERNAL_TESTS
+void tst_QXmppStream::testStreamError()
+{
+    auto values = {
+        std::tuple {
+            "<stream:error><bad-format xmlns='urn:ietf:params:xml:ns:xmpp-streams'/></stream:error>",
+            StreamErrorElement {
+                StreamError::BadFormat,
+                {},
+            },
+        },
+        std::tuple {
+            "<stream:error><see-other-host xmlns='urn:ietf:params:xml:ns:xmpp-streams'>[2001:41D0:1:A49b::1]:9222</see-other-host><text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>Moved</text></stream:error>",
+            StreamErrorElement {
+                StreamErrorElement::SeeOtherHost { "2001:41d0:1:a49b::1", 9222 },
+                "Moved",
+            },
+        },
+    };
+    const auto streamWrapper =
+        QStringLiteral("<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>%1</stream:stream>");
+
+    for (const auto &[xml, error] : values) {
+        auto result = StreamErrorElement::fromDom(xmlToDom(streamWrapper.arg(xml)).firstChildElement());
+        if (auto *parseErr = std::get_if<QXmppError>(&result)) {
+            qDebug() << parseErr->description;
+        }
+        Q_ASSERT(std::holds_alternative<StreamErrorElement>(result));
+
+        auto parsed = std::get<StreamErrorElement>(std::move(result));
+        if (!(parsed == error)) {
+            qDebug() << xml;
+        }
+        QCOMPARE(parsed, error);
+    }
+}
+#endif
 
 QTEST_MAIN(tst_QXmppStream)
 #include "tst_qxmppstream.moc"
