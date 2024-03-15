@@ -16,6 +16,7 @@
 
 #include <QCryptographicHash>
 #include <QMap>
+#include <QUuid>
 
 class QDomElement;
 class QXmlStreamWriter;
@@ -104,6 +105,73 @@ struct StreamFeature {
     QList<QString> mechanisms;
     bool streamResumptionAvailable;
     bool bind2Available;
+};
+
+struct UserAgent {
+    static std::optional<UserAgent> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QUuid id;
+    QString software;
+    QString device;
+};
+
+struct Authenticate {
+    static std::optional<Authenticate> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QString mechanism;
+    QByteArray initialResponse;
+    std::optional<UserAgent> userAgent;
+    // bind2 and other extensions may be added here later on
+};
+
+struct Challenge {
+    static std::optional<Challenge> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QByteArray data;
+};
+
+struct Response {
+    static std::optional<Response> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QByteArray data;
+};
+
+struct Success {
+    static std::optional<Success> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    std::optional<QByteArray> additionalData;
+    QString authorizationIdentifier;
+    // extensions
+};
+
+struct Failure {
+    static std::optional<Failure> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    Sasl::ErrorCondition condition;
+    QString text;
+    // extensions
+};
+
+struct Continue {
+    static std::optional<Continue> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QByteArray additionalData;
+    std::vector<QString> tasks;
+    QString text;
+};
+
+struct Abort {
+    static std::optional<Abort> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QString text;
 };
 
 }  // namespace QXmpp::Private::Sasl2
