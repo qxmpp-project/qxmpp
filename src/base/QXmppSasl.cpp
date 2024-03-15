@@ -170,6 +170,49 @@ void Success::toXml(QXmlStreamWriter *writer) const
 
 }  // namespace QXmpp::Private::Sasl
 
+namespace QXmpp::Private::Sasl2 {
+
+std::optional<StreamFeature> StreamFeature::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"authentication" || el.namespaceURI() != ns_sasl_2) {
+        return {};
+    }
+
+    StreamFeature feature { {}, false, false };
+
+    for (const auto &mechEl : iterChildElements(el, u"mechanism", ns_sasl_2)) {
+        feature.mechanisms.push_back(mechEl.text());
+    }
+
+    if (auto inlineEl = firstChildElement(el, u"inline", ns_sasl_2); !inlineEl.isNull()) {
+        feature.bind2Available = !firstChildElement(inlineEl, u"bind", ns_bind2).isNull();
+        feature.streamResumptionAvailable = !firstChildElement(inlineEl, u"sm", ns_stream_management).isNull();
+    }
+    return feature;
+}
+
+void StreamFeature::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("authentication"));
+    writer->writeDefaultNamespace(toString65(ns_sasl_2));
+    for (const auto &mechanism : mechanisms) {
+        writeXmlTextElement(writer, u"mechanism", mechanism);
+    }
+    if (bind2Available || streamResumptionAvailable) {
+        writer->writeStartElement(QSL65("inline"));
+        if (bind2Available) {
+            writeEmptyElement(writer, u"bind", ns_bind2);
+        }
+        if (streamResumptionAvailable) {
+            writeEmptyElement(writer, u"sm", ns_stream_management);
+        }
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
+}
+
+}  // namespace QXmpp::Private::Sasl2
+
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
 static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
     { QStringLiteral("SCRAM-SHA-1"), QCryptographicHash::Sha1 },

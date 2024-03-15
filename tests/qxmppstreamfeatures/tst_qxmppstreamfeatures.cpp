@@ -3,6 +3,9 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppStreamFeatures.h"
+#ifdef BUILD_INTERNAL_TESTS
+#include "QXmppSasl_p.h"
+#endif
 
 #include "util.h"
 
@@ -33,6 +36,9 @@ private:
     Q_SLOT void testRequired();
     Q_SLOT void testFull();
     Q_SLOT void testSetters();
+#ifdef BUILD_INTERNAL_TESTS
+    Q_SLOT void testSasl2();
+#endif
 };
 
 void tst_QXmppStreamFeatures::testEmpty()
@@ -134,6 +140,22 @@ void tst_QXmppStreamFeatures::testSetters()
     features.setCompressionMethods(QStringList() << "compression-methods");
     QCOMPARE(features.compressionMethods(), QStringList() << "compression-methods");
 }
+
+#ifdef BUILD_INTERNAL_TESTS
+void tst_QXmppStreamFeatures::testSasl2()
+{
+    auto xml = "<stream:features>"
+               "<authentication xmlns='urn:xmpp:sasl:2'>"
+               "<mechanism>SCRAM-SHA-1</mechanism>"
+               "<mechanism>SCRAM-SHA-1-PLUS</mechanism>"
+               "</authentication>"
+               "</stream:features>";
+
+    QXmppStreamFeatures features;
+    parsePacketWithStream(features, xml);
+    QVERIFY(features.sasl2Feature().has_value());
+}
+#endif
 
 QTEST_MAIN(tst_QXmppStreamFeatures)
 #include "tst_qxmppstreamfeatures.moc"
