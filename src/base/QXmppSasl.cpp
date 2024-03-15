@@ -35,6 +35,15 @@ constexpr auto SASL_ERROR_CONDITIONS = to_array<QStringView>({
     u"temporary-auth-failure",
 });
 
+namespace QXmpp::Private::Sasl {
+
+QString errorConditionToString(ErrorCondition c)
+{
+    return SASL_ERROR_CONDITIONS.at(size_t(c)).toString();
+}
+
+}  // namespace QXmpp::Private::Sasl
+
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
 static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
     { QStringLiteral("SCRAM-SHA-1"), QCryptographicHash::Sha1 },
@@ -151,21 +160,16 @@ void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-QString QXmppSaslFailure::conditionToString(QXmpp::Private::SaslErrorCondition condition)
-{
-    return SASL_ERROR_CONDITIONS.at(size_t(condition)).toString();
-}
-
 void QXmppSaslFailure::parse(const QDomElement &element)
 {
     auto errorConditionString = element.firstChildElement().tagName();
-    condition = enumFromString<SaslErrorCondition>(SASL_ERROR_CONDITIONS, errorConditionString);
+    condition = enumFromString<Sasl::ErrorCondition>(SASL_ERROR_CONDITIONS, errorConditionString);
 
     // RFC3920 defines the error condition as "not-authorized", but
     // some broken servers use "bad-auth" instead. We tolerate this
     // by remapping the error to "not-authorized".
     if (!condition && errorConditionString == u"bad-auth") {
-        condition = SaslErrorCondition::NotAuthorized;
+        condition = Sasl::ErrorCondition::NotAuthorized;
     }
 
     text = element.firstChildElement(QStringLiteral("text")).text();

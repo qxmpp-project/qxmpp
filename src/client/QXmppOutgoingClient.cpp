@@ -150,7 +150,7 @@ public:
     HandleElementResult handleElement(const QDomElement &el);
 
 private:
-    static AuthenticationError::Type mapSaslCondition(const std::optional<SaslErrorCondition> &condition);
+    static AuthenticationError::Type mapSaslCondition(const std::optional<Sasl::ErrorCondition> &condition);
 
     SendDataInterface *m_socket;
     std::unique_ptr<QXmppSaslClient> m_saslClient;
@@ -728,7 +728,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
 
                     d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     try {
-                        if (std::any_cast<QXmppSaslFailure &>(err.details).condition == SaslErrorCondition::NotAuthorized) {
+                        if (std::any_cast<QXmppSaslFailure &>(err.details).condition == Sasl::ErrorCondition::NotAuthorized) {
                             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
                         }
                     } catch (std::bad_any_cast) {
@@ -1139,7 +1139,7 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
         failure.parse(el);
 
         auto text = failure.text.isEmpty()
-            ? QXmppSaslFailure::conditionToString(failure.condition.value_or(SaslErrorCondition::NotAuthorized))
+            ? Sasl::errorConditionToString(failure.condition.value_or(Sasl::ErrorCondition::NotAuthorized))
             : failure.text;
 
         finish(AuthError {
@@ -1151,10 +1151,10 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
     return Rejected;
 }
 
-AuthenticationError::Type SaslManager::mapSaslCondition(const std::optional<SaslErrorCondition> &condition)
+AuthenticationError::Type SaslManager::mapSaslCondition(const std::optional<Sasl::ErrorCondition> &condition)
 {
     using Auth = AuthenticationError;
-    using Sasl = SaslErrorCondition;
+    using Sasl = Sasl::ErrorCondition;
 
     switch (condition.value_or(Sasl::NotAuthorized)) {
     case Sasl::AccountDisabled:
