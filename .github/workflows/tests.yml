@@ -132,7 +132,8 @@ jobs:
           style: file
           version: 15
           files-changed-only: false
-          thread-comments: true
+          step-summary: true
+          thread-comments: false
       - name: C++ Linter
         if: steps.linter.outputs.checks-failed > 0
         run: echo "Some files failed the linting checks!"
