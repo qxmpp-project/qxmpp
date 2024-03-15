@@ -80,6 +80,10 @@ void writeXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView
 void writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView value);
 void writeEmptyElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns);
 
+// Base64
+std::optional<QByteArray> parseBase64(const QString &);
+inline QString serializeBase64(const QByteArray &data) { return QString::fromUtf8(data.toBase64()); }
+
 //
 // DOM
 //
