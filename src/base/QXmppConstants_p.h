@@ -216,6 +216,10 @@ inline constexpr QStringView ns_omemo_1 = u"urn:xmpp:omemo:1";
 inline constexpr QStringView ns_omemo_2 = u"urn:xmpp:omemo:2";
 inline constexpr QStringView ns_omemo_2_bundles = u"urn:xmpp:omemo:2:bundles";
 inline constexpr QStringView ns_omemo_2_devices = u"urn:xmpp:omemo:2:devices";
+// XEP-0386: Bind 2
+inline constexpr QStringView ns_bind2 = u"urn:xmpp:bind:0";
+// XEP-0388: Extensible SASL Profile
+inline constexpr QStringView ns_sasl_2 = u"urn:xmpp:sasl:2";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 inline constexpr QStringView ns_mix_pam = u"urn:xmpp:mix:pam:1";
 inline constexpr QStringView ns_mix_roster = u"urn:xmpp:mix:roster:0";
