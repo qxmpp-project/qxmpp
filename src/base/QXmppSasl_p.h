@@ -95,6 +95,19 @@ struct Success {
 
 }  // namespace QXmpp::Private::Sasl
 
+namespace QXmpp::Private::Sasl2 {
+
+struct StreamFeature {
+    static std::optional<StreamFeature> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QList<QString> mechanisms;
+    bool streamResumptionAvailable;
+    bool bind2Available;
+};
+
+}  // namespace QXmpp::Private::Sasl2
+
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
     Q_OBJECT

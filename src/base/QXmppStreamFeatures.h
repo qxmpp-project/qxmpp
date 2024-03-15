@@ -11,6 +11,10 @@
 
 class QXmppStreamFeaturesPrivate;
 
+namespace QXmpp::Private::Sasl2 {
+struct StreamFeature;
+}
+
 ///
 /// \brief The QXmppStreamFeatures class represents the features returned by an
 /// XMPP server or client.
@@ -44,6 +48,9 @@ public:
 
     QStringList authMechanisms() const;
     void setAuthMechanisms(const QStringList &mechanisms);
+
+    const std::optional<QXmpp::Private::Sasl2::StreamFeature> &sasl2Feature() const;
+    void setSasl2Feature(const std::optional<QXmpp::Private::Sasl2::StreamFeature> &);
 
     QStringList compressionMethods() const;
     void setCompressionMethods(const QStringList &methods);

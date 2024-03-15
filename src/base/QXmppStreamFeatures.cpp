@@ -6,6 +6,7 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppGlobal_p.h"
+#include "QXmppSasl_p.h"
 #include "QXmppUtils_p.h"
 
 #include <QDomElement>
@@ -28,6 +29,7 @@ public:
     bool rosterVersioningSupported;
     QStringList authMechanisms;
     QStringList compressionMethods;
+    std::optional<Sasl2::StreamFeature> sasl2Feature;
 };
 
 QXmppStreamFeaturesPrivate::QXmppStreamFeaturesPrivate()
@@ -120,6 +122,22 @@ QStringList QXmppStreamFeatures::authMechanisms() const
 void QXmppStreamFeatures::setAuthMechanisms(const QStringList &mechanisms)
 {
     d->authMechanisms = mechanisms;
+}
+
+///
+/// Returns the \xep{0388, Extensible SASL Profile} stream feature.
+///
+const std::optional<Sasl2::StreamFeature> &QXmppStreamFeatures::sasl2Feature() const
+{
+    return d->sasl2Feature;
+}
+
+///
+/// Sets the \xep{0388, Extensible SASL Profile} stream feature.
+///
+void QXmppStreamFeatures::setSasl2Feature(const std::optional<Sasl2::StreamFeature> &feature)
+{
+    d->sasl2Feature = feature;
 }
 
 ///
@@ -302,6 +320,8 @@ void QXmppStreamFeatures::parse(const QDomElement &element)
     for (const auto &subElement : iterChildElements(mechs, u"mechanism")) {
         d->authMechanisms << subElement.text();
     }
+
+    d->sasl2Feature = Sasl2::StreamFeature::fromDom(firstChildElement(element, u"authentication", ns_sasl_2));
 }
 
 static void writeFeature(QXmlStreamWriter *writer, QStringView tagName, QStringView tagNs, QXmppStreamFeatures::Mode mode)
@@ -354,6 +374,11 @@ void QXmppStreamFeatures::toXml(QXmlStreamWriter *writer) const
         }
         writer->writeEndElement();
     }
+
+    if (d->sasl2Feature) {
+        d->sasl2Feature->toXml(writer);
+    }
+
     writer->writeEndElement();
 }
 /// \endcond

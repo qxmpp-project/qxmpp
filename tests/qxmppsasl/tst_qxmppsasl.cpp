@@ -16,6 +16,7 @@ class tst_QXmppSasl : public QObject
     Q_OBJECT
 
 private:
+    // SASL 1 parsing
     Q_SLOT void testParsing();
     Q_SLOT void testAuth_data();
     Q_SLOT void testAuth();
@@ -25,6 +26,9 @@ private:
     Q_SLOT void testResponse_data();
     Q_SLOT void testResponse();
     Q_SLOT void testSuccess();
+
+    // SASL 2 parsing
+    Q_SLOT void sasl2StreamFeature();
 
     // client
     Q_SLOT void testClientAvailableMechanisms();
@@ -184,6 +188,27 @@ void tst_QXmppSasl::testSuccess()
     QVERIFY(Sasl::Success::fromDom(xmlToDom(xml)));
     Sasl::Success success;
     serializePacket(success, xml);
+}
+
+void tst_QXmppSasl::sasl2StreamFeature()
+{
+    auto xml =
+        "<authentication xmlns='urn:xmpp:sasl:2'>"
+        "<mechanism>SCRAM-SHA-1</mechanism>"
+        "<mechanism>SCRAM-SHA-1-PLUS</mechanism>"
+        "<inline>"
+        "<bind xmlns='urn:xmpp:bind:0'/>"
+        "<sm xmlns='urn:xmpp:sm:3'/>"
+        "</inline>"
+        "</authentication>";
+
+    auto feature = Sasl2::StreamFeature::fromDom(xmlToDom(xml));
+    QVERIFY(feature.has_value());
+    QCOMPARE(feature->mechanisms.size(), 2);
+    QCOMPARE(feature->mechanisms, (QList<QString> { "SCRAM-SHA-1", "SCRAM-SHA-1-PLUS" }));
+    QCOMPARE(feature->streamResumptionAvailable, true);
+    QCOMPARE(feature->bind2Available, true);
+    serializePacket(*feature, xml);
 }
 
 void tst_QXmppSasl::testClientAvailableMechanisms()
