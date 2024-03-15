@@ -137,7 +137,7 @@ void tst_QXmppSasl::testFailure()
     const QByteArray xml2 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><not-authorized/></failure>";
     QXmppSaslFailure failure2;
     parsePacket(failure2, xml2);
-    QCOMPARE(failure2.condition, SaslErrorCondition::NotAuthorized);
+    QCOMPARE(failure2.condition, Sasl::ErrorCondition::NotAuthorized);
     serializePacket(failure2, xml2);
 
     // email verification required
@@ -148,12 +148,12 @@ void tst_QXmppSasl::testFailure()
 
     QXmppSaslFailure failure3;
     parsePacket(failure3, xml3);
-    QCOMPARE(failure3.condition, SaslErrorCondition::AccountDisabled);
+    QCOMPARE(failure3.condition, Sasl::ErrorCondition::AccountDisabled);
     QCOMPARE(failure3.text, "Your account has not been activated yet. Please check your email inbox for an activation link");
     serializePacket(failure3, xml3);
 
     QXmppSaslFailure failure4;
-    failure4.condition = SaslErrorCondition::AccountDisabled;
+    failure4.condition = Sasl::ErrorCondition::AccountDisabled;
     failure4.text = "Your account has not been activated yet. Please check your email inbox for an activation link";
     serializePacket(failure4, xml3);
 }

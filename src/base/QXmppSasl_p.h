@@ -39,9 +39,9 @@ class SaslManager;
 // We mean it.
 //
 
-namespace QXmpp::Private {
+namespace QXmpp::Private::Sasl {
 
-enum class SaslErrorCondition {
+enum class ErrorCondition {
     Aborted,
     AccountDisabled,
     CredentialsExpired,
@@ -55,7 +55,9 @@ enum class SaslErrorCondition {
     TemporaryAuthFailure,
 };
 
-}
+QString errorConditionToString(ErrorCondition);
+
+}  // namespace QXmpp::Private::Sasl
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
@@ -159,11 +161,9 @@ public:
 class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppNonza
 {
 public:
-    static QString conditionToString(QXmpp::Private::SaslErrorCondition condition);
+    QXmppSaslFailure(std::optional<QXmpp::Private::Sasl::ErrorCondition> condition = {}, QString text = {}) : condition(condition), text(text) { }
 
-    QXmppSaslFailure(std::optional<QXmpp::Private::SaslErrorCondition> condition = {}, QString text = {}) : condition(condition), text(text) { }
-
-    std::optional<QXmpp::Private::SaslErrorCondition> condition;
+    std::optional<QXmpp::Private::Sasl::ErrorCondition> condition;
     QString text;
 
     void parse(const QDomElement &element) override;
