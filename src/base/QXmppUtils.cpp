@@ -342,11 +342,20 @@ void QXmpp::Private::writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStri
     }
 }
 
+
 void QXmpp::Private::writeEmptyElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns)
 {
     writer->writeStartElement(toString65(name));
     writer->writeDefaultNamespace(toString65(xmlns));
     writer->writeEndElement();
+}
+
+std::optional<QByteArray> QXmpp::Private::parseBase64(const QString &text)
+{
+    if (auto result = QByteArray::fromBase64Encoding(text.toUtf8())) {
+        return *result;
+    }
+    return {};
 }
 
 bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, QStringView xmlns)
