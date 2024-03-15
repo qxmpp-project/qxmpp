@@ -325,6 +325,16 @@ void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *stream, QStringView n
     }
 }
 
+void QXmpp::Private::writeXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns, QStringView value)
+{
+    writer->writeStartElement(toString65(name));
+    writer->writeDefaultNamespace(toString65(xmlns));
+    if (!value.isEmpty()) {
+        writer->writeCharacters(toString65(value));
+    }
+    writer->writeEndElement();
+}
+
 void QXmpp::Private::writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView value)
 {
     if (!value.isEmpty()) {
