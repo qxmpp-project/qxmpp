@@ -25,10 +25,18 @@ template<typename String>
 inline QDomElement xmlToDom(const String &xml)
 {
     QDomDocument doc;
+    QString errorText;
+    bool success = false;
     if constexpr (std::is_same_v<String, QString> || std::is_same_v<String, QByteArray>) {
-        QVERIFY_RV(doc.setContent(xml, true), "XML is not valid");
+        success = doc.setContent(xml, true, &errorText);
     } else {
-        QVERIFY_RV(doc.setContent(QString(xml), true), "XML is not valid");
+        success = doc.setContent(QString(xml), true, &errorText);
+    }
+    if (!success) {
+        qDebug() << "Parsing error:";
+        qDebug().noquote() << xml;
+        qDebug().noquote() << "Error:" << errorText;
+        QTest::qFail("Invalid XML", __FILE__, __LINE__);
     }
     return doc.documentElement();
 }
