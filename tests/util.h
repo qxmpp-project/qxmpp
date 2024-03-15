@@ -67,8 +67,10 @@ static void serializePacket(T &packet, const QByteArray &xml)
     processedXml.replace(u'\'', u'"');
 
     const auto data = packetToXml(packet);
-    qDebug() << "expect " << processedXml;
-    qDebug() << "writing" << data;
+    if (data != processedXml) {
+        qDebug() << "expect " << processedXml;
+        qDebug() << "writing" << data;
+    }
     QCOMPARE(data, processedXml);
 }
 
