@@ -76,6 +76,7 @@ std::optional<Enum> enumFromString(const std::array<QStringView, N> &values, QSt
 // XML streams
 void writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name, QStringView value);
 void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView value);
+void writeXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns, QStringView value);
 void writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView value);
 
 //
