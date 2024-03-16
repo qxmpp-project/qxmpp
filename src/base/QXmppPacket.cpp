@@ -12,7 +12,7 @@ using namespace QXmpp::Private;
 
 /// \cond
 QXmppPacket::QXmppPacket(const QXmppNonza &nonza, QXmppPromise<QXmpp::SendResult> interface)
-    : QXmppPacket(serializeNonza(nonza), nonza.isXmppStanza(), std::move(interface))
+    : QXmppPacket(serializeXml(nonza), nonza.isXmppStanza(), std::move(interface))
 {
 }
 
