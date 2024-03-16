@@ -301,18 +301,6 @@ private:
     int m_step;
 };
 
-class QXmppSaslServerFacebook : public QXmppSaslServer
-{
-public:
-    QXmppSaslServerFacebook(QObject *parent = nullptr);
-    QString mechanism() const override;
-
-    Response respond(const QByteArray &challenge, QByteArray &response) override;
-
-private:
-    int m_step;
-};
-
 class QXmppSaslServerPlain : public QXmppSaslServer
 {
 public:
