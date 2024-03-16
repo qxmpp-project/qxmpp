@@ -65,6 +65,32 @@ static void setCredentials(QXmppSaslClient *saslClient, const QXmppConfiguration
     }
 }
 
+static AuthenticationError::Type mapSaslCondition(std::optional<Sasl::ErrorCondition> condition)
+{
+    using Auth = AuthenticationError;
+    using Sasl = Sasl::ErrorCondition;
+
+    switch (condition.value_or(Sasl::NotAuthorized)) {
+    case Sasl::AccountDisabled:
+        return Auth::AccountDisabled;
+    case Sasl::CredentialsExpired:
+        return Auth::CredentialsExpired;
+    case Sasl::EncryptionRequired:
+        return Auth::EncryptionRequired;
+    case Sasl::IncorrectEncoding:
+    case Sasl::InvalidAuthzid:
+    case Sasl::InvalidMechanism:
+    case Sasl::MalformedRequest:
+    case Sasl::MechanismTooWeak:
+        return Auth::ProcessingError;
+    case Sasl::Aborted:
+    case Sasl::NotAuthorized:
+    case Sasl::TemporaryAuthFailure:
+        return Auth::NotAuthorized;
+    }
+    return Auth::NotAuthorized;
+}
+
 QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent)
 {
     Q_ASSERT(!m_promise.has_value());
@@ -148,32 +174,6 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
         return Finished;
     }
     return Rejected;
-}
-
-AuthenticationError::Type SaslManager::mapSaslCondition(std::optional<Sasl::ErrorCondition> condition)
-{
-    using Auth = AuthenticationError;
-    using Sasl = Sasl::ErrorCondition;
-
-    switch (condition.value_or(Sasl::NotAuthorized)) {
-    case Sasl::AccountDisabled:
-        return Auth::AccountDisabled;
-    case Sasl::CredentialsExpired:
-        return Auth::CredentialsExpired;
-    case Sasl::EncryptionRequired:
-        return Auth::EncryptionRequired;
-    case Sasl::IncorrectEncoding:
-    case Sasl::InvalidAuthzid:
-    case Sasl::InvalidMechanism:
-    case Sasl::MalformedRequest:
-    case Sasl::MechanismTooWeak:
-        return Auth::ProcessingError;
-    case Sasl::Aborted:
-    case Sasl::NotAuthorized:
-    case Sasl::TemporaryAuthFailure:
-        return Auth::NotAuthorized;
-    }
-    return Auth::NotAuthorized;
 }
 
 }  // namespace QXmpp::Private

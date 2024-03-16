@@ -34,8 +34,6 @@ public:
     HandleElementResult handleElement(const QDomElement &el);
 
 private:
-    static AuthenticationError::Type mapSaslCondition(std::optional<Sasl::ErrorCondition> condition);
-
     SendDataInterface *m_socket;
     std::unique_ptr<QXmppSaslClient> m_saslClient;
     std::optional<QXmppPromise<AuthResult>> m_promise;
