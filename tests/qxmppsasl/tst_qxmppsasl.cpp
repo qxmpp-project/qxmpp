@@ -3,14 +3,32 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
+#include "QXmppSaslManager_p.h"
 #include "QXmppSasl_p.h"
 
+#include "XmppSocket.h"
 #include "util.h"
 
 #include <QObject>
 
 using namespace QXmpp::Private;
+
+struct TestSocket : SendDataInterface {
+    std::vector<QByteArray> sent;
+    bool sendData(const QByteArray &data)
+    {
+        sent.push_back(data);
+        return true;
+    }
+};
+
+struct Sasl2ManagerTest {
+    std::unique_ptr<QXmppLoggable> loggable = std::make_unique<QXmppLoggable>();
+    TestSocket socket;
+    Sasl2Manager manager = Sasl2Manager { &socket };
+};
 
 class tst_QXmppSasl : public QObject
 {
@@ -60,6 +78,11 @@ private:
     Q_SLOT void testServerDigestMd5();
     Q_SLOT void testServerPlain();
     Q_SLOT void testServerPlainChallenge();
+
+    // SASL 2 client manager
+    Q_SLOT void sasl2ManagerPlain();
+    Q_SLOT void sasl2ManagerFailure();
+    Q_SLOT void sasl2ManagerUnsupportedTasks();
 };
 
 void tst_QXmppSasl::testParsing()
@@ -658,6 +681,106 @@ void tst_QXmppSasl::testServerPlainChallenge()
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
+}
+
+void tst_QXmppSasl::sasl2ManagerPlain()
+{
+    Sasl2ManagerTest test;
+    auto &sent = test.socket.sent;
+
+    QXmppConfiguration config;
+    config.setUser("marc");
+    config.setPassword("1234");
+    // prefer PLAIN
+    config.setSaslAuthMechanism("PLAIN");
+
+    auto task = test.manager.authenticate(
+        config,
+        Sasl2::StreamFeature { { "PLAIN", "SCRAM-SHA-1" }, false, false },
+        test.loggable.get());
+
+    QVERIFY(!task.isFinished());
+    QCOMPARE(sent.size(), 1);
+    QCOMPARE(sent.at(0), "<authenticate xmlns=\"urn:xmpp:sasl:2\" mechanism=\"PLAIN\"><initial-response>AG1hcmMAMTIzNA==</initial-response></authenticate>");
+
+    test.manager.handleElement(xmlToDom("<success xmlns='urn:xmpp:sasl:2'><authorization-identifier>marc@example.org</authorization-identifier></success>"));
+
+    QVERIFY(task.isFinished());
+    auto success = expectFutureVariant<Sasl2::Success>(task);
+
+    QCOMPARE(success.additionalData, std::nullopt);
+    QCOMPARE(success.authorizationIdentifier, "marc@example.org");
+}
+
+void tst_QXmppSasl::sasl2ManagerFailure()
+{
+    Sasl2ManagerTest test;
+    auto &sent = test.socket.sent;
+
+    QXmppConfiguration config;
+    config.setUser("bowman");
+    config.setPassword("1234");
+
+    auto task = test.manager.authenticate(
+        config,
+        Sasl2::StreamFeature { { "SCRAM-SHA-1" }, false, false },
+        test.loggable.get());
+
+    QVERIFY(!task.isFinished());
+    QCOMPARE(sent.size(), 1);
+    QCOMPARE(sent.at(0), "<authenticate xmlns=\"urn:xmpp:sasl:2\" mechanism=\"SCRAM-SHA-1\"><initial-response>biwsbj1ib3dtYW4scj1PSTA4L20rUVJtNk1hK2ZLT2p1cVZYdHo0MHNSNXU5L3U1R042c1NXMHJzPQ==</initial-response></authenticate>");
+
+    auto handled = test.manager.handleElement(xmlToDom(
+        "<failure xmlns='urn:xmpp:sasl:2'>"
+        "<aborted xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>"
+        "<optional-application-specific xmlns='urn:something:else'/>"
+        "<text>This is a terrible example.</text>"
+        "</failure>"));
+    QCOMPARE(handled, Finished);
+
+    auto [text, err] = expectFutureVariant<Sasl2Manager::AuthError>(task);
+    QCOMPARE(err.type, QXmpp::AuthenticationError::NotAuthorized);
+    QCOMPARE(err.text, "This is a terrible example.");
+}
+
+void tst_QXmppSasl::sasl2ManagerUnsupportedTasks()
+{
+    Sasl2ManagerTest test;
+    auto &sent = test.socket.sent;
+
+    QXmppConfiguration config;
+    config.setUser("bowman");
+    config.setPassword("1234");
+
+    auto task = test.manager.authenticate(
+        config,
+        Sasl2::StreamFeature { { "SCRAM-SHA-1" }, false, false },
+        test.loggable.get());
+
+    auto handled = test.manager.handleElement(xmlToDom(
+        "<continue xmlns='urn:xmpp:sasl:2'>"
+        "<additional-data>SSdtIGJvcmVkIG5vdy4=</additional-data>"
+        "<tasks>"
+        "<task>HOTP-EXAMPLE</task>"
+        "<task>TOTP-EXAMPLE</task>"
+        "</tasks>"
+        "<text>This account requires 2FA</text>"
+        "</continue>"));
+    QCOMPARE(handled, Accepted);
+
+    QCOMPARE(sent.size(), 2);
+    QCOMPARE(sent.at(1), "<abort xmlns=\"urn:xmpp:sasl:2\"><text>SASL 2 tasks are not supported.</text></abort>");
+
+    handled = test.manager.handleElement(xmlToDom(
+        "<failure xmlns='urn:xmpp:sasl:2'>"
+        "<aborted xmlns='urn:ietf:params:xml:ns:xmpp-sasl'/>"
+        "<text>Aborted as you said</text>"
+        "</failure>"));
+    QCOMPARE(handled, Finished);
+
+    auto [text, err] = expectFutureVariant<Sasl2Manager::AuthError>(task);
+    QCOMPARE(err.type, QXmpp::AuthenticationError::RequiredTasks);
+    QCOMPARE(err.text, "This account requires 2FA");
 }
 
 QTEST_MAIN(tst_QXmppSasl)
