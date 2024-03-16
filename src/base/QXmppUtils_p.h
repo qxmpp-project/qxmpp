@@ -127,8 +127,6 @@ inline QByteArray serializeXml(const T &packet)
         std::invoke(&T::toXml, reinterpret_cast<const T *>(packet), w);
     });
 }
-template<typename T>
-inline QByteArray serializeNonza(const T &data) { return serializeXml(data); }
 
 QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);

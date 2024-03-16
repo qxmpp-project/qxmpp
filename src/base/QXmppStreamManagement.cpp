@@ -463,7 +463,7 @@ void StreamAckManager::sendAcknowledgement()
         return;
     }
 
-    socket.sendData(serializeNonza(QXmppStreamManagementAck(m_lastIncomingSequenceNumber)));
+    socket.sendData(serializeXml(QXmppStreamManagementAck(m_lastIncomingSequenceNumber)));
 }
 
 void StreamAckManager::sendAcknowledgementRequest()

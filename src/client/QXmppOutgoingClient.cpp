@@ -843,7 +843,7 @@ QXmppTask<BindManager::Result> BindManager::bindAddress(const QString &resource)
 
     const auto iq = QXmppBindIq::bindAddressIq(resource);
     m_iqId = iq.id();
-    m_socket.sendData(serializeNonza(iq));
+    m_socket.sendData(serializeXml(iq));
 
     return m_promise->task();
 }
@@ -912,7 +912,7 @@ QXmppTask<NonSaslAuthManager::OptionsResult> NonSaslAuthManager::queryOptions(co
     // not attempt to guess the required fields?
     authQuery.setUsername(username);
 
-    m_socket.sendData(serializeNonza(authQuery));
+    m_socket.sendData(serializeXml(authQuery));
 
     return query.p.task();
 }
@@ -936,7 +936,7 @@ QXmppTask<NonSaslAuthManager::AuthResult> NonSaslAuthManager::authenticate(bool 
     authQuery.setResource(resource);
     query.id = authQuery.id();
 
-    m_socket.sendData(serializeNonza(authQuery));
+    m_socket.sendData(serializeXml(authQuery));
     return query.p.task();
 }
 
@@ -1062,7 +1062,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
             AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
         });
     }
-    m_socket.sendData(serializeNonza(QXmppSaslAuth(m_saslClient->mechanism(), response)));
+    m_socket.sendData(serializeXml(QXmppSaslAuth(m_saslClient->mechanism(), response)));
 
     m_promise = QXmppPromise<AuthResult>();
     return m_promise->task();
@@ -1088,7 +1088,7 @@ bool SaslManager::handleElement(const QDomElement &el)
 
         QByteArray response;
         if (m_saslClient->respond(challenge.value, response)) {
-            m_socket.sendData(serializeNonza(QXmppSaslResponse(response)));
+            m_socket.sendData(serializeXml(QXmppSaslResponse(response)));
         } else {
             finish(AuthError {
                 QStringLiteral("Could not respond to SASL challenge"),
@@ -1280,12 +1280,12 @@ void C2sStreamManager::requestResume()
     m_isResuming = true;
 
     auto lastAckNumber = q->streamAckManager().lastIncomingSequenceNumber();
-    q->xmppSocket().sendData(serializeNonza(QXmppStreamManagementResume(lastAckNumber, m_smId)));
+    q->xmppSocket().sendData(serializeXml(QXmppStreamManagementResume(lastAckNumber, m_smId)));
 }
 
 void C2sStreamManager::requestEnable()
 {
-    q->xmppSocket().sendData(serializeNonza(QXmppStreamManagementEnable(true)));
+    q->xmppSocket().sendData(serializeXml(QXmppStreamManagementEnable(true)));
 }
 
 bool C2sStreamManager::setResumeAddress(const QString &address)
