@@ -58,6 +58,41 @@ enum class ErrorCondition {
 QString errorConditionToString(ErrorCondition);
 std::optional<ErrorCondition> errorConditionFromString(QStringView);
 
+struct Auth {
+    static std::optional<Auth> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    QString mechanism;
+    QByteArray value;
+};
+
+struct Challenge {
+    static std::optional<Challenge> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    QByteArray value;
+};
+
+struct Failure {
+    static std::optional<Failure> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    std::optional<ErrorCondition> condition;
+    QString text;
+};
+
+struct Response {
+    static std::optional<Response> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    QByteArray value;
+};
+
+struct Success {
+    static std::optional<Success> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *writer) const;
+};
+
 }  // namespace QXmpp::Private::Sasl
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
@@ -134,59 +169,6 @@ public:
     // message parsing and serialization
     static QMap<QByteArray, QByteArray> parseMessage(const QByteArray &ba);
     static QByteArray serializeMessage(const QMap<QByteArray, QByteArray> &map);
-};
-
-class QXMPP_AUTOTEST_EXPORT QXmppSaslAuth : public QXmppNonza
-{
-public:
-    QXmppSaslAuth(QString mechanism = {}, QByteArray value = {}) : mechanism(mechanism), value(value) { }
-
-    QString mechanism;
-    QByteArray value;
-
-    void parse(const QDomElement &element) override;
-    void toXml(QXmlStreamWriter *writer) const override;
-};
-
-class QXMPP_AUTOTEST_EXPORT QXmppSaslChallenge : public QXmppNonza
-{
-public:
-    QXmppSaslChallenge(QByteArray value = {}) : value(value) { }
-
-    QByteArray value;
-
-    void parse(const QDomElement &element) override;
-    void toXml(QXmlStreamWriter *writer) const override;
-};
-
-class QXMPP_AUTOTEST_EXPORT QXmppSaslFailure : public QXmppNonza
-{
-public:
-    QXmppSaslFailure(std::optional<QXmpp::Private::Sasl::ErrorCondition> condition = {}, QString text = {}) : condition(condition), text(text) { }
-
-    std::optional<QXmpp::Private::Sasl::ErrorCondition> condition;
-    QString text;
-
-    void parse(const QDomElement &element) override;
-    void toXml(QXmlStreamWriter *writer) const override;
-};
-
-class QXMPP_AUTOTEST_EXPORT QXmppSaslResponse : public QXmppNonza
-{
-public:
-    QXmppSaslResponse(QByteArray value = {}) : value(value) { }
-
-    QByteArray value;
-
-    void parse(const QDomElement &element) override;
-    void toXml(QXmlStreamWriter *writer) const override;
-};
-
-class QXMPP_AUTOTEST_EXPORT QXmppSaslSuccess : public QXmppNonza
-{
-public:
-    void parse(const QDomElement &) override { }
-    void toXml(QXmlStreamWriter *writer) const override;
 };
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient

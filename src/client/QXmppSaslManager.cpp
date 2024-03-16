@@ -123,7 +123,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
             AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
         });
     }
-    m_socket->sendData(serializeXml(QXmppSaslAuth(m_saslClient->mechanism(), response)));
+    m_socket->sendData(serializeXml(Sasl::Auth { m_saslClient->mechanism(), response }));
 
     m_promise = QXmppPromise<AuthResult>();
     return m_promise->task();
@@ -144,13 +144,10 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
     if (el.tagName() == u"success") {
         finish(Success());
         return Finished;
-    } else if (el.tagName() == u"challenge") {
-        QXmppSaslChallenge challenge;
-        challenge.parse(el);
-
+    } else if (auto challenge = Sasl::Challenge::fromDom(el)) {
         QByteArray response;
-        if (m_saslClient->respond(challenge.value, response)) {
-            m_socket->sendData(serializeXml(QXmppSaslResponse(response)));
+        if (m_saslClient->respond(challenge->value, response)) {
+            m_socket->sendData(serializeXml(Sasl::Response { response }));
             return Accepted;
         } else {
             finish(AuthError {
@@ -159,17 +156,14 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
             });
             return Finished;
         }
-    } else if (el.tagName() == u"failure") {
-        QXmppSaslFailure failure;
-        failure.parse(el);
-
-        auto text = failure.text.isEmpty()
-            ? Sasl::errorConditionToString(failure.condition.value_or(Sasl::ErrorCondition::NotAuthorized))
-            : failure.text;
+    } else if (auto failure = Sasl::Failure::fromDom(el)) {
+        auto text = failure->text.isEmpty()
+            ? Sasl::errorConditionToString(failure->condition.value_or(Sasl::ErrorCondition::NotAuthorized))
+            : failure->text;
 
         finish(AuthError {
             QStringLiteral("Authentication failed: %1").arg(text),
-            AuthenticationError { mapSaslCondition(failure.condition), failure.text, std::move(failure) },
+            AuthenticationError { mapSaslCondition(failure->condition), failure->text, std::move(*failure) },
         });
         return Finished;
     }

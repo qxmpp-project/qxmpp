@@ -697,7 +697,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
 
                     d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
                     try {
-                        if (std::any_cast<QXmppSaslFailure &>(err.details).condition == Sasl::ErrorCondition::NotAuthorized) {
+                        if (std::any_cast<Sasl::Failure &>(err.details).condition == Sasl::ErrorCondition::NotAuthorized) {
                             d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
                         }
                     } catch (std::bad_any_cast) {

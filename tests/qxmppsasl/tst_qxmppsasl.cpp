@@ -90,11 +90,11 @@ void tst_QXmppSasl::testAuth()
     QFETCH(QByteArray, value);
 
     // no condition
-    QXmppSaslAuth auth;
-    parsePacket(auth, xml);
-    QCOMPARE(auth.mechanism, mechanism);
-    QCOMPARE(auth.value, value);
-    serializePacket(auth, xml);
+    auto auth = Sasl::Auth::fromDom(xmlToDom(xml));
+    QVERIFY(auth);
+    QCOMPARE(auth->mechanism, mechanism);
+    QCOMPARE(auth->value, value);
+    serializePacket(*auth, xml);
 }
 
 void tst_QXmppSasl::testChallenge_data()
@@ -117,28 +117,27 @@ void tst_QXmppSasl::testChallenge()
     QFETCH(QByteArray, value);
 
     // no condition
-    QXmppSaslChallenge challenge;
-    parsePacket(challenge, xml);
-    QCOMPARE(challenge.value, value);
-    serializePacket(challenge, xml);
+    auto challenge = Sasl::Challenge::fromDom(xmlToDom(xml));
+    QVERIFY(challenge);
+    QCOMPARE(challenge->value, value);
+    serializePacket(*challenge, xml);
 }
 
 void tst_QXmppSasl::testFailure()
 {
     // no condition
     const QByteArray xml = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>";
-    QXmppSaslFailure failure;
-    parsePacket(failure, xml);
-    QVERIFY(!failure.condition.has_value());
-    QVERIFY(failure.text.isEmpty());
-    serializePacket(failure, xml);
+    auto failure = Sasl::Failure::fromDom(xmlToDom(xml));
+    QVERIFY(!failure->condition.has_value());
+    QVERIFY(failure->text.isEmpty());
+    serializePacket(*failure, xml);
 
     // not authorized
     const QByteArray xml2 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"><not-authorized/></failure>";
-    QXmppSaslFailure failure2;
-    parsePacket(failure2, xml2);
-    QCOMPARE(failure2.condition, Sasl::ErrorCondition::NotAuthorized);
-    serializePacket(failure2, xml2);
+    auto failure2 = Sasl::Failure::fromDom(xmlToDom(xml2));
+    QVERIFY(failure2);
+    QCOMPARE(failure2->condition, Sasl::ErrorCondition::NotAuthorized);
+    serializePacket(*failure2, xml2);
 
     // email verification required
     const QByteArray xml3 = "<failure xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\">"
@@ -146,16 +145,11 @@ void tst_QXmppSasl::testFailure()
                             "<text xml:lang=\"en\">Your account has not been activated yet. Please check your email inbox for an activation link</text>"
                             "</failure>";
 
-    QXmppSaslFailure failure3;
-    parsePacket(failure3, xml3);
-    QCOMPARE(failure3.condition, Sasl::ErrorCondition::AccountDisabled);
-    QCOMPARE(failure3.text, "Your account has not been activated yet. Please check your email inbox for an activation link");
-    serializePacket(failure3, xml3);
-
-    QXmppSaslFailure failure4;
-    failure4.condition = Sasl::ErrorCondition::AccountDisabled;
-    failure4.text = "Your account has not been activated yet. Please check your email inbox for an activation link";
-    serializePacket(failure4, xml3);
+    auto failure3 = Sasl::Failure::fromDom(xmlToDom(xml3));
+    QVERIFY(failure3);
+    QCOMPARE(failure3->condition, Sasl::ErrorCondition::AccountDisabled);
+    QCOMPARE(failure3->text, "Your account has not been activated yet. Please check your email inbox for an activation link");
+    serializePacket(*failure3, xml3);
 }
 
 void tst_QXmppSasl::testResponse_data()
@@ -178,18 +172,18 @@ void tst_QXmppSasl::testResponse()
     QFETCH(QByteArray, value);
 
     // no condition
-    QXmppSaslResponse response;
-    parsePacket(response, xml);
-    QCOMPARE(response.value, value);
-    serializePacket(response, xml);
+    auto response = Sasl::Response::fromDom(xmlToDom(xml));
+    QVERIFY(response);
+    QCOMPARE(response->value, value);
+    serializePacket(*response, xml);
 }
 
 void tst_QXmppSasl::testSuccess()
 {
     const QByteArray xml = "<success xmlns=\"urn:ietf:params:xml:ns:xmpp-sasl\"/>";
-    QXmppSaslSuccess stanza;
-    parsePacket(stanza, xml);
-    serializePacket(stanza, xml);
+    QVERIFY(Sasl::Success::fromDom(xmlToDom(xml)));
+    Sasl::Success success;
+    serializePacket(success, xml);
 }
 
 void tst_QXmppSasl::testClientAvailableMechanisms()

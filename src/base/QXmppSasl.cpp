@@ -47,6 +47,127 @@ std::optional<ErrorCondition> errorConditionFromString(QStringView str)
     return enumFromString<ErrorCondition>(SASL_ERROR_CONDITIONS, str);
 }
 
+std::optional<Auth> Auth::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"auth" || el.namespaceURI() != ns_sasl) {
+        return {};
+    }
+
+    Auth auth;
+    if (auto value = parseBase64(el.text())) {
+        auth.value = *value;
+    } else {
+        return {};
+    }
+    auth.mechanism = el.attribute(QStringLiteral("mechanism"));
+    return auth;
+}
+
+void Auth::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("auth"));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
+    writer->writeAttribute(QSL65("mechanism"), mechanism);
+    if (!value.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        writer->writeCharacters(value.toBase64());
+#else
+        writer->writeCharacters(serializeBase64(value));
+#endif
+    }
+    writer->writeEndElement();
+}
+
+std::optional<Challenge> Challenge::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"challenge" || el.namespaceURI() != ns_sasl) {
+        return {};
+    }
+
+    if (auto value = parseBase64(el.text())) {
+        return Challenge { *value };
+    }
+    return {};
+}
+
+void Challenge::toXml(QXmlStreamWriter *writer) const
+{
+    writeXmlTextElement(writer, u"challenge", ns_sasl, serializeBase64(value));
+}
+
+std::optional<Failure> Failure::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"failure" || el.namespaceURI() != ns_sasl) {
+        return {};
+    }
+
+    auto errorConditionString = el.firstChildElement().tagName();
+
+    Failure failure {
+        errorConditionFromString(errorConditionString),
+        el.firstChildElement(QStringLiteral("text")).text(),
+    };
+
+    // RFC3920 defines the error condition as "not-authorized", but
+    // some broken servers use "bad-auth" instead. We tolerate this
+    // by remapping the error to "not-authorized".
+    if (!failure.condition && errorConditionString == u"bad-auth") {
+        failure.condition = ErrorCondition::NotAuthorized;
+    }
+
+    return failure;
+}
+
+void Failure::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("failure"));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
+    if (condition) {
+        writer->writeEmptyElement(toString65(SASL_ERROR_CONDITIONS.at(size_t(*condition))));
+    }
+
+    if (!text.isEmpty()) {
+        writer->writeStartElement(QStringLiteral("text"));
+        writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
+        writer->writeCharacters(text);
+        writer->writeEndElement();
+    }
+
+    writer->writeEndElement();
+}
+
+std::optional<Response> Response::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"response" || el.namespaceURI() != ns_sasl) {
+        return {};
+    }
+
+    if (auto value = parseBase64(el.text())) {
+        return Response { *value };
+    }
+    return {};
+}
+
+void Response::toXml(QXmlStreamWriter *writer) const
+{
+    writeXmlTextElement(writer, u"response", ns_sasl, serializeBase64(value));
+}
+
+std::optional<Success> Success::fromDom(const QDomElement &el)
+{
+    if (el.tagName() == u"success" && el.namespaceURI() == ns_sasl) {
+        return Success();
+    }
+    return {};
+}
+
+void Success::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("success"));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
+    writer->writeEndElement();
+}
+
 }  // namespace QXmpp::Private::Sasl
 
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
@@ -123,87 +244,6 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
         }
     }
     return map;
-}
-
-void QXmppSaslAuth::parse(const QDomElement &element)
-{
-    mechanism = element.attribute(QStringLiteral("mechanism"));
-    value = parseBase64(element.text()).value_or(QByteArray());
-}
-
-void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement(QSL65("auth"));
-    writer->writeDefaultNamespace(toString65(ns_sasl));
-    writer->writeAttribute(QSL65("mechanism"), mechanism);
-    if (!value.isEmpty()) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        writer->writeCharacters(value.toBase64());
-#else
-        writer->writeCharacters(serializeBase64(value));
-#endif
-    }
-    writer->writeEndElement();
-}
-
-void QXmppSaslChallenge::parse(const QDomElement &element)
-{
-    value = parseBase64(element.text()).value_or(QByteArray());
-}
-
-void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
-{
-    writeXmlTextElement(writer, u"challenge", ns_sasl, serializeBase64(value));
-}
-
-void QXmppSaslFailure::parse(const QDomElement &element)
-{
-    auto errorConditionString = element.firstChildElement().tagName();
-    condition = Sasl::errorConditionFromString(errorConditionString);
-
-    // RFC3920 defines the error condition as "not-authorized", but
-    // some broken servers use "bad-auth" instead. We tolerate this
-    // by remapping the error to "not-authorized".
-    if (!condition && errorConditionString == u"bad-auth") {
-        condition = Sasl::ErrorCondition::NotAuthorized;
-    }
-
-    text = element.firstChildElement(QStringLiteral("text")).text();
-}
-
-void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement(QSL65("failure"));
-    writer->writeDefaultNamespace(toString65(ns_sasl));
-    if (condition) {
-        writer->writeEmptyElement(toString65(SASL_ERROR_CONDITIONS.at(size_t(*condition))));
-    }
-
-    if (!text.isEmpty()) {
-        writer->writeStartElement(QStringLiteral("text"));
-        writer->writeAttribute(QStringLiteral("xml:lang"), QStringLiteral("en"));
-        writer->writeCharacters(text);
-        writer->writeEndElement();
-    }
-
-    writer->writeEndElement();
-}
-
-void QXmppSaslResponse::parse(const QDomElement &element)
-{
-    value = parseBase64(element.text()).value_or(QByteArray());
-}
-
-void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
-{
-    writeXmlTextElement(writer, u"response", ns_sasl, serializeBase64(value));
-}
-
-void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
-{
-    writer->writeStartElement(QSL65("success"));
-    writer->writeDefaultNamespace(toString65(ns_sasl));
-    writer->writeEndElement();
 }
 
 class QXmppSaslClientPrivate

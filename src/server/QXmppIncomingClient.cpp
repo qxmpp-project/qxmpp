@@ -223,18 +223,15 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
     } else if (ns == ns_sasl) {
         if (!d->passwordChecker) {
             warning(QStringLiteral("Cannot perform authentication, no password checker"));
-            sendPacket(QXmppSaslFailure(Sasl::ErrorCondition::TemporaryAuthFailure));
+            sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
             disconnectFromHost();
             return;
         }
 
-        if (nodeRecv.tagName() == QLatin1String("auth")) {
-            QXmppSaslAuth auth;
-            auth.parse(nodeRecv);
-
-            d->saslServer = QXmppSaslServer::create(auth.mechanism, this);
+        if (auto auth = Sasl::Auth::fromDom(nodeRecv)) {
+            d->saslServer = QXmppSaslServer::create(auth->mechanism, this);
             if (!d->saslServer) {
-                sendPacket(QXmppSaslFailure(Sasl::ErrorCondition::InvalidMechanism));
+                sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::InvalidMechanism, QString() }));
                 disconnectFromHost();
                 return;
             }
@@ -242,45 +239,42 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             d->saslServer->setRealm(d->domain);
 
             QByteArray challenge;
-            QXmppSaslServer::Response result = d->saslServer->respond(auth.value, challenge);
+            QXmppSaslServer::Response result = d->saslServer->respond(auth->value, challenge);
 
             if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                d->checkCredentials(auth.value);
+                d->checkCredentials(auth->value);
             } else if (result == QXmppSaslServer::Challenge) {
-                sendPacket(QXmppSaslChallenge(challenge));
+                sendData(serializeXml(Sasl::Challenge { challenge }));
             } else {
                 // FIXME: what condition?
-                sendPacket(QXmppSaslFailure());
+                sendData(serializeXml(Sasl::Failure()));
                 disconnectFromHost();
                 return;
             }
-        } else if (nodeRecv.tagName() == u"response") {
-            QXmppSaslResponse response;
-            response.parse(nodeRecv);
-
+        } else if (auto response = Sasl::Response::fromDom(nodeRecv)) {
             if (!d->saslServer) {
                 warning(QStringLiteral("SASL response received, but no mechanism selected"));
-                sendPacket(QXmppSaslFailure());
+                sendData(serializeXml(Sasl::Failure()));
                 disconnectFromHost();
                 return;
             }
 
             QByteArray challenge;
-            QXmppSaslServer::Response result = d->saslServer->respond(response.value, challenge);
+            QXmppSaslServer::Response result = d->saslServer->respond(response->value, challenge);
             if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                d->checkCredentials(response.value);
+                d->checkCredentials(response->value);
             } else if (result == QXmppSaslServer::Succeeded) {
                 // authentication succeeded
                 d->jid = QStringLiteral("%1@%2").arg(d->saslServer->username(), d->domain);
                 info(QStringLiteral("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
                 Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.success"));
-                sendPacket(QXmppSaslSuccess());
+                sendData(serializeXml(Sasl::Success()));
                 handleStart();
             } else {
                 // FIXME: what condition?
-                sendPacket(QXmppSaslFailure());
+                sendData(serializeXml(Sasl::Failure()));
                 disconnectFromHost();
             }
         }
@@ -364,7 +358,7 @@ void QXmppIncomingClient::onDigestReply()
     if (reply->error() == QXmppPasswordReply::TemporaryError) {
         warning(QStringLiteral("Temporary authentication failure for '%1' from %2").arg(d->saslServer->username(), d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.temporary-auth-failure"));
-        sendPacket(QXmppSaslFailure(Sasl::ErrorCondition::TemporaryAuthFailure));
+        sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
         disconnectFromHost();
         return;
     }
@@ -376,13 +370,13 @@ void QXmppIncomingClient::onDigestReply()
     if (result != QXmppSaslServer::Challenge) {
         warning(QStringLiteral("Authentication failed for '%1' from %2").arg(d->saslServer->username(), d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.not-authorized"));
-        sendPacket(QXmppSaslFailure(Sasl::ErrorCondition::NotAuthorized));
+        sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::NotAuthorized, QString() }));
         disconnectFromHost();
         return;
     }
 
     // send new challenge
-    sendPacket(QXmppSaslChallenge(challenge));
+    sendData(serializeXml(Sasl::Challenge { challenge }));
 }
 
 void QXmppIncomingClient::onPasswordReply()
@@ -399,19 +393,19 @@ void QXmppIncomingClient::onPasswordReply()
         d->jid = jid;
         info(QStringLiteral("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.success"));
-        sendPacket(QXmppSaslSuccess());
+        sendData(serializeXml(Sasl::Success()));
         handleStart();
         break;
     case QXmppPasswordReply::AuthorizationError:
         warning(QStringLiteral("Authentication failed for '%1' from %2").arg(jid, d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.not-authorized"));
-        sendPacket(QXmppSaslFailure(Sasl::ErrorCondition::NotAuthorized));
+        sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::NotAuthorized, QString() }));
         disconnectFromHost();
         break;
     case QXmppPasswordReply::TemporaryError:
         warning(QStringLiteral("Temporary authentication failure for '%1' from %2").arg(jid, d->origin()));
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.temporary-auth-failure"));
-        sendPacket(QXmppSaslFailure(Sasl::ErrorCondition::TemporaryAuthFailure));
+        sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
         disconnectFromHost();
         break;
     }
