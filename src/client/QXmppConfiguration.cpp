@@ -43,6 +43,7 @@ public:
     // will keep reconnecting if disconnected, default is true
     bool autoReconnectionEnabled = true;
     // which authentication systems to use (if any)
+    bool useSasl2Authentication = true;
     bool useSASLAuthentication = true;
     bool useNonSASLAuthentication = true;
     // default is false
@@ -331,6 +332,25 @@ bool QXmppConfiguration::autoReconnectionEnabled() const
 void QXmppConfiguration::setAutoReconnectionEnabled(bool value)
 {
     d->autoReconnectionEnabled = value;
+}
+
+///
+/// Returns whether SASL 2 (\xep{0388, Extensible SASL Profile}) authentication is used if
+/// available.
+///
+bool QXmppConfiguration::useSasl2Authentication() const
+{
+    return d->useSasl2Authentication;
+}
+
+///
+/// Sets whether to use SASL 2 (\xep{0388, Extensible SASL Profile}) authentication if available.
+///
+/// \since QXmpp 1.7
+///
+void QXmppConfiguration::setUseSasl2Authentication(bool enabled)
+{
+    d->useSasl2Authentication = enabled;
 }
 
 /// Returns whether SSL errors (such as certificate validation errors)
