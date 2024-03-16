@@ -56,6 +56,7 @@ enum class ErrorCondition {
 };
 
 QString errorConditionToString(ErrorCondition);
+std::optional<ErrorCondition> errorConditionFromString(QStringView);
 
 }  // namespace QXmpp::Private::Sasl
 
