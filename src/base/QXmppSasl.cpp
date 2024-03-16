@@ -285,22 +285,22 @@ QStringList QXmppSaslClient::availableMechanisms()
 ///
 /// Creates an SASL client for the given mechanism.
 ///
-QXmppSaslClient *QXmppSaslClient::create(const QString &mechanism, QObject *parent)
+std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(const QString &mechanism, QObject *parent)
 {
     if (mechanism == u"PLAIN") {
-        return new QXmppSaslClientPlain(parent);
+        return std::make_unique<QXmppSaslClientPlain>(parent);
     } else if (mechanism == u"DIGEST-MD5") {
-        return new QXmppSaslClientDigestMd5(parent);
+        return std::make_unique<QXmppSaslClientDigestMd5>(parent);
     } else if (mechanism == u"ANONYMOUS") {
-        return new QXmppSaslClientAnonymous(parent);
+        return std::make_unique<QXmppSaslClientAnonymous>(parent);
     } else if (SCRAM_ALGORITHMS.contains(mechanism)) {
-        return new QXmppSaslClientScram(SCRAM_ALGORITHMS.value(mechanism), parent);
+        return std::make_unique<QXmppSaslClientScram>(SCRAM_ALGORITHMS.value(mechanism), parent);
     } else if (mechanism == u"X-FACEBOOK-PLATFORM") {
-        return new QXmppSaslClientFacebook(parent);
+        return std::make_unique<QXmppSaslClientFacebook>(parent);
     } else if (mechanism == u"X-MESSENGER-OAUTH2") {
-        return new QXmppSaslClientWindowsLive(parent);
+        return std::make_unique<QXmppSaslClientWindowsLive>(parent);
     } else if (mechanism == u"X-OAUTH2") {
-        return new QXmppSaslClientGoogle(parent);
+        return std::make_unique<QXmppSaslClientGoogle>(parent);
     } else {
         return nullptr;
     }

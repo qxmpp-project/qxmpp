@@ -103,7 +103,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
         });
     }
 
-    m_saslClient.reset(QXmppSaslClient::create(mechanism, parent));
+    m_saslClient = QXmppSaslClient::create(mechanism, parent);
     if (!m_saslClient) {
         return makeReadyTask<AuthResult>(AuthError {
             QStringLiteral("SASL mechanism negotiation failed"),
