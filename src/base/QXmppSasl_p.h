@@ -155,7 +155,7 @@ public:
     virtual QString mechanism() const = 0;
     virtual Response respond(const QByteArray &challenge, QByteArray &response) = 0;
 
-    static QXmppSaslServer *create(const QString &mechanism, QObject *parent = nullptr);
+    static std::unique_ptr<QXmppSaslServer> create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
     const std::unique_ptr<QXmppSaslServerPrivate> d;

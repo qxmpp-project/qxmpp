@@ -26,13 +26,13 @@ class QXmppIncomingClientPrivate
 {
 public:
     QXmppIncomingClientPrivate(QXmppIncomingClient *qq);
-    QTimer *idleTimer;
+    QTimer *idleTimer = nullptr;
 
     QString domain;
     QString jid;
     QString resource;
-    QXmppPasswordChecker *passwordChecker;
-    QXmppSaslServer *saslServer;
+    QXmppPasswordChecker *passwordChecker = nullptr;
+    std::unique_ptr<QXmppSaslServer> saslServer;
 
     void checkCredentials(const QByteArray &response);
     QString origin() const;
@@ -42,7 +42,7 @@ private:
 };
 
 QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
-    : idleTimer(nullptr), passwordChecker(nullptr), saslServer(nullptr), q(qq)
+    : q(qq)
 {
 }
 
@@ -157,10 +157,7 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     if (d->idleTimer->interval()) {
         d->idleTimer->start();
     }
-    if (d->saslServer != nullptr) {
-        delete d->saslServer;
-        d->saslServer = nullptr;
-    }
+    d->saslServer.reset();
 
     // start stream
     const QByteArray sessionId = QXmppUtils::generateStanzaHash().toLatin1();
