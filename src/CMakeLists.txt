@@ -266,6 +266,7 @@ set(SOURCE_FILES
     client/QXmppPubSubManager.cpp
     client/QXmppRemoteMethod.cpp
     client/QXmppRpcManager.cpp
+    client/QXmppSaslManager.cpp
     client/QXmppSendStanzaParams.cpp
     client/QXmppTlsManager.cpp
     client/QXmppTransferManager.cpp
