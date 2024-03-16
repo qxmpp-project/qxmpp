@@ -128,7 +128,7 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
 void QXmppSaslAuth::parse(const QDomElement &element)
 {
     mechanism = element.attribute(QStringLiteral("mechanism"));
-    value = QByteArray::fromBase64(element.text().toLatin1());
+    value = parseBase64(element.text()).value_or(QByteArray());
 }
 
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
@@ -140,7 +140,7 @@ void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(value.toBase64());
 #else
-        writer->writeCharacters(QString::fromUtf8(value.toBase64()));
+        writer->writeCharacters(serializeBase64(value));
 #endif
     }
     writer->writeEndElement();
@@ -148,21 +148,12 @@ void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 
 void QXmppSaslChallenge::parse(const QDomElement &element)
 {
-    value = QByteArray::fromBase64(element.text().toLatin1());
+    value = parseBase64(element.text()).value_or(QByteArray());
 }
 
 void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL65("challenge"));
-    writer->writeDefaultNamespace(toString65(ns_sasl));
-    if (!value.isEmpty()) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        writer->writeCharacters(value.toBase64());
-#else
-        writer->writeCharacters(QString::fromUtf8(value.toBase64()));
-#endif
-    }
-    writer->writeEndElement();
+    writeXmlTextElement(writer, u"challenge", ns_sasl, serializeBase64(value));
 }
 
 void QXmppSaslFailure::parse(const QDomElement &element)
@@ -200,21 +191,12 @@ void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 
 void QXmppSaslResponse::parse(const QDomElement &element)
 {
-    value = QByteArray::fromBase64(element.text().toLatin1());
+    value = parseBase64(element.text()).value_or(QByteArray());
 }
 
 void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 {
-    writer->writeStartElement(QSL65("response"));
-    writer->writeDefaultNamespace(toString65(ns_sasl));
-    if (!value.isEmpty()) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
-        writer->writeCharacters(value.toBase64());
-#else
-        writer->writeCharacters(QString::fromUtf8(value.toBase64()));
-#endif
-    }
-    writer->writeEndElement();
+    writeXmlTextElement(writer, u"response", ns_sasl, serializeBase64(value));
 }
 
 void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
