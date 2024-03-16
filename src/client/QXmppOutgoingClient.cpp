@@ -7,6 +7,7 @@
 #include "QXmppOutgoingClient.h"
 
 #include "QXmppAuthenticationError.h"
+#include "QXmppBindIq.h"
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
@@ -14,41 +15,29 @@
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
 #include "QXmppPacket_p.h"
+#include "QXmppPingIq.h"
 #include "QXmppPresence.h"
 #include "QXmppPromise.h"
 #include "QXmppSasl_p.h"
 #include "QXmppStreamError_p.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppStreamManagement_p.h"
-#include "QXmppTask.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
 #include "Stream.h"
 #include "XmppSocket.h"
 
-#include <QCryptographicHash>
+#include <unordered_map>
+
 #include <QDnsLookup>
-#include <QFuture>
+#include <QHostAddress>
 #include <QNetworkProxy>
+#include <QRegularExpression>
 #include <QSslConfiguration>
 #include <QSslSocket>
 #include <QStringBuilder>
-#include <QUrl>
-
-// IQ types
-#include "QXmppBindIq.h"
-#include "QXmppPingIq.h"
-
-#include <unordered_map>
-
-#include <QCoreApplication>
-#include <QDomDocument>
-#include <QHostAddress>
-#include <QRegularExpression>
-#include <QStringBuilder>
 #include <QTimer>
-#include <QXmlStreamWriter>
 
 using std::visit;
 using namespace std::chrono_literals;
