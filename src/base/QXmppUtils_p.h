@@ -9,6 +9,7 @@
 #include "QXmppGlobal.h"
 
 #include <array>
+#include <functional>
 #include <optional>
 #include <stdint.h>
 
@@ -118,7 +119,16 @@ struct DomChildElements {
 
 inline DomChildElements iterChildElements(const QDomElement &el, QStringView tagName = {}, QStringView namespaceUri = {}) { return DomChildElements { el, tagName, namespaceUri }; }
 
-QByteArray serializeNonza(const QXmppNonza &);
+QByteArray serializeXml(const void *packet, void (*toXml)(const void *, QXmlStreamWriter *));
+template<typename T>
+inline QByteArray serializeXml(const T &packet)
+{
+    return serializeXml(&packet, [](const void *packet, QXmlStreamWriter *w) {
+        std::invoke(&T::toXml, reinterpret_cast<const T *>(packet), w);
+    });
+}
+template<typename T>
+inline QByteArray serializeNonza(const T &data) { return serializeXml(data); }
 
 QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
 QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);

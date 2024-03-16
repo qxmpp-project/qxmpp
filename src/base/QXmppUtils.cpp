@@ -391,11 +391,11 @@ QDomElement QXmpp::Private::nextSiblingElement(const QDomElement &el, QStringVie
     return {};
 }
 
-QByteArray QXmpp::Private::serializeNonza(const QXmppNonza &nonza)
+QByteArray QXmpp::Private::serializeXml(const void *packet, void (*toXml)(const void *, QXmlStreamWriter *))
 {
     QByteArray data;
     QXmlStreamWriter xmlStream(&data);
-    nonza.toXml(&xmlStream);
+    toXml(packet, &xmlStream);
     return data;
 }
 
