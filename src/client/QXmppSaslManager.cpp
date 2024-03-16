@@ -19,10 +19,8 @@
 
 namespace QXmpp::Private {
 
-QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent)
+static QString chooseMechanism(const QXmppConfiguration &config, const QList<QString> &availableMechanisms)
 {
-    Q_ASSERT(!m_promise.has_value());
-
     // supported and preferred SASL auth mechanisms
     const QString preferredMechanism = config.saslAuthMechanism();
     QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
@@ -42,21 +40,44 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
 
     // determine SASL Authentication mechanism to use
     QStringList commonMechanisms;
-    QString usedMechanism;
     for (const auto &mechanism : std::as_const(supportedMechanisms)) {
-        if (features.authMechanisms().contains(mechanism)) {
+        if (availableMechanisms.contains(mechanism)) {
             commonMechanisms << mechanism;
         }
     }
-    if (commonMechanisms.isEmpty()) {
+    return commonMechanisms.empty() ? QString() : commonMechanisms.first();
+}
+
+static void setCredentials(QXmppSaslClient *saslClient, const QXmppConfiguration &config)
+{
+    auto mechanism = saslClient->mechanism();
+    if (mechanism == u"X-FACEBOOK-PLATFORM") {
+        saslClient->setUsername(config.facebookAppId());
+        saslClient->setPassword(config.facebookAccessToken());
+    } else if (mechanism == u"X-MESSENGER-OAUTH2") {
+        saslClient->setPassword(config.windowsLiveAccessToken());
+    } else if (mechanism == u"X-OAUTH2") {
+        saslClient->setUsername(config.user());
+        saslClient->setPassword(config.googleAccessToken());
+    } else {
+        saslClient->setUsername(config.user());
+        saslClient->setPassword(config.password());
+    }
+}
+
+QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent)
+{
+    Q_ASSERT(!m_promise.has_value());
+
+    auto mechanism = chooseMechanism(config, features.authMechanisms());
+    if (mechanism.isEmpty()) {
         return makeReadyTask<AuthResult>(AuthError {
             QStringLiteral("No supported SASL Authentication mechanism available"),
             AuthenticationError { AuthenticationError::MechanismMismatch, {}, {} },
         });
     }
-    usedMechanism = commonMechanisms.first();
 
-    m_saslClient.reset(QXmppSaslClient::create(usedMechanism, parent));
+    m_saslClient.reset(QXmppSaslClient::create(mechanism, parent));
     if (!m_saslClient) {
         return makeReadyTask<AuthResult>(AuthError {
             QStringLiteral("SASL mechanism negotiation failed"),
@@ -66,18 +87,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
     m_saslClient->info(QStringLiteral("SASL mechanism '%1' selected").arg(m_saslClient->mechanism()));
     m_saslClient->setHost(config.domain());
     m_saslClient->setServiceType(QStringLiteral("xmpp"));
-    if (m_saslClient->mechanism() == u"X-FACEBOOK-PLATFORM") {
-        m_saslClient->setUsername(config.facebookAppId());
-        m_saslClient->setPassword(config.facebookAccessToken());
-    } else if (m_saslClient->mechanism() == u"X-MESSENGER-OAUTH2") {
-        m_saslClient->setPassword(config.windowsLiveAccessToken());
-    } else if (m_saslClient->mechanism() == u"X-OAUTH2") {
-        m_saslClient->setUsername(config.user());
-        m_saslClient->setPassword(config.googleAccessToken());
-    } else {
-        m_saslClient->setUsername(config.user());
-        m_saslClient->setPassword(config.password());
-    }
+    setCredentials(m_saslClient.get(), config);
 
     // send SASL auth request
     QByteArray response;
@@ -140,7 +150,7 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
     return Rejected;
 }
 
-AuthenticationError::Type SaslManager::mapSaslCondition(const std::optional<Sasl::ErrorCondition> &condition)
+AuthenticationError::Type SaslManager::mapSaslCondition(std::optional<Sasl::ErrorCondition> condition)
 {
     using Auth = AuthenticationError;
     using Sasl = Sasl::ErrorCondition;
