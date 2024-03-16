@@ -39,6 +39,29 @@ private:
     std::optional<QXmppPromise<AuthResult>> m_promise;
 };
 
+// Authentication using SASL 2
+class Sasl2Manager
+{
+public:
+    using AuthError = std::pair<QString, AuthenticationError>;
+    using AuthResult = std::variant<Sasl2::Success, AuthError>;
+
+    explicit Sasl2Manager(SendDataInterface *socket) : m_socket(socket) { }
+
+    QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const Sasl2::StreamFeature &feature, QXmppLoggable *loggable);
+    HandleElementResult handleElement(const QDomElement &);
+
+private:
+    struct State {
+        std::unique_ptr<QXmppSaslClient> sasl;
+        QXmppPromise<AuthResult> p;
+        std::optional<Sasl2::Continue> unsupportedContinue;
+    };
+
+    SendDataInterface *m_socket;
+    std::optional<State> m_state;
+};
+
 }  // namespace QXmpp::Private
 
 #endif  // QXMPPSASLMANAGER_P_H

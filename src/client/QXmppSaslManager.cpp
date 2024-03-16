@@ -7,6 +7,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppSaslManager_p.h"
+#include "QXmppSasl_p.h"
 #include "QXmppStream.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils_p.h"
@@ -185,6 +186,85 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
             AuthenticationError { mapSaslCondition(failure->condition), failure->text, std::move(*failure) },
         });
         return Finished;
+    }
+    return Rejected;
+}
+
+QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(const QXmppConfiguration &config, const Sasl2::StreamFeature &feature, QXmppLoggable *loggable)
+{
+    Q_ASSERT(!m_state.has_value());
+
+    auto result = initSaslAuthentication(config, feature.mechanisms, loggable);
+    if (result.error) {
+        return makeReadyTask<AuthResult>(std::move(*result.error));
+    }
+
+    m_socket->sendData(serializeXml(Sasl2::Authenticate {
+        result.saslClient->mechanism(),
+        result.initialResponse,
+        {},
+    }));
+
+    m_state = State();
+    m_state->sasl = std::move(result.saslClient);
+    return m_state->p.task();
+}
+
+HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
+{
+    using namespace Sasl2;
+
+    auto finish = [this](AuthResult &&value) {
+        Q_ASSERT(m_state);
+        auto state = std::move(*m_state);
+        m_state.reset();
+        state.p.finish(value);
+    };
+
+    if (!m_state || el.namespaceURI() != ns_sasl_2) {
+        return Rejected;
+    }
+
+    if (auto challenge = Sasl2::Challenge::fromDom(el)) {
+        if (auto response = m_state->sasl->respond(challenge->data)) {
+            m_socket->sendData(serializeXml(Sasl2::Response { *response }));
+            return Accepted;
+        } else {
+            finish(AuthError {
+                QStringLiteral("Could not respond to SASL challenge"),
+                AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
+            });
+            return Finished;
+        }
+    } else if (auto success = Success::fromDom(el)) {
+        finish(std::move(*success));
+        return Finished;
+    } else if (auto failure = Failure::fromDom(el)) {
+        auto text = failure->text.isEmpty()
+            ? Sasl::errorConditionToString(failure->condition)
+            : failure->text;
+
+        if (failure->condition == Sasl::ErrorCondition::Aborted && m_state->unsupportedContinue) {
+            finish(AuthError {
+                QStringLiteral("Required authentication tasks not supported."),
+                AuthenticationError {
+                    AuthenticationError::RequiredTasks,
+                    m_state->unsupportedContinue->text,
+                    *m_state->unsupportedContinue,
+                },
+            });
+        } else {
+            finish(AuthError {
+                QStringLiteral("Authentication failed: %1").arg(text),
+                AuthenticationError { mapSaslCondition(failure->condition), failure->text, std::move(*failure) },
+            });
+        }
+        return Finished;
+    } else if (auto continueElement = Continue::fromDom(el)) {
+        // no SASL 2 tasks are currently implemented
+        m_state->unsupportedContinue = continueElement;
+        m_socket->sendData(serializeXml(Sasl2::Abort { QStringLiteral("SASL 2 tasks are not supported.") }));
+        return Accepted;
     }
     return Rejected;
 }
