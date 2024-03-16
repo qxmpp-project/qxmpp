@@ -115,7 +115,7 @@ public:
     void setPassword(const QString &password);
 
     virtual QString mechanism() const = 0;
-    virtual bool respond(const QByteArray &challenge, QByteArray &response) = 0;
+    virtual std::optional<QByteArray> respond(const QByteArray &challenge) = 0;
 
     static QStringList availableMechanisms();
     static QXmppSaslClient *create(const QString &mechanism, QObject *parent = nullptr);
@@ -177,7 +177,7 @@ class QXmppSaslClientAnonymous : public QXmppSaslClient
 public:
     QXmppSaslClientAnonymous(QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     int m_step;
@@ -189,7 +189,7 @@ class QXmppSaslClientDigestMd5 : public QXmppSaslClient
 public:
     QXmppSaslClientDigestMd5(QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     QByteArray m_cnonce;
@@ -205,7 +205,7 @@ class QXmppSaslClientFacebook : public QXmppSaslClient
 public:
     QXmppSaslClientFacebook(QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     int m_step;
@@ -217,7 +217,7 @@ class QXmppSaslClientGoogle : public QXmppSaslClient
 public:
     QXmppSaslClientGoogle(QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     int m_step;
@@ -229,7 +229,7 @@ class QXmppSaslClientPlain : public QXmppSaslClient
 public:
     QXmppSaslClientPlain(QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     int m_step;
@@ -241,7 +241,7 @@ class QXmppSaslClientScram : public QXmppSaslClient
 public:
     QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     QCryptographicHash::Algorithm m_algorithm;
@@ -259,7 +259,7 @@ class QXmppSaslClientWindowsLive : public QXmppSaslClient
 public:
     QXmppSaslClientWindowsLive(QObject *parent = nullptr);
     QString mechanism() const override;
-    bool respond(const QByteArray &challenge, QByteArray &response) override;
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
     int m_step;

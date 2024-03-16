@@ -217,12 +217,10 @@ void tst_QXmppSasl::testClientAnonymous()
     QCOMPARE(client->mechanism(), QLatin1String("ANONYMOUS"));
 
     // initial step returns nothing
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray());
+    QCOMPARE(client->respond(QByteArray()), QByteArray());
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -260,18 +258,15 @@ void tst_QXmppSasl::testClientDigestMd5()
     client->setServiceType("xmpp");
 
     // initial step returns nothing
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray());
+    QCOMPARE(client->respond(QByteArray()), QByteArray());
 
-    QVERIFY(client->respond(QByteArray("nonce=\"2530347127\"") + qop + QByteArray("charset=utf-8,algorithm=md5-sess"), response));
-    QCOMPARE(response, QByteArray("charset=utf-8,cnonce=\"AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=\",digest-uri=\"xmpp/jabber.ru\",nc=00000001,nonce=2530347127,qop=auth,response=a61fbf4320577d74038b71a8546bc7ae,username=qxmpp1"));
+    QCOMPARE(client->respond(QByteArray("nonce=\"2530347127\"") + qop + QByteArray("charset=utf-8,algorithm=md5-sess")),
+             QByteArray("charset=utf-8,cnonce=\"AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=\",digest-uri=\"xmpp/jabber.ru\",nc=00000001,nonce=2530347127,qop=auth,response=a61fbf4320577d74038b71a8546bc7ae,username=qxmpp1"));
 
-    QVERIFY(client->respond(QByteArray("rspauth=d92bf7f4331700c24799cbab364a14b7"), response));
-    QCOMPARE(response, QByteArray());
+    QCOMPARE(client->respond(QByteArray("rspauth=d92bf7f4331700c24799cbab364a14b7")), QByteArray());
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -286,16 +281,14 @@ void tst_QXmppSasl::testClientFacebook()
     client->setPassword("abcdefghijlkmno");
 
     // initial step returns nothing
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray());
+    QCOMPARE(client->respond(QByteArray()), QByteArray());
 
     // challenge response
-    QVERIFY(client->respond(QByteArray("version=1&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8"), response));
-    QCOMPARE(response, QByteArray("access_token=abcdefghijlkmno&api_key=123456789012345&call_id&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8&v=1.0"));
+    QCOMPARE(client->respond(QByteArray("version=1&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8")),
+             QByteArray("access_token=abcdefghijlkmno&api_key=123456789012345&call_id&method=auth.xmpp_login&nonce=AA4EFEE16F2AB64B131EEFFE6EACDDB8&v=1.0"));
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -310,12 +303,10 @@ void tst_QXmppSasl::testClientGoogle()
     client->setPassword("bar");
 
     // initial step returns data
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray("\0foo\0bar", 8));
+    QCOMPARE(client->respond(QByteArray()), QByteArray("\0foo\0bar", 8));
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -330,12 +321,10 @@ void tst_QXmppSasl::testClientPlain()
     client->setPassword("bar");
 
     // initial step returns data
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray("\0foo\0bar", 8));
+    QCOMPARE(client->respond(QByteArray()), QByteArray("\0foo\0bar", 8));
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -352,20 +341,17 @@ void tst_QXmppSasl::testClientScramSha1()
     client->setPassword("pencil");
 
     // first step
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
+    QCOMPARE(client->respond(QByteArray()), QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
 
     // second step
-    QVERIFY(client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096"), response));
-    QCOMPARE(response, QByteArray("c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts="));
+    QCOMPARE(client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92,i=4096")),
+             QByteArray("c=biws,r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,p=v0X8v3Bz2T0CJGbJQyF0X+HI4Ts="));
 
     // third step
-    QVERIFY(client->respond(QByteArray("v=rmF9pqV8S7suAoZWja4dJRkFsKQ"), response));
-    QCOMPARE(response, QByteArray());
+    QCOMPARE(client->respond(QByteArray("v=rmF9pqV8S7suAoZWja4dJRkFsKQ")), QByteArray());
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -382,18 +368,16 @@ void tst_QXmppSasl::testClientScramSha1_bad()
     client->setPassword("pencil");
 
     // first step
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
+    QCOMPARE(client->respond(QByteArray()), QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
 
     // no nonce
-    QVERIFY(!client->respond(QByteArray("s=QSXCR+Q6sek8bf92,i=4096"), response));
+    QVERIFY(!client->respond(QByteArray("s=QSXCR+Q6sek8bf92,i=4096")));
 
     // no salt
-    QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,i=4096"), response));
+    QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,i=4096")));
 
     // no iterations
-    QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92"), response));
+    QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92")));
 
     delete client;
 }
@@ -410,20 +394,17 @@ void tst_QXmppSasl::testClientScramSha256()
     client->setPassword("pencil");
 
     // first step
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray("n,,n=user,r=rOprNGfwEbeRWgbNEkqO"));
+    QCOMPARE(client->respond(QByteArray()), QByteArray("n,,n=user,r=rOprNGfwEbeRWgbNEkqO"));
 
     // second step
-    QVERIFY(client->respond(QByteArray("r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096"), response));
-    QCOMPARE(response, QByteArray("c=biws,r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,p=dHzbZapWIk4jUhN+Ute9ytag9zjfMHgsqmmiz7AndVQ="));
+    QCOMPARE(client->respond(QByteArray("r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096")),
+             QByteArray("c=biws,r=rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0,p=dHzbZapWIk4jUhN+Ute9ytag9zjfMHgsqmmiz7AndVQ="));
 
     // third step
-    QVERIFY(client->respond(QByteArray("v=6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4="), response));
-    QCOMPARE(response, QByteArray());
+    QCOMPARE(client->respond(QByteArray("v=6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4=")), QByteArray());
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }
@@ -437,12 +418,10 @@ void tst_QXmppSasl::testClientWindowsLive()
     client->setPassword(QByteArray("footoken").toBase64());
 
     // initial step returns data
-    QByteArray response;
-    QVERIFY(client->respond(QByteArray(), response));
-    QCOMPARE(response, QByteArray("footoken", 8));
+    QCOMPARE(client->respond(QByteArray()), QByteArray("footoken", 8));
 
     // any further step is an error
-    QVERIFY(!client->respond(QByteArray(), response));
+    QVERIFY(!client->respond(QByteArray()));
 
     delete client;
 }

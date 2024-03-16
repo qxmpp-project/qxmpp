@@ -116,14 +116,14 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
     setCredentials(m_saslClient.get(), config);
 
     // send SASL auth request
-    QByteArray response;
-    if (!m_saslClient->respond(QByteArray(), response)) {
+    if (auto response = m_saslClient->respond(QByteArray())) {
+        m_socket->sendData(serializeXml(Sasl::Auth { m_saslClient->mechanism(), *response }));
+    } else {
         return makeReadyTask<AuthResult>(AuthError {
             QStringLiteral("SASL initial response failed"),
             AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
         });
     }
-    m_socket->sendData(serializeXml(Sasl::Auth { m_saslClient->mechanism(), response }));
 
     m_promise = QXmppPromise<AuthResult>();
     return m_promise->task();
@@ -145,9 +145,8 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
         finish(Success());
         return Finished;
     } else if (auto challenge = Sasl::Challenge::fromDom(el)) {
-        QByteArray response;
-        if (m_saslClient->respond(challenge->value, response)) {
-            m_socket->sendData(serializeXml(Sasl::Response { response }));
+        if (auto response = m_saslClient->respond(challenge->value)) {
+            m_socket->sendData(serializeXml(Sasl::Response { *response }));
             return Accepted;
         } else {
             finish(AuthError {
