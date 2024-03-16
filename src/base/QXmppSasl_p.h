@@ -118,7 +118,7 @@ public:
     virtual std::optional<QByteArray> respond(const QByteArray &challenge) = 0;
 
     static QStringList availableMechanisms();
-    static QXmppSaslClient *create(const QString &mechanism, QObject *parent = nullptr);
+    static std::unique_ptr<QXmppSaslClient> create(const QString &mechanism, QObject *parent = nullptr);
 
 private:
     friend class QXmpp::Private::SaslManager;

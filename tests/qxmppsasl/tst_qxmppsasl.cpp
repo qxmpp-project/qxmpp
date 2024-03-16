@@ -206,23 +206,20 @@ void tst_QXmppSasl::testClientAvailableMechanisms()
 
 void tst_QXmppSasl::testClientBadMechanism()
 {
-    QXmppSaslClient *client = QXmppSaslClient::create("BAD-MECH");
-    QVERIFY(client == 0);
+    QVERIFY(!QXmppSaslClient::create("BAD-MECH"));
 }
 
 void tst_QXmppSasl::testClientAnonymous()
 {
-    QXmppSaslClient *client = QXmppSaslClient::create("ANONYMOUS");
-    QVERIFY(client != 0);
-    QCOMPARE(client->mechanism(), QLatin1String("ANONYMOUS"));
+    auto client = QXmppSaslClient::create("ANONYMOUS");
+    QVERIFY(client);
+    QCOMPARE(client->mechanism(), "ANONYMOUS");
 
     // initial step returns nothing
     QCOMPARE(client->respond(QByteArray()), QByteArray());
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientDigestMd5_data()
@@ -248,9 +245,9 @@ void tst_QXmppSasl::testClientDigestMd5()
 
     QXmppSaslDigestMd5::setNonce("AMzVG8Oibf+sVUCPPlWLR8lZQvbbJtJB9vJd+u3c6dw=");
 
-    QXmppSaslClient *client = QXmppSaslClient::create("DIGEST-MD5");
-    QVERIFY(client != 0);
-    QCOMPARE(client->mechanism(), QLatin1String("DIGEST-MD5"));
+    auto client = QXmppSaslClient::create("DIGEST-MD5");
+    QVERIFY(client);
+    QCOMPARE(client->mechanism(), "DIGEST-MD5");
 
     client->setUsername("qxmpp1");
     client->setPassword("qxmpp123");
@@ -267,14 +264,12 @@ void tst_QXmppSasl::testClientDigestMd5()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientFacebook()
 {
-    QXmppSaslClient *client = QXmppSaslClient::create("X-FACEBOOK-PLATFORM");
-    QVERIFY(client != 0);
+    auto client = QXmppSaslClient::create("X-FACEBOOK-PLATFORM");
+    QVERIFY(client);
     QCOMPARE(client->mechanism(), QLatin1String("X-FACEBOOK-PLATFORM"));
 
     client->setUsername("123456789012345");
@@ -289,14 +284,12 @@ void tst_QXmppSasl::testClientFacebook()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientGoogle()
 {
-    QXmppSaslClient *client = QXmppSaslClient::create("X-OAUTH2");
-    QVERIFY(client != 0);
+    auto client = QXmppSaslClient::create("X-OAUTH2");
+    QVERIFY(client);
     QCOMPARE(client->mechanism(), QLatin1String("X-OAUTH2"));
 
     client->setUsername("foo");
@@ -307,14 +300,12 @@ void tst_QXmppSasl::testClientGoogle()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientPlain()
 {
-    QXmppSaslClient *client = QXmppSaslClient::create("PLAIN");
-    QVERIFY(client != 0);
+    auto client = QXmppSaslClient::create("PLAIN");
+    QVERIFY(client);
     QCOMPARE(client->mechanism(), QLatin1String("PLAIN"));
 
     client->setUsername("foo");
@@ -325,16 +316,13 @@ void tst_QXmppSasl::testClientPlain()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientScramSha1()
 {
     QXmppSaslDigestMd5::setNonce("fyko+d2lbbFgONRv9qkxdawL");
 
-    QXmppSaslClient *client = QXmppSaslClient::create("SCRAM-SHA-1");
-    QVERIFY(client != 0);
+    auto client = QXmppSaslClient::create("SCRAM-SHA-1");
     QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-1"));
 
     client->setUsername("user");
@@ -352,16 +340,13 @@ void tst_QXmppSasl::testClientScramSha1()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientScramSha1_bad()
 {
     QXmppSaslDigestMd5::setNonce("fyko+d2lbbFgONRv9qkxdawL");
 
-    QXmppSaslClient *client = QXmppSaslClient::create("SCRAM-SHA-1");
-    QVERIFY(client != 0);
+    auto client = QXmppSaslClient::create("SCRAM-SHA-1");
     QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-1"));
 
     client->setUsername("user");
@@ -378,15 +363,13 @@ void tst_QXmppSasl::testClientScramSha1_bad()
 
     // no iterations
     QVERIFY(!client->respond(QByteArray("r=fyko+d2lbbFgONRv9qkxdawL3rfcNHYJY1ZVvWVs7j,s=QSXCR+Q6sek8bf92")));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientScramSha256()
 {
     QXmppSaslDigestMd5::setNonce("rOprNGfwEbeRWgbNEkqO");
 
-    QXmppSaslClient *client = QXmppSaslClient::create("SCRAM-SHA-256");
+    auto client = QXmppSaslClient::create("SCRAM-SHA-256");
     QVERIFY(client != 0);
     QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-256"));
 
@@ -405,13 +388,11 @@ void tst_QXmppSasl::testClientScramSha256()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testClientWindowsLive()
 {
-    QXmppSaslClient *client = QXmppSaslClient::create("X-MESSENGER-OAUTH2");
+    auto client = QXmppSaslClient::create("X-MESSENGER-OAUTH2");
     QVERIFY(client != 0);
     QCOMPARE(client->mechanism(), QLatin1String("X-MESSENGER-OAUTH2"));
 
@@ -422,8 +403,6 @@ void tst_QXmppSasl::testClientWindowsLive()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
-
-    delete client;
 }
 
 void tst_QXmppSasl::testServerBadMechanism()
