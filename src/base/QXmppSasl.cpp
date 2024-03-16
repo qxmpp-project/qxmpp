@@ -120,7 +120,7 @@ void QXmppSaslAuth::parse(const QDomElement &element)
 void QXmppSaslAuth::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("auth"));
-    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
     writer->writeAttribute(QSL65("mechanism"), mechanism);
     if (!value.isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
@@ -140,7 +140,7 @@ void QXmppSaslChallenge::parse(const QDomElement &element)
 void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("challenge"));
-    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
     if (!value.isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(value.toBase64());
@@ -174,7 +174,7 @@ void QXmppSaslFailure::parse(const QDomElement &element)
 void QXmppSaslFailure::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("failure"));
-    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
     if (condition) {
         writer->writeEmptyElement(toString65(SASL_ERROR_CONDITIONS.at(size_t(*condition))));
     }
@@ -197,7 +197,7 @@ void QXmppSaslResponse::parse(const QDomElement &element)
 void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("response"));
-    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
     if (!value.isEmpty()) {
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeCharacters(value.toBase64());
@@ -211,7 +211,7 @@ void QXmppSaslResponse::toXml(QXmlStreamWriter *writer) const
 void QXmppSaslSuccess::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("success"));
-    writer->writeDefaultNamespace(toString65(ns_xmpp_sasl));
+    writer->writeDefaultNamespace(toString65(ns_sasl));
     writer->writeEndElement();
 }
 
