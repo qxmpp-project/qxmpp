@@ -32,6 +32,8 @@ struct AuthenticationError {
         MechanismMismatch,
         /// Local error while processing authentication challenges
         ProcessingError,
+        /// The server requested for tasks that are not supported
+        RequiredTasks,
     };
     /// Type of the authentication error
     Type type;
