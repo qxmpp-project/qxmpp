@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -7,7 +8,12 @@
 
 #include "QXmppClientExtension.h"
 
+#include <variant>
+
+template<typename T>
+class QXmppTask;
 class QXmppVCardIq;
+class QXmppError;
 class QXmppVCardManagerPrivate;
 
 ///
@@ -39,20 +45,24 @@ class QXMPP_EXPORT QXmppVCardManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    /// Iq result containing QXmppVCardIq or a QXmppError
+    using IqResult = std::variant<QXmppVCardIq, QXmppError>;
+    /// Simple result containing QXmpp::Success or a QXmppError
+    using Result = std::variant<QXmpp::Success, QXmppError>;
+
     QXmppVCardManager();
     ~QXmppVCardManager() override;
 
-    QString requestVCard(const QString &bareJid = QString());
+    QXmppTask<IqResult> requestVCard(const QString &bareJid = QString());
 
     const QXmppVCardIq &clientVCard() const;
-    void setClientVCard(const QXmppVCardIq &);
+    QXmppTask<Result> setClientVCard(const QXmppVCardIq &);
 
-    QString requestClientVCard();
+    QXmppTask<IqResult> requestClientVCard();
     bool isClientVCardReceived() const;
 
     /// \cond
     QStringList discoveryFeatures() const override;
-    bool handleStanza(const QDomElement &element) override;
     /// \endcond
 
 Q_SIGNALS:
@@ -65,6 +75,8 @@ Q_SIGNALS:
     void clientVCardReceived();
 
 private:
+    void handleReceivedVCard(const QXmppVCardIq &vcard);
+
     const std::unique_ptr<QXmppVCardManagerPrivate> d;
 };
 

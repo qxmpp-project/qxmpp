@@ -8,6 +8,7 @@
 #include "QXmppRosterManager.h"
 #include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
+#include "QXmppTask.h"
 
 #include <QBuffer>
 #include <QCoreApplication>
