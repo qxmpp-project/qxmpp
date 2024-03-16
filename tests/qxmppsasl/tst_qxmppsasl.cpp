@@ -407,15 +407,14 @@ void tst_QXmppSasl::testClientWindowsLive()
 
 void tst_QXmppSasl::testServerBadMechanism()
 {
-    QXmppSaslServer *server = QXmppSaslServer::create("BAD-MECH");
-    QVERIFY(server == 0);
+    QVERIFY(!QXmppSaslServer::create("BAD-MECH"));
 }
 
 void tst_QXmppSasl::testServerAnonymous()
 {
-    QXmppSaslServer *server = QXmppSaslServer::create("ANONYMOUS");
-    QVERIFY(server != 0);
-    QCOMPARE(server->mechanism(), QLatin1String("ANONYMOUS"));
+    auto server = QXmppSaslServer::create("ANONYMOUS");
+    QVERIFY(server);
+    QCOMPARE(server->mechanism(), "ANONYMOUS");
 
     // initial step returns success
     QByteArray response;
@@ -424,17 +423,15 @@ void tst_QXmppSasl::testServerAnonymous()
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
-
-    delete server;
 }
 
 void tst_QXmppSasl::testServerDigestMd5()
 {
     QXmppSaslDigestMd5::setNonce("OI08/m+QRm6Ma+fKOjuqVXtz40sR5u9/u5GN6sSW0rs=");
 
-    QXmppSaslServer *server = QXmppSaslServer::create("DIGEST-MD5");
-    QVERIFY(server != 0);
-    QCOMPARE(server->mechanism(), QLatin1String("DIGEST-MD5"));
+    auto server = QXmppSaslServer::create("DIGEST-MD5");
+    QVERIFY(server);
+    QCOMPARE(server->mechanism(), "DIGEST-MD5");
 
     // initial step returns challenge
     QByteArray response;
@@ -457,15 +454,13 @@ void tst_QXmppSasl::testServerDigestMd5()
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
-
-    delete server;
 }
 
 void tst_QXmppSasl::testServerPlain()
 {
-    QXmppSaslServer *server = QXmppSaslServer::create("PLAIN");
-    QVERIFY(server != 0);
-    QCOMPARE(server->mechanism(), QLatin1String("PLAIN"));
+    auto server = QXmppSaslServer::create("PLAIN");
+    QVERIFY(server);
+    QCOMPARE(server->mechanism(), "PLAIN");
 
     // initial step returns success
     QByteArray response;
@@ -476,15 +471,13 @@ void tst_QXmppSasl::testServerPlain()
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
-
-    delete server;
 }
 
 void tst_QXmppSasl::testServerPlainChallenge()
 {
-    QXmppSaslServer *server = QXmppSaslServer::create("PLAIN");
-    QVERIFY(server != 0);
-    QCOMPARE(server->mechanism(), QLatin1String("PLAIN"));
+    auto server = QXmppSaslServer::create("PLAIN");
+    QVERIFY(server);
+    QCOMPARE(server->mechanism(), "PLAIN");
 
     // initial step returns challenge
     QByteArray response;
@@ -499,8 +492,6 @@ void tst_QXmppSasl::testServerPlainChallenge()
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
-
-    delete server;
 }
 
 QTEST_MAIN(tst_QXmppSasl)
