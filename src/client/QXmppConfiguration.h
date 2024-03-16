@@ -98,6 +98,9 @@ public:
     bool autoReconnectionEnabled() const;
     void setAutoReconnectionEnabled(bool);
 
+    bool useSasl2Authentication() const;
+    void setUseSasl2Authentication(bool);
+
     bool useSASLAuthentication() const;
     void setUseSASLAuthentication(bool);
 
