@@ -42,6 +42,11 @@ QString errorConditionToString(ErrorCondition c)
     return SASL_ERROR_CONDITIONS.at(size_t(c)).toString();
 }
 
+std::optional<ErrorCondition> errorConditionFromString(QStringView str)
+{
+    return enumFromString<ErrorCondition>(SASL_ERROR_CONDITIONS, str);
+}
+
 }  // namespace QXmpp::Private::Sasl
 
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
@@ -163,7 +168,7 @@ void QXmppSaslChallenge::toXml(QXmlStreamWriter *writer) const
 void QXmppSaslFailure::parse(const QDomElement &element)
 {
     auto errorConditionString = element.firstChildElement().tagName();
-    condition = enumFromString<Sasl::ErrorCondition>(SASL_ERROR_CONDITIONS, errorConditionString);
+    condition = Sasl::errorConditionFromString(errorConditionString);
 
     // RFC3920 defines the error condition as "not-authorized", but
     // some broken servers use "bad-auth" instead. We tolerate this
