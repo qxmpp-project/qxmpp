@@ -13,14 +13,12 @@
 class QXmppConfigurationPrivate : public QSharedData
 {
 public:
-    QXmppConfigurationPrivate();
-
     QString host;
-    int port;
+    int port = 5222;
     QString user;
     QString password;
     QString domain;
-    QString resource;
+    QString resource = QStringLiteral("QXmpp");
 
     // Facebook
     QString facebookAccessToken;
@@ -32,49 +30,29 @@ public:
     // Windows Live
     QString windowsLiveAccessToken;
 
-    // default is false
-    bool autoAcceptSubscriptions;
-    // default is true
-    bool sendIntialPresence;
-    // default is true
-    bool sendRosterRequest;
+    bool autoAcceptSubscriptions = false;
+    bool sendIntialPresence = true;
+    bool sendRosterRequest = true;
     // interval in seconds, if zero won't ping
-    int keepAliveInterval;
+    int keepAliveInterval = 60;
     // interval in seconds, if zero won't timeout
-    int keepAliveTimeout;
+    int keepAliveTimeout = 20;
     // will keep reconnecting if disconnected, default is true
-    bool autoReconnectionEnabled;
+    bool autoReconnectionEnabled = true;
     // which authentication systems to use (if any)
-    bool useSASLAuthentication;
-    bool useNonSASLAuthentication;
+    bool useSASLAuthentication = true;
+    bool useNonSASLAuthentication = true;
     // default is false
-    bool ignoreSslErrors;
+    bool ignoreSslErrors = false;
 
-    QXmppConfiguration::StreamSecurityMode streamSecurityMode;
-    QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism;
+    QXmppConfiguration::StreamSecurityMode streamSecurityMode = QXmppConfiguration::TLSEnabled;
+    QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism = QXmppConfiguration::NonSASLDigest;
     QString saslAuthMechanism;
 
     QNetworkProxy networkProxy;
 
     QList<QSslCertificate> caCertificates;
 };
-
-QXmppConfigurationPrivate::QXmppConfigurationPrivate()
-    : port(5222),
-      resource(QStringLiteral("QXmpp")),
-      autoAcceptSubscriptions(false),
-      sendIntialPresence(true),
-      sendRosterRequest(true),
-      keepAliveInterval(60),
-      keepAliveTimeout(20),
-      autoReconnectionEnabled(true),
-      useSASLAuthentication(true),
-      useNonSASLAuthentication(true),
-      ignoreSslErrors(false),
-      streamSecurityMode(QXmppConfiguration::TLSEnabled),
-      nonSASLAuthMechanism(QXmppConfiguration::NonSASLDigest)
-{
-}
 
 /// Creates a QXmppConfiguration object.
 QXmppConfiguration::QXmppConfiguration()
