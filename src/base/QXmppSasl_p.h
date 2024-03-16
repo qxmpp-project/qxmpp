@@ -59,6 +59,7 @@ enum class SaslErrorCondition {
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
+    Q_OBJECT
 public:
     QXmppSaslClient(QObject *parent = nullptr);
     ~QXmppSaslClient() override;
@@ -89,6 +90,7 @@ private:
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslServer : public QXmppLoggable
 {
+    Q_OBJECT
 public:
     enum Response {
         Challenge = 0,
@@ -188,6 +190,7 @@ public:
 
 class QXmppSaslClientAnonymous : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientAnonymous(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -199,6 +202,7 @@ private:
 
 class QXmppSaslClientDigestMd5 : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientDigestMd5(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -214,6 +218,7 @@ private:
 
 class QXmppSaslClientFacebook : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientFacebook(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -225,6 +230,7 @@ private:
 
 class QXmppSaslClientGoogle : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientGoogle(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -236,6 +242,7 @@ private:
 
 class QXmppSaslClientPlain : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientPlain(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -247,6 +254,7 @@ private:
 
 class QXmppSaslClientScram : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent = nullptr);
     QString mechanism() const override;
@@ -264,6 +272,7 @@ private:
 
 class QXmppSaslClientWindowsLive : public QXmppSaslClient
 {
+    Q_OBJECT
 public:
     QXmppSaslClientWindowsLive(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -275,6 +284,7 @@ private:
 
 class QXmppSaslServerAnonymous : public QXmppSaslServer
 {
+    Q_OBJECT
 public:
     QXmppSaslServerAnonymous(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -287,6 +297,7 @@ private:
 
 class QXmppSaslServerDigestMd5 : public QXmppSaslServer
 {
+    Q_OBJECT
 public:
     QXmppSaslServerDigestMd5(QObject *parent = nullptr);
     QString mechanism() const override;
@@ -303,6 +314,7 @@ private:
 
 class QXmppSaslServerPlain : public QXmppSaslServer
 {
+    Q_OBJECT
 public:
     QXmppSaslServerPlain(QObject *parent = nullptr);
     QString mechanism() const override;
