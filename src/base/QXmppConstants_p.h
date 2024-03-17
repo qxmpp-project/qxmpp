@@ -18,6 +18,12 @@
 // We mean it.
 //
 
+namespace QXmpp::Private {
+
+constexpr int XMPP_DEFAULT_PORT = 5222;
+
+}
+
 inline constexpr QStringView ns_stream = u"http://etherx.jabber.org/streams";
 inline constexpr QStringView ns_client = u"jabber:client";
 inline constexpr QStringView ns_server = u"jabber:server";

@@ -23,8 +23,6 @@
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
-constexpr quint16 XMPP_PORT_FALLBACK = 5222;
-
 class QXmppStreamPrivate
 {
 public:
@@ -222,7 +220,7 @@ std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const Q
             condition = conditionEnum;
         } else if (tagName == u"see-other-host") {
             if (auto [host, port] = parseHostAddress(subEl.text()); !host.isEmpty()) {
-                condition = SeeOtherHost { host, port > 0 ? quint16(port) : XMPP_PORT_FALLBACK };
+                condition = SeeOtherHost { host, quint16(port > 0 ? port : XMPP_DEFAULT_PORT) };
             }
         }
     }

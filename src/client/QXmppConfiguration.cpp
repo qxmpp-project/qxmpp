@@ -4,17 +4,20 @@
 
 #include "QXmppConfiguration.h"
 
+#include "QXmppConstants_p.h"
 #include "QXmppUtils.h"
 
 #include <QNetworkProxy>
 #include <QSslSocket>
 #include <QStringBuilder>
 
+using namespace QXmpp::Private;
+
 class QXmppConfigurationPrivate : public QSharedData
 {
 public:
     QString host;
-    int port = 5222;
+    int port = XMPP_DEFAULT_PORT;
     QString user;
     QString password;
     QString domain;
@@ -97,7 +100,6 @@ void QXmppConfiguration::setDomain(const QString &domain)
 ///
 /// \param port Port number at which the XMPP server is listening. The default
 /// value is 5222.
-///
 ///
 void QXmppConfiguration::setPort(int port)
 {

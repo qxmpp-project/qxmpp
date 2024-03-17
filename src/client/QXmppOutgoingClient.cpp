@@ -1297,7 +1297,7 @@ bool C2sStreamManager::setResumeAddress(const QString &address)
         if (location.second > 0) {
             m_resumePort = location.second;
         } else {
-            m_resumePort = 5222;
+            m_resumePort = XMPP_DEFAULT_PORT;
         }
         return true;
     }
