@@ -58,7 +58,6 @@ public:
     bool sendPacket(const QXmppNonza &);
 
     QXmpp::Private::XmppSocket &xmppSocket() const;
-    QXmpp::Private::StreamAckManager &streamAckManager() const;
 
 Q_SIGNALS:
     /// This signal is emitted when the stream is connected.
@@ -91,8 +90,6 @@ public Q_SLOTS:
 
 private:
     friend class tst_QXmppStream;
-
-    void onStanzaReceived(const QDomElement &);
 
     const std::unique_ptr<QXmppStreamPrivate> d;
 };

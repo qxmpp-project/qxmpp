@@ -7,12 +7,9 @@
 #include "QXmppStream.h"
 
 #include "QXmppConstants_p.h"
-#include "QXmppFutureUtils_p.h"
-#include "QXmppIq.h"
-#include "QXmppPacket_p.h"
+#include "QXmppError.h"
+#include "QXmppNonza.h"
 #include "QXmppStreamError_p.h"
-#include "QXmppStreamManagement_p.h"
-#include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
 #include <QDomDocument>
@@ -29,14 +26,10 @@ public:
     QXmppStreamPrivate(QXmppStream *stream);
 
     XmppSocket socket;
-
-    // stream management
-    StreamAckManager streamAckManager;
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
-    : socket(stream),
-      streamAckManager(socket)
+    : socket(stream)
 {
 }
 
@@ -50,26 +43,18 @@ QXmppStream::QXmppStream(QObject *parent)
       d(std::make_unique<QXmppStreamPrivate>(this))
 {
     connect(&d->socket, &XmppSocket::started, this, &QXmppStream::handleStart);
-    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppStream::onStanzaReceived);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppStream::handleStanza);
     connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppStream::handleStream);
     connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppStream::disconnectFromHost);
 }
 
-///
-/// Destroys a base XMPP stream.
-///
-QXmppStream::~QXmppStream()
-{
-    // causes tasks to be finished
-    d->streamAckManager.resetCache();
-}
+QXmppStream::~QXmppStream() = default;
 
 ///
 /// Disconnects from the remote host.
 ///
 void QXmppStream::disconnectFromHost()
 {
-    d->streamAckManager.handleDisconnect();
     d->socket.disconnectFromHost();
 }
 
@@ -77,11 +62,8 @@ void QXmppStream::disconnectFromHost()
 /// Handles a stream start event, which occurs when the underlying transport
 /// becomes ready (socket connected, encryption started).
 ///
-/// If you redefine handleStart(), make sure to call the base class's method.
-///
 void QXmppStream::handleStart()
 {
-    d->streamAckManager.handleStart();
 }
 
 ///
@@ -109,7 +91,7 @@ bool QXmppStream::sendData(const QByteArray &data)
 ///
 bool QXmppStream::sendPacket(const QXmppNonza &nonza)
 {
-    return d->streamAckManager.sendPacketCompat(nonza);
+    return d->socket.sendData(serializeXml(nonza));
 }
 
 ///
@@ -118,14 +100,6 @@ bool QXmppStream::sendPacket(const QXmppNonza &nonza)
 XmppSocket &QXmppStream::xmppSocket() const
 {
     return d->socket;
-}
-
-///
-/// Returns the manager for Stream Management
-///
-StreamAckManager &QXmppStream::streamAckManager() const
-{
-    return d->streamAckManager;
 }
 
 ///
@@ -142,17 +116,6 @@ QSslSocket *QXmppStream::socket() const
 void QXmppStream::setSocket(QSslSocket *socket)
 {
     d->socket.setSocket(socket);
-}
-
-void QXmppStream::onStanzaReceived(const QDomElement &stanza)
-{
-    // handle possible stream management packets first
-    if (streamAckManager().handleStanza(stanza)) {
-        return;
-    }
-
-    // process all other kinds of packets
-    handleStanza(stanza);
 }
 
 namespace QXmpp::Private {
