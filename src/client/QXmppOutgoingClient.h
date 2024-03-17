@@ -34,6 +34,12 @@ class OutgoingIqManager;
 class PingManager;
 class StreamAckManager;
 class XmppSocket;
+
+enum HandleElementResult {
+    Accepted,
+    Rejected,
+    Finished,
+};
 }  // namespace QXmpp::Private
 
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
@@ -93,7 +99,8 @@ public:
 
 private:
     void handleStart();
-    void handleStanza(const QDomElement &element);
+    void handlePacketReceived(const QDomElement &element);
+    QXmpp::Private::HandleElementResult handleElement(const QDomElement &nodeRecv);
     void handleStream(const QDomElement &element);
 
     void _q_socketDisconnected();
