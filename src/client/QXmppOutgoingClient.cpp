@@ -96,7 +96,7 @@ public:
 
     void reset();
     QXmppTask<Result> bindAddress(const QString &resource);
-    bool handleElement(const QDomElement &el);
+    HandleElementResult handleElement(const QDomElement &el);
 
 private:
     SendDataInterface *m_socket;
@@ -121,7 +121,7 @@ public:
     void reset();
     QXmppTask<OptionsResult> queryOptions(const QString &streamFrom, const QString &username);
     QXmppTask<AuthResult> authenticate(bool plainText, const QString &username, const QString &password, const QString &resource, const QString &streamId);
-    bool handleElement(const QDomElement &el);
+    HandleElementResult handleElement(const QDomElement &el);
 
 private:
     struct NoQuery {
@@ -149,7 +149,7 @@ public:
 
     void reset();
     QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent);
-    bool handleElement(const QDomElement &el);
+    HandleElementResult handleElement(const QDomElement &el);
 
 private:
     static AuthenticationError::Type mapSaslCondition(const std::optional<SaslErrorCondition> &condition);
@@ -241,19 +241,15 @@ public:
     // Redirection
     std::optional<StreamErrorElement::SeeOtherHost> redirect;
 
-    // Session
-    BindManager bindManager;
+    // Authentication & Session
+    bool isAuthenticated = false;
     bool bindModeAvailable = false;
     bool sessionStarted = false;
-
-    // Authentication
-    bool isAuthenticated = false;
-    NonSaslAuthManager nonSaslAuthManager;
-    SaslManager saslManager;
 
     // Client State Indication
     bool clientStateIndicationEnabled = false;
 
+    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, BindManager> manager;
     C2sStreamManager c2sStreamManager;
     PingManager pingManager;
 
@@ -265,9 +261,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : socket(qq),
       streamAckManager(socket),
       iqManager(qq, streamAckManager),
-      bindManager(&socket),
-      nonSaslAuthManager(&socket),
-      saslManager(&socket),
+      manager(qq),
       c2sStreamManager(qq),
       pingManager(qq),
       q(qq)
@@ -326,7 +320,7 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingClient::socketError);
 
     connect(&d->socket, &XmppSocket::started, this, &QXmppOutgoingClient::handleStart);
-    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppOutgoingClient::handleStanza);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppOutgoingClient::handlePacketReceived);
     connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppOutgoingClient::handleStream);
     connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppOutgoingClient::disconnectFromHost);
 
@@ -433,7 +427,6 @@ void QXmppOutgoingClient::connectToHost()
 ///
 void QXmppOutgoingClient::disconnectFromHost()
 {
-    d->bindManager.reset();
     d->c2sStreamManager.onDisconnecting();
     d->streamAckManager.handleDisconnect();
     d->socket.disconnectFromHost();
@@ -512,7 +505,8 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
 
 void QXmppOutgoingClient::startNonSaslAuth()
 {
-    d->nonSaslAuthManager.queryOptions(d->streamFrom, d->config.user()).then(this, [this](auto result) {
+    d->manager = NonSaslAuthManager(&d->socket);
+    std::get<NonSaslAuthManager>(d->manager).queryOptions(d->streamFrom, d->config.user()).then(this, [this](auto result) {
         if (auto *options = std::get_if<NonSaslAuthOptions>(&result)) {
             bool plainText = false;
 
@@ -529,7 +523,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
                 return;
             }
 
-            auto task = d->nonSaslAuthManager.authenticate(plainText, d->config.user(), d->config.password(), d->config.resource(), d->streamId);
+            auto task = std::get<NonSaslAuthManager>(d->manager).authenticate(plainText, d->config.user(), d->config.password(), d->config.resource(), d->streamId);
             task.then(this, [this](auto result) {
                 if (std::holds_alternative<Success>(result)) {
                     // successful Non-SASL Authentication
@@ -558,7 +552,8 @@ void QXmppOutgoingClient::startNonSaslAuth()
 
 void QXmppOutgoingClient::startResourceBinding()
 {
-    d->bindManager.bindAddress(d->config.resource()).then(this, [this](BindManager::Result r) {
+    d->manager = BindManager(&d->socket);
+    std::get<BindManager>(d->manager).bindAddress(d->config.resource()).then(this, [this](BindManager::Result r) {
         if (auto *addr = std::get_if<BoundAddress>(&r)) {
             d->config.setUser(addr->user);
             d->config.setDomain(addr->domain);
@@ -636,9 +631,8 @@ void QXmppOutgoingClient::handleStart()
     d->streamFrom.clear();
     d->streamVersion.clear();
 
-    // reset authentication step
-    d->nonSaslAuthManager.reset();
-    d->saslManager.reset();
+    // reset active manager (e.g. authentication)
+    d->manager = this;
 
     // reset session information
     d->sessionStarted = false;
@@ -671,7 +665,7 @@ void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
     }
 }
 
-void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
+void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
 {
     // if we receive any kind of data, stop the timeout timer
     d->pingManager.onDataReceived();
@@ -681,13 +675,34 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         return;
     }
 
+    switch (visit(overloaded {
+                      [&](auto *manager) { return manager->handleElement(nodeRecv); },
+                      [&](auto &manager) { return manager.handleElement(nodeRecv); },
+                  },
+                  d->manager)) {
+    case Accepted:
+        return;
+    case Rejected:
+        d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
+        Q_EMIT errorOccurred(QStringLiteral("Unexpected element received."), StreamError::UndefinedCondition, QXmppClient::XmppStreamError);
+        warning(QStringLiteral("Unexpected element received. Closing stream."));
+        disconnectFromHost();
+        return;
+    case Finished:
+        d->manager = this;
+        return;
+    }
+}
+
+HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRecv)
+{
     const QString ns = nodeRecv.namespaceURI();
 
     // give client opportunity to handle stanza
     bool handled = false;
     Q_EMIT elementReceived(nodeRecv, handled);
     if (handled) {
-        return;
+        return Accepted;
     }
 
     if (QXmppStreamFeatures::isStreamFeatures(nodeRecv)) {
@@ -701,8 +716,10 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // handle authentication
         const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
         const bool saslAvailable = !features.authMechanisms().isEmpty();
+
         if (saslAvailable && configuration().useSASLAuthentication()) {
-            d->saslManager.authenticate(d->config, features, this).then(this, [this](auto result) {
+            d->manager = SaslManager(&d->socket);
+            std::get<SaslManager>(d->manager).authenticate(d->config, features, this).then(this, [this](auto result) {
                 if (std::holds_alternative<Success>(result)) {
                     debug(QStringLiteral("Authenticated"));
                     d->isAuthenticated = true;
@@ -724,10 +741,10 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                     disconnectFromHost();
                 }
             });
-            return;
+            return Accepted;
         } else if (nonSaslAvailable && configuration().useNonSASLAuthentication()) {
             startNonSaslAuth();
-            return;
+            return Accepted;
         }
 
         // store which features are available
@@ -737,18 +754,19 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
         // check whether the stream can be resumed
         if (d->c2sStreamManager.canRequestResume()) {
             d->c2sStreamManager.requestResume();
-            return;
+            return Accepted;
         }
 
         // check whether bind is available
         if (d->bindModeAvailable) {
             startResourceBinding();
-            return;
+            return Accepted;
         }
 
         // otherwise we are done
         d->sessionStarted = true;
         Q_EMIT connected();
+        return Accepted;
     } else if (ns == ns_stream && nodeRecv.tagName() == u"error") {
         visit(
             overloaded {
@@ -789,11 +807,6 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 },
             },
             StreamErrorElement::fromDom(nodeRecv));
-    } else if (ns == ns_sasl) {
-        if (!d->saslManager.handleElement(nodeRecv)) {
-            warning(QStringLiteral("Unexpected SASL stanza received"));
-            return;
-        }
     } else if (ns == ns_client) {
         if (nodeRecv.tagName() == u"iq") {
             QString type = nodeRecv.attribute(QStringLiteral("type"));
@@ -801,11 +814,7 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
                 warning(QStringLiteral("QXmppStream: iq type can't be empty"));
             }
 
-            if (d->bindManager.handleElement(nodeRecv) ||
-                d->nonSaslAuthManager.handleElement(nodeRecv) ||
-                d->pingManager.handleIq(nodeRecv)) {
-                // handled in manager
-            } else {
+            if (!d->pingManager.handleIq(nodeRecv)) {
                 QXmppIq iqPacket;
                 iqPacket.parse(nodeRecv);
 
@@ -835,10 +844,14 @@ void QXmppOutgoingClient::handleStanza(const QDomElement &nodeRecv)
 
             // emit message
             Q_EMIT messageReceived(message);
+        } else {
+            return Rejected;
         }
+    } else if (d->c2sStreamManager.handleElement(nodeRecv)) {
     } else {
-        d->c2sStreamManager.handleElement(nodeRecv);
+        return Rejected;
     }
+    return Accepted;
 }
 
 void QXmppOutgoingClient::throwKeepAliveError()
@@ -886,7 +899,7 @@ QXmppTask<BindManager::Result> BindManager::bindAddress(const QString &resource)
     return m_promise->task();
 }
 
-bool BindManager::handleElement(const QDomElement &el)
+HandleElementResult BindManager::handleElement(const QDomElement &el)
 {
     auto process = [](QXmppBindIq &&iq) -> Result {
         if (iq.type() == QXmppIq::Result) {
@@ -919,15 +932,12 @@ bool BindManager::handleElement(const QDomElement &el)
         bind.parse(el);
 
         // do not accept other IQ types than result and error
-        if (bind.type() != QXmppIq::Result && bind.type() != QXmppIq::Error) {
-            return false;
+        if (bind.type() == QXmppIq::Result || bind.type() == QXmppIq::Error) {
+            p.finish(process(std::move(bind)));
+            return Finished;
         }
-
-        // report result
-        p.finish(process(std::move(bind)));
-        return true;
     }
-    return false;
+    return Rejected;
 }
 
 void NonSaslAuthManager::reset()
@@ -978,13 +988,18 @@ QXmppTask<NonSaslAuthManager::AuthResult> NonSaslAuthManager::authenticate(bool 
     return query.p.task();
 }
 
-bool NonSaslAuthManager::handleElement(const QDomElement &el)
+HandleElementResult NonSaslAuthManager::handleElement(const QDomElement &el)
 {
+    if (el.tagName() != u"iq") {
+        return Rejected;
+    }
+
     if (std::holds_alternative<OptionsQuery>(m_query)) {
         auto query = std::get<OptionsQuery>(std::move(m_query));
         m_query = {};
 
-        if (QXmppNonSASLAuthIq::isNonSASLAuthIq(el) && el.attribute(QStringLiteral("type")) == u"result") {
+        auto iqType = el.attribute(QStringLiteral("type"));
+        if (QXmppNonSASLAuthIq::isNonSASLAuthIq(el) && iqType == u"result") {
             auto queryEl = firstChildElement(el, u"query");
 
             bool digest = !firstChildElement(queryEl, u"digest").isNull();
@@ -997,7 +1012,7 @@ bool NonSaslAuthManager::handleElement(const QDomElement &el)
 
             query.p.finish(QXmppError { iq.error().text(), iq.error() });
         }
-        return true;
+        return Finished;
     }
 
     if (std::holds_alternative<AuthQuery>(m_query)) {
@@ -1021,9 +1036,9 @@ bool NonSaslAuthManager::handleElement(const QDomElement &el)
         } else {
             query.p.finish(QXmppError { QStringLiteral("Received IQ response with wrong ID."), {} });
         }
-        return true;
+        return Finished;
     }
-    return false;
+    return Rejected;
 }
 
 void SaslManager::reset()
@@ -1106,7 +1121,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
     return m_promise->task();
 }
 
-bool SaslManager::handleElement(const QDomElement &el)
+HandleElementResult SaslManager::handleElement(const QDomElement &el)
 {
     auto finish = [this](auto &&value) {
         auto p = std::move(*m_promise);
@@ -1115,11 +1130,12 @@ bool SaslManager::handleElement(const QDomElement &el)
     };
 
     if (!m_promise.has_value() || el.namespaceURI() != ns_sasl) {
-        return false;
+        return Rejected;
     }
 
     if (el.tagName() == u"success") {
         finish(Success());
+        return Finished;
     } else if (el.tagName() == u"challenge") {
         QXmppSaslChallenge challenge;
         challenge.parse(el);
@@ -1127,11 +1143,13 @@ bool SaslManager::handleElement(const QDomElement &el)
         QByteArray response;
         if (m_saslClient->respond(challenge.value, response)) {
             m_socket->sendData(serializeXml(QXmppSaslResponse(response)));
+            return Accepted;
         } else {
             finish(AuthError {
                 QStringLiteral("Could not respond to SASL challenge"),
                 AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
             });
+            return Finished;
         }
     } else if (el.tagName() == u"failure") {
         QXmppSaslFailure failure;
@@ -1145,10 +1163,9 @@ bool SaslManager::handleElement(const QDomElement &el)
             QStringLiteral("Authentication failed: %1").arg(text),
             AuthenticationError { mapSaslCondition(failure.condition), failure.text, std::move(failure) },
         });
-    } else {
-        return false;
+        return Finished;
     }
-    return true;
+    return Rejected;
 }
 
 AuthenticationError::Type SaslManager::mapSaslCondition(const std::optional<SaslErrorCondition> &condition)
