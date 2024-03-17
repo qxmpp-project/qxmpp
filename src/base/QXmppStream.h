@@ -99,34 +99,6 @@ private:
 
 namespace QXmpp::Private {
 
-using IqResult = std::variant<QDomElement, QXmppError>;
-
-class OutgoingIqManager
-{
-public:
-    OutgoingIqManager(QXmppLoggable *l, StreamAckManager &streamAckMananger);
-    ~OutgoingIqManager();
-
-    QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
-    QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
-
-    bool hasId(const QString &id) const;
-    bool isIdValid(const QString &id) const;
-
-    QXmppTask<IqResult> start(const QString &id, const QString &to);
-    void finish(const QString &id, IqResult &&result);
-    void cancelAll();
-
-    bool handleStanza(const QDomElement &stanza);
-
-private:
-    void warning(const QString &message);
-
-    QXmppLoggable *l;
-    StreamAckManager &m_streamAckManager;
-    std::unordered_map<QString, IqState> m_requests;
-};
-
 class QXMPP_EXPORT XmppSocket : public QXmppLoggable
 {
     Q_OBJECT

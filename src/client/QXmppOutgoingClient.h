@@ -31,6 +31,7 @@ class QXmppOutgoingClientPrivate;
 namespace QXmpp::Private {
 class PingManager;
 class C2sStreamManager;
+using IqResult = std::variant<QDomElement, QXmppError>;
 }  // namespace QXmpp::Private
 
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
