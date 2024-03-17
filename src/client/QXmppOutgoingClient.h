@@ -31,7 +31,6 @@ class QXmppOutgoingClientPrivate;
 namespace QXmpp::Private {
 class PingManager;
 class C2sStreamManager;
-using IqResult = std::variant<QDomElement, QXmppError>;
 }  // namespace QXmpp::Private
 
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
@@ -40,6 +39,7 @@ class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
     Q_OBJECT
 
 public:
+    using IqResult = std::variant<QDomElement, QXmppError>;
     using ConnectionError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmpp::StreamError, QXmpp::AuthenticationError, QXmpp::BindError>;
 
     explicit QXmppOutgoingClient(QObject *parent);
@@ -50,7 +50,7 @@ public:
     bool isAuthenticated() const;
     bool isConnected() const;
     bool isClientStateIndicationEnabled() const;
-    QXmppTask<QXmpp::Private::IqResult> sendIq(QXmppIq &&);
+    QXmppTask<IqResult> sendIq(QXmppIq &&);
 
     /// Returns the used socket
     QSslSocket *socket() const;

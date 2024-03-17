@@ -174,6 +174,8 @@ private:
     QTimer *timeoutTimer;
 };
 
+using IqResult = QXmppOutgoingClient::IqResult;
+
 struct IqState {
     QXmppPromise<IqResult> interface;
     QString jid;
