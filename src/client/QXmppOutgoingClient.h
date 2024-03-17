@@ -42,6 +42,10 @@ enum HandleElementResult {
 };
 }  // namespace QXmpp::Private
 
+namespace QXmpp::Private::Sasl2 {
+struct StreamFeature;
+}
+
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
 class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
 {
@@ -107,6 +111,7 @@ private:
     void socketError(QAbstractSocket::SocketError);
     void socketSslErrors(const QList<QSslError> &);
 
+    void startSasl2Auth(const QXmpp::Private::Sasl2::StreamFeature &sasl2Feature);
     void startNonSaslAuth();
     void startResourceBinding();
     void onSMResumeFinished();
