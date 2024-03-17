@@ -216,7 +216,7 @@ public:
     // Client State Indication
     bool clientStateIndicationEnabled = false;
 
-    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, BindManager> manager;
+    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, BindManager> manager;
     C2sStreamManager c2sStreamManager;
     PingManager pingManager;
 
@@ -470,6 +470,27 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
     }
 }
 
+void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Feature)
+{
+    d->manager = Sasl2Manager(&d->socket);
+    std::get<Sasl2Manager>(d->manager).authenticate(d->config, sasl2Feature, this).then(this, [this](auto result) {
+        if (auto success = std::get_if<Sasl2::Success>(&result)) {
+            debug(QStringLiteral("Authenticated"));
+            d->isAuthenticated = true;
+
+            // new stream features will be sent by the server now
+        } else {
+            auto [text, err] = std::get<Sasl2Manager::AuthError>(std::move(result));
+
+            d->xmppStreamError = QXmppStanza::Error::NotAuthorized;
+
+            Q_EMIT errorOccurred(text, err, QXmppClient::XmppStreamError);
+            warning(QStringLiteral("Could not authenticate using SASL 2: ") + text);
+            disconnectFromHost();
+        }
+    });
+}
+
 void QXmppOutgoingClient::startNonSaslAuth()
 {
     d->manager = NonSaslAuthManager(&d->socket);
@@ -685,7 +706,10 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
         const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
         const bool saslAvailable = !features.authMechanisms().isEmpty();
 
-        if (saslAvailable && configuration().useSASLAuthentication()) {
+        if (features.sasl2Feature().has_value() && d->config.useSasl2Authentication()) {
+            startSasl2Auth(features.sasl2Feature().value());
+            return Accepted;
+        } else if (saslAvailable && configuration().useSASLAuthentication()) {
             d->manager = SaslManager(&d->socket);
             std::get<SaslManager>(d->manager).authenticate(d->config, features.authMechanisms(), this).then(this, [this](auto result) {
                 if (std::holds_alternative<Success>(result)) {
