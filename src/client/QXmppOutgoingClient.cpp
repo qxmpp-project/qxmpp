@@ -46,6 +46,7 @@
 #include <QXmlStreamWriter>
 
 using std::visit;
+using namespace std::chrono_literals;
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
@@ -1156,7 +1157,7 @@ PingManager::PingManager(QXmppOutgoingClient *q)
 
         // start ping timer
         if (interval > 0) {
-            pingTimer->setInterval(interval * 1000);
+            pingTimer->setInterval(interval * 1s);
             pingTimer->start();
         }
     });
@@ -1198,7 +1199,7 @@ void PingManager::sendPing()
     // start timeout timer
     const int timeout = q->configuration().keepAliveTimeout();
     if (timeout > 0) {
-        timeoutTimer->setInterval(timeout * 1000);
+        timeoutTimer->setInterval(timeout * 1s);
         timeoutTimer->start();
     }
 }
