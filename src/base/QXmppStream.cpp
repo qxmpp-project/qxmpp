@@ -32,15 +32,11 @@ public:
 
     // stream management
     StreamAckManager streamAckManager;
-
-    // iq response handling
-    OutgoingIqManager iqManager;
 };
 
 QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
     : socket(stream),
-      streamAckManager(socket),
-      iqManager(stream, streamAckManager)
+      streamAckManager(socket)
 {
 }
 
@@ -66,7 +62,6 @@ QXmppStream::~QXmppStream()
 {
     // causes tasks to be finished
     d->streamAckManager.resetCache();
-    d->iqManager.cancelAll();
 }
 
 ///
@@ -134,14 +129,6 @@ StreamAckManager &QXmppStream::streamAckManager() const
 }
 
 ///
-/// Returns the manager for outgoing IQ request tracking.
-///
-OutgoingIqManager &QXmppStream::iqManager() const
-{
-    return d->iqManager;
-}
-
-///
 /// Returns the QSslSocket used for this stream.
 ///
 QSslSocket *QXmppStream::socket() const
@@ -160,7 +147,7 @@ void QXmppStream::setSocket(QSslSocket *socket)
 void QXmppStream::onStanzaReceived(const QDomElement &stanza)
 {
     // handle possible stream management packets first
-    if (streamAckManager().handleStanza(stanza) || iqManager().handleStanza(stanza)) {
+    if (streamAckManager().handleStanza(stanza)) {
         return;
     }
 

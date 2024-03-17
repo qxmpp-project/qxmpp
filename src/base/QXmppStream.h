@@ -59,7 +59,6 @@ public:
 
     QXmpp::Private::XmppSocket &xmppSocket() const;
     QXmpp::Private::StreamAckManager &streamAckManager() const;
-    QXmpp::Private::OutgoingIqManager &iqManager() const;
 
 Q_SIGNALS:
     /// This signal is emitted when the stream is connected.
