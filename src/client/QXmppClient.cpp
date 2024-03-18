@@ -27,6 +27,8 @@
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
+#include "XmppSocket.h"
+
 #include <chrono>
 
 #include <QDomElement>

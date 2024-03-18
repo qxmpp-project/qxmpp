@@ -5,6 +5,7 @@
 #include "QXmppStream.h"
 #include "QXmppStreamError_p.h"
 
+#include "XmppSocket.h"
 #include "util.h"
 
 using namespace QXmpp;

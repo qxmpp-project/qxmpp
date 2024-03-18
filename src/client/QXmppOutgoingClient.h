@@ -11,13 +11,13 @@
 #include "QXmppBindError.h"
 #include "QXmppClient.h"
 #include "QXmppStanza.h"
-#include "QXmppStream.h"
 #include "QXmppStreamError.h"
 
 #include <QAbstractSocket>
 
 class QDomElement;
 class QSslError;
+class QSslSocket;
 
 class QXmppConfiguration;
 class QXmppPresence;
@@ -29,8 +29,11 @@ class QXmppOutgoingClient;
 class QXmppOutgoingClientPrivate;
 
 namespace QXmpp::Private {
-class PingManager;
 class C2sStreamManager;
+class OutgoingIqManager;
+class PingManager;
+class StreamAckManager;
+class XmppSocket;
 }  // namespace QXmpp::Private
 
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.

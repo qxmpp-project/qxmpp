@@ -8,39 +8,17 @@
 #define QXMPPSTREAM_H
 
 #include "QXmppLogger.h"
-#include "QXmppSendResult.h"
 
 #include <memory>
-#include <unordered_map>
-#include <variant>
-
-#include <QAbstractSocket>
-#include <QObject>
 
 class QDomElement;
-template<typename T>
-class QXmppTask;
-template<typename T>
-class QFuture;
-template<typename T>
-class QFutureInterface;
 class QSslSocket;
-class QXmppIq;
 class QXmppNonza;
-class QXmppPacket;
-class QXmppStanza;
-class QXmppStreamManager;
 class QXmppStreamPrivate;
-class TestStream;
 
 namespace QXmpp::Private {
-
 class XmppSocket;
-class StreamAckManager;
-class OutgoingIqManager;
-struct IqState;
-
-}  // namespace QXmpp::Private
+}
 
 ///
 /// \brief The QXmppStream class is the base class for all XMPP streams.
@@ -93,40 +71,5 @@ private:
 
     const std::unique_ptr<QXmppStreamPrivate> d;
 };
-
-namespace QXmpp::Private {
-
-class QXMPP_EXPORT XmppSocket : public QXmppLoggable
-{
-    Q_OBJECT
-public:
-    XmppSocket(QObject *parent);
-    ~XmppSocket() override = default;
-
-    QSslSocket *socket() const { return m_socket; }
-    void setSocket(QSslSocket *socket);
-
-    bool isConnected() const;
-    void disconnectFromHost();
-    bool sendData(const QByteArray &);
-
-    Q_SIGNAL void started();
-    Q_SIGNAL void stanzaReceived(const QDomElement &);
-    Q_SIGNAL void streamReceived(const QDomElement &);
-    Q_SIGNAL void streamClosed();
-
-private:
-    void processData(const QString &data);
-
-    friend class ::TestStream;
-
-    QString m_dataBuffer;
-    QSslSocket *m_socket = nullptr;
-
-    // incoming stream state
-    QString m_streamOpenElement;
-};
-
-}  // namespace QXmpp::Private
 
 #endif  // QXMPPSTREAM_H

@@ -24,6 +24,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "XmppSocket.h"
+
 #include <QCryptographicHash>
 #include <QDnsLookup>
 #include <QFuture>
