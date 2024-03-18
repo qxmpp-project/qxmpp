@@ -94,7 +94,6 @@ public:
 
     explicit BindManager(SendDataInterface *socket) : m_socket(socket) { }
 
-    void reset();
     QXmppTask<Result> bindAddress(const QString &resource);
     HandleElementResult handleElement(const QDomElement &el);
 
@@ -118,7 +117,6 @@ public:
 
     explicit NonSaslAuthManager(SendDataInterface *socket) : m_socket(socket) { }
 
-    void reset();
     QXmppTask<OptionsResult> queryOptions(const QString &streamFrom, const QString &username);
     QXmppTask<AuthResult> authenticate(bool plainText, const QString &username, const QString &password, const QString &resource, const QString &streamId);
     HandleElementResult handleElement(const QDomElement &el);
@@ -147,7 +145,6 @@ public:
 
     explicit SaslManager(SendDataInterface *socket) : m_socket(socket) { }
 
-    void reset();
     QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent);
     HandleElementResult handleElement(const QDomElement &el);
 
@@ -879,12 +876,6 @@ QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 
 namespace QXmpp::Private {
 
-void BindManager::reset()
-{
-    m_iqId.clear();
-    m_promise.reset();
-}
-
 QXmppTask<BindManager::Result> BindManager::bindAddress(const QString &resource)
 {
     Q_ASSERT(!m_promise);
@@ -926,7 +917,8 @@ HandleElementResult BindManager::handleElement(const QDomElement &el)
         Q_ASSERT(m_promise.has_value());
 
         auto p = std::move(*m_promise);
-        reset();
+        m_iqId.clear();
+        m_promise.reset();
 
         QXmppBindIq bind;
         bind.parse(el);
@@ -938,11 +930,6 @@ HandleElementResult BindManager::handleElement(const QDomElement &el)
         }
     }
     return Rejected;
-}
-
-void NonSaslAuthManager::reset()
-{
-    m_query = {};
 }
 
 QXmppTask<NonSaslAuthManager::OptionsResult> NonSaslAuthManager::queryOptions(const QString &streamFrom, const QString &username)
@@ -1039,12 +1026,6 @@ HandleElementResult NonSaslAuthManager::handleElement(const QDomElement &el)
         return Finished;
     }
     return Rejected;
-}
-
-void SaslManager::reset()
-{
-    m_saslClient.reset();
-    m_promise.reset();
 }
 
 QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent)
