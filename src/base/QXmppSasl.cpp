@@ -6,6 +6,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppConstants_p.h"
+#include "QXmppSasl2UserAgent.h"
 #include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
@@ -414,6 +415,83 @@ void Abort::toXml(QXmlStreamWriter *writer) const
 }
 
 }  // namespace QXmpp::Private::Sasl2
+
+///
+/// \class QXmppSasl2UserAgent
+///
+/// \brief User-agent for identifying devices across reconnects, defined in \xep{0388, Extensible
+/// SASL Profile}.
+///
+/// \since QXmpp 1.7
+///
+
+struct QXmppSasl2UserAgentPrivate : QSharedData, Sasl2::UserAgent { };
+
+/// Default-constructor
+QXmppSasl2UserAgent::QXmppSasl2UserAgent()
+    : d(new QXmppSasl2UserAgentPrivate())
+{
+}
+
+/// Constructs a new user-agent with given values.
+QXmppSasl2UserAgent::QXmppSasl2UserAgent(QUuid deviceId, const QString &softwareName, const QString &deviceName)
+    : d(new QXmppSasl2UserAgentPrivate { QSharedData(), Sasl2::UserAgent { deviceId, softwareName, deviceName } })
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppSasl2UserAgent)
+
+///
+/// Returns the unique and stable ID of this device.
+///
+/// This ID is intended to be persistent across reconnects and reboots of the used device.
+///
+QUuid QXmppSasl2UserAgent::deviceId() const
+{
+    return d->id;
+}
+
+///
+/// Sets the unique and stable ID of this device.
+///
+/// This ID is intended to be persistent across reconnects and reboots of the used device.
+///
+void QXmppSasl2UserAgent::setDeviceId(QUuid id)
+{
+    d->id = id;
+}
+
+///
+/// Returns the name of the used software (e.g. *AwesomeXMPP*).
+///
+const QString &QXmppSasl2UserAgent::softwareName() const
+{
+    return d->software;
+}
+
+///
+/// Sets the name of the used software (e.g. *AwesomeXMPP*).
+///
+void QXmppSasl2UserAgent::setSoftwareName(const QString &software)
+{
+    d->software = software;
+}
+
+///
+/// Returns the name of this device (e.g. *Kiva's Phone*).
+///
+const QString &QXmppSasl2UserAgent::deviceName() const
+{
+    return d->device;
+}
+
+///
+/// Sets the name of this device (e.g. *Kiva's Phone*).
+///
+void QXmppSasl2UserAgent::setDeviceName(const QString &device)
+{
+    d->device = device;
+}
 
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
 static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
