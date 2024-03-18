@@ -92,14 +92,14 @@ class BindManager
 public:
     using Result = std::variant<BoundAddress, QXmppStanza::Error, ProtocolError>;
 
-    explicit BindManager(XmppSocket &socket) : m_socket(socket) { }
+    explicit BindManager(SendDataInterface *socket) : m_socket(socket) { }
 
     void reset();
     QXmppTask<Result> bindAddress(const QString &resource);
     bool handleElement(const QDomElement &el);
 
 private:
-    XmppSocket &m_socket;
+    SendDataInterface *m_socket;
     QString m_iqId;
     std::optional<QXmppPromise<Result>> m_promise;
 };
@@ -116,7 +116,7 @@ public:
     using OptionsResult = std::variant<NonSaslAuthOptions, QXmppError>;
     using AuthResult = std::variant<Success, QXmppError>;
 
-    explicit NonSaslAuthManager(XmppSocket &socket) : m_socket(socket) { }
+    explicit NonSaslAuthManager(SendDataInterface *socket) : m_socket(socket) { }
 
     void reset();
     QXmppTask<OptionsResult> queryOptions(const QString &streamFrom, const QString &username);
@@ -134,7 +134,7 @@ private:
         QString id;
     };
 
-    XmppSocket &m_socket;
+    SendDataInterface *m_socket;
     std::variant<NoQuery, OptionsQuery, AuthQuery> m_query;
 };
 
@@ -145,7 +145,7 @@ public:
     using AuthError = std::pair<QString, AuthenticationError>;
     using AuthResult = std::variant<Success, AuthError>;
 
-    explicit SaslManager(XmppSocket &socket) : m_socket(socket) { }
+    explicit SaslManager(SendDataInterface *socket) : m_socket(socket) { }
 
     void reset();
     QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent);
@@ -154,7 +154,7 @@ public:
 private:
     static AuthenticationError::Type mapSaslCondition(const std::optional<SaslErrorCondition> &condition);
 
-    XmppSocket &m_socket;
+    SendDataInterface *m_socket;
     std::unique_ptr<QXmppSaslClient> m_saslClient;
     std::optional<QXmppPromise<AuthResult>> m_promise;
 };
@@ -265,9 +265,9 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : socket(qq),
       streamAckManager(socket),
       iqManager(qq, streamAckManager),
-      bindManager(socket),
-      nonSaslAuthManager(socket),
-      saslManager(socket),
+      bindManager(&socket),
+      nonSaslAuthManager(&socket),
+      saslManager(&socket),
       c2sStreamManager(qq),
       pingManager(qq),
       q(qq)
@@ -881,7 +881,7 @@ QXmppTask<BindManager::Result> BindManager::bindAddress(const QString &resource)
 
     const auto iq = QXmppBindIq::bindAddressIq(resource);
     m_iqId = iq.id();
-    m_socket.sendData(serializeXml(iq));
+    m_socket->sendData(serializeXml(iq));
 
     return m_promise->task();
 }
@@ -950,7 +950,7 @@ QXmppTask<NonSaslAuthManager::OptionsResult> NonSaslAuthManager::queryOptions(co
     // not attempt to guess the required fields?
     authQuery.setUsername(username);
 
-    m_socket.sendData(serializeXml(authQuery));
+    m_socket->sendData(serializeXml(authQuery));
 
     return query.p.task();
 }
@@ -974,7 +974,7 @@ QXmppTask<NonSaslAuthManager::AuthResult> NonSaslAuthManager::authenticate(bool 
     authQuery.setResource(resource);
     query.id = authQuery.id();
 
-    m_socket.sendData(serializeXml(authQuery));
+    m_socket->sendData(serializeXml(authQuery));
     return query.p.task();
 }
 
@@ -1100,7 +1100,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
             AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
         });
     }
-    m_socket.sendData(serializeXml(QXmppSaslAuth(m_saslClient->mechanism(), response)));
+    m_socket->sendData(serializeXml(QXmppSaslAuth(m_saslClient->mechanism(), response)));
 
     m_promise = QXmppPromise<AuthResult>();
     return m_promise->task();
@@ -1126,7 +1126,7 @@ bool SaslManager::handleElement(const QDomElement &el)
 
         QByteArray response;
         if (m_saslClient->respond(challenge.value, response)) {
-            m_socket.sendData(serializeXml(QXmppSaslResponse(response)));
+            m_socket->sendData(serializeXml(QXmppSaslResponse(response)));
         } else {
             finish(AuthError {
                 QStringLiteral("Could not respond to SASL challenge"),
