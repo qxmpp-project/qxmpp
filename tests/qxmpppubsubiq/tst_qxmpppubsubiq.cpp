@@ -10,6 +10,7 @@
 
 #include "pubsubutil.h"
 #include "util.h"
+
 #include <QObject>
 
 using namespace QXmpp::Private;

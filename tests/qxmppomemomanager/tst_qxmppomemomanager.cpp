@@ -19,6 +19,7 @@
 
 #include "IntegrationTesting.h"
 #include "util.h"
+
 #include <QObject>
 
 using namespace QXmpp;

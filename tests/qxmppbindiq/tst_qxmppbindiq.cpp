@@ -7,6 +7,7 @@
 
 #include "compat/QXmppSessionIq.h"
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppBindIq : public QObject

@@ -5,6 +5,7 @@
 #include "QXmppRosterIq.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppRosterIq : public QObject

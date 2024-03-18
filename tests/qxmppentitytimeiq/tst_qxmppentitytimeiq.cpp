@@ -6,6 +6,7 @@
 #include "QXmppEntityTimeIq.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppEntityTimeIq : public QObject

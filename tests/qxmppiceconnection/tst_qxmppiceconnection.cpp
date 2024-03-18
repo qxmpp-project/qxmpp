@@ -5,6 +5,7 @@
 #include "QXmppStun.h"
 
 #include "util.h"
+
 #include <QHostInfo>
 
 class tst_QXmppIceConnection : public QObject

@@ -15,6 +15,7 @@
 
 #include "OmemoLibWrappers.h"
 #include "QcaInitializer_p.h"
+
 #include <QDomElement>
 #include <QTimer>
 #include <QtCrypto>

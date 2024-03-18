@@ -5,6 +5,7 @@
 #include "QXmppMessageReaction.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppMessageReaction : public QObject

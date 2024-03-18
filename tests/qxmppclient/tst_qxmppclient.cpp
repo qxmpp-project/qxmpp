@@ -15,6 +15,7 @@
 #include "QXmppVersionManager.h"
 
 #include "util.h"
+
 #include <QObject>
 
 using namespace QXmpp::Private;

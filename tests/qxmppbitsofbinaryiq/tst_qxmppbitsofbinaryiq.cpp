@@ -6,6 +6,7 @@
 #include "QXmppBitsOfBinaryIq.h"
 
 #include "util.h"
+
 #include <QMimeType>
 #include <QObject>
 

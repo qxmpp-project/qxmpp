@@ -7,6 +7,7 @@
 #include "QXmppTransferManager.h"
 
 #include "util.h"
+
 #include <QBuffer>
 #include <QObject>
 

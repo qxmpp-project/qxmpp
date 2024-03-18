@@ -12,6 +12,7 @@
 #include "QXmppMessageHandler.h"
 
 #include "util.h"
+
 #include <QObject>
 
 void compareMessages(const QXmppMessage &lhs, const QXmppMessage &rhs)

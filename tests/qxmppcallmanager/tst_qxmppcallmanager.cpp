@@ -7,6 +7,7 @@
 #include "QXmppServer.h"
 
 #include "util.h"
+
 #include <QBuffer>
 
 class tst_QXmppCallManager : public QObject

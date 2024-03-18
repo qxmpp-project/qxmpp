@@ -7,6 +7,7 @@
 #include "QXmppJingleData.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppJingleData : public QObject

@@ -13,6 +13,7 @@
 #include "QXmppUtils.h"
 
 #include "util.h"
+
 #include <QObject>
 #include <QSet>
 

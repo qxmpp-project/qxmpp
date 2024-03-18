@@ -16,6 +16,7 @@
 
 #include "TestClient.h"
 #include "util.h"
+
 #include <QObject>
 
 Q_DECLARE_METATYPE(QXmpp::Private::PubSubIq<>);

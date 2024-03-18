@@ -7,6 +7,7 @@
 #include "QXmppPresence.h"
 
 #include "util.h"
+
 #include <QDateTime>
 #include <QObject>
 

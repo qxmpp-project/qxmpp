@@ -5,6 +5,7 @@
 #include "QXmppMixInvitation.h"
 
 #include "util.h"
+
 #include <QDomDocument>
 #include <QObject>
 

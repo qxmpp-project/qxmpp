@@ -13,6 +13,7 @@
 #include "IntegrationTesting.h"
 #include "TestClient.h"
 #include "util.h"
+
 #include <QMimeDatabase>
 
 static const auto UPLOAD_SERVICE_NAME = QStringLiteral("upload.montague.tld");

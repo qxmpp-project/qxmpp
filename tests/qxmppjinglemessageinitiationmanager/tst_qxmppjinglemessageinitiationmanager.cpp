@@ -9,6 +9,7 @@
 
 #include "IntegrationTesting.h"
 #include "util.h"
+
 #include <QTest>
 
 using Jmi = QXmppJingleMessageInitiation;

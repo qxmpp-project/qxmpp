@@ -6,6 +6,7 @@
 #include "QXmppTrustMessageKeyOwner.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppTrustMessages : public QObject
