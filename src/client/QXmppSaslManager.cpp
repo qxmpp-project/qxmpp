@@ -133,11 +133,11 @@ static AuthenticationError::Type mapSaslCondition(std::optional<Sasl::ErrorCondi
     return Auth::NotAuthorized;
 }
 
-QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent)
+QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfiguration &config, const QList<QString> &availableMechanisms, QXmppLoggable *parent)
 {
     Q_ASSERT(!m_promise.has_value());
 
-    auto result = initSaslAuthentication(config, features.authMechanisms(), parent);
+    auto result = initSaslAuthentication(config, availableMechanisms, parent);
     if (result.error) {
         return makeReadyTask<AuthResult>(std::move(*result.error));
     }
