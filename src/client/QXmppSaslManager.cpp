@@ -21,7 +21,7 @@
 
 namespace QXmpp::Private {
 
-static QString chooseMechanism(const QXmppConfiguration &config, const QList<QString> &availableMechanisms)
+static std::tuple<QString, QStringList> chooseMechanism(const QXmppConfiguration &config, const QList<QString> &availableMechanisms)
 {
     // supported and preferred SASL auth mechanisms
     const QString preferredMechanism = config.saslAuthMechanism();
@@ -47,7 +47,17 @@ static QString chooseMechanism(const QXmppConfiguration &config, const QList<QSt
             commonMechanisms << mechanism;
         }
     }
-    return commonMechanisms.empty() ? QString() : commonMechanisms.first();
+
+    // Remove disabled mechanisms and add to disabledAvailable
+    const auto disabled = config.disabledSaslMechanisms();
+    QStringList disabledAvailable;
+    for (const auto &m : disabled) {
+        if (commonMechanisms.removeAll(m)) {
+            disabledAvailable.push_back(m);
+        }
+    }
+
+    return { commonMechanisms.empty() ? QString() : commonMechanisms.first(), disabledAvailable };
 }
 
 static void setCredentials(QXmppSaslClient *saslClient, const QXmppConfiguration &config)
@@ -84,10 +94,13 @@ static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &confi
         Q_EMIT parent->logMessage(QXmppLogger::InformationMessage, message);
     };
 
-    auto mechanism = chooseMechanism(config, availableMechanisms);
+    auto [mechanism, disabled] = chooseMechanism(config, availableMechanisms);
     if (mechanism.isEmpty()) {
-        return error(QStringLiteral("No supported SASL Authentication mechanism available"),
-                     { AuthenticationError::MechanismMismatch, {}, {} });
+        auto text = disabled.empty()
+            ? QStringLiteral("No supported SASL mechanism available")
+            : QStringLiteral("No supported SASL mechanism available (%1 is disabled)").arg(disabled.join(u", "));
+
+        return error(std::move(text), { AuthenticationError::MechanismMismatch, {}, {} });
     }
 
     auto saslClient = QXmppSaslClient::create(mechanism, parent);
