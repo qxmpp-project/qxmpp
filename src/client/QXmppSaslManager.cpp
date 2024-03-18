@@ -65,6 +65,48 @@ static void setCredentials(QXmppSaslClient *saslClient, const QXmppConfiguration
     }
 }
 
+struct InitSaslAuthResult {
+    std::unique_ptr<QXmppSaslClient> saslClient;
+    std::optional<SaslManager::AuthError> error;
+    QByteArray initialResponse;
+};
+
+static InitSaslAuthResult error(QString text, AuthenticationError err)
+{
+    return { {}, SaslManager::AuthError { text, err }, {} };
+}
+
+static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &config, const QList<QString> &availableMechanisms, QXmppLoggable *parent)
+{
+    auto info = [&](const auto &message) {
+        Q_EMIT parent->logMessage(QXmppLogger::InformationMessage, message);
+    };
+
+    auto mechanism = chooseMechanism(config, availableMechanisms);
+    if (mechanism.isEmpty()) {
+        return error(QStringLiteral("No supported SASL Authentication mechanism available"),
+                     { AuthenticationError::MechanismMismatch, {}, {} });
+    }
+
+    auto saslClient = QXmppSaslClient::create(mechanism, parent);
+    if (!saslClient) {
+        return error(QStringLiteral("SASL mechanism negotiation failed"),
+                     AuthenticationError { AuthenticationError::ProcessingError, {}, {} });
+    }
+    info(QStringLiteral("SASL mechanism '%1' selected").arg(saslClient->mechanism()));
+    saslClient->setHost(config.domain());
+    saslClient->setServiceType(QStringLiteral("xmpp"));
+    setCredentials(saslClient.get(), config);
+
+    // send SASL auth request
+    if (auto response = saslClient->respond(QByteArray())) {
+        return { std::move(saslClient), {}, *response };
+    } else {
+        return error(QStringLiteral("SASL initial response failed"),
+                     AuthenticationError { AuthenticationError::ProcessingError, {}, {} });
+    }
+}
+
 static AuthenticationError::Type mapSaslCondition(std::optional<Sasl::ErrorCondition> condition)
 {
     using Auth = AuthenticationError;
@@ -95,37 +137,15 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
 {
     Q_ASSERT(!m_promise.has_value());
 
-    auto mechanism = chooseMechanism(config, features.authMechanisms());
-    if (mechanism.isEmpty()) {
-        return makeReadyTask<AuthResult>(AuthError {
-            QStringLiteral("No supported SASL Authentication mechanism available"),
-            AuthenticationError { AuthenticationError::MechanismMismatch, {}, {} },
-        });
+    auto result = initSaslAuthentication(config, features.authMechanisms(), parent);
+    if (result.error) {
+        return makeReadyTask<AuthResult>(std::move(*result.error));
     }
 
-    m_saslClient = QXmppSaslClient::create(mechanism, parent);
-    if (!m_saslClient) {
-        return makeReadyTask<AuthResult>(AuthError {
-            QStringLiteral("SASL mechanism negotiation failed"),
-            AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
-        });
-    }
-    m_saslClient->info(QStringLiteral("SASL mechanism '%1' selected").arg(m_saslClient->mechanism()));
-    m_saslClient->setHost(config.domain());
-    m_saslClient->setServiceType(QStringLiteral("xmpp"));
-    setCredentials(m_saslClient.get(), config);
-
-    // send SASL auth request
-    if (auto response = m_saslClient->respond(QByteArray())) {
-        m_socket->sendData(serializeXml(Sasl::Auth { m_saslClient->mechanism(), *response }));
-    } else {
-        return makeReadyTask<AuthResult>(AuthError {
-            QStringLiteral("SASL initial response failed"),
-            AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
-        });
-    }
+    m_socket->sendData(serializeXml(Sasl::Auth { result.saslClient->mechanism(), result.initialResponse }));
 
     m_promise = QXmppPromise<AuthResult>();
+    m_saslClient = std::move(result.saslClient);
     return m_promise->task();
 }
 
