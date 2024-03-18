@@ -5,8 +5,10 @@
 #include "QXmppConfiguration.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppSasl2UserAgent.h"
 #include "QXmppUtils.h"
 
+#include <QCoreApplication>
 #include <QNetworkProxy>
 #include <QSslSocket>
 #include <QStringBuilder>
@@ -46,12 +48,12 @@ public:
     bool useSasl2Authentication = true;
     bool useSASLAuthentication = true;
     bool useNonSASLAuthentication = true;
-    // default is false
     bool ignoreSslErrors = false;
 
     QXmppConfiguration::StreamSecurityMode streamSecurityMode = QXmppConfiguration::TLSEnabled;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism = QXmppConfiguration::NonSASLDigest;
     QString saslAuthMechanism;
+    std::optional<QXmppSasl2UserAgent> sasl2UserAgent;
 
     QNetworkProxy networkProxy;
 
@@ -434,6 +436,30 @@ QString QXmppConfiguration::saslAuthMechanism() const
 void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
 {
     d->saslAuthMechanism = mechanism;
+}
+
+///
+/// Returns the user-agent used for \xep{0388, Extensible SASL Profile}.
+///
+/// If this is empty, no user-agent will be sent.
+///
+/// \since QXmpp 1.7
+///
+std::optional<QXmppSasl2UserAgent> QXmppConfiguration::sasl2UserAgent() const
+{
+    return d->sasl2UserAgent;
+}
+
+///
+/// Sets the user-agent used for \xep{0388, Extensible SASL Profile}.
+///
+/// If this is empty, no user-agent will be sent.
+///
+/// \since QXmpp 1.7
+///
+void QXmppConfiguration::setSasl2UserAgent(const std::optional<QXmppSasl2UserAgent> &userAgent)
+{
+    d->sasl2UserAgent = userAgent;
 }
 
 ///

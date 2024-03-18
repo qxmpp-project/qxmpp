@@ -7,13 +7,17 @@
 
 #include "QXmppGlobal.h"
 
+#include <optional>
+
 #include <QSharedDataPointer>
 #include <QString>
 
 class QNetworkProxy;
 class QSslCertificate;
 class QXmppConfigurationPrivate;
+class QXmppSasl2UserAgent;
 
+///
 /// \brief The QXmppConfiguration class holds configuration options.
 ///
 /// It can be passed to QXmppClient to specify the options when connecting to
@@ -24,7 +28,6 @@ class QXmppConfigurationPrivate;
 /// of authentication mechanism, type of security used by stream (encryption),
 /// etc..
 ///
-
 class QXMPP_EXPORT QXmppConfiguration
 {
 public:
@@ -118,6 +121,9 @@ public:
 
     QString saslAuthMechanism() const;
     void setSaslAuthMechanism(const QString &mechanism);
+
+    std::optional<QXmppSasl2UserAgent> sasl2UserAgent() const;
+    void setSasl2UserAgent(const std::optional<QXmppSasl2UserAgent> &);
 
     QNetworkProxy networkProxy() const;
     void setNetworkProxy(const QNetworkProxy &proxy);
