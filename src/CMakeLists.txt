@@ -229,6 +229,8 @@ set(SOURCE_FILES
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
     base/compat/removed_api.cpp
+    # to trigger MOC
+    base/XmppSocket.h
 
     # Client
     client/QXmppArchiveManager.cpp

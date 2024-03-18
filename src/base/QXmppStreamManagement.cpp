@@ -10,6 +10,8 @@
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils_p.h"
 
+#include "XmppSocket.h"
+
 using namespace QXmpp::Private;
 
 /// \cond

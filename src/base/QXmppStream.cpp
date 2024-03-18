@@ -12,6 +12,8 @@
 #include "QXmppStreamError_p.h"
 #include "QXmppUtils_p.h"
 
+#include "XmppSocket.h"
+
 #include <QDomDocument>
 #include <QHostAddress>
 #include <QRegularExpression>
