@@ -687,7 +687,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
 
         if (saslAvailable && configuration().useSASLAuthentication()) {
             d->manager = SaslManager(&d->socket);
-            std::get<SaslManager>(d->manager).authenticate(d->config, features, this).then(this, [this](auto result) {
+            std::get<SaslManager>(d->manager).authenticate(d->config, features.authMechanisms(), this).then(this, [this](auto result) {
                 if (std::holds_alternative<Success>(result)) {
                     debug(QStringLiteral("Authenticated"));
                     d->isAuthenticated = true;

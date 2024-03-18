@@ -30,7 +30,7 @@ public:
 
     explicit SaslManager(SendDataInterface *socket) : m_socket(socket) { }
 
-    QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const QXmppStreamFeatures &features, QXmppLoggable *parent);
+    QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const QList<QString> &availableMechanisms, QXmppLoggable *parent);
     HandleElementResult handleElement(const QDomElement &el);
 
 private:
