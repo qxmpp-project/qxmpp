@@ -5,6 +5,7 @@
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
+#include "QXmppSasl2UserAgent.h"
 #include "QXmppSaslManager_p.h"
 #include "QXmppSasl_p.h"
 
@@ -689,10 +690,15 @@ void tst_QXmppSasl::sasl2ManagerPlain()
     auto &sent = test.socket.sent;
 
     QXmppConfiguration config;
-    config.setUser("marc");
+    config.setUser("bowman");
     config.setPassword("1234");
     // prefer PLAIN
     config.setSaslAuthMechanism("PLAIN");
+    config.setSasl2UserAgent(QXmppSasl2UserAgent {
+        QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")),
+        "QXmpp",
+        "HAL 9000",
+    });
 
     auto task = test.manager.authenticate(
         config,
@@ -701,15 +707,15 @@ void tst_QXmppSasl::sasl2ManagerPlain()
 
     QVERIFY(!task.isFinished());
     QCOMPARE(sent.size(), 1);
-    QCOMPARE(sent.at(0), "<authenticate xmlns=\"urn:xmpp:sasl:2\" mechanism=\"PLAIN\"><initial-response>AG1hcmMAMTIzNA==</initial-response></authenticate>");
+    QCOMPARE(sent.at(0), "<authenticate xmlns=\"urn:xmpp:sasl:2\" mechanism=\"PLAIN\"><initial-response>AGJvd21hbgAxMjM0</initial-response><user-agent id=\"d4565fa7-4d72-4749-b3d3-740edbf87770\"><software>QXmpp</software><device>HAL 9000</device></user-agent></authenticate>");
 
-    test.manager.handleElement(xmlToDom("<success xmlns='urn:xmpp:sasl:2'><authorization-identifier>marc@example.org</authorization-identifier></success>"));
+    test.manager.handleElement(xmlToDom("<success xmlns='urn:xmpp:sasl:2'><authorization-identifier>bowman@example.org</authorization-identifier></success>"));
 
     QVERIFY(task.isFinished());
     auto success = expectFutureVariant<Sasl2::Success>(task);
 
     QCOMPARE(success.additionalData, std::nullopt);
-    QCOMPARE(success.authorizationIdentifier, "marc@example.org");
+    QCOMPARE(success.authorizationIdentifier, "bowman@example.org");
 }
 
 void tst_QXmppSasl::sasl2ManagerFailure()

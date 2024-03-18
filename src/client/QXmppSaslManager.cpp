@@ -6,6 +6,7 @@
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
+#include "QXmppSasl2UserAgent.h"
 #include "QXmppSaslManager_p.h"
 #include "QXmppSasl_p.h"
 #include "QXmppStream.h"
@@ -199,11 +200,27 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(const QXmppConfig
         return makeReadyTask<AuthResult>(std::move(*result.error));
     }
 
-    m_socket->sendData(serializeXml(Sasl2::Authenticate {
+    // create request
+    Sasl2::Authenticate auth {
         result.saslClient->mechanism(),
         result.initialResponse,
         {},
-    }));
+    };
+
+    // set user-agent if enabled
+    if (auto userAgent = config.sasl2UserAgent()) {
+        // ID is mandatory
+        if (userAgent->deviceId().isNull()) {
+            return makeReadyTask<AuthResult>(AuthError {
+                QStringLiteral("Invalid user-agent: device ID must be set."),
+                AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
+            });
+        }
+        auth.userAgent = { userAgent->deviceId(), userAgent->softwareName(), userAgent->deviceName() };
+    }
+
+    // send request
+    m_socket->sendData(serializeXml(auth));
 
     m_state = State();
     m_state->sasl = std::move(result.saslClient);
