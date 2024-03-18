@@ -7,6 +7,7 @@
 #include "QXmppStanza.h"
 
 #include "util.h"
+
 #include <QDateTime>
 #include <QObject>
 

@@ -5,6 +5,7 @@
 #include "QXmppBitsOfBinaryContentId.h"
 
 #include "util.h"
+
 #include <QObject>
 
 Q_DECLARE_METATYPE(QCryptographicHash::Algorithm)

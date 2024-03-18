@@ -6,6 +6,7 @@
 #include "QXmppSasl_p.h"
 
 #include "util.h"
+
 #include <QObject>
 
 using namespace QXmpp::Private;

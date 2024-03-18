@@ -5,6 +5,7 @@
 #include "QXmppSceEnvelope_p.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppSceEnvelope : public QObject

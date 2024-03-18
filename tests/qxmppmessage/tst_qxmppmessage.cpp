@@ -15,9 +15,10 @@
 #include "QXmppOutOfBandUrl.h"
 #include "QXmppTrustMessageElement.h"
 
+#include "util.h"
+
 #include <optional>
 
-#include "util.h"
 #include <QObject>
 
 class tst_QXmppMessage : public QObject

@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QcaInitializer_p.h"
+
 #include <QtCrypto>
 
 using namespace QCA;

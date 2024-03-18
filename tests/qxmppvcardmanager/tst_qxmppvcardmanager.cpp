@@ -7,10 +7,11 @@
 #include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
 
-#include <memory>
-
 #include "IntegrationTesting.h"
 #include "util.h"
+
+#include <memory>
+
 #include <QObject>
 
 Q_DECLARE_METATYPE(QXmppVCardIq);

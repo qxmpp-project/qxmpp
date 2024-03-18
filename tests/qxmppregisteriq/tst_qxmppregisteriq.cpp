@@ -9,6 +9,7 @@
 #include "QXmppRegisterIq.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppRegisterIq : public QObject

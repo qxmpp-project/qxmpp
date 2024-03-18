@@ -46,8 +46,7 @@ void tst_QXmppMixItem::testInfo()
     QCOMPARE(item.name(), QStringLiteral("Witches Coven"));
     QCOMPARE(item.description(), QStringLiteral("A location not far from the blasted "
                                                 "heath where the three witches meet"));
-    QCOMPARE(item.contactJids(), QStringList() << "greymalkin@shakespeare.example"
-                                               << "joan@shakespeare.example");
+    QCOMPARE(item.contactJids(), QStringList() << "greymalkin@shakespeare.example" << "joan@shakespeare.example");
 
     serializePacket(item, xml);
 

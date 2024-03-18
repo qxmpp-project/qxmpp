@@ -12,6 +12,7 @@
 #include "QXmppUtils.h"
 
 #include "QcaInitializer_p.h"
+
 #include <QMimeDatabase>
 
 using namespace QXmpp;

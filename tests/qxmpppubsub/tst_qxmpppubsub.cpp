@@ -7,6 +7,7 @@
 
 #include "pubsubutil.h"
 #include "util.h"
+
 #include <QObject>
 
 using Affiliation = QXmppPubSubAffiliation;

@@ -18,9 +18,10 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "OmemoCryptoProvider.h"
+
 #include <protocol.h>
 
-#include "OmemoCryptoProvider.h"
 #include <QRandomGenerator>
 #include <QStringBuilder>
 

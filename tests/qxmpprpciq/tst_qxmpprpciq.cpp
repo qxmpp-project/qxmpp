@@ -5,6 +5,7 @@
 #include "QXmppRpcIq.h"
 
 #include "util.h"
+
 #include <QObject>
 
 static void checkVariant(const QVariant &value, const QByteArray &xml)

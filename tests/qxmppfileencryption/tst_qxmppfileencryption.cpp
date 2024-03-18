@@ -5,6 +5,7 @@
 #include "QXmppFileEncryption.h"
 
 #include "QcaInitializer_p.h"
+
 #include <QtTest>
 
 using namespace QXmpp;

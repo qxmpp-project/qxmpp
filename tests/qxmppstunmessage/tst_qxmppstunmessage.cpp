@@ -5,6 +5,7 @@
 #include "QXmppStun.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppStunMessage : public QObject

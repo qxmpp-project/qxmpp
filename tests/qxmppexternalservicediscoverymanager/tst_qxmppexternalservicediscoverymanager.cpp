@@ -6,6 +6,7 @@
 
 #include "TestClient.h"
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppExternalServiceDiscoveryManager : public QObject

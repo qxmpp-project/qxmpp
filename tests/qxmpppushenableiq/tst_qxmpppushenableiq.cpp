@@ -6,6 +6,7 @@
 #include <QXmppPushEnableIq.h>
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppPushEnableIq : public QObject

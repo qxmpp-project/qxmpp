@@ -9,6 +9,7 @@
 #include "QXmppRpcManager.h"
 
 #include "remoteinterface.h"
+
 #include <QCoreApplication>
 
 int main(int argc, char *argv[])

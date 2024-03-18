@@ -6,6 +6,7 @@
 #include "QXmppMessage.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class QXmppMamTestHelper : public QObject

@@ -12,6 +12,7 @@
 #include "QXmppOmemoIq_p.h"
 
 #include "util.h"
+
 #include <QObject>
 
 ///

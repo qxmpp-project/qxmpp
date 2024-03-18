@@ -8,6 +8,7 @@
 
 #include "pubsubutil.h"
 #include "util.h"
+
 #include <QObject>
 
 Q_DECLARE_METATYPE(std::optional<QXmppPubSubSubscription>)

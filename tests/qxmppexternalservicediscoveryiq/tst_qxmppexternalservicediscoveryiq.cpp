@@ -5,6 +5,7 @@
 #include "QXmppExternalServiceDiscoveryIq.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppExternalServiceDiscoveryIq : public QObject

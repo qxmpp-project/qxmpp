@@ -5,6 +5,7 @@
 #include "QXmppVCardIq.h"
 
 #include "util.h"
+
 #include <QObject>
 
 class tst_QXmppVCardIq : public QObject
