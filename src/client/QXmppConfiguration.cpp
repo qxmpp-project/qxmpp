@@ -53,6 +53,7 @@ public:
     QXmppConfiguration::StreamSecurityMode streamSecurityMode = QXmppConfiguration::TLSEnabled;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism = QXmppConfiguration::NonSASLDigest;
     QString saslAuthMechanism;
+    QList<QString> disabledSaslMechanisms;
     std::optional<QXmppSasl2UserAgent> sasl2UserAgent;
 
     QNetworkProxy networkProxy;
@@ -436,6 +437,44 @@ QString QXmppConfiguration::saslAuthMechanism() const
 void QXmppConfiguration::setSaslAuthMechanism(const QString &mechanism)
 {
     d->saslAuthMechanism = mechanism;
+}
+
+///
+/// Returns the list of disabled SASL mechanisms.
+///
+/// Those mechanisms are not used by the client, even if no other mechanism is available.
+///
+/// \since QXmpp 1.7
+///
+QList<QString> QXmppConfiguration::disabledSaslMechanisms() const
+{
+    return d->disabledSaslMechanisms;
+}
+
+///
+/// Adds to the list of disabled SASL mechanisms.
+///
+/// Those mechanisms are not used by the client, even if no other mechanism is available.
+///
+/// \since QXmpp 1.7
+///
+void QXmppConfiguration::addDisabledSaslMechanism(const QString &m)
+{
+    if (!d->disabledSaslMechanisms.contains(m)) {
+        d->disabledSaslMechanisms.push_back(m);
+    }
+}
+
+///
+/// Sets the list of disabled SASL mechanisms.
+///
+/// Those mechanisms are not used by the client, even if no other mechanism is available.
+///
+/// \since QXmpp 1.7
+///
+void QXmppConfiguration::setDisabledSaslMechanisms(const QList<QString> &disabled)
+{
+    d->disabledSaslMechanisms = disabled;
 }
 
 ///

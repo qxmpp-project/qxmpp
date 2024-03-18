@@ -122,6 +122,10 @@ public:
     QString saslAuthMechanism() const;
     void setSaslAuthMechanism(const QString &mechanism);
 
+    QList<QString> disabledSaslMechanisms() const;
+    void addDisabledSaslMechanism(const QString &);
+    void setDisabledSaslMechanisms(const QList<QString> &);
+
     std::optional<QXmppSasl2UserAgent> sasl2UserAgent() const;
     void setSasl2UserAgent(const std::optional<QXmppSasl2UserAgent> &);
 
