@@ -21,10 +21,12 @@ IncludeBlocks: Regroup
 IncludeCategories:
   - Regex: "^.QXmpp.*"
     Priority: 1
-  - Regex: "^<Q(?!Xmpp).*"
+  - Regex: "^\".*\"$"
     Priority: 2
-  - Regex: "^<[^Q].*"
+  - Regex: "^<Q(?!Xmpp).*"
     Priority: 3
+  - Regex: "^<[^Q].*"
+    Priority: 4
 InsertBraces: true
 Language: Cpp
 PointerAlignment: Right
