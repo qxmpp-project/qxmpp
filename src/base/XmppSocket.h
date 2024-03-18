@@ -13,7 +13,13 @@ class TestStream;
 
 namespace QXmpp::Private {
 
-class QXMPP_EXPORT XmppSocket : public QXmppLoggable
+class SendDataInterface
+{
+public:
+    virtual bool sendData(const QByteArray &) = 0;
+};
+
+class QXMPP_EXPORT XmppSocket : public QXmppLoggable, public SendDataInterface
 {
     Q_OBJECT
 public:
@@ -25,7 +31,7 @@ public:
 
     bool isConnected() const;
     void disconnectFromHost();
-    bool sendData(const QByteArray &);
+    bool sendData(const QByteArray &) override;
 
     Q_SIGNAL void started();
     Q_SIGNAL void stanzaReceived(const QDomElement &);
