@@ -53,7 +53,7 @@ public:
     QXmppConfiguration::StreamSecurityMode streamSecurityMode = QXmppConfiguration::TLSEnabled;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism = QXmppConfiguration::NonSASLDigest;
     QString saslAuthMechanism;
-    QList<QString> disabledSaslMechanisms;
+    QList<QString> disabledSaslMechanisms = { QStringLiteral("PLAIN") };
     std::optional<QXmppSasl2UserAgent> sasl2UserAgent;
 
     QNetworkProxy networkProxy;
