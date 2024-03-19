@@ -25,6 +25,12 @@ struct TestSocket : SendDataInterface {
     }
 };
 
+struct SaslManagerTest {
+    std::unique_ptr<QXmppLoggable> loggable = std::make_unique<QXmppLoggable>();
+    TestSocket socket;
+    SaslManager manager = SaslManager { &socket };
+};
+
 struct Sasl2ManagerTest {
     std::unique_ptr<QXmppLoggable> loggable = std::make_unique<QXmppLoggable>();
     TestSocket socket;
@@ -79,6 +85,9 @@ private:
     Q_SLOT void testServerDigestMd5();
     Q_SLOT void testServerPlain();
     Q_SLOT void testServerPlainChallenge();
+
+    // SASL 1 client manager
+    Q_SLOT void saslManagerNoMechanisms();
 
     // SASL 2 client manager
     Q_SLOT void sasl2ManagerPlain();
@@ -682,6 +691,24 @@ void tst_QXmppSasl::testServerPlainChallenge()
 
     // any further step is an error
     QCOMPARE(server->respond(QByteArray(), response), QXmppSaslServer::Failed);
+}
+
+void tst_QXmppSasl::saslManagerNoMechanisms()
+{
+    SaslManagerTest test;
+    auto &sent = test.socket.sent;
+
+    QXmppConfiguration config;
+    config.setUser("marc");
+    config.setPassword("1234");
+    config.setDisabledSaslMechanisms({ "SCRAM-SHA-1" });
+
+    QVERIFY(QXmppSaslClient::availableMechanisms().contains("SCRAM-SHA-1"));
+
+    auto task = test.manager.authenticate(config, { "SCRAM-SHA-1" }, test.loggable.get());
+
+    auto [text, error] = expectFutureVariant<SaslManager::AuthError>(task);
+    QCOMPARE(error.type, QXmpp::AuthenticationError::MechanismMismatch);
 }
 
 void tst_QXmppSasl::sasl2ManagerPlain()
