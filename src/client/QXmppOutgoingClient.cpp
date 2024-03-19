@@ -638,7 +638,11 @@ void QXmppOutgoingClient::handleStart()
     d->c2sStreamManager.onStreamStart();
 
     // start stream
-    d->socket.sendData(serializeXml(StreamOpen { d->config.domain(), {}, ns_client }));
+    d->socket.sendData(serializeXml(StreamOpen {
+        d->config.domain(),
+        d->config.user().isEmpty() ? QString() : d->config.jidBare(),
+        ns_client,
+    }));
 }
 
 void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
