@@ -12,7 +12,9 @@
 #include "QXmppStreamError_p.h"
 #include "QXmppUtils_p.h"
 
+#include "Stream.h"
 #include "XmppSocket.h"
+#include "qxmlstream.h"
 
 #include <QDomDocument>
 #include <QHostAddress>
@@ -121,6 +123,20 @@ void QXmppStream::setSocket(QSslSocket *socket)
 }
 
 namespace QXmpp::Private {
+
+void StreamOpen::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartDocument();
+    writer->writeStartElement(QSL65("stream:stream"));
+    if (!from.isEmpty()) {
+        writer->writeAttribute(QSL65("from"), from);
+    }
+    writer->writeAttribute(QSL65("to"), to);
+    writer->writeAttribute(QSL65("version"), QSL65("1.0"));
+    writer->writeDefaultNamespace(toString65(xmlns));
+    writer->writeNamespace(toString65(ns_stream), QSL65("stream"));
+    writer->writeCharacters({});
+}
 
 constexpr auto STREAM_ERROR_CONDITIONS = to_array<QStringView>({
     u"bad-format",

@@ -2,9 +2,11 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppConstants_p.h"
 #include "QXmppStream.h"
 #include "QXmppStreamError_p.h"
 
+#include "Stream.h"
 #include "XmppSocket.h"
 #include "util.h"
 
@@ -57,6 +59,7 @@ private:
     Q_SLOT void initTestCase();
     Q_SLOT void testProcessData();
 #ifdef BUILD_INTERNAL_TESTS
+    Q_SLOT void streamOpen();
     Q_SLOT void testStreamError();
 #endif
 };
@@ -132,6 +135,13 @@ void tst_QXmppStream::testProcessData()
 }
 
 #ifdef BUILD_INTERNAL_TESTS
+void tst_QXmppStream::streamOpen()
+{
+    auto xml = "<?xml version='1.0' encoding='UTF-8'?><stream:stream from='juliet@im.example.com' to='im.example.com' version='1.0' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>";
+    StreamOpen s { "im.example.com", "juliet@im.example.com", ns_client };
+    serializePacket(s, xml);
+}
+
 void tst_QXmppStream::testStreamError()
 {
     auto values = {
