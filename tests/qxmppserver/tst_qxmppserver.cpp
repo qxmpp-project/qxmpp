@@ -85,6 +85,7 @@ void tst_QXmppServer::testConnect()
     config.setUser(username);
     config.setPassword(password);
     config.setSaslAuthMechanism(mechanism);
+    config.setDisabledSaslMechanisms({});
     client.connectToServer(config);
     loop.exec();
     QCOMPARE(client.isConnected(), connected);

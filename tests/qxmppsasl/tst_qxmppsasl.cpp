@@ -719,8 +719,9 @@ void tst_QXmppSasl::sasl2ManagerPlain()
     QXmppConfiguration config;
     config.setUser("bowman");
     config.setPassword("1234");
-    // prefer PLAIN
+    // use PLAIN
     config.setSaslAuthMechanism("PLAIN");
+    config.setDisabledSaslMechanisms({});
     config.setSasl2UserAgent(QXmppSasl2UserAgent {
         QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")),
         "QXmpp",
