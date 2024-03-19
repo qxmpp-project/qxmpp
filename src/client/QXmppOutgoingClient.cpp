@@ -24,6 +24,7 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Stream.h"
 #include "XmppSocket.h"
 
 #include <QCryptographicHash>
@@ -637,10 +638,7 @@ void QXmppOutgoingClient::handleStart()
     d->c2sStreamManager.onStreamStart();
 
     // start stream
-    QByteArray data = "<?xml version='1.0'?><stream:stream to='";
-    data.append(configuration().domain().toUtf8());
-    data.append("' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'>");
-    d->socket.sendData(data);
+    d->socket.sendData(serializeXml(StreamOpen { d->config.domain(), {}, ns_client }));
 }
 
 void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
