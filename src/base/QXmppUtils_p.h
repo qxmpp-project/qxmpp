@@ -78,6 +78,7 @@ void writeOptionalXmlAttribute(QXmlStreamWriter *stream, QStringView name, QStri
 void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView value);
 void writeXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns, QStringView value);
 void writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView value);
+void writeEmptyElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns);
 
 //
 // DOM
