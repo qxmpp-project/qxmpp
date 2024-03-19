@@ -48,6 +48,8 @@ private Q_SLOTS:
     void onTimeout();
 
 private:
+    void sendStreamFeatures();
+
     const std::unique_ptr<QXmppIncomingClientPrivate> d;
     friend class QXmppIncomingClientPrivate;
 };
