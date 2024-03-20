@@ -76,14 +76,12 @@ enum StampType {
 class QXmppMessagePrivate : public QSharedData
 {
 public:
-    QXmppMessagePrivate();
-
     QString body;
     QString e2eeFallbackBody;
     QString subject;
     QString thread;
     QString parentThread;
-    QXmppMessage::Type type;
+    QXmppMessage::Type type = QXmppMessage::Chat;
 
     // XEP-0066: Out of Band Data
     QVector<QXmppOutOfBandUrl> outOfBandUrls;
@@ -92,18 +90,18 @@ public:
     QString xhtml;
 
     // XEP-0085: Chat State Notifications
-    QXmppMessage::State state;
+    QXmppMessage::State state = QXmppMessage::None;
 
     // XEP-0091: Legacy Delayed Delivery | XEP-0203: Delayed Delivery
     QDateTime stamp;
-    StampType stampType;
+    StampType stampType = DelayedDelivery;
 
     // XEP-0184: Message Delivery Receipts
     QString receiptId;
-    bool receiptRequested;
+    bool receiptRequested = false;
 
     // XEP-0224: Attention
-    bool attentionRequested;
+    bool attentionRequested = false;
 
     // XEP-0231: Bits of Binary
     QXmppBitsOfBinaryDataList bitsOfBinaryData;
@@ -114,20 +112,20 @@ public:
     QString mucInvitationReason;
 
     // XEP-0280: Message Carbons
-    bool privatemsg;
-    bool isCarbonForwarded;
+    bool privatemsg = false;
+    bool isCarbonForwarded = false;
 
     // XEP-0308: Last Message Correction
     QString replaceId;
 
     // XEP-0333: Chat Markers
-    bool markable;
-    QXmppMessage::Marker marker;
+    bool markable = false;
+    QXmppMessage::Marker marker = QXmppMessage::NoMarker;
     QString markedId;
     QString markedThread;
 
     // XEP-0334: Message Processing Hints
-    quint8 hints;
+    quint8 hints = 0;
 
     // XEP-0353: Jingle Message Initiation
     std::optional<QXmppJingleMessageInitiationElement> jingleMessageInitiationElement;
@@ -149,7 +147,7 @@ public:
     QString encryptionName;
 
     // XEP-0382: Spoiler messages
-    bool isSpoiler;
+    bool isSpoiler = false;
     QString spoilerHint;
 #ifdef BUILD_OMEMO
     // XEP-0384: OMEMO Encryption
@@ -173,21 +171,6 @@ public:
     // XEP-0482: Call Invites
     std::optional<QXmppCallInviteElement> callInviteElement;
 };
-
-QXmppMessagePrivate::QXmppMessagePrivate()
-    : type(QXmppMessage::Chat),
-      state(QXmppMessage::None),
-      stampType(DelayedDelivery),
-      receiptRequested(false),
-      attentionRequested(false),
-      privatemsg(false),
-      isCarbonForwarded(false),
-      markable(false),
-      marker(QXmppMessage::NoMarker),
-      hints(0),
-      isSpoiler(false)
-{
-}
 
 /// Constructs a QXmppMessage.
 ///
