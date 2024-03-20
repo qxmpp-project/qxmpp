@@ -85,6 +85,12 @@ void writeEmptyElement(QXmlStreamWriter *writer, QStringView name, QStringView x
 std::optional<QByteArray> parseBase64(const QString &);
 inline QString serializeBase64(const QByteArray &data) { return QString::fromUtf8(data.toBase64()); }
 
+// Integer parsing
+template<typename Int>
+std::optional<Int> parseInt(QStringView str);
+template<typename Int>
+inline QString serializeInt(Int value) { return QString::number(value); }
+
 //
 // DOM
 //

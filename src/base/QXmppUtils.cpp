@@ -358,6 +358,57 @@ std::optional<QByteArray> QXmpp::Private::parseBase64(const QString &text)
     return {};
 }
 
+template<typename Int>
+Int stringToInt(QStringView str, bool *ok)
+{
+    if constexpr (std::is_same_v<Int, int8_t>) {
+        auto result = str.toShort(ok);
+        if (ok && result <= std::numeric_limits<int8_t>().max() && result >= std::numeric_limits<int8_t>().min()) {
+            return int8_t(result);
+        }
+        *ok = false;
+        return 0;
+    } else if constexpr (std::is_same_v<Int, uint8_t>) {
+        auto result = str.toUShort(ok);
+        if (ok && result <= std::numeric_limits<int8_t>().max() && result >= std::numeric_limits<int8_t>().min()) {
+            return int8_t(result);
+        }
+        *ok = false;
+        return 0;
+    } else if constexpr (std::is_same_v<Int, int16_t>) {
+        return str.toShort(ok);
+    } else if constexpr (std::is_same_v<Int, uint16_t>) {
+        return str.toUShort(ok);
+    } else if constexpr (std::is_same_v<Int, int32_t>) {
+        return str.toInt(ok);
+    } else if constexpr (std::is_same_v<Int, uint32_t>) {
+        return str.toUInt(ok);
+    } else if constexpr (std::is_same_v<Int, int64_t>) {
+        return str.toLongLong(ok);
+    } else if constexpr (std::is_same_v<Int, uint64_t>) {
+        return str.toULongLong(ok);
+    }
+}
+
+template<typename Int>
+std::optional<Int> QXmpp::Private::parseInt(QStringView str)
+{
+    bool ok = false;
+    if (auto result = stringToInt<Int>(str, &ok); ok) {
+        return result;
+    }
+    return {};
+}
+
+template std::optional<int8_t> QXmpp::Private::parseInt<int8_t>(QStringView);
+template std::optional<uint8_t> QXmpp::Private::parseInt<uint8_t>(QStringView);
+template std::optional<int16_t> QXmpp::Private::parseInt<int16_t>(QStringView);
+template std::optional<uint16_t> QXmpp::Private::parseInt<uint16_t>(QStringView);
+template std::optional<int32_t> QXmpp::Private::parseInt<int32_t>(QStringView);
+template std::optional<uint32_t> QXmpp::Private::parseInt<uint32_t>(QStringView);
+template std::optional<int64_t> QXmpp::Private::parseInt<int64_t>(QStringView);
+template std::optional<uint64_t> QXmpp::Private::parseInt<uint64_t>(QStringView);
+
 bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, QStringView xmlns)
 {
     // IQs must have only one child element, so we do not need to iterate over the child elements.
