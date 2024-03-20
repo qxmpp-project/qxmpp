@@ -10,6 +10,7 @@
 
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppConstants_p.h"
+#include "QXmppFallback.h"
 #include "QXmppFileShare.h"
 #include "QXmppGlobal_p.h"
 #include "QXmppJingleData.h"
@@ -158,7 +159,7 @@ public:
     std::optional<QXmppMixInvitation> mixInvitation;
 
     // XEP-0428: Fallback Indication
-    bool isFallback;
+    QVector<QXmppFallback> fallbackMarkers;
 
     // XEP-0434: Trust Messages (TM)
     std::optional<QXmppTrustMessageElement> trustMessageElement;
@@ -184,8 +185,7 @@ QXmppMessagePrivate::QXmppMessagePrivate()
       markable(false),
       marker(QXmppMessage::NoMarker),
       hints(0),
-      isSpoiler(false),
-      isFallback(false)
+      isSpoiler(false)
 {
 }
 
@@ -1211,31 +1211,53 @@ void QXmppMessage::setMixInvitation(const std::optional<QXmppMixInvitation> &mix
 }
 
 ///
-/// Sets whether this message is only a fallback according to \xep{0428}:
-/// Fallback Indication.
+/// Sets whether this message is only a fallback according to \xep{0428, Fallback Indication}.
 ///
 /// This is useful for clients not supporting end-to-end encryption to indicate
 /// that the message body does not contain the intended text of the author.
+///
+/// \deprecated Use fallbackMarkers() instead, it provides full access to the fallback elements.
 ///
 /// \since QXmpp 1.3
 ///
 bool QXmppMessage::isFallback() const
 {
-    return d->isFallback;
+    return !d->fallbackMarkers.empty();
 }
 
 ///
-/// Sets whether this message is only a fallback according to \xep{0428}:
-/// Fallback Indication.
+/// Sets whether this message is only a fallback according to \xep{0428, Fallback Indication}.
 ///
 /// This is useful for clients not supporting end-to-end encryption to indicate
 /// that the message body does not contain the intended text of the author.
+///
+/// \deprecated Use setFallbackMarkers() instead, it provides full access to the fallback elements.
 ///
 /// \since QXmpp 1.3
 ///
 void QXmppMessage::setIsFallback(bool isFallback)
 {
-    d->isFallback = isFallback;
+    d->fallbackMarkers = { QXmppFallback { {}, {} } };
+}
+
+///
+/// Returns the fallback elements defined in \xep{0428, Fallback Indication}.
+///
+/// \since QXmpp 1.7
+///
+const QVector<QXmppFallback> &QXmppMessage::fallbackMarkers() const
+{
+    return d->fallbackMarkers;
+}
+
+///
+/// Sets the fallback elements defined in \xep{0428, Fallback Indication}.
+///
+/// \since QXmpp 1.7
+///
+void QXmppMessage::setFallbackMarkers(const QVector<QXmppFallback> &fallbackMarkers)
+{
+    d->fallbackMarkers = fallbackMarkers;
 }
 
 ///
@@ -1464,7 +1486,9 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
 #endif
         // XEP-0428: Fallback Indication
         if (checkElement(element, u"fallback", ns_fallback_indication)) {
-            d->isFallback = true;
+            if (auto fallback = QXmppFallback::fromDom(element)) {
+                d->fallbackMarkers.push_back(std::move(*fallback));
+            }
             return true;
         }
         // XEP-0482: Call Invites
@@ -1716,10 +1740,8 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 #endif
 
         // XEP-0428: Fallback Indication
-        if (d->isFallback) {
-            writer->writeStartElement(QSL65("fallback"));
-            writer->writeDefaultNamespace(toString65(ns_fallback_indication));
-            writer->writeEndElement();
+        for (const auto &fallback : d->fallbackMarkers) {
+            fallback.toXml(writer);
         }
     }
 
@@ -1902,4 +1924,128 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             d->callInviteElement->toXml(writer);
         }
     }
+}
+
+struct QXmppFallbackPrivate : QSharedData {
+    QString forNamespace;
+    QVector<QXmppFallback::Reference> references;
+};
+
+///
+/// \class QXmppFallback
+///
+/// Fallback marker for message stanzas as defined in \xep{0428, Fallback Indication}.
+///
+/// \sa QXmppFallback
+/// \since QXmpp 1.7
+///
+
+///
+/// \enum QXmppFallback::Element
+///
+/// Describes the element of the message stanza this refers to.
+///
+
+///
+/// \struct QXmppFallback::Range
+///
+/// A character range of a string, see \xep{0426, Character counting in message bodies} for details.
+///
+
+///
+/// \struct QXmppFallback::Reference
+///
+/// A reference to a text in the message stanza.
+///
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppFallback)
+
+/// Creates a fallback marker.
+QXmppFallback::QXmppFallback(const QString &forNamespace, const QVector<Reference> &references)
+    : d(new QXmppFallbackPrivate { {}, forNamespace, references })
+{
+}
+
+///
+/// Returns the namespace of the XEP that this fallback marker is referring to.
+///
+const QString &QXmppFallback::forNamespace() const
+{
+    return d->forNamespace;
+}
+
+///
+/// Sets the namespace of the XEP that this fallback marker is referring to.
+///
+void QXmppFallback::setForNamespace(const QString &ns)
+{
+    d->forNamespace = ns;
+}
+
+///
+/// Returns the text references of this fallback marker.
+///
+const QVector<QXmppFallback::Reference> &QXmppFallback::references() const
+{
+    return d->references;
+}
+
+///
+/// Sets the text references of this fallback marker.
+///
+void QXmppFallback::setReferences(const QVector<Reference> &references)
+{
+    d->references = references;
+}
+
+///
+/// Tries to parse \a el into a QXmppFallback object.
+///
+/// \return Empty optional on failure, parsed object otherwise.
+///
+std::optional<QXmppFallback> QXmppFallback::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"fallback" || el.namespaceURI() != ns_fallback_indication) {
+        return {};
+    }
+
+    QVector<Reference> references;
+    for (const auto &subEl : iterChildElements(el, {}, ns_fallback_indication)) {
+        auto start = parseInt<uint32_t>(subEl.attribute(QStringLiteral("start")));
+        auto end = parseInt<uint32_t>(subEl.attribute(QStringLiteral("end")));
+        std::optional<Range> range;
+        if (start && end) {
+            range = Range { *start, *end };
+        }
+
+        if (subEl.tagName() == u"body") {
+            references.push_back(Reference { Body, range });
+        } else if (subEl.tagName() == u"subject") {
+            references.push_back(Reference { Subject, range });
+        }
+    }
+
+    return QXmppFallback {
+        el.attribute(QStringLiteral("for")),
+        references,
+    };
+}
+
+///
+/// Serializes the object to XML.
+///
+void QXmppFallback::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("fallback"));
+    writer->writeDefaultNamespace(toString65(ns_fallback_indication));
+    writeOptionalXmlAttribute(writer, u"for", d->forNamespace);
+    for (const auto &reference : d->references) {
+        writer->writeStartElement(reference.element == Body ? QSL65("body") : QSL65("subject"));
+        if (reference.range) {
+            writer->writeAttribute(QSL65("start"), serializeInt(reference.range->start));
+            writer->writeAttribute(QSL65("end"), serializeInt(reference.range->end));
+        }
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
 }

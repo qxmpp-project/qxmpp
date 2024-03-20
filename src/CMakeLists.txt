@@ -30,6 +30,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppExtension.h
     base/QXmppExternalService.h
     base/QXmppExternalServiceDiscoveryIq.h
+    base/QXmppFallback.h
     base/QXmppFileMetadata.h
     base/QXmppFileShare.h
     base/QXmppFutureUtils_p.h
