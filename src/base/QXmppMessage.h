@@ -19,6 +19,7 @@
 
 class QXmppMessagePrivate;
 class QXmppBitsOfBinaryDataList;
+class QXmppFallback;
 class QXmppJingleMessageInitiationElement;
 class QXmppMessageReaction;
 class QXmppMixInvitation;
@@ -254,8 +255,12 @@ public:
     void setMixInvitation(const std::optional<QXmppMixInvitation> &mixInvitation);
 
     // XEP-0428: Fallback Indication
-    bool isFallback() const;
-    void setIsFallback(bool isFallback);
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use fallbackMarkers()")]] bool isFallback() const;
+    [[deprecated("Use setFallbackMarkers()")]] void setIsFallback(bool isFallback);
+#endif
+    const QVector<QXmppFallback> &fallbackMarkers() const;
+    void setFallbackMarkers(const QVector<QXmppFallback> &);
 
     // XEP-0434: Trust Messages (TM)
     std::optional<QXmppTrustMessageElement> trustMessageElement() const;

@@ -8,6 +8,7 @@
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryDataList.h"
 #include "QXmppEncryptedFileSource.h"
+#include "QXmppFallback.h"
 #include "QXmppJingleData.h"
 #include "QXmppMessage.h"
 #include "QXmppMessageReaction.h"
@@ -1003,11 +1004,15 @@ void tst_QXmppMessage::testBobData()
 
 void tst_QXmppMessage::testFallbackIndication()
 {
-    const QByteArray xml = QByteArrayLiteral(
+    using Fallback = QXmppFallback;
+
+    QByteArray xml = QByteArrayLiteral(
         "<message type=\"chat\">"
         "<fallback xmlns=\"urn:xmpp:fallback:0\"/>"
         "</message>");
 
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     QXmppMessage message;
     parsePacket(message, xml);
     QVERIFY(message.isFallback());
@@ -1016,6 +1021,44 @@ void tst_QXmppMessage::testFallbackIndication()
     QXmppMessage message2;
     message2.setIsFallback(true);
     serializePacket(message2, xml);
+    QT_WARNING_POP
+
+    xml =
+        "<message type='chat'>"
+        "<fallback xmlns='urn:xmpp:fallback:0' for='urn:xmpp:reply:0'>"
+        "<body start='0' end='33'/>"
+        "<subject start='5' end='10'/>"
+        "<body/>"
+        "</fallback>"
+        "</message>";
+    message = {};
+    parsePacket(message, xml);
+    QCOMPARE(message.fallbackMarkers().size(), 1);
+    auto marker = message.fallbackMarkers().first();
+    QCOMPARE(marker.forNamespace(), "urn:xmpp:reply:0");
+    const auto &refs = marker.references();
+    QCOMPARE(refs.size(), 3);
+    QCOMPARE(refs.at(0).element, Fallback::Body);
+    QCOMPARE(refs.at(1).element, Fallback::Subject);
+    QCOMPARE(refs.at(2).element, Fallback::Body);
+    QVERIFY(refs.at(0).range.has_value());
+    QVERIFY(refs.at(1).range.has_value());
+    QVERIFY(!refs.at(2).range.has_value());
+    QCOMPARE(refs.at(0).range->start, 0);
+    QCOMPARE(refs.at(0).range->end, 33);
+
+    serializePacket(message, xml);
+
+    message = {};
+    message.setFallbackMarkers({
+        Fallback {
+            "urn:xmpp:reply:0",
+            { Fallback::Reference { Fallback::Body, Fallback::Range { 0, 33 } },
+              Fallback::Reference { Fallback::Subject, Fallback::Range { 5, 10 } },
+              Fallback::Reference { Fallback::Body, {} } },
+        },
+    });
+    serializePacket(message, xml);
 }
 
 void tst_QXmppMessage::testStanzaIds()
