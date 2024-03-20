@@ -1170,9 +1170,9 @@ void QXmppMessage::setOmemoElement(const std::optional<QXmppOmemoElement> &omemo
 #endif
 
 ///
-/// Returns an included \xep{0369}: Mediated Information eXchange (MIX)
-/// invitation as defined by \xep{0407}: Mediated Information eXchange (MIX):
-/// Miscellaneous Capabilities.
+/// Returns an included \xep{0369, Mediated Information eXchange (MIX)}
+/// invitation as defined by
+/// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
 ///
 /// \since QXmpp 1.4
 ///
@@ -1182,9 +1182,8 @@ std::optional<QXmppMixInvitation> QXmppMessage::mixInvitation() const
 }
 
 ///
-/// Sets a \xep{0369}: Mediated Information eXchange (MIX) invitation as defined
-/// by \xep{0407}: Mediated Information eXchange (MIX): Miscellaneous
-/// Capabilities.
+/// Sets a \xep{0369, Mediated Information eXchange (MIX)} invitation as defined
+/// by \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
 ///
 /// \since QXmpp 1.4
 ///
