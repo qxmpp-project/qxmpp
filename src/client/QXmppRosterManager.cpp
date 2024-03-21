@@ -115,15 +115,16 @@ void QXmppRosterManager::_q_connected()
     if (!d->isRosterReceived && client()->isAuthenticated()) {
         requestRoster().then(this, [this](auto &&result) {
             if (auto *rosterIq = std::get_if<QXmppRosterIq>(&result)) {
-                d->isRosterReceived = true;
-                Q_EMIT rosterReceived();
-
                 // reset entries
                 d->entries.clear();
                 const auto items = rosterIq->items();
                 for (const auto &item : items) {
                     d->entries.insert(item.bareJid(), item);
                 }
+
+                // notify
+                d->isRosterReceived = true;
+                Q_EMIT rosterReceived();
             }
         });
     }
