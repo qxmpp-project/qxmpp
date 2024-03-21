@@ -66,6 +66,10 @@ static void serializePacket(T &packet, const QByteArray &xml)
     auto processedXml = xml;
     processedXml.replace(u'\'', u'"');
 
+    // Remove newlines and needless spaces from raw strings.
+    processedXml = processedXml.simplified();
+    processedXml.replace("> <", "><");
+
     const auto data = packetToXml(packet);
     if (data != processedXml) {
         qDebug() << "expect " << processedXml;
