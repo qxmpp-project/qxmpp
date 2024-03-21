@@ -11,6 +11,7 @@
 
 #include <QSharedDataPointer>
 
+class QXmppMixInvitation;
 class QXmppMixIqPrivate;
 
 class QXMPP_EXPORT QXmppMixIq : public QXmppIq
@@ -70,6 +71,9 @@ public:
 
     QString nick() const;
     void setNick(const QString &);
+
+    std::optional<QXmppMixInvitation> invitation() const;
+    void setInvitation(const std::optional<QXmppMixInvitation> &);
 
     /// \cond
     static bool isMixIq(const QDomElement &);
