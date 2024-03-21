@@ -3,10 +3,13 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppMixIq.h"
+#include "QXmppMixIq_p.h"
 
 #include "util.h"
 
 #include <QObject>
+
+using namespace QXmpp::Private;
 
 class tst_QXmppMixIq : public QObject
 {
@@ -19,6 +22,11 @@ private:
     Q_SLOT void testSetters();
     Q_SLOT void testInvalidActionType();
     Q_SLOT void testIsMixIq();
+    Q_SLOT void testListToMixNodes();
+    Q_SLOT void testMixNodesToList();
+    Q_SLOT void testIsMixSubscriptionUpdateIq_data();
+    Q_SLOT void testIsMixSubscriptionUpdateIq();
+    Q_SLOT void testMixSubscriptionUpdateIq();
 };
 
 void tst_QXmppMixIq::testBase_data()
@@ -111,6 +119,7 @@ void tst_QXmppMixIq::testBase_data()
         "<leave xmlns=\"urn:xmpp:mix:core:1\"/>"
         "</client-leave>"
         "</iq>");
+    // Using QXmppMixIq::UpdateSubscription is deprecated since QXmpp 1.7.
     QByteArray updateSubscriptionSetXml(
         "<iq id=\"E6E10350-76CF-40C6-B91B-1EA08C332FC7\" "
         "to=\"hag66@shakespeare.example\" "
@@ -120,6 +129,7 @@ void tst_QXmppMixIq::testBase_data()
         "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
         "</update-subscription>"
         "</iq>");
+    // Using QXmppMixIq::UpdateSubscription is deprecated since QXmpp 1.7.
     QByteArray updateSubscriptionResultXml(
         "<iq id=\"E6E10350-76CF-40C6-B91B-1EA08C332FC7\" "
         "to=\"hag66@shakespeare.example/UUID-a1j/7533\" "
@@ -245,6 +255,9 @@ void tst_QXmppMixIq::testBase_data()
         << QXmppMixIq::ClientLeave
         << ""
         << "" << emptyNodes << "";
+    // Using QXmppMixIq::UpdateSubscription is deprecated since QXmpp 1.7.
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     QTest::newRow("update-subscription-set")
         << updateSubscriptionSetXml
         << QXmppIq::Set
@@ -261,6 +274,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << (QStringList() << "urn:xmpp:mix:nodes:messages")
         << "";
+    QT_WARNING_POP
     QTest::newRow("setnick-set")
         << setNickSetXml
         << QXmppIq::Set
@@ -397,6 +411,96 @@ void tst_QXmppMixIq::testIsMixIq()
     doc.setContent(falseXml, true);
     QDomElement falseElement = doc.documentElement();
     QVERIFY(!QXmppMixIq::isMixIq(falseElement));
+}
+
+void tst_QXmppMixIq::testListToMixNodes()
+{
+    QVERIFY(!listToMixNodes({}));
+    const QXmppMixConfigItem::Nodes nodes = { QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids };
+    const QVector<QString> nodeList = { QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("urn:xmpp:mix:nodes:banned") };
+    QCOMPARE(listToMixNodes(nodeList), nodes);
+}
+
+void tst_QXmppMixIq::testMixNodesToList()
+{
+    QVERIFY(mixNodesToList({}).isEmpty());
+    const QXmppMixConfigItem::Nodes nodes = { QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids };
+    const QVector<QString> nodeList = { QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("urn:xmpp:mix:nodes:banned") };
+    QCOMPARE(mixNodesToList(nodes), nodeList);
+}
+
+void tst_QXmppMixIq::testIsMixSubscriptionUpdateIq_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("valid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral(R"(
+            <iq id="E6E10350-76CF-40C6-B91B-1EA08C332FC7" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-a1j/7533" type="set">
+                <update-subscription xmlns="urn:xmpp:mix:core:1"/>
+            </iq>
+        )")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral(R"(
+            <iq id="E6E10350-76CF-40C6-B91B-1EA08C332FC7" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-a1j/7533" type="set">
+                <invalid xmlns="urn:xmpp:mix:core:1"/>
+            </iq>
+        )")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral(R"(
+            <iq id="E6E10350-76CF-40C6-B91B-1EA08C332FC7" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-a1j/7533" type="set">
+                <update-subscription xmlns="invalid"/>
+            </iq>
+        )")
+        << false;
+}
+
+void tst_QXmppMixIq::testIsMixSubscriptionUpdateIq()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, valid);
+
+    QCOMPARE(QXmppMixSubscriptionUpdateIq::isMixSubscriptionUpdateIq(xmlToDom(xml)), valid);
+}
+
+void tst_QXmppMixIq::testMixSubscriptionUpdateIq()
+{
+    const QByteArray xml(R"(
+        <iq id="E6E10350-76CF-40C6-B91B-1EA08C332FC7" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-a1j/7533" type="set">
+            <update-subscription xmlns="urn:xmpp:mix:core:1">
+                <subscribe node="urn:xmpp:mix:nodes:allowed"/>
+                <subscribe node="urn:xmpp:mix:nodes:banned"/>
+                <unsubscribe node="urn:xmpp:mix:nodes:info"/>
+                <unsubscribe node="urn:xmpp:mix:nodes:messages"/>
+            </update-subscription>
+        </iq>
+    )");
+
+    QXmppMixSubscriptionUpdateIq iq1;
+    QVERIFY(!iq1.additions());
+    QVERIFY(!iq1.removals());
+
+    const QXmppMixConfigItem::Nodes additions = { QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids };
+    const QXmppMixConfigItem::Nodes removals = { QXmppMixConfigItem::Node::Information | QXmppMixConfigItem::Node::Messages };
+
+    parsePacket(iq1, xml);
+    QCOMPARE(iq1.additions(), additions);
+    QCOMPARE(iq1.removals(), removals);
+    serializePacket(iq1, xml);
+
+    QXmppMixSubscriptionUpdateIq iq2;
+    iq2.setType(QXmppIq::Set);
+    iq2.setId(QStringLiteral("E6E10350-76CF-40C6-B91B-1EA08C332FC7"));
+    iq2.setFrom(QStringLiteral("hag66@shakespeare.example/UUID-a1j/7533"));
+    iq2.setTo(QStringLiteral("coven@mix.shakespeare.example"));
+    iq2.setAdditions(additions);
+    iq2.setRemovals(removals);
+
+    QCOMPARE(iq2.additions(), additions);
+    QCOMPARE(iq2.removals(), removals);
+    serializePacket(iq2, xml);
 }
 
 QTEST_MAIN(tst_QXmppMixIq)

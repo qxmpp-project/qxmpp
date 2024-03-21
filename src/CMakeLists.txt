@@ -51,6 +51,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMixInfoItem.h
     base/QXmppMixInvitation.h
     base/QXmppMixIq.h
+    base/QXmppMixIq_p.h
     base/QXmppMixParticipantItem.h
     base/QXmppMucIq.h
     base/QXmppNonza.h
