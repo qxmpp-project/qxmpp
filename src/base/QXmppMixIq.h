@@ -7,6 +7,7 @@
 #define QXMPPMIXIQ_H
 
 #include "QXmppIq.h"
+#include "QXmppMixConfigItem.h"
 
 #include <QSharedDataPointer>
 
@@ -40,14 +41,32 @@ public:
     QXmppMixIq::Type actionType() const;
     void setActionType(QXmppMixIq::Type);
 
-    QString jid() const;
-    void setJid(const QString &);
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use participantId() and channelJid()")]] QString jid() const;
+    [[deprecated("Use setParticipantId() and setChannelJid()")]] void setJid(const QString &);
+#endif
 
-    QString channelName() const;
-    void setChannelName(const QString &);
+    QString participantId() const;
+    void setParticipantId(const QString &);
 
-    QStringList nodes() const;
-    void setNodes(const QStringList &);
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use channelId()")]] QString channelName() const;
+    [[deprecated("Use setChannelId()")]] void setChannelName(const QString &);
+#endif
+
+    QString channelId() const;
+    void setChannelId(const QString &);
+
+    QString channelJid() const;
+    void setChannelJid(const QString &);
+
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use subscriptions()")]] QStringList nodes() const;
+    [[deprecated("Use setSubscriptions()")]] void setNodes(const QStringList &);
+#endif
+
+    QXmppMixConfigItem::Nodes subscriptions() const;
+    void setSubscriptions(QXmppMixConfigItem::Nodes);
 
     QString nick() const;
     void setNick(const QString &);

@@ -226,7 +226,7 @@ inline constexpr QStringView ns_mix_node_presence = u"urn:xmpp:mix:nodes:presenc
 // XEP-0404: Mediated Information eXchange (MIX): JID Hidden Channels
 inline constexpr QStringView ns_mix_node_jidmap = u"urn:xmpp:mix:nodes:jidmap";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
-inline constexpr QStringView ns_mix_pam = u"urn:xmpp:mix:pam:1";
+inline constexpr QStringView ns_mix_pam = u"urn:xmpp:mix:pam:2";
 inline constexpr QStringView ns_mix_roster = u"urn:xmpp:mix:roster:0";
 inline constexpr QStringView ns_mix_presence = u"urn:xmpp:presence:0";
 // XEP-0406: Mediated Information eXchange (MIX): MIX Administration
