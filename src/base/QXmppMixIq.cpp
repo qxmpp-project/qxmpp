@@ -147,6 +147,133 @@ void QXmppMixSubscriptionUpdateIq::toXmlElementFromChild(QXmlStreamWriter *write
 }
 /// \endcond
 
+///
+/// \class QXmppMixInvitationRequestIq
+///
+/// This class represents an IQ used to request an invitation to a MIX channel as defined by
+/// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
+///
+/// \since QXmpp 1.7
+///
+/// \ingroup Stanzas
+///
+
+/// \cond
+///
+/// Constructs a MIX invitation request IQ.
+///
+QXmppMixInvitationRequestIq::QXmppMixInvitationRequestIq()
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMixInvitationRequestIq)
+
+///
+/// Returns the JID of the invitee for whom an invitation is requested from a channel.
+///
+/// \return the invitee's JID
+///
+QString QXmppMixInvitationRequestIq::inviteeJid() const
+{
+    return m_inviteeJid;
+}
+
+///
+/// Sets the JID of the invitee for whom an invitation is requested from a channel.
+///
+/// \param inviteeJid invitee's JID
+///
+void QXmppMixInvitationRequestIq::setInviteeJid(const QString &inviteeJid)
+{
+    m_inviteeJid = inviteeJid;
+}
+
+bool QXmppMixInvitationRequestIq::isMixInvitationRequestIq(const QDomElement &element)
+{
+    const QDomElement &child = element.firstChildElement(QStringLiteral("invite"));
+    return !child.isNull() && (child.namespaceURI() == ns_mix_misc);
+}
+
+void QXmppMixInvitationRequestIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement child = element.firstChildElement();
+    const auto subChild = child.firstChildElement(QStringLiteral("invitee"));
+    m_inviteeJid = subChild.text();
+}
+
+void QXmppMixInvitationRequestIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("invite"));
+    writer->writeDefaultNamespace(toString65(ns_mix_misc));
+    writeXmlTextElement(writer, u"invitee", m_inviteeJid);
+    writer->writeEndElement();
+}
+/// \endcond
+
+///
+/// \class QXmppMixInvitationResponseIq
+///
+/// This class represents an IQ that contains a requested invitation to a MIX channel as defined by
+/// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
+///
+/// \since QXmpp 1.7
+///
+/// \ingroup Stanzas
+///
+
+/// \cond
+///
+/// Constructs a MIX invitation response IQ.
+///
+QXmppMixInvitationResponseIq::QXmppMixInvitationResponseIq()
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMixInvitationResponseIq)
+
+///
+/// Returns the invitation to a channel.
+///
+/// \return the channel invitation
+///
+QXmppMixInvitation QXmppMixInvitationResponseIq::invitation() const
+{
+    return m_invitation;
+}
+
+///
+/// Sets the invitation to a channel.
+///
+/// \param invitation channel invitation
+///
+void QXmppMixInvitationResponseIq::setInvitation(const QXmppMixInvitation &invitation)
+{
+    m_invitation = invitation;
+}
+
+bool QXmppMixInvitationResponseIq::isMixInvitationResponseIq(const QDomElement &element)
+{
+    const QDomElement &child = element.firstChildElement(QStringLiteral("invite"));
+    return !child.isNull() && (child.namespaceURI() == ns_mix_misc);
+}
+
+void QXmppMixInvitationResponseIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement child = element.firstChildElement();
+    const auto subChild = child.firstChildElement(QStringLiteral("invitation"));
+    m_invitation = QXmppMixInvitation();
+    m_invitation.parse(subChild);
+}
+
+void QXmppMixInvitationResponseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("invite"));
+    writer->writeDefaultNamespace(toString65(ns_mix_misc));
+    m_invitation.toXml(writer);
+    writer->writeEndElement();
+}
+/// \endcond
+
 class QXmppMixIqPrivate : public QSharedData
 {
 public:
