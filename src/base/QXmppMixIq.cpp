@@ -11,6 +11,7 @@
 
 #include <QDomElement>
 #include <QSharedData>
+#include <QStringBuilder>
 
 using namespace QXmpp::Private;
 
@@ -277,9 +278,10 @@ void QXmppMixInvitationResponseIq::toXmlElementFromChild(QXmlStreamWriter *write
 class QXmppMixIqPrivate : public QSharedData
 {
 public:
-    QString jid;
-    QString channelName;
-    QStringList nodes;
+    QString participantId;
+    QString channelId;
+    QString channelJid;
+    QXmppMixConfigItem::Nodes subscriptions;
     QString nick;
     QXmppMixIq::Type actionType = QXmppMixIq::None;
 };
@@ -354,64 +356,215 @@ QXmppMixIq::~QXmppMixIq() = default;
 QXmppMixIq &QXmppMixIq::operator=(const QXmppMixIq &) = default;
 /// Default move-assignment operator
 QXmppMixIq &QXmppMixIq::operator=(QXmppMixIq &&) = default;
-
-/// Returns the channel JID. It also contains a participant id for Join/
-/// ClientJoin results.
-
+///
+/// Returns the channel JID, in case of a Join/ClientJoin query result, containing the participant
+/// ID.
+///
+/// \deprecated This method is deprecated since QXmpp 1.7. Use QXmppMixIq::participantId() and
+/// QXmppMixIq::channelJid() instead.
+///
 QString QXmppMixIq::jid() const
 {
-    return d->jid;
+    if (d->participantId.isEmpty()) {
+        return d->channelJid;
+    }
+
+    if (d->channelJid.isEmpty()) {
+        return {};
+    }
+
+    return d->participantId % u'#' % d->channelJid;
 }
 
-/// Sets the channel JID. For results of Join/ClientJoin queries this also
-/// needs to contain a participant id.
-
+///
+/// Sets the channel JID, in case of a Join/ClientJoin query result, containing the participant ID.
+///
+/// \param jid channel JID including a possible participant ID
+///
+/// \deprecated This method is deprecated since QXmpp 1.7. Use QXmppMixIq::setParticipantId() and
+/// QXmppMixIq::setChannelJid() instead.
+///
 void QXmppMixIq::setJid(const QString &jid)
 {
-    d->jid = jid;
+    const auto jidParts = jid.split(u'#');
+
+    if (jidParts.size() == 1) {
+        d->channelJid = jid;
+    } else if (jidParts.size() == 2) {
+        d->participantId = jidParts.at(0);
+        d->channelJid = jidParts.at(1);
+    }
 }
 
-/// Returns the channel name (the name part of the channel JID). This may still
-/// be empty, if a JID was set.
+///
+/// Returns the participant ID for a Join/ClientJoin result.
+///
+/// \return the participant ID
+///
+/// \since QXmpp 1.7
+///
+QString QXmppMixIq::participantId() const
+{
+    return d->participantId;
+}
 
+///
+/// Sets the participant ID for a Join/ClientJoin result.
+///
+/// @param participantId ID of the user in the channel
+///
+/// \since QXmpp 1.7
+///
+void QXmppMixIq::setParticipantId(const QString &participantId)
+{
+    d->participantId = participantId;
+}
+
+///
+/// Returns the channel's ID (the local part of the channel JID).
+///
+/// It can be empty if a JID was set.
+///
+/// \return the ID of the channel
+///
+/// \deprecated This method is deprecated since QXmpp 1.7. Use QXmppMixIq::channelId() instead.
+///
 QString QXmppMixIq::channelName() const
 {
-    return d->channelName;
+    return d->channelId;
 }
 
-/// Sets the channel name for creating/destroying specific channels. When you
-/// create a new channel, this can also be left empty to let the server
-/// generate a name.
-
+///
+/// Sets the channel's ID (the local part of the channel JID) for creating or destroying a channel.
+///
+/// If you create a new channel, the channel ID can be left empty to let the server generate an ID.
+///
+/// \param channelName ID of the channel
+///
+/// \deprecated This method is deprecated since QXmpp 1.7. Use QXmppMixIq::setChannelId()
+/// instead.
+///
 void QXmppMixIq::setChannelName(const QString &channelName)
 {
-    d->channelName = channelName;
+    d->channelId = channelName;
 }
 
-/// Returns the list of nodes to subscribe to.
+///
+/// Returns the channel's ID (the local part of the channel JID).
+///
+/// It can be empty if a JID was set.
+///
+/// \return the ID of the channel
+///
+/// \since QXmpp 1.7
+///
+QString QXmppMixIq::channelId() const
+{
+    return d->channelId;
+}
 
+///
+/// Sets the channel's ID (the local part of the channel JID) for creating or destroying a channel.
+///
+/// If you create a new channel, the channel ID can be left empty to let the server generate an ID.
+///
+/// @param channelId channel ID to be set
+///
+/// \since QXmpp 1.7
+///
+void QXmppMixIq::setChannelId(const QString &channelId)
+{
+    d->channelId = channelId;
+}
+
+///
+/// Returns the channel's JID.
+///
+/// \return the JID of the channel
+///
+/// \since QXmpp 1.7
+///
+QString QXmppMixIq::channelJid() const
+{
+    return d->channelJid;
+}
+
+///
+/// Sets the channel's JID.
+///
+/// @param channelJid JID to be set
+///
+/// \since QXmpp 1.7
+///
+void QXmppMixIq::setChannelJid(const QString &channelJid)
+{
+    d->channelJid = channelJid;
+}
+
+///
+/// Returns the nodes being subscribed to.
+///
+/// \return the nodes being subscribed to
+///
+/// \deprecated This method is deprecated since QXmpp 1.7. Use QXmppMixIq::subscriptions() instead.
+///
 QStringList QXmppMixIq::nodes() const
 {
-    return d->nodes;
+    return mixNodesToList(d->subscriptions).toList();
 }
 
-/// Sets the nodes to subscribe to. Note that for UpdateSubscription queries
-/// you only need to include the new subscriptions.
-
+///
+/// Sets the nodes being subscribed to.
+///
+/// \param nodes nodes being subscribed to
+///
+/// \deprecated This method is deprecated since QXmpp 1.7. Use QXmppMixIq::setSubscriptions()
+/// instead.
+///
 void QXmppMixIq::setNodes(const QStringList &nodes)
 {
-    d->nodes = nodes;
+    d->subscriptions = listToMixNodes(nodes.toVector());
 }
 
-/// Returns the user's nickname in the channel.
+///
+/// Returns the nodes to subscribe to.
+///
+/// \return the nodes being subscribed to
+///
+/// \since QXmpp 1.7
+///
+QXmppMixConfigItem::Nodes QXmppMixIq::subscriptions() const
+{
+    return d->subscriptions;
+}
 
+///
+/// Sets the nodes to subscribe to.
+///
+/// \param subscriptions nodes being subscribed to
+///
+/// \since QXmpp 1.7
+///
+void QXmppMixIq::setSubscriptions(QXmppMixConfigItem::Nodes subscriptions)
+{
+    d->subscriptions = subscriptions;
+}
+
+///
+/// Returns the user's nickname in the channel.
+///
+/// \return the nickname of the user
+///
 QString QXmppMixIq::nick() const
 {
     return d->nick;
 }
 
-/// Sets the nickname for the channel.
-
+///
+/// Sets the user's nickname used for the channel.
+///
+/// \param nick nick of the user to be set
+///
 void QXmppMixIq::setNick(const QString &nick)
 {
     d->nick = nick;
@@ -419,13 +572,20 @@ void QXmppMixIq::setNick(const QString &nick)
 
 /// Returns the MIX channel action type.
 
+/// Returns the MIX channel's action type.
+///
+/// \return the action type of the channel
+///
 QXmppMixIq::Type QXmppMixIq::actionType() const
 {
     return d->actionType;
 }
 
-/// Sets the channel action.
-
+///
+/// Sets the MIX channel's action type.
+///
+/// \param type action type of the channel
+///
 void QXmppMixIq::setActionType(QXmppMixIq::Type type)
 {
     d->actionType = type;
@@ -441,31 +601,38 @@ bool QXmppMixIq::isMixIq(const QDomElement &element)
 void QXmppMixIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement child = element.firstChildElement();
-    // determine action type
-    if (auto index = MIX_ACTION_TYPES.indexOf(child.tagName()); index >= 0) {
-        d->actionType = Type(index);
-    }
+
+    const auto actionTypeIndex = MIX_ACTION_TYPES.indexOf(child.tagName());
+    d->actionType = actionTypeIndex == -1 ? None : (QXmppMixIq::Type)actionTypeIndex;
 
     if (child.namespaceURI() == ns_mix_pam) {
         if (child.hasAttribute(QStringLiteral("channel"))) {
-            d->jid = child.attribute(QStringLiteral("channel"));
+            d->channelJid = child.attribute(QStringLiteral("channel"));
         }
 
         child = child.firstChildElement();
     }
 
     if (!child.isNull() && child.namespaceURI() == ns_mix) {
+        if (child.hasAttribute(QStringLiteral("id"))) {
+            d->participantId = child.attribute(QStringLiteral("id"));
+        }
         if (child.hasAttribute(QStringLiteral("jid"))) {
-            d->jid = child.attribute(QStringLiteral("jid"));
+            d->channelJid = (child.attribute(QStringLiteral("jid"))).split(u'#').last();
         }
         if (child.hasAttribute(QStringLiteral("channel"))) {
-            d->channelName = child.attribute(QStringLiteral("channel"));
+            d->channelId = child.attribute(QStringLiteral("channel"));
         }
 
-        for (const auto &node : iterChildElements(child, u"subscribe")) {
-            d->nodes << node.attribute(QStringLiteral("node"));
-        }
         d->nick = firstChildElement(child, u"nick").text();
+
+        QVector<QString> subscriptions;
+
+        for (const auto &node : iterChildElements(child, u"subscribe")) {
+            subscriptions << node.attribute(QStringLiteral("node"));
+        }
+
+        d->subscriptions = listToMixNodes(subscriptions);
     }
 }
 
@@ -476,12 +643,12 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(MIX_ACTION_TYPES.at(d->actionType));
+
     if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
         writer->writeDefaultNamespace(toString65(ns_mix_pam));
         if (type() == Set) {
-            writeOptionalXmlAttribute(writer, u"channel", d->jid);
+            writeOptionalXmlAttribute(writer, u"channel", d->channelJid);
         }
-
         if (d->actionType == ClientJoin) {
             writer->writeStartElement(QSL65("join"));
         } else if (d->actionType == ClientLeave) {
@@ -490,21 +657,24 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
 
     writer->writeDefaultNamespace(toString65(ns_mix));
-    writeOptionalXmlAttribute(writer, u"channel", d->channelName);
+    writeOptionalXmlAttribute(writer, u"channel", d->channelId);
     if (type() == Result) {
-        writeOptionalXmlAttribute(writer, u"jid", d->jid);
+        writeOptionalXmlAttribute(writer, u"id", d->participantId);
     }
 
-    for (const auto &node : d->nodes) {
+    const auto subscriptions = mixNodesToList(d->subscriptions);
+    for (const auto &subscription : subscriptions) {
         writer->writeStartElement(QSL65("subscribe"));
-        writer->writeAttribute(QSL65("node"), node);
+        writer->writeAttribute(QSL65("node"), subscription);
         writer->writeEndElement();
     }
+
     if (!d->nick.isEmpty()) {
         writer->writeTextElement(QSL65("nick"), d->nick);
     }
 
     writer->writeEndElement();
+
     if (d->actionType == ClientJoin || d->actionType == ClientLeave) {
         writer->writeEndElement();
     }
