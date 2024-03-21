@@ -17,6 +17,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -1037,14 +1039,10 @@ auto QXmppPubSubManager::publishItems(PubSubIqBase &&request) -> QXmppTask<Publi
 
     return chainIq(client()->sendIq(std::move(request)), this,
                    [](const PubSubIq<> &iq) -> PublishItemsResult {
-                       const auto itemToId = [](const QXmppPubSubBaseItem &item) {
-                           return item.id();
-                       };
-
                        const auto items = iq.items();
-                       QVector<QString> ids(items.size());
-                       std::transform(items.begin(), items.end(), ids.begin(), itemToId);
-                       return ids;
+                       return transform<QVector<QString>>(items, [](const auto &item) {
+                           return item.id();
+                       });
                    });
 }
 /// \endcond

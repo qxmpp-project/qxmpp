@@ -7,7 +7,6 @@
 
 #include "QXmppBitsOfBinaryContentId.h"
 #include "QXmppBitsOfBinaryData.h"
-#include "QXmppClient.h"
 #include "QXmppFileMetadata.h"
 #include "QXmppFileShare.h"
 #include "QXmppFutureUtils_p.h"
@@ -15,6 +14,8 @@
 #include "QXmppThumbnail.h"
 #include "QXmppUploadRequestManager.h"
 #include "QXmppUtils_p.h"
+
+#include "Algorithms.h"
 
 #include <any>
 #include <unordered_map>
@@ -41,16 +42,6 @@ static std::vector<HashAlgorithm> hashAlgorithms()
 #else
     return { HashAlgorithm::Sha256, HashAlgorithm::Sha3_256 };
 #endif
-}
-
-template<typename T, typename Converter>
-auto transform(T &input, Converter convert)
-{
-    using Output = std::decay_t<decltype(convert(input.front()))>;
-    std::vector<Output> output;
-    output.reserve(input.size());
-    std::transform(input.begin(), input.end(), std::back_inserter(output), std::move(convert));
-    return output;
 }
 
 class QXmppFileUploadPrivate
@@ -475,12 +466,9 @@ std::shared_ptr<QXmppFileUpload> QXmppFileSharingManager::uploadFile(std::shared
                     auto &hashValue = hashResult->result;
                     if (std::holds_alternative<std::vector<QXmppHash>>(hashValue)) {
                         const auto &hashesVector = std::get<std::vector<QXmppHash>>(hashValue);
-                        QVector<QXmppHash> hashes;
-                        hashes.reserve(hashesVector.size());
-                        std::transform(hashesVector.begin(), hashesVector.end(),
-                                       std::back_inserter(hashes), [](auto &&hash) {
-                                           return hash;
-                                       });
+                        auto hashes = transform<QVector<QXmppHash>>(hashesVector, [](auto &&hash) {
+                            return hash;
+                        });
                         upload->d->metadata.setHashes(hashes);
                         upload->d->success = true;
                     } else if (std::holds_alternative<Cancelled>(hashValue)) {
@@ -564,7 +552,7 @@ std::shared_ptr<QXmppFileDownload> QXmppFileSharingManager::downloadFile(
 
         download->d->hashesFuture = verifyHashes(
             std::move(file),
-            transform(download->d->hashes, [](auto hash) { return hash; }));
+            transform<std::vector<QXmppHash>>(download->d->hashes, [](auto hash) { return hash; }));
 
         await(download->d->hashesFuture, this, [download](HashVerificationResultPtr hashResult) {
             auto convert = overloaded {

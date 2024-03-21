@@ -6,6 +6,8 @@
 #include "QXmppHash.h"
 #include "QXmppHashing_p.h"
 
+#include "Algorithms.h"
+
 #include <QCryptographicHash>
 #include <QFuture>
 #include <QFutureInterface>
@@ -167,16 +169,6 @@ uint16_t QXmpp::Private::hashPriority(HashAlgorithm algorithm)
     return 0;
 }
 
-template<typename T, typename Converter>
-auto transform(std::vector<T> &input, Converter convert)
-{
-    using Output = std::decay_t<decltype(convert(input.front()))>;
-    std::vector<Output> output;
-    output.reserve(input.size());
-    std::transform(input.begin(), input.end(), std::back_inserter(output), std::move(convert));
-    return output;
-}
-
 auto makeReadyResult(HashingResult::Result result, std::unique_ptr<QIODevice> device)
 {
     return makeReadyFuture<HashingResultPtr>(std::make_shared<HashingResult>(std::move(result), std::move(device)));
@@ -263,7 +255,7 @@ public:
                                 std::function<bool()> isCancelled)
     {
         // convert to QCryptographicHash::Algorithm for hashing
-        auto qtAlgorithms = transform(algorithms, [](auto algorithm) {
+        auto qtAlgorithms = transform<std::vector<QCryptographicHash::Algorithm>>(algorithms, [](auto algorithm) {
             auto converted = toCryptograhicHashAlgorithm(algorithm);
             Q_ASSERT_X(converted.has_value(), "calculate hashes", "Must only be called with algorithms supported by QCryptographicHash");
             return *converted;
@@ -304,7 +296,7 @@ public:
           m_isCancelled(std::move(isCancelled))
     {
         // create hash processors
-        m_hashProcessors = transform(algorithms, [this](auto algorithm) {
+        m_hashProcessors = transform<std::vector<HashProcessor>>(algorithms, [this](auto algorithm) {
             return HashProcessor(this, algorithm);
         });
 
@@ -389,7 +381,7 @@ public:
 
     void finish()
     {
-        auto hashes = transform(m_hashProcessors, [](auto &processor) {
+        auto hashes = transform<std::vector<QXmppHash>>(m_hashProcessors, [](auto &processor) {
             QXmppHash hash;
             hash.setAlgorithm(toHashAlgorithm(processor.algorithm));
             hash.setHash(processor.hash->result());

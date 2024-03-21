@@ -10,11 +10,14 @@
 #include "QXmppTlsManager_p.h"
 #include "QXmppUploadRequestManager.h"
 
+#include "Algorithms.h"
 #include "IntegrationTesting.h"
 #include "TestClient.h"
 #include "util.h"
 
 #include <QMimeDatabase>
+
+using namespace QXmpp::Private;
 
 static const auto UPLOAD_SERVICE_NAME = QStringLiteral("upload.montague.tld");
 constexpr quint64 MAX_FILE_SIZE = 500UL * 1024UL * 1024UL;
@@ -378,8 +381,7 @@ void tst_QXmppHttpUploadManager::testUpload()
     // get server items
     auto items = expectVariant<QList<DiscoItem>>(wait(disco->requestDiscoItems(test.configuration().domain()).toFuture(this)));
     // request disco info for each item
-    std::vector<QXmppTask<DiscoInfoResult>> infoFutures;
-    std::transform(items.cbegin(), items.cend(), std::back_inserter(infoFutures), [disco](const auto &item) {
+    auto infoFutures = transform<std::vector<QXmppTask<DiscoInfoResult>>>(items, [disco](const auto &item) {
         return disco->requestDiscoInfo(item.jid(), item.node());
     });
     auto uploadServiceJid = [&]() {
