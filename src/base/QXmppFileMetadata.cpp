@@ -10,6 +10,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
+
 #include <utility>
 
 #include <QDateTime>
@@ -79,10 +81,8 @@ QVector<QDomElement> allChildElements(const QDomElement &el, const QString &name
 template<typename Func>
 QVector<std::invoke_result_t<Func, QDomElement>> forAllChildElements(const QDomElement &el, const QString &name, Func func)
 {
-    auto elements = allChildElements(el, name);
-    QVector<std::invoke_result_t<Func, QDomElement>> out;
-    std::transform(elements.begin(), elements.end(), std::back_inserter(out), func);
-    return out;
+    return transform<std::vector<std::invoke_result_t<Func, QDomElement>>>(
+        allChildElements(el, name), std::forward<Func>(func));
 }
 
 template<typename ElementType>

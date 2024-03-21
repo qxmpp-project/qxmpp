@@ -15,22 +15,14 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
+
 #include <unordered_map>
 
 #include <QDomElement>
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
-
-template<typename T, typename Converter>
-auto transform(const T &input, Converter convert)
-{
-    using Output = std::decay_t<decltype(convert(*input.begin()))>;
-    QVector<Output> output;
-    output.reserve(input.size());
-    std::transform(input.begin(), input.end(), std::back_inserter(output), std::move(convert));
-    return output;
-}
 
 template<typename T>
 auto sum(const T &c)
@@ -322,7 +314,7 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
             state.processedMessages.resize(state.messages.size());
 
             // check for encrypted messages (once)
-            auto messagesEncrypted = transform(state.messages, [&](const auto &m) {
+            auto messagesEncrypted = transform<std::vector<bool>>(state.messages, [&](const auto &m) {
                 return e2eeExt->isEncrypted(m.element);
             });
             auto encryptedCount = sum(messagesEncrypted);
@@ -367,7 +359,7 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
         }
 
         // for the case without decryption, finish here
-        state.processedMessages = transform(state.messages, [](const auto &m) {
+        state.processedMessages = transform<QVector<QXmppMessage>>(state.messages, [](const auto &m) {
             return parseMamMessage(m, Unencrypted);
         });
         state.finish();
