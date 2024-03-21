@@ -48,6 +48,12 @@ void tst_QXmppMixIq::testBase_data()
         "<subscribe node=\"urn:xmpp:mix:nodes:info\"/>"
         "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
         "<nick>third witch</nick>"
+        "<invitation xmlns=\"urn:xmpp:mix:misc:0\">"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
         "</join>"
         "</client-join>"
         "</iq>");
@@ -60,6 +66,12 @@ void tst_QXmppMixIq::testBase_data()
         "<subscribe node=\"urn:xmpp:mix:nodes:info\"/>"
         "<subscribe node=\"urn:xmpp:mix:nodes:messages\"/>"
         "<nick>stpeter</nick>"
+        "<invitation xmlns=\"urn:xmpp:mix:misc:0\">"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
         "</join>"
         "</iq>");
     QByteArray joinS2sResultXml(
@@ -201,6 +213,7 @@ void tst_QXmppMixIq::testBase_data()
     QTest::addColumn<QStringList>("nodes");
     QTest::addColumn<QXmppMixConfigItem::Nodes>("subscriptions");
     QTest::addColumn<QString>("nick");
+    QTest::addColumn<QString>("invitationToken");
 
     QTest::newRow("join-c2s-set")
         << joinC2sSetXml
@@ -213,7 +226,8 @@ void tst_QXmppMixIq::testBase_data()
         << "coven@mix.shakespeare.example"
         << nodeList
         << subscriptions
-        << "third witch";
+        << "third witch"
+        << "ABCDEF";
     QTest::newRow("join-s2s-set")
         << joinS2sSetXml
         << QXmppIq::Set
@@ -225,7 +239,8 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << nodeList
         << subscriptions
-        << "stpeter";
+        << "stpeter"
+        << "ABCDEF";
     QTest::newRow("join-s2s-result")
         << joinS2sResultXml
         << QXmppIq::Result
@@ -237,7 +252,8 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << nodeList
         << subscriptions
-        << "third witch";
+        << "third witch"
+        << "";
     QTest::newRow("join-c2s-result")
         << joinC2sResultXml
         << QXmppIq::Result
@@ -249,6 +265,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << nodeList
         << subscriptions
+        << ""
         << "";
     QTest::newRow("leave-c2s-set")
         << leaveC2sSetXml
@@ -261,6 +278,7 @@ void tst_QXmppMixIq::testBase_data()
         << "coven@mix.shakespeare.example"
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     QTest::newRow("leave-s2s-set")
         << leaveS2sSetXml
@@ -273,6 +291,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     QTest::newRow("leave-s2s-result")
         << leaveS2sResultXml
@@ -285,6 +304,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     QTest::newRow("leave-c2s-result")
         << leaveC2sResultXml
@@ -297,6 +317,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     // Using QXmppMixIq::UpdateSubscription is deprecated since QXmpp 1.7.
     QT_WARNING_PUSH
@@ -312,6 +333,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << nodeList
         << subscriptions
+        << ""
         << "";
     QTest::newRow("update-subscription-result")
         << updateSubscriptionResultXml
@@ -324,6 +346,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << nodeList
         << subscriptions
+        << ""
         << "";
     QT_WARNING_POP
     QTest::newRow("setnick-set")
@@ -337,7 +360,8 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
-        << "thirdwitch";
+        << "thirdwitch"
+        << "";
     QTest::newRow("setnick-result")
         << setNickResultXml
         << QXmppIq::Result
@@ -349,7 +373,8 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
-        << "thirdwitch";
+        << "thirdwitch"
+        << "";
     QTest::newRow("create")
         << createXml
         << QXmppIq::Set
@@ -361,6 +386,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     QTest::newRow("create-without-id")
         << createWithoutIdXml
@@ -373,6 +399,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     QTest::newRow("destroy")
         << destroyXml
@@ -385,6 +412,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
     QTest::newRow("empty")
         << emptyXml
@@ -397,6 +425,7 @@ void tst_QXmppMixIq::testBase_data()
         << ""
         << emptyNodeList
         << noNodes
+        << ""
         << "";
 }
 
@@ -413,6 +442,7 @@ void tst_QXmppMixIq::testBase()
     QFETCH(QStringList, nodes);
     QFETCH(QXmppMixConfigItem::Nodes, subscriptions);
     QFETCH(QString, nick);
+    QFETCH(QString, invitationToken);
 
     QXmppMixIq iq;
     parsePacket(iq, xml);
@@ -435,6 +465,10 @@ void tst_QXmppMixIq::testBase()
     QT_WARNING_POP
     QCOMPARE(iq.subscriptions(), subscriptions);
     QCOMPARE(iq.nick(), nick);
+    QCOMPARE(iq.invitation().has_value(), !invitationToken.isEmpty());
+    if (iq.invitation()) {
+        QCOMPARE(iq.invitation()->token(), invitationToken);
+    }
     serializePacket(iq, xml);
 }
 
@@ -459,6 +493,7 @@ void tst_QXmppMixIq::testDefaults()
     QT_WARNING_POP
     QCOMPARE(iq.subscriptions(), QXmppMixConfigItem::Nodes {});
     QCOMPARE(iq.nick(), QString());
+    QVERIFY(!iq.invitation());
 }
 
 void tst_QXmppMixIq::testSetters()
@@ -500,6 +535,12 @@ void tst_QXmppMixIq::testSetters()
 
     iq.setNick("third witch");
     QCOMPARE(iq.nick(), QStringLiteral("third witch"));
+
+    QXmppMixInvitation invitation;
+    invitation.setToken(QStringLiteral("ABCDEF"));
+
+    iq.setInvitation(invitation);
+    QCOMPARE(iq.invitation()->token(), QStringLiteral("ABCDEF"));
 }
 
 void tst_QXmppMixIq::testInvalidActionType()
