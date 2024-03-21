@@ -283,6 +283,7 @@ public:
     QString channelJid;
     QXmppMixConfigItem::Nodes subscriptions;
     QString nick;
+    std::optional<QXmppMixInvitation> invitation;
     QXmppMixIq::Type actionType = QXmppMixIq::None;
 };
 
@@ -290,8 +291,9 @@ public:
 /// \class QXmppMixIq
 ///
 /// This class represents an IQ used to do actions on a MIX channel as defined by
-/// \xep{0369, Mediated Information eXchange (MIX)} and
-/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements}.
+/// \xep{0369, Mediated Information eXchange (MIX)},
+/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements} and
+/// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
 ///
 /// \since QXmpp 1.1
 ///
@@ -570,7 +572,29 @@ void QXmppMixIq::setNick(const QString &nick)
     d->nick = nick;
 }
 
-/// Returns the MIX channel action type.
+///
+/// Returns the invitation to the channel being joined via Type::ClientJoin or Type::Join.
+///
+/// \return the channel invitation
+///
+/// \since QXmpp 1.7
+///
+std::optional<QXmppMixInvitation> QXmppMixIq::invitation() const
+{
+    return d->invitation;
+}
+
+///
+/// Sets the invitation to the channel being joined via Type::ClientJoin or Type::Join.
+///
+/// \param invitation channel invitation
+///
+/// \since QXmpp 1.7
+///
+void QXmppMixIq::setInvitation(const std::optional<QXmppMixInvitation> &invitation)
+{
+    d->invitation = invitation;
+}
 
 /// Returns the MIX channel's action type.
 ///
@@ -626,6 +650,11 @@ void QXmppMixIq::parseElementFromChild(const QDomElement &element)
 
         d->nick = firstChildElement(child, u"nick").text();
 
+        if (const auto invitationElement = firstChildElement(child, u"invitation"); !invitationElement.isNull()) {
+            d->invitation = QXmppMixInvitation();
+            d->invitation->parse(invitationElement);
+        }
+
         QVector<QString> subscriptions;
 
         for (const auto &node : iterChildElements(child, u"subscribe")) {
@@ -671,6 +700,10 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 
     if (!d->nick.isEmpty()) {
         writer->writeTextElement(QSL65("nick"), d->nick);
+    }
+
+    if (d->invitation) {
+        d->invitation->toXml(writer);
     }
 
     writer->writeEndElement();
