@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "QXmppMixInvitation.h"
 #include "QXmppMixIq.h"
 #include "QXmppMixIq_p.h"
 
@@ -24,6 +25,12 @@ private:
     Q_SLOT void testIsMixIq();
     Q_SLOT void testListToMixNodes();
     Q_SLOT void testMixNodesToList();
+    Q_SLOT void testIsMixInvitationResponseIq_data();
+    Q_SLOT void testIsMixInvitationResponseIq();
+    Q_SLOT void testMixInvitationResponseIq();
+    Q_SLOT void testIsMixInvitationRequestIq_data();
+    Q_SLOT void testIsMixInvitationRequestIq();
+    Q_SLOT void testMixInvitationRequestIq();
     Q_SLOT void testIsMixSubscriptionUpdateIq_data();
     Q_SLOT void testIsMixSubscriptionUpdateIq();
     Q_SLOT void testMixSubscriptionUpdateIq();
@@ -427,6 +434,139 @@ void tst_QXmppMixIq::testMixNodesToList()
     const QXmppMixConfigItem::Nodes nodes = { QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids };
     const QVector<QString> nodeList = { QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("urn:xmpp:mix:nodes:banned") };
     QCOMPARE(mixNodesToList(nodes), nodeList);
+}
+
+void tst_QXmppMixIq::testIsMixInvitationResponseIq_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("valid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral(R"(
+            <iq id="kl2fax27" to="hag66@shakespeare.example/UUID-h5z/0253" from="coven@mix.shakespeare.example" type="result">
+                <invite xmlns="urn:xmpp:mix:misc:0"/>
+            </iq>
+        )")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral(R"(
+            <iq id="kl2fax27" to="hag66@shakespeare.example/UUID-h5z/0253" from="coven@mix.shakespeare.example" type="result">
+                <invalid xmlns="urn:xmpp:mix:misc:0"/>
+            </iq>
+        )")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral(R"(
+            <iq id="kl2fax27" to="hag66@shakespeare.example/UUID-h5z/0253" from="coven@mix.shakespeare.example" type="result">
+                <invite xmlns="invalid"/>
+            </iq>
+        )")
+        << false;
+}
+
+void tst_QXmppMixIq::testIsMixInvitationResponseIq()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, valid);
+
+    QCOMPARE(QXmppMixInvitationResponseIq::isMixInvitationResponseIq(xmlToDom(xml)), valid);
+}
+
+void tst_QXmppMixIq::testMixInvitationResponseIq()
+{
+    const QByteArray xml(R"(
+        <iq id="kl2fax27" to="hag66@shakespeare.example/UUID-h5z/0253" from="coven@mix.shakespeare.example" type="result">
+            <invite xmlns="urn:xmpp:mix:misc:0">
+                <invitation xmlns="urn:xmpp:mix:misc:0">
+                    <token>ABCDEF</token>
+                </invitation>
+            </invite>
+        </iq>
+    )");
+
+    QXmppMixInvitationResponseIq iq1;
+    QVERIFY(iq1.invitation().token().isEmpty());
+
+    parsePacket(iq1, xml);
+    QCOMPARE(iq1.invitation().token(), QStringLiteral("ABCDEF"));
+    serializePacket(iq1, xml);
+
+    QXmppMixInvitation invitation;
+    invitation.setToken(QStringLiteral("ABCDEF"));
+
+    QXmppMixInvitationResponseIq iq2;
+    iq2.setType(QXmppIq::Result);
+    iq2.setId(QStringLiteral("kl2fax27"));
+    iq2.setFrom(QStringLiteral("coven@mix.shakespeare.example"));
+    iq2.setTo(QStringLiteral("hag66@shakespeare.example/UUID-h5z/0253"));
+    iq2.setInvitation(invitation);
+
+    QCOMPARE(iq2.invitation().token(), QStringLiteral("ABCDEF"));
+    serializePacket(iq2, xml);
+}
+
+void tst_QXmppMixIq::testIsMixInvitationRequestIq_data()
+{
+    QTest::addColumn<QByteArray>("xml");
+    QTest::addColumn<bool>("valid");
+
+    QTest::newRow("valid")
+        << QByteArrayLiteral(R"(
+            <iq id="kl2fax27" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-h5z/0253" type="get">
+                <invite xmlns="urn:xmpp:mix:misc:0"/>
+            </iq>
+        )")
+        << true;
+    QTest::newRow("invalidTag")
+        << QByteArrayLiteral(R"(
+            <iq id="kl2fax27" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-h5z/0253" type="get">
+                <invalid xmlns="urn:xmpp:mix:misc:0"/>
+            </iq>
+        )")
+        << false;
+    QTest::newRow("invalidNamespace")
+        << QByteArrayLiteral(R"(
+            <iq id="kl2fax27" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-h5z/0253" type="get">
+                <invite xmlns="invalid"/>
+            </iq>
+        )")
+        << false;
+}
+
+void tst_QXmppMixIq::testIsMixInvitationRequestIq()
+{
+    QFETCH(QByteArray, xml);
+    QFETCH(bool, valid);
+
+    QCOMPARE(QXmppMixInvitationRequestIq::isMixInvitationRequestIq(xmlToDom(xml)), valid);
+}
+
+void tst_QXmppMixIq::testMixInvitationRequestIq()
+{
+    const QByteArray xml(R"(
+        <iq id="kl2fax27" to="coven@mix.shakespeare.example" from="hag66@shakespeare.example/UUID-h5z/0253" type="get">
+            <invite xmlns="urn:xmpp:mix:misc:0">
+                <invitee>cat@shakespeare.example</invitee>
+            </invite>
+        </iq>
+    )");
+
+    QXmppMixInvitationRequestIq iq1;
+    QVERIFY(iq1.inviteeJid().isEmpty());
+
+    parsePacket(iq1, xml);
+    QCOMPARE(iq1.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
+    serializePacket(iq1, xml);
+
+    QXmppMixInvitationRequestIq iq2;
+    iq2.setType(QXmppIq::Get);
+    iq2.setId(QStringLiteral("kl2fax27"));
+    iq2.setFrom(QStringLiteral("hag66@shakespeare.example/UUID-h5z/0253"));
+    iq2.setTo(QStringLiteral("coven@mix.shakespeare.example"));
+    iq2.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
+
+    QCOMPARE(iq2.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
+    serializePacket(iq2, xml);
 }
 
 void tst_QXmppMixIq::testIsMixSubscriptionUpdateIq_data()

@@ -9,9 +9,6 @@
 #include "QXmppMixConfigItem.h"
 #include "QXmppMixInvitation.h"
 
-class QXmppMixInvitationRequestIqPrivate;
-class QXmppMixInvitationResponseIqPrivate;
-
 class QXMPP_EXPORT QXmppMixSubscriptionUpdateIq : public QXmppIq
 {
 public:
@@ -36,6 +33,50 @@ protected:
 private:
     QXmppMixConfigItem::Nodes m_additions;
     QXmppMixConfigItem::Nodes m_removals;
+};
+
+class QXMPP_EXPORT QXmppMixInvitationRequestIq : public QXmppIq
+{
+public:
+    QXmppMixInvitationRequestIq();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppMixInvitationRequestIq)
+
+    QString inviteeJid() const;
+    void setInviteeJid(const QString &);
+
+    /// \cond
+    static bool isMixInvitationRequestIq(const QDomElement &);
+
+protected:
+    void parseElementFromChild(const QDomElement &) override;
+    void toXmlElementFromChild(QXmlStreamWriter *) const override;
+    /// \endcond
+
+private:
+    QString m_inviteeJid;
+};
+
+class QXMPP_EXPORT QXmppMixInvitationResponseIq : public QXmppIq
+{
+public:
+    QXmppMixInvitationResponseIq();
+
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppMixInvitationResponseIq)
+
+    QXmppMixInvitation invitation() const;
+    void setInvitation(const QXmppMixInvitation &);
+
+    /// \cond
+    static bool isMixInvitationResponseIq(const QDomElement &);
+
+protected:
+    void parseElementFromChild(const QDomElement &) override;
+    void toXmlElementFromChild(QXmlStreamWriter *) const override;
+    /// \endcond
+
+private:
+    QXmppMixInvitation m_invitation;
 };
 
 namespace QXmpp::Private {
