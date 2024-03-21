@@ -1,10 +1,12 @@
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppMixIq.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppMixIq_p.h"
 #include "QXmppUtils_p.h"
 
 #include <QDomElement>
@@ -23,6 +25,127 @@ static const QStringList MIX_ACTION_TYPES = {
     QStringLiteral("create"),
     QStringLiteral("destroy")
 };
+
+static const QMap<QXmppMixConfigItem::Node, QStringView> NODES = {
+    { QXmppMixConfigItem::Node::AllowedJids, ns_mix_node_allowed },
+    { QXmppMixConfigItem::Node::AvatarData, ns_user_avatar_data },
+    { QXmppMixConfigItem::Node::AvatarMetadata, ns_user_avatar_metadata },
+    { QXmppMixConfigItem::Node::BannedJids, ns_mix_node_banned },
+    { QXmppMixConfigItem::Node::Configuration, ns_mix_node_config },
+    { QXmppMixConfigItem::Node::Information, ns_mix_node_info },
+    { QXmppMixConfigItem::Node::JidMap, ns_mix_node_jidmap },
+    { QXmppMixConfigItem::Node::Messages, ns_mix_node_messages },
+    { QXmppMixConfigItem::Node::Participants, ns_mix_node_participants },
+    { QXmppMixConfigItem::Node::Presence, ns_mix_node_presence },
+};
+
+///
+/// \class QXmppMixSubscriptionUpdateIq
+///
+/// This class represents an IQ used to subscribe to nodes and unsubcribe from nodes of a MIX
+/// channel as defined by \xep{0369, Mediated Information eXchange (MIX)}.
+///
+/// \since QXmpp 1.7
+///
+/// \ingroup Stanzas
+///
+
+/// \cond
+///
+/// Constructs a MIX subscription update IQ.
+///
+QXmppMixSubscriptionUpdateIq::QXmppMixSubscriptionUpdateIq()
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppMixSubscriptionUpdateIq)
+
+///
+/// Returns the nodes to subscribe to.
+///
+/// \return the nodes being subscribed to
+///
+QXmppMixConfigItem::Nodes QXmppMixSubscriptionUpdateIq::additions() const
+{
+    return m_additions;
+}
+
+///
+/// Sets the nodes to subscribe to.
+///
+/// \param additions nodes being subscribed to
+///
+void QXmppMixSubscriptionUpdateIq::setAdditions(QXmppMixConfigItem::Nodes additions)
+{
+    m_additions = additions;
+}
+
+///
+/// Returns the nodes to unsubscribe from.
+///
+/// \return the nodes being unsubscribed from
+///
+QXmppMixConfigItem::Nodes QXmppMixSubscriptionUpdateIq::removals() const
+{
+    return m_removals;
+}
+
+///
+/// Sets the nodes to unsubscribe from.
+///
+/// \param removals nodes being unsubscribed from
+///
+void QXmppMixSubscriptionUpdateIq::setRemovals(QXmppMixConfigItem::Nodes removals)
+{
+    m_removals = removals;
+}
+
+bool QXmppMixSubscriptionUpdateIq::isMixSubscriptionUpdateIq(const QDomElement &element)
+{
+    const QDomElement &child = element.firstChildElement(QStringLiteral("update-subscription"));
+    return !child.isNull() && (child.namespaceURI() == ns_mix);
+}
+
+void QXmppMixSubscriptionUpdateIq::parseElementFromChild(const QDomElement &element)
+{
+    QDomElement child = element.firstChildElement();
+
+    QVector<QString> additions;
+    QVector<QString> removals;
+
+    for (const auto &node : iterChildElements(child, u"subscribe")) {
+        additions << node.attribute(QStringLiteral("node"));
+    }
+    for (const auto &node : iterChildElements(child, u"unsubscribe")) {
+        removals << node.attribute(QStringLiteral("node"));
+    }
+
+    m_additions = listToMixNodes(additions);
+    m_removals = listToMixNodes(removals);
+}
+
+void QXmppMixSubscriptionUpdateIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("update-subscription"));
+    writer->writeDefaultNamespace(toString65(ns_mix));
+
+    const auto additions = mixNodesToList(m_additions);
+    for (const auto &addition : additions) {
+        writer->writeStartElement(QSL65("subscribe"));
+        writer->writeAttribute(QSL65("node"), addition);
+        writer->writeEndElement();
+    }
+
+    const auto removals = mixNodesToList(m_removals);
+    for (const auto &removal : removals) {
+        writer->writeStartElement(QSL65("unsubscribe"));
+        writer->writeAttribute(QSL65("node"), removal);
+        writer->writeEndElement();
+    }
+
+    writer->writeEndElement();
+}
+/// \endcond
 
 class QXmppMixIqPrivate : public QSharedData
 {
@@ -74,6 +197,8 @@ public:
 /// \var QXmppMixIq::UpdateSubscription
 ///
 /// The client subscribes to MIX nodes or unsubscribes from MIX nodes.
+///
+/// \deprecated This is deprecated since QXmpp 1.7. Use QXmppMixManager instead.
 ///
 /// \var QXmppMixIq::SetNick
 ///
@@ -258,3 +383,47 @@ void QXmppMixIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     }
 }
 /// \endcond
+
+namespace QXmpp::Private {
+
+///
+/// Converts a nodes flag to a list of nodes.
+///
+/// \param nodes nodes to convert
+///
+/// \return the list of nodes
+///
+QVector<QString> mixNodesToList(QXmppMixConfigItem::Nodes nodes)
+{
+    QVector<QString> nodeList;
+
+    for (auto itr = NODES.cbegin(); itr != NODES.cend(); ++itr) {
+        if (nodes.testFlag(itr.key())) {
+            nodeList.append(itr.value().toString());
+        }
+    }
+
+    return nodeList;
+}
+
+///
+/// Converts a list of nodes to a nodes flag
+///
+/// \param nodeList list of nodes to convert
+///
+/// \return the nodes flag
+///
+QXmppMixConfigItem::Nodes listToMixNodes(const QVector<QString> &nodeList)
+{
+    QXmppMixConfigItem::Nodes nodes;
+
+    for (auto itr = NODES.cbegin(); itr != NODES.cend(); ++itr) {
+        if (nodeList.contains(itr.value().toString())) {
+            nodes |= itr.key();
+        }
+    }
+
+    return nodes;
+}
+
+}  // namespace QXmpp::Private

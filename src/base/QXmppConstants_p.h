@@ -93,6 +93,9 @@ inline constexpr QStringView ns_authFeature = u"http://jabber.org/features/iq-au
 // XEP-0080: User Location
 inline constexpr QStringView ns_geoloc = u"http://jabber.org/protocol/geoloc";
 inline constexpr QStringView ns_geoloc_notify = u"http://jabber.org/protocol/geoloc+notify";
+// XEP-0084: User Avatar
+inline constexpr QStringView ns_user_avatar_data = u"urn:xmpp:avatar:data";
+inline constexpr QStringView ns_user_avatar_metadata = u"urn:xmpp:avatar:metadata";
 // XEP-0085: Chat State Notifications
 inline constexpr QStringView ns_chat_states = u"http://jabber.org/protocol/chatstates";
 // XEP-0091: Legacy Delayed Delivery
@@ -199,11 +202,9 @@ inline constexpr QStringView ns_message_attaching = u"urn:xmpp:message-attaching
 inline constexpr QStringView ns_mix = u"urn:xmpp:mix:core:1";
 inline constexpr QStringView ns_mix_create_channel = u"urn:xmpp:mix:core:1#create-channel";
 inline constexpr QStringView ns_mix_searchable = u"urn:xmpp:mix:core:1#searchable";
+inline constexpr QStringView ns_mix_node_info = u"urn:xmpp:mix:nodes:info";
 inline constexpr QStringView ns_mix_node_messages = u"urn:xmpp:mix:nodes:messages";
 inline constexpr QStringView ns_mix_node_participants = u"urn:xmpp:mix:nodes:participants";
-inline constexpr QStringView ns_mix_node_presence = u"urn:xmpp:mix:nodes:presence";
-inline constexpr QStringView ns_mix_node_config = u"urn:xmpp:mix:nodes:config";
-inline constexpr QStringView ns_mix_node_info = u"urn:xmpp:mix:nodes:info";
 // XEP-0373: OpenPGP for XMPP
 inline constexpr QStringView ns_ox = u"urn:xmpp:openpgp:0";
 // XEP-0380: Explicit Message Encryption
@@ -220,12 +221,19 @@ inline constexpr QStringView ns_omemo_2_devices = u"urn:xmpp:omemo:2:devices";
 inline constexpr QStringView ns_bind2 = u"urn:xmpp:bind:0";
 // XEP-0388: Extensible SASL Profile
 inline constexpr QStringView ns_sasl_2 = u"urn:xmpp:sasl:2";
+// XEP-0403: Mediated Information eXchange (MIX): Presence Support
+inline constexpr QStringView ns_mix_node_presence = u"urn:xmpp:mix:nodes:presence";
+// XEP-0404: Mediated Information eXchange (MIX): JID Hidden Channels
+inline constexpr QStringView ns_mix_node_jidmap = u"urn:xmpp:mix:nodes:jidmap";
 // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
 inline constexpr QStringView ns_mix_pam = u"urn:xmpp:mix:pam:1";
 inline constexpr QStringView ns_mix_roster = u"urn:xmpp:mix:roster:0";
 inline constexpr QStringView ns_mix_presence = u"urn:xmpp:presence:0";
 // XEP-0406: Mediated Information eXchange (MIX): MIX Administration
 inline constexpr QStringView ns_mix_admin = u"urn:xmpp:mix:admin:0";
+inline constexpr QStringView ns_mix_node_allowed = u"urn:xmpp:mix:nodes:allowed";
+inline constexpr QStringView ns_mix_node_banned = u"urn:xmpp:mix:nodes:banned";
+inline constexpr QStringView ns_mix_node_config = u"urn:xmpp:mix:nodes:config";
 // XEP-0407: Mediated Information eXchange (MIX): Miscellaneous Capabilities
 inline constexpr QStringView ns_mix_misc = u"urn:xmpp:mix:misc:0";
 // XEP-0428: Fallback Indication

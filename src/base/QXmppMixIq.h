@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -20,8 +21,10 @@ public:
         ClientLeave,
         Join,
         Leave,
-        UpdateSubscription,
-        SetNick,
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+        UpdateSubscription [[deprecated("Use QXmppMixManager")]],
+#endif
+        SetNick = 6,
         Create,
         Destroy
     };
