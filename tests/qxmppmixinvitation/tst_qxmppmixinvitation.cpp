@@ -28,25 +28,33 @@ void tst_QXmppMixInvitation::testInvitation()
         "<token>ABCDEF</token>"
         "</invitation>");
 
-    QXmppMixInvitation invitation;
-    parsePacket(invitation, xml);
+    QXmppMixInvitation invitation1;
 
-    QCOMPARE(invitation.inviterJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(invitation.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
-    QCOMPARE(invitation.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
-    QCOMPARE(invitation.token(), QStringLiteral("ABCDEF"));
+    QVERIFY(invitation1.inviterJid().isEmpty());
+    QVERIFY(invitation1.inviteeJid().isEmpty());
+    QVERIFY(invitation1.channelJid().isEmpty());
+    QVERIFY(invitation1.token().isEmpty());
 
-    serializePacket(invitation, xml);
+    parsePacket(invitation1, xml);
 
-    invitation.setInviterJid("hag66@shakespeare.example");
-    invitation.setInviteeJid("cat@shakespeare.example");
-    invitation.setChannelJid("coven@mix.shakespeare.example");
-    invitation.setToken("ABCDEF");
+    QCOMPARE(invitation1.inviterJid(), QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(invitation1.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
+    QCOMPARE(invitation1.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
+    QCOMPARE(invitation1.token(), QStringLiteral("ABCDEF"));
 
-    QCOMPARE(invitation.inviterJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(invitation.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
-    QCOMPARE(invitation.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
-    QCOMPARE(invitation.token(), QStringLiteral("ABCDEF"));
+    serializePacket(invitation1, xml);
+
+    QXmppMixInvitation invitation2;
+
+    invitation2.setInviterJid(QStringLiteral("hag66@shakespeare.example"));
+    invitation2.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
+    invitation2.setChannelJid(QStringLiteral("coven@mix.shakespeare.example"));
+    invitation2.setToken(QStringLiteral("ABCDEF"));
+
+    QCOMPARE(invitation2.inviterJid(), QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(invitation2.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
+    QCOMPARE(invitation2.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
+    QCOMPARE(invitation2.token(), QStringLiteral("ABCDEF"));
 }
 
 void tst_QXmppMixInvitation::testIsInvitation()
