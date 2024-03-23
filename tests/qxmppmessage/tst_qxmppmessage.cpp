@@ -151,10 +151,13 @@ void tst_QXmppMessage::testBasic()
     QVERIFY(!message.hasHint(QXmppMessage::NoCopy));
     QVERIFY(!message.hasHint(QXmppMessage::Store));
     QCOMPARE(message.bitsOfBinaryData(), QXmppBitsOfBinaryDataList());
-    QVERIFY(!message.isFallback());
     QVERIFY(message.stanzaId().isNull());
     QVERIFY(message.stanzaIdBy().isNull());
     QVERIFY(message.originId().isNull());
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
+    QVERIFY(!message.isFallback());
+    QT_WARNING_POP
 
     message = QXmppMessage();
     message.setTo(QStringLiteral("foo@example.com/QXmpp"));
