@@ -51,6 +51,42 @@ public:
 ///
 /// Action type of the MIX IQ stanza.
 ///
+/// \var QXmppMixIq::None
+///
+/// Nothing is done.
+///
+/// \var QXmppMixIq::ClientJoin
+///
+/// The client sends a request to join a MIX channel to the user's server.
+///
+/// \var QXmppMixIq::ClientLeave
+///
+/// The client sends a request to leave a MIX channel to the user's server.
+///
+/// \var QXmppMixIq::Join
+///
+/// The user's server forwards a join request from the client to the MIX channel.
+///
+/// \var QXmppMixIq::Leave
+///
+/// The user's server forwards a leave request from the client to the MIX channel.
+///
+/// \var QXmppMixIq::UpdateSubscription
+///
+/// The client subscribes to MIX nodes or unsubscribes from MIX nodes.
+///
+/// \var QXmppMixIq::SetNick
+///
+/// The client changes the user's nickname within the MIX channel.
+///
+/// \var QXmppMixIq::Create
+///
+/// The client creates a MIX channel.
+///
+/// \var QXmppMixIq::Destroy
+///
+/// The client destroys a MIX channel.
+///
 
 QXmppMixIq::QXmppMixIq()
     : d(new QXmppMixIqPrivate)
