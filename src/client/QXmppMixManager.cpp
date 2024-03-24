@@ -499,14 +499,7 @@ QXmppTask<QXmppMixManager::ConfigurationResult> QXmppMixManager::requestChannelC
 QXmppTask<QXmppClient::EmptyResult> QXmppMixManager::updateChannelConfiguration(const QString &channelJid, QXmppMixConfigItem configuration)
 {
     configuration.setFormType(QXmppDataForm::Submit);
-
-    return chain<QXmppClient::EmptyResult>(d->pubSubManager->publishItem(channelJid, ns_mix_node_config.toString(), configuration), this, [](QXmppPubSubManager::PublishItemResult &&result) -> QXmppClient::EmptyResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        return QXmpp::Success();
-    });
+    return chainSuccess(d->pubSubManager->publishItem(channelJid, ns_mix_node_config.toString(), configuration), this);
 }
 
 ///
@@ -550,14 +543,7 @@ QXmppTask<QXmppMixManager::InformationResult> QXmppMixManager::requestChannelInf
 QXmppTask<QXmppClient::EmptyResult> QXmppMixManager::updateChannelInformation(const QString &channelJid, QXmppMixInfoItem information)
 {
     information.setFormType(QXmppDataForm::Submit);
-
-    return chain<QXmppClient::EmptyResult>(d->pubSubManager->publishItem(channelJid, ns_mix_node_info.toString(), information), this, [](QXmppPubSubManager::PublishItemResult &&result) -> QXmppClient::EmptyResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        return QXmpp::Success();
-    });
+    return chainSuccess(d->pubSubManager->publishItem(channelJid, ns_mix_node_info.toString(), information), this);
 }
 
 ///
@@ -1225,15 +1211,7 @@ QXmppTask<QXmppMixManager::JidResult> QXmppMixManager::requestJids(const QString
 ///
 QXmppTask<QXmppClient::EmptyResult> QXmppMixManager::addJidToNode(const QString &channelJid, const QString &node, const QString &jid)
 {
-    const QXmppPubSubBaseItem item { jid };
-
-    return chain<QXmppClient::EmptyResult>(d->pubSubManager->publishItem(channelJid, node, item), this, [](QXmppPubSubManager::PublishItemResult &&result) -> QXmppClient::EmptyResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        return QXmpp::Success();
-    });
+    return chainSuccess(d->pubSubManager->publishItem(channelJid, node, QXmppPubSubBaseItem { jid }), this);
 }
 
 ///
