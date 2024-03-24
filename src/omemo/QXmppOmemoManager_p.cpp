@@ -177,12 +177,6 @@ static void replaceChildElements(QDomElement &oldElement, const QDomElement &new
     }
 }
 
-template<typename T, typename Err>
-auto mapToSuccess(std::variant<T, Err> var)
-{
-    return mapSuccess(std::move(var), [](T) { return Success(); });
-}
-
 QXmppOmemoManagerPrivate::QXmppOmemoManagerPrivate(Manager *parent, QXmppOmemoStorage *omemoStorage)
     : q(parent),
       omemoStorage(omemoStorage),

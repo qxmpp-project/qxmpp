@@ -195,6 +195,20 @@ auto mapSuccess(std::variant<T, Err> var, Function lambda)
                       std::move(var));
 }
 
+template<typename T, typename Err>
+auto mapToSuccess(std::variant<T, Err> var)
+{
+    return mapSuccess(std::move(var), [](T) {
+        return Success();
+    });
+}
+
+template<typename T, typename Err>
+auto chainSuccess(QXmppTask<std::variant<T, Err>> &&source, QObject *context) -> QXmppTask<std::variant<QXmpp::Success, QXmppError>>
+{
+    return chain<std::variant<QXmpp::Success, QXmppError>>(std::move(source), context, mapToSuccess<T, Err>);
+}
+
 }  // namespace QXmpp::Private
 
 #endif  // QXMPPFUTUREUTILS_P_H
