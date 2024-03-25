@@ -24,9 +24,8 @@ class QXmppPresence;
 class QXmppIq;
 class QXmppMessage;
 class QXmppStreamFeatures;
-
-class QXmppOutgoingClient;
 class QXmppOutgoingClientPrivate;
+class TestClient;
 
 namespace QXmpp::Private {
 class C2sStreamManager;
@@ -152,7 +151,11 @@ public:
     void requestEnable();
 
 private:
+    friend class ::TestClient;
+
     bool setResumeAddress(const QString &address);
+    void setEnabled(bool enabled) { m_enabled = enabled; }
+    void setResumed(bool resumed) { m_streamResumed = resumed; }
 
     QXmppOutgoingClient *q;
 

@@ -70,6 +70,23 @@ public:
         QXmppStanza::s_uniqeIdNo = 0;
     }
 
+    void setStreamManagementState(QXmppClient::StreamManagementState state)
+    {
+        switch (state) {
+        case QXmppClient::StreamManagementState::NoStreamManagement:
+            d->stream->c2sStreamManager().setEnabled(false);
+            break;
+        case QXmppClient::StreamManagementState::NewStream:
+            d->stream->c2sStreamManager().setEnabled(true);
+            d->stream->c2sStreamManager().setResumed(false);
+            break;
+        case QXmppClient::StreamManagementState::ResumedStream:
+            d->stream->c2sStreamManager().setEnabled(true);
+            d->stream->c2sStreamManager().setResumed(true);
+            break;
+        }
+    }
+
 private:
     void onLoggerMessage(QXmppLogger::MessageType type, const QString &text)
     {
