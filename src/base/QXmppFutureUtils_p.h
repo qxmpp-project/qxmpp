@@ -209,6 +209,14 @@ auto chainSuccess(QXmppTask<std::variant<T, Err>> &&source, QObject *context) ->
     return chain<std::variant<QXmpp::Success, QXmppError>>(std::move(source), context, mapToSuccess<T, Err>);
 }
 
+template<typename Input, typename Converter>
+auto chainMapSuccess(QXmppTask<Input> &&source, QObject *context, Converter convert)
+{
+    return chain<std::variant<decltype(convert({})), QXmppError>>(std::move(source), context, [convert](Input &&input) {
+        return mapSuccess(std::move(input), convert);
+    });
+}
+
 }  // namespace QXmpp::Private
 
 #endif  // QXMPPFUTUREUTILS_P_H
