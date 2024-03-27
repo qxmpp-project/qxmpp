@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2021 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -57,15 +58,22 @@ class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
-    /// Empty result containing QXmpp::Success or a QXmppError
+    /// Iq result containing QXmppRosterIq or a QXmppError
+    using IqResult = std::variant<QXmppRosterIq, QXmppError>;
+    /// Simple result containing QXmpp::Success or a QXmppError
     using Result = std::variant<QXmpp::Success, QXmppError>;
 
     explicit QXmppRosterManager(QXmppClient *stream);
     ~QXmppRosterManager() override;
 
+    QXmppTask<IqResult> requestRoster();
+
     bool isRosterReceived() const;
     QStringList getRosterBareJids() const;
     QXmppRosterIq::Item getRosterEntry(const QString &bareJid) const;
+
+    QXmppRosterIq roster() const;
+    QXmppTask<Result> setRoster(const QXmppRosterIq &);
 
     QStringList getResources(const QString &bareJid) const;
     QMap<QString, QXmppPresence> getAllPresencesForBareJid(
@@ -135,8 +143,7 @@ private Q_SLOTS:
     void _q_presenceReceived(const QXmppPresence &);
 
 private:
-    using RosterResult = std::variant<QXmppRosterIq, QXmppError>;
-    QXmppTask<RosterResult> requestRoster();
+    bool handleReceivedRoster(const QXmppRosterIq &roster);
 
     const std::unique_ptr<QXmppRosterManagerPrivate> d;
 };

@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2020 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -81,6 +82,25 @@ QXmppRosterManager::QXmppRosterManager(QXmppClient *client)
 QXmppRosterManager::~QXmppRosterManager() = default;
 
 ///
+/// This function requests the server for roster.
+/// Once received the signal rosterReceived() is emitted.
+///
+QXmppTask<QXmppRosterManager::IqResult> QXmppRosterManager::requestRoster()
+{
+    QXmppRosterIq iq;
+    iq.setType(QXmppIq::Get);
+    iq.setFrom(client()->configuration().jid());
+
+    // TODO: Request MIX annotations only when the server supports MIX-PAM.
+    iq.setMixAnnotate(true);
+
+    return chainIq(client()->sendIq(std::move(iq)), this, [this](QXmppRosterIq &&roster) -> QXmppRosterManager::IqResult {
+        handleReceivedRoster(roster);
+        return std::move(roster);
+    });
+}
+
+///
 /// Accepts an existing subscription request or pre-approves future subscription
 /// requests.
 ///
@@ -112,21 +132,10 @@ void QXmppRosterManager::_q_connected()
         d->clear();
     }
 
-    if (!d->isRosterReceived && client()->isAuthenticated()) {
-        requestRoster().then(this, [this](auto &&result) {
-            if (auto *rosterIq = std::get_if<QXmppRosterIq>(&result)) {
-                // reset entries
-                d->entries.clear();
-                const auto items = rosterIq->items();
-                for (const auto &item : items) {
-                    d->entries.insert(item.bareJid(), item);
-                }
-
-                // notify
-                d->isRosterReceived = true;
-                Q_EMIT rosterReceived();
-            }
-        });
+    if (!d->isRosterReceived) {
+        if (client()->isAuthenticated()) {
+            requestRoster();
+        }
     }
 }
 
@@ -145,51 +154,10 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
         return false;
     }
 
-    // Security check: only server should send this iq
-    // from() should be either empty or bareJid of the user
-    const auto fromJid = element.attribute(QStringLiteral("from"));
-    if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare()) {
-        return false;
-    }
-
     QXmppRosterIq rosterIq;
     rosterIq.parse(element);
 
-    switch (rosterIq.type()) {
-    case QXmppIq::Set: {
-        // send result iq
-        QXmppIq returnIq(QXmppIq::Result);
-        returnIq.setId(rosterIq.id());
-        client()->sendPacket(returnIq);
-
-        // store updated entries and notify changes
-        const auto items = rosterIq.items();
-        for (const auto &item : items) {
-            const QString bareJid = item.bareJid();
-            if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
-                if (d->entries.remove(bareJid)) {
-                    // notify the user that the item was removed
-                    Q_EMIT itemRemoved(bareJid);
-                }
-            } else {
-                const bool added = !d->entries.contains(bareJid);
-                d->entries.insert(bareJid, item);
-                if (added) {
-                    // notify the user that the item was added
-                    Q_EMIT itemAdded(bareJid);
-                } else {
-                    // notify the user that the item changed
-                    Q_EMIT itemChanged(bareJid);
-                }
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-
-    return true;
+    return handleReceivedRoster(rosterIq);
 }
 /// \endcond
 
@@ -229,18 +197,6 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
     }
 }
 
-QXmppTask<QXmppRosterManager::RosterResult> QXmppRosterManager::requestRoster()
-{
-    QXmppRosterIq iq;
-    iq.setType(QXmppIq::Get);
-    iq.setFrom(client()->configuration().jid());
-
-    // TODO: Request MIX annotations only when the server supports MIX-PAM.
-    iq.setMixAnnotate(true);
-
-    return chainIq<RosterResult>(client()->sendIq(std::move(iq)), this);
-}
-
 ///
 /// Adds a new item to the roster without sending any subscription requests.
 ///
@@ -262,9 +218,8 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::addRosterItem(const QS
     item.setSubscriptionType(QXmppRosterIq::Item::NotSet);
 
     QXmppRosterIq iq;
-    iq.setType(QXmppIq::Set);
     iq.addItem(item);
-    return client()->sendGenericIq(std::move(iq));
+    return setRoster(std::move(iq));
 }
 
 ///
@@ -284,9 +239,8 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::removeRosterItem(const
     item.setSubscriptionType(QXmppRosterIq::Item::Remove);
 
     QXmppRosterIq iq;
-    iq.setType(QXmppIq::Set);
     iq.addItem(item);
-    return client()->sendGenericIq(std::move(iq));
+    return setRoster(std::move(iq));
 }
 
 ///
@@ -316,9 +270,8 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const
     }
 
     QXmppRosterIq iq;
-    iq.setType(QXmppIq::Set);
     iq.addItem(item);
-    return client()->sendGenericIq(std::move(iq));
+    return setRoster(std::move(iq));
 }
 
 ///
@@ -472,6 +425,67 @@ bool QXmppRosterManager::unsubscribe(const QString &bareJid, const QString &reas
     return client()->sendPacket(packet);
 }
 
+bool QXmppRosterManager::handleReceivedRoster(const QXmppRosterIq &roster)
+{
+    // Security check: only server should send this iq
+    // from() should be either empty or bareJid of the user
+    const auto fromJid = roster.from();
+    if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare()) {
+        qWarning("%s: Unexpected sender", Q_FUNC_INFO);
+        return false;
+    }
+
+    switch (roster.type()) {
+    case QXmppIq::Set: {
+        // send result iq
+        QXmppIq returnIq(QXmppIq::Result);
+        returnIq.setId(roster.id());
+        client()->sendPacket(returnIq);
+
+        // store updated entries and notify changes
+        const auto items = roster.items();
+        for (const auto &item : items) {
+            const QString bareJid = item.bareJid();
+            if (item.subscriptionType() == QXmppRosterIq::Item::Remove) {
+                if (d->entries.remove(bareJid)) {
+                    // notify the user that the item was removed
+                    Q_EMIT itemRemoved(bareJid);
+                }
+            } else {
+                const bool added = !d->entries.contains(bareJid);
+                d->entries.insert(bareJid, item);
+                if (added) {
+                    // notify the user that the item was added
+                    Q_EMIT itemAdded(bareJid);
+                } else {
+                    // notify the user that the item changed
+                    Q_EMIT itemChanged(bareJid);
+                }
+            }
+        }
+    } break;
+    case QXmppIq::Result: {
+        // reset entries
+        d->entries.clear();
+        const auto items = roster.items();
+        for (const auto &item : items) {
+            const auto bareJid = item.bareJid();
+            d->entries.insert(bareJid, item);
+        }
+        if (!d->isRosterReceived) {
+            // notify
+            d->isRosterReceived = true;
+            Q_EMIT rosterReceived();
+        }
+        break;
+    }
+    default:
+        break;
+    }
+
+    return true;
+}
+
 ///
 /// Function to get all the bareJids present in the roster.
 ///
@@ -496,6 +510,34 @@ QXmppRosterIq::Item QXmppRosterManager::getRosterEntry(
         return d->entries.value(bareJid);
     }
     return {};
+}
+
+///
+/// Returns the roster.
+///
+QXmppRosterIq QXmppRosterManager::roster() const
+{
+    QXmppRosterIq roster;
+
+    roster.setType(QXmppRosterIq::Set);
+    roster.addItems(d->entries.values());
+
+    return roster;
+}
+
+/// Sets the roster of the connected client.
+///
+/// \param roster QXmppRoster
+///
+QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::setRoster(const QXmppRosterIq &roster)
+{
+    auto iq = roster;
+    iq.setType(QXmppIq::Set);
+
+    return chainIq(client()->sendIq(std::move(iq)), this, [this](QXmppRosterIq &&roster) -> QXmppRosterManager::Result {
+        handleReceivedRoster(std::move(roster));
+        return QXmpp::Success {};
+    });
 }
 
 ///
