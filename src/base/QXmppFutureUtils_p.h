@@ -224,6 +224,12 @@ auto mapToSuccess(std::variant<T, Err> var)
     });
 }
 
+template<typename T, typename Err, typename Converter>
+auto mapTaskToSuccess(std::variant<T, Err> var, Converter task)
+{
+    return mapSuccess(std::move(var), task);
+}
+
 template<typename Input>
 auto chainSuccess(QXmppTask<Input> &&source, QObject *context) -> QXmppTask<QXmppClient::EmptyResult>
 {
@@ -231,6 +237,18 @@ auto chainSuccess(QXmppTask<Input> &&source, QObject *context) -> QXmppTask<QXmp
 
     source.then(context, [=](Input &&input) mutable {
         promise.finish(mapToSuccess(std::move(input)));
+    });
+
+    return promise.task();
+}
+
+template<typename Result, typename Input, typename Converter>
+auto chainOnSuccess(QXmppTask<Input> &&source, QObject *context, Converter task) -> QXmppTask<Result>
+{
+    QXmppPromise<Result> promise;
+
+    source.then(context, [=](Input &&input) mutable {
+        promise.finish(mapTaskToSuccess(std::move(input), task));
     });
 
     return promise.task();
