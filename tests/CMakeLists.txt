@@ -27,6 +27,7 @@ if(BUILD_INTERNAL_TESTS)
 endif()
 
 add_simple_test(qxmpparchiveiq)
+add_simple_test(qxmppaccountmigrationmanager TestClient.h)
 add_simple_test(qxmppatmmanager)
 add_simple_test(qxmppattentionmanager)
 add_simple_test(qxmppbindiq)

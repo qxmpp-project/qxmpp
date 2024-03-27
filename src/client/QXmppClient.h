@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -149,7 +150,7 @@ public:
     QXmppE2eeExtension *encryptionExtension() const;
     void setEncryptionExtension(QXmppE2eeExtension *);
 
-    QList<QXmppClientExtension *> extensions();
+    QList<QXmppClientExtension *> extensions() const;
 
     ///
     /// \brief Returns the extension which can be cast into type T*, or 0
@@ -165,7 +166,7 @@ public:
     /// \endcode
     ///
     template<typename T>
-    T *findExtension()
+    T *findExtension() const
     {
         const QList<QXmppClientExtension *> list = extensions();
         for (auto ext : list) {
@@ -193,7 +194,7 @@ public:
     /// \since QXmpp 1.2
     ///
     template<typename T>
-    int indexOfExtension()
+    int indexOfExtension() const
     {
         auto list = extensions();
         for (int i = 0; i < list.size(); ++i) {

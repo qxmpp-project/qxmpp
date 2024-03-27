@@ -1,13 +1,19 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppVCardManager.h"
 
+#include "QXmppAccountMigrationManager.h"
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
+#include "QXmppFutureUtils_p.h"
+#include "QXmppTask.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardIq.h"
+
+using namespace QXmpp::Private;
 
 class QXmppVCardManagerPrivate
 {
@@ -19,6 +25,21 @@ public:
 QXmppVCardManager::QXmppVCardManager()
     : d(std::make_unique<QXmppVCardManagerPrivate>())
 {
+    const auto parseIq = [](const QDomElement &element) -> QXmppAccountData::ExtensionParserResult<QXmppVCardIq> {
+        if (QXmppVCardIq::isVCard(element)) {
+            QXmppVCardIq iq;
+            iq.parse(element);
+            return iq;
+        }
+
+        return QXmppError { QStringLiteral("Not a QXmppVCardIq"), {} };
+    };
+    const auto serializeIq = [](const QXmppVCardIq &iq, QXmlStreamWriter &writer) -> QXmppAccountData::ExtensionSerializerResult<QXmppVCardIq> {
+        iq.toXml(&writer);
+    };
+
+    QXmppAccountData::registerExtension<QXmppVCardIq, parseIq, serializeIq>(u"vCard", ns_vcard);
+
     d->isClientVCardReceived = false;
 }
 
@@ -30,14 +51,14 @@ QXmppVCardManager::~QXmppVCardManager() = default;
 ///
 /// \param jid Jid of the specific entry in the roster
 ///
-QString QXmppVCardManager::requestVCard(const QString &jid)
+QXmppTask<QXmppVCardManager::IqResult> QXmppVCardManager::requestVCard(const QString &jid)
 {
-    QXmppVCardIq request(jid);
-    if (client()->sendPacket(request)) {
-        return request.id();
-    } else {
-        return QString();
-    }
+    QXmppVCardIq iq(jid);
+
+    return chainIq(client()->sendIq(std::move(iq)), this, [this](QXmppVCardIq &&vcard) -> QXmppVCardManager::IqResult {
+        handleReceivedVCard(vcard);
+        return std::move(vcard);
+    });
 }
 
 /// Returns the vCard of the connected client.
@@ -47,13 +68,17 @@ const QXmppVCardIq &QXmppVCardManager::clientVCard() const
 }
 
 /// Sets the vCard of the connected client.
-void QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
+QXmppTask<QXmppVCardManager::Result> QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
 {
-    d->clientVCard = clientVCard;
-    d->clientVCard.setTo({});
-    d->clientVCard.setFrom({});
-    d->clientVCard.setType(QXmppIq::Set);
-    client()->sendPacket(d->clientVCard);
+    auto iq = clientVCard;
+    iq.setTo({});
+    iq.setFrom({});
+    iq.setType(QXmppIq::Set);
+
+    return chainIq(client()->sendIq(std::move(iq)), this, [this](QXmppVCardIq &&vcard) -> QXmppVCardManager::Result {
+        handleReceivedVCard(std::move(vcard));
+        return QXmpp::Success {};
+    });
 }
 
 ///
@@ -61,7 +86,7 @@ void QXmppVCardManager::setClientVCard(const QXmppVCardIq &clientVCard)
 /// Once received the signal clientVCardReceived() is emitted. Received vCard
 /// can be get using clientVCard().
 ///
-QString QXmppVCardManager::requestClientVCard()
+QXmppTask<QXmppVCardManager::IqResult> QXmppVCardManager::requestClientVCard()
 {
     return requestVCard();
 }
@@ -80,24 +105,40 @@ QStringList QXmppVCardManager::discoveryFeatures() const
         ns_vcard.toString(),
     };
 }
+/// \endcond
 
-bool QXmppVCardManager::handleStanza(const QDomElement &element)
+void QXmppVCardManager::onRegistered(QXmppClient *client)
 {
-    if (element.tagName() == u"iq" && QXmppVCardIq::isVCard(element)) {
-        QXmppVCardIq vCardIq;
-        vCardIq.parse(element);
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        auto importData = [this](QXmppVCardIq data) -> QXmppAccountMigrationManager::ImportDataTask {
+            return setClientVCard(data);
+        };
+        auto exportData = [this]() -> QXmppAccountMigrationManager::ExportDataTask<QXmppVCardIq> {
+            if (isClientVCardReceived()) {
+                return makeReadyTask<IqResult>(clientVCard());
+            }
 
-        if (vCardIq.from().isEmpty() || vCardIq.from() == client()->configuration().jidBare()) {
-            d->clientVCard = vCardIq;
-            d->isClientVCardReceived = true;
-            Q_EMIT clientVCardReceived();
-        }
+            return requestClientVCard();
+        };
 
-        Q_EMIT vCardReceived(vCardIq);
+        manager->registerExtension<QXmppVCardIq>(importData, exportData);
+    }
+}
 
-        return true;
+void QXmppVCardManager::onUnregistered(QXmppClient *client)
+{
+    if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
+        manager->unregisterExtension<QXmppVCardIq>();
+    }
+}
+
+void QXmppVCardManager::handleReceivedVCard(const QXmppVCardIq &vcard)
+{
+    if (vcard.from().isEmpty() || vcard.from() == client()->configuration().jidBare()) {
+        d->clientVCard = vcard;
+        d->isClientVCardReceived = true;
+        Q_EMIT clientVCardReceived();
     }
 
-    return false;
+    Q_EMIT vCardReceived(vcard);
 }
-/// \endcond

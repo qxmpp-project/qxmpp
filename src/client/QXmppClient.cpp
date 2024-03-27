@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -366,7 +367,7 @@ void QXmppClient::setEncryptionExtension(QXmppE2eeExtension *extension)
 }
 
 /// Returns a list containing all the client's extensions.
-QList<QXmppClientExtension *> QXmppClient::extensions()
+QList<QXmppClientExtension *> QXmppClient::extensions() const
 {
     return d->extensions;
 }

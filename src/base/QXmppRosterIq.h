@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -95,6 +96,7 @@ public:
     void setVersion(const QString &);
 
     void addItem(const Item &);
+    void addItems(const QList<Item> &);
     QList<Item> items() const;
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements

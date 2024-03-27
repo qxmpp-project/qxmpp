@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2021 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -46,7 +47,7 @@ public:
     void expect(QString &&packet)
     {
         QVERIFY2(!m_sentPackets.empty(), "No packet was sent!");
-        QCOMPARE(m_sentPackets.takeFirst(), packet.replace(u'\'', u'"'));
+        QCOMPARE(m_sentPackets.takeFirst().replace(u'\'', u'"'), packet.replace(u'\'', u'"'));
         resetIdCount();
     }
     QString takePacket()
@@ -96,7 +97,7 @@ private:
         }
 
         if (debugEnabled) {
-            qDebug() << "LOG" << text;
+            qDebug() << "LOG:" << text.toLocal8Bit().constData();
         }
 
         m_sentPackets << text;

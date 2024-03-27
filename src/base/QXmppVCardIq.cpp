@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -634,7 +635,6 @@ bool operator==(const QXmppVCardIq &left, const QXmppVCardIq &right)
 {
     return left.birthday() == right.birthday() &&
         left.description() == right.description() &&
-        left.email() == right.email() &&
         left.firstName() == right.firstName() &&
         left.fullName() == right.fullName() &&
         left.lastName() == right.lastName() &&
