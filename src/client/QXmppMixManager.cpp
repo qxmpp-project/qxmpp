@@ -430,12 +430,7 @@ QXmppTask<QXmppMixManager::CreationResult> QXmppMixManager::createChannel(const 
 ///
 QXmppTask<QXmppMixManager::ChannelJidResult> QXmppMixManager::requestChannelJids(const QString &serviceJid)
 {
-    return chain<ChannelJidResult>(d->discoveryManager->requestDiscoItems(serviceJid), this, [](QXmppDiscoveryManager::ItemsResult &&result) -> ChannelJidResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        const auto &items = std::get<QList<QXmppDiscoveryIq::Item>>(result);
+    return chainMapSuccess(d->discoveryManager->requestDiscoItems(serviceJid), this, [](QList<QXmppDiscoveryIq::Item> &&items) {
         return transform<QVector<ChannelJid>>(items, [](const QXmppDiscoveryIq::Item &item) {
             return item.jid();
         });
@@ -451,17 +446,10 @@ QXmppTask<QXmppMixManager::ChannelJidResult> QXmppMixManager::requestChannelJids
 ///
 QXmppTask<QXmppMixManager::ChannelNodeResult> QXmppMixManager::requestChannelNodes(const QString &channelJid)
 {
-    return chain<ChannelNodeResult>(d->discoveryManager->requestDiscoItems(channelJid, MIX_SERVICE_DISCOVERY_NODE.toString()), this, [](QXmppDiscoveryManager::ItemsResult &&result) -> ChannelNodeResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        const auto &items = std::get<QList<QXmppDiscoveryIq::Item>>(result);
-        const auto nodes = transform<QVector<QString>>(items, [](const QXmppDiscoveryIq::Item &item) {
+    return chainMapSuccess(d->discoveryManager->requestDiscoItems(channelJid, MIX_SERVICE_DISCOVERY_NODE.toString()), this, [](QList<QXmppDiscoveryIq::Item> &&items) {
+        return listToMixNodes(transform<QVector<QString>>(items, [](const QXmppDiscoveryIq::Item &item) {
             return item.node();
-        });
-
-        return listToMixNodes(nodes);
+        }));
     });
 }
 
@@ -474,12 +462,8 @@ QXmppTask<QXmppMixManager::ChannelNodeResult> QXmppMixManager::requestChannelNod
 ///
 QXmppTask<QXmppMixManager::ConfigurationResult> QXmppMixManager::requestChannelConfiguration(const QString &channelJid)
 {
-    return chain<ConfigurationResult>(d->pubSubManager->requestItems<QXmppMixConfigItem>(channelJid, ns_mix_node_config.toString()), this, [](QXmppPubSubManager::ItemsResult<QXmppMixConfigItem> &&result) -> ConfigurationResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        return std::get<QXmppPubSubManager::Items<QXmppMixConfigItem>>(result).items.takeFirst();
+    return chainMapSuccess(d->pubSubManager->requestItems<QXmppMixConfigItem>(channelJid, ns_mix_node_config.toString()), this, [](QXmppPubSubManager::Items<QXmppMixConfigItem> &&items) {
+        return items.items.takeFirst();
     });
 }
 
@@ -519,12 +503,8 @@ QXmppTask<QXmppClient::EmptyResult> QXmppMixManager::updateChannelConfiguration(
 ///
 QXmppTask<QXmppMixManager::InformationResult> QXmppMixManager::requestChannelInformation(const QString &channelJid)
 {
-    return chain<InformationResult>(d->pubSubManager->requestItems<QXmppMixInfoItem>(channelJid, ns_mix_node_info.toString()), this, [](QXmppPubSubManager::ItemsResult<QXmppMixInfoItem> &&result) -> InformationResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        return std::get<QXmppPubSubManager::Items<QXmppMixInfoItem>>(result).items.takeFirst();
+    return chainMapSuccess(d->pubSubManager->requestItems<QXmppMixInfoItem>(channelJid, ns_mix_node_info.toString()), this, [](QXmppPubSubManager::Items<QXmppMixInfoItem> &&items) {
+        return items.items.takeFirst();
     });
 }
 
@@ -884,12 +864,8 @@ QXmppTask<QXmppClient::EmptyResult> QXmppMixManager::unbanAllJids(const QString 
 ///
 QXmppTask<QXmppMixManager::ParticipantResult> QXmppMixManager::requestParticipants(const QString &channelJid)
 {
-    return chain<ParticipantResult>(d->pubSubManager->requestItems<QXmppMixParticipantItem>(channelJid, ns_mix_node_participants.toString()), this, [](QXmppPubSubManager::ItemsResult<QXmppMixParticipantItem> &&result) -> ParticipantResult {
-        if (auto *error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        return std::get<QXmppPubSubManager::Items<QXmppMixParticipantItem>>(std::move(result)).items;
+    return chainMapSuccess(d->pubSubManager->requestItems<QXmppMixParticipantItem>(channelJid, ns_mix_node_participants.toString()), this, [](QXmppPubSubManager::Items<QXmppMixParticipantItem> &&items) {
+        return items.items;
     });
 }
 
@@ -1185,13 +1161,8 @@ QXmppTask<QXmppMixManager::JoiningResult> QXmppMixManager::joinChannel(QXmppMixI
 ///
 QXmppTask<QXmppMixManager::JidResult> QXmppMixManager::requestJids(const QString &channelJid, const QString &node)
 {
-    return chain<JidResult>(d->pubSubManager->requestItems(channelJid, node), this, [](QXmppPubSubManager::ItemsResult<QXmppPubSubBaseItem> &&result) -> JidResult {
-        if (auto error = std::get_if<QXmppError>(&result)) {
-            return std::move(*error);
-        }
-
-        const auto &items = std::get<QXmppPubSubManager::Items<QXmppPubSubBaseItem>>(result).items;
-        return transform<QVector<Jid>>(items, [](const QXmppPubSubBaseItem &item) {
+    return chainMapSuccess(d->pubSubManager->requestItems(channelJid, node), this, [](QXmppPubSubManager::Items<QXmppPubSubBaseItem> &&items) {
+        return transform<QVector<Jid>>(items.items, [](const QXmppPubSubBaseItem &item) {
             return item.id();
         });
     });
