@@ -38,4 +38,6 @@ private:
     QSharedDataPointer<QXmppMixParticipantItemPrivate> d;
 };
 
+Q_DECLARE_METATYPE(QXmppMixParticipantItem)
+
 #endif  // QXMPPMIXPARTICIPANTITEM_H

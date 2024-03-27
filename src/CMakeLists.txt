@@ -47,9 +47,11 @@ set(INSTALL_HEADER_FILES
     base/QXmppMamIq.h
     base/QXmppMessage.h
     base/QXmppMessageReaction.h
+    base/QXmppMixConfigItem.h
     base/QXmppMixInfoItem.h
     base/QXmppMixInvitation.h
     base/QXmppMixIq.h
+    base/QXmppMixIq_p.h
     base/QXmppMixParticipantItem.h
     base/QXmppMucIq.h
     base/QXmppNonza.h
@@ -124,6 +126,7 @@ set(INSTALL_HEADER_FILES
     client/QXmppMamManager.h
     client/QXmppMessageHandler.h
     client/QXmppMessageReceiptManager.h
+    client/QXmppMixManager.h
     client/QXmppMucManager.h
     client/QXmppOutgoingClient.h
     client/QXmppRegistrationManager.h
@@ -260,6 +263,7 @@ set(SOURCE_FILES
     client/QXmppJingleMessageInitiationManager.cpp
     client/QXmppMamManager.cpp
     client/QXmppMessageReceiptManager.cpp
+    client/QXmppMixManager.cpp
     client/QXmppMucManager.cpp
     client/QXmppOutgoingClient.cpp
     client/QXmppRosterManager.cpp

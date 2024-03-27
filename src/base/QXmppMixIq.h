@@ -1,4 +1,5 @@
 // SPDX-FileCopyrightText: 2019 Linus Jahn <lnj@kaidan.im>
+// SPDX-FileCopyrightText: 2023 Melvin Keskin <melvo@olomono.de>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -6,32 +7,25 @@
 #define QXMPPMIXIQ_H
 
 #include "QXmppIq.h"
+#include "QXmppMixConfigItem.h"
 
 #include <QSharedDataPointer>
 
+class QXmppMixInvitation;
 class QXmppMixIqPrivate;
 
-///
-/// \brief The QXmppMixIq class represents an IQ used to do actions on a MIX
-/// channel as defined by \xep{0369}: Mediated Information eXchange (MIX) and
-/// \xep{0405}: Mediated Information eXchange (MIX): Participant Server
-/// Requirements.
-///
-/// \since QXmpp 1.1
-///
-/// \ingroup Stanzas
-///
 class QXMPP_EXPORT QXmppMixIq : public QXmppIq
 {
 public:
-    /// The action type of the MIX query IQ.
     enum Type {
         None,
         ClientJoin,
         ClientLeave,
         Join,
         Leave,
-        UpdateSubscription,
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+        UpdateSubscription [[deprecated("Use QXmppMixSubscriptionUpdate")]],
+#endif
         SetNick,
         Create,
         Destroy
@@ -48,17 +42,38 @@ public:
     QXmppMixIq::Type actionType() const;
     void setActionType(QXmppMixIq::Type);
 
-    QString jid() const;
-    void setJid(const QString &);
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use participantId() and channelJid()")]] QString jid() const;
+    [[deprecated("Use setParticipantId() and setChannelJid()")]] void setJid(const QString &);
+#endif
 
-    QString channelName() const;
-    void setChannelName(const QString &);
+    QString participantId() const;
+    void setParticipantId(const QString &);
 
-    QStringList nodes() const;
-    void setNodes(const QStringList &);
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use channelId()")]] QString channelName() const;
+    [[deprecated("Use setChannelId()")]] void setChannelName(const QString &);
+#endif
+
+    QString channelId() const;
+    void setChannelId(const QString &);
+
+    QString channelJid() const;
+    void setChannelJid(const QString &);
+
+#if QXMPP_DEPRECATED_SINCE(1, 7)
+    [[deprecated("Use subscriptions()")]] QStringList nodes() const;
+    [[deprecated("Use setSubscriptions()")]] void setNodes(const QStringList &);
+#endif
+
+    QXmppMixConfigItem::Nodes subscriptions() const;
+    void setSubscriptions(QXmppMixConfigItem::Nodes);
 
     QString nick() const;
     void setNick(const QString &);
+
+    std::optional<QXmppMixInvitation> invitation() const;
+    void setInvitation(const std::optional<QXmppMixInvitation> &);
 
     /// \cond
     static bool isMixIq(const QDomElement &);
@@ -73,5 +88,7 @@ protected:
 private:
     QSharedDataPointer<QXmppMixIqPrivate> d;
 };
+
+Q_DECLARE_METATYPE(QXmppMixIq::Type)
 
 #endif  // QXMPPMIXIQ_H

@@ -342,7 +342,6 @@ void QXmpp::Private::writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStri
     }
 }
 
-
 void QXmpp::Private::writeEmptyElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns)
 {
     writer->writeStartElement(toString65(name));

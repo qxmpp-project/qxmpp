@@ -15,6 +15,7 @@
 // We mean it.
 //
 
+#include "QXmppClient.h"
 #include "QXmppIq.h"
 #include "QXmppPromise.h"
 #include "QXmppSendResult.h"
@@ -213,6 +214,44 @@ auto mapSuccess(std::variant<T, Err> var, Function lambda)
                               return err;
                           } },
                       std::move(var));
+}
+
+template<typename T, typename Err>
+auto mapToSuccess(std::variant<T, Err> var)
+{
+    return mapSuccess(std::move(var), [](T) {
+        return Success();
+    });
+}
+
+template<typename T, typename Err, typename Converter>
+auto mapTaskToSuccess(std::variant<T, Err> var, Converter task)
+{
+    return mapSuccess(std::move(var), task);
+}
+
+template<typename Input>
+auto chainSuccess(QXmppTask<Input> &&source, QObject *context) -> QXmppTask<QXmppClient::EmptyResult>
+{
+    QXmppPromise<QXmppClient::EmptyResult> promise;
+
+    source.then(context, [=](Input &&input) mutable {
+        promise.finish(mapToSuccess(std::move(input)));
+    });
+
+    return promise.task();
+}
+
+template<typename Result, typename Input, typename Converter>
+auto chainOnSuccess(QXmppTask<Input> &&source, QObject *context, Converter task) -> QXmppTask<Result>
+{
+    QXmppPromise<Result> promise;
+
+    source.then(context, [=](Input &&input) mutable {
+        promise.finish(mapTaskToSuccess(std::move(input), task));
+    });
+
+    return promise.task();
 }
 
 template<typename T>
