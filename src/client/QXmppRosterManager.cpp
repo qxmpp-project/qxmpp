@@ -65,26 +65,46 @@ void QXmppRosterManagerPrivate::clear()
     isRosterReceived = false;
 }
 
+void QXmppRosterManager::RosterData::toXml(QXmlStreamWriter *writer) const
+{
+    Q_UNUSED(writer)
+}
+
+QXmppRosterIq QXmppRosterManager::RosterData::toIq() const
+{
+    return {};
+}
+
+std::optional<QXmppRosterManager::RosterData> QXmppRosterManager::RosterData::parseXml(const QDomElement &element)
+{
+    Q_UNUSED(element)
+    return {};
+}
+
+QXmppRosterManager::RosterData QXmppRosterManager::RosterData::fromIq(const QXmppRosterIq &iq)
+{
+    Q_UNUSED(iq)
+    return {};
+}
+
 ///
 /// Constructs a roster manager.
 ///
 QXmppRosterManager::QXmppRosterManager(QXmppClient *client)
     : d(std::make_unique<QXmppRosterManagerPrivate>())
 {
-    const auto parseIq = [](const QDomElement &element) -> QXmppAccountData::ExtensionParserResult<QXmppRosterIq> {
-        if (QXmppRosterIq::isRosterIq(element)) {
-            QXmppRosterIq iq;
-            iq.parse(element);
-            return iq;
+    const auto parseData = [](const QDomElement &element) -> QXmppAccountData::ExtensionParserResult<RosterData> {
+        if (auto result = RosterData::parseXml(element); result.has_value()) {
+            return std::move(*result);
         }
 
-        return QXmppError { QStringLiteral("Not a QXmppRosterIq"), {} };
+        return QXmppError { QStringLiteral("Not a RosterData"), {} };
     };
-    const auto serializeIq = [](const QXmppRosterIq &iq, QXmlStreamWriter &writer) -> QXmppAccountData::ExtensionSerializerResult<QXmppRosterIq> {
-        iq.toXml(&writer);
+    const auto serializeData = [](const RosterData &data, QXmlStreamWriter &writer) -> QXmppAccountData::ExtensionSerializerResult<RosterData> {
+        data.toXml(&writer);
     };
 
-    QXmppAccountData::registerExtension<QXmppRosterIq, parseIq, serializeIq>(u"query", ns_roster);
+    QXmppAccountData::registerExtension<RosterData, parseData, serializeData>(u"roster-data", ns_roster);
 
     connect(client, &QXmppClient::connected,
             this, &QXmppRosterManager::_q_connected);
@@ -445,25 +465,27 @@ bool QXmppRosterManager::unsubscribe(const QString &bareJid, const QString &reas
 void QXmppRosterManager::onRegistered(QXmppClient *client)
 {
     if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
-        auto importData = [this](QXmppRosterIq data) -> QXmppAccountMigrationManager::ImportDataTask {
-            return setRoster(data);
+        auto importData = [this](RosterData data) -> QXmppAccountMigrationManager::ImportDataTask {
+            return setRoster(data.toIq());
         };
-        auto exportData = [this]() -> QXmppAccountMigrationManager::ExportDataTask<QXmppRosterIq> {
+        auto exportData = [this]() -> QXmppAccountMigrationManager::ExportDataTask<RosterData> {
             if (isRosterReceived()) {
-                return makeReadyTask<IqResult>(roster());
+                return makeReadyTask<QXmppAccountMigrationManager::ExportDataResult<RosterData>>(RosterData::fromIq(roster()));
             }
 
-            return requestRoster();
+            return chainIq(requestRoster(), this, [](QXmppRosterIq &&roster) -> QXmppAccountMigrationManager::ExportDataResult<RosterData> {
+                return RosterData::fromIq(roster);
+            });
         };
 
-        manager->registerExtension<QXmppRosterIq>(importData, exportData);
+        manager->registerExtension<RosterData>(importData, exportData);
     }
 }
 
 void QXmppRosterManager::onUnregistered(QXmppClient *client)
 {
     if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
-        manager->unregisterExtension<QXmppRosterIq>();
+        manager->unregisterExtension<RosterData>();
     }
 }
 

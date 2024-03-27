@@ -63,6 +63,16 @@ public:
     /// Simple result containing QXmpp::Success or a QXmppError
     using Result = std::variant<QXmpp::Success, QXmppError>;
 
+    struct RosterData {
+        QList<QXmppRosterIq::Item> items;
+
+        void toXml(QXmlStreamWriter *writer) const;
+        QXmppRosterIq toIq() const;
+
+        static std::optional<RosterData> parseXml(const QDomElement &element);
+        static RosterData fromIq(const QXmppRosterIq &iq);
+    };
+
     explicit QXmppRosterManager(QXmppClient *stream);
     ~QXmppRosterManager() override;
 
