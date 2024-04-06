@@ -100,19 +100,6 @@ inline QXmppTask<void> makeReadyTask()
 }
 
 template<typename T, typename Handler>
-void awaitLast(const QFuture<T> &future, QObject *context, Handler handler)
-{
-    auto *watcher = new QFutureWatcher<T>(context);
-    QObject::connect(watcher, &QFutureWatcherBase::finished,
-                     context, [watcher, handler = std::move(handler)]() mutable {
-                         auto future = watcher->future();
-                         handler(future.resultAt(future.resultCount() - 1));
-                         watcher->deleteLater();
-                     });
-    watcher->setFuture(future);
-}
-
-template<typename T, typename Handler>
 void await(const QFuture<T> &future, QObject *context, Handler handler)
 {
     auto *watcher = new QFutureWatcher<T>(context);
@@ -193,13 +180,6 @@ auto chainIq(QXmppTask<Input> &&input, QObject *context) -> QXmppTask<Result>
     });
 }
 
-template<typename T>
-void reportFinishedResult(QFutureInterface<T> &interface, const T &result)
-{
-    interface.reportResult(result);
-    interface.reportFinished();
-}
-
 template<typename T, typename Err, typename Function>
 auto mapSuccess(std::variant<T, Err> var, Function lambda)
 {
@@ -213,24 +193,6 @@ auto mapSuccess(std::variant<T, Err> var, Function lambda)
                               return err;
                           } },
                       std::move(var));
-}
-
-template<typename T>
-static auto taskFromFuture(QFuture<T> &&future) -> QXmppTask<T>
-{
-    QXmppPromise<T> promise;
-    auto *watcher = new QFutureWatcher<T>();
-    QObject::connect(watcher, &QFutureWatcher<T>::finished, [promise = std::move(promise), watcher]() mutable {
-        if constexpr (std::is_void_v<T>) {
-            promise.finish();
-        } else {
-            promise.finish(watcher->result());
-        }
-        watcher->deleteLater();
-    });
-    watcher->setFuture(future);
-
-    return promise.task();
 }
 
 }  // namespace QXmpp::Private
