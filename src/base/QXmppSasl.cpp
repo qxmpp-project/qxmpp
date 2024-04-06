@@ -170,6 +170,42 @@ void Success::toXml(QXmlStreamWriter *writer) const
 
 }  // namespace QXmpp::Private::Sasl
 
+namespace QXmpp::Private {
+
+std::optional<Bind2Feature> Bind2Feature::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"bind" || el.namespaceURI() != ns_bind2) {
+        return {};
+    }
+
+    Bind2Feature bind2;
+
+    auto inlineElement = firstChildElement(el, u"inline", ns_bind2);
+    for (const auto &featureEl : iterChildElements(inlineElement, u"feature", ns_bind2)) {
+        bind2.features.push_back(featureEl.attribute(QStringLiteral("var")));
+    }
+
+    return bind2;
+}
+
+void Bind2Feature::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("bind"));
+    writer->writeDefaultNamespace(toString65(ns_bind2));
+    if (!features.empty()) {
+        writer->writeStartElement(QSL65("inline"));
+        for (const auto &feature : features) {
+            writer->writeStartElement(QSL65("feature"));
+            writer->writeAttribute(QSL65("var"), feature);
+            writer->writeEndElement();
+        }
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
+}
+
+}  // namespace QXmpp::Private
+
 namespace QXmpp::Private::Sasl2 {
 
 std::optional<StreamFeature> StreamFeature::fromDom(const QDomElement &el)
@@ -178,14 +214,14 @@ std::optional<StreamFeature> StreamFeature::fromDom(const QDomElement &el)
         return {};
     }
 
-    StreamFeature feature { {}, false, false };
+    StreamFeature feature;
 
     for (const auto &mechEl : iterChildElements(el, u"mechanism", ns_sasl_2)) {
         feature.mechanisms.push_back(mechEl.text());
     }
 
     if (auto inlineEl = firstChildElement(el, u"inline", ns_sasl_2); !inlineEl.isNull()) {
-        feature.bind2Available = !firstChildElement(inlineEl, u"bind", ns_bind2).isNull();
+        feature.bind2Feature = Bind2Feature::fromDom(firstChildElement(inlineEl, u"bind", ns_bind2));
         feature.streamResumptionAvailable = !firstChildElement(inlineEl, u"sm", ns_stream_management).isNull();
     }
     return feature;
@@ -198,10 +234,10 @@ void StreamFeature::toXml(QXmlStreamWriter *writer) const
     for (const auto &mechanism : mechanisms) {
         writeXmlTextElement(writer, u"mechanism", mechanism);
     }
-    if (bind2Available || streamResumptionAvailable) {
+    if (bind2Feature || streamResumptionAvailable) {
         writer->writeStartElement(QSL65("inline"));
-        if (bind2Available) {
-            writeEmptyElement(writer, u"bind", ns_bind2);
+        if (bind2Feature) {
+            bind2Feature->toXml(writer);
         }
         if (streamResumptionAvailable) {
             writeEmptyElement(writer, u"sm", ns_stream_management);

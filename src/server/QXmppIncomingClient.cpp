@@ -207,7 +207,7 @@ void QXmppIncomingClient::sendStreamFeatures()
             mechanisms << QStringLiteral("DIGEST-MD5");
         }
         features.setAuthMechanisms(mechanisms);
-        features.setSasl2Feature(Sasl2::StreamFeature { mechanisms, false, false });
+        features.setSasl2Feature(Sasl2::StreamFeature { mechanisms, {}, false });
     }
     sendPacket(features);
 }
