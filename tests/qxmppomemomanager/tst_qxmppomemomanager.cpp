@@ -28,22 +28,22 @@ using namespace QXmpp::Private;
 struct OmemoUser {
     QXmppClient client;
     QXmppLogger logger;
-    QXmppOmemoManager *manager;
-    QXmppCarbonManagerV2 *carbonManager;
-    QXmppDiscoveryManager *discoveryManager;
-    QXmppPubSubManager *pubSubManager;
+    QXmppOmemoManager *manager = nullptr;
+    QXmppCarbonManagerV2 *carbonManager = nullptr;
+    QXmppDiscoveryManager *discoveryManager = nullptr;
+    QXmppPubSubManager *pubSubManager = nullptr;
     std::unique_ptr<QXmppOmemoMemoryStorage> omemoStorage;
     std::unique_ptr<QXmppAtmTrustStorage> trustStorage;
-    QXmppAtmManager *trustManager;
+    QXmppAtmManager *trustManager = nullptr;
 };
 
 class OmemoIqHandler : public QXmppClientExtension
 {
 public:
     OmemoIqHandler(const QXmppBitsOfBinaryIq &requestIq, const QXmppBitsOfBinaryIq &responseIq)
+        : m_requestIq(requestIq),
+          m_responseIq(responseIq)
     {
-        m_requestIq = requestIq;
-        m_responseIq = responseIq;
     }
 
     bool handleStanza(const QDomElement &stanza, const std::optional<QXmppE2eeMetadata> &e2eeMetadata) override
@@ -62,7 +62,7 @@ public:
         }
 
         return false;
-    };
+    }
 
 private:
     QXmppBitsOfBinaryIq m_requestIq;
@@ -85,7 +85,6 @@ private:
     Q_SLOT void testSendIq();
     Q_SLOT void finish(OmemoUser &omemoUser);
 
-private:
     OmemoUser m_alice1;
     OmemoUser m_alice2;
 };
@@ -169,7 +168,7 @@ void tst_QXmppOmemoManager::testInit()
 
 void tst_QXmppOmemoManager::testSetUp()
 {
-    SKIP_IF_INTEGRATION_TESTS_DISABLED();
+    SKIP_IF_INTEGRATION_TESTS_DISABLED()
 
     auto isManagerSetUp = false;
     const QObject context;
