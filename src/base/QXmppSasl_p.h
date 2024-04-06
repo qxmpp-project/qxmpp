@@ -105,6 +105,14 @@ struct Bind2Feature {
     std::vector<QString> features;
 };
 
+struct Bind2Request {
+    static std::optional<Bind2Request> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QString tag;
+    // bind2 extensions may be added here (like carbons, sm, csi)
+};
+
 }  // namespace QXmpp::Private
 
 namespace QXmpp::Private::Sasl2 {
@@ -134,7 +142,7 @@ struct Authenticate {
     QString mechanism;
     QByteArray initialResponse;
     std::optional<UserAgent> userAgent;
-    // bind2 and other extensions may be added here later on
+    std::optional<Bind2Request> bindRequest;
 };
 
 struct Challenge {

@@ -204,6 +204,25 @@ void Bind2Feature::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+std::optional<Bind2Request> Bind2Request::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"bind" || el.namespaceURI() != ns_bind2) {
+        return {};
+    }
+
+    return Bind2Request {
+        firstChildElement(el, u"tag", ns_bind2).text(),
+    };
+}
+
+void Bind2Request::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("bind"));
+    writer->writeDefaultNamespace(toString65(ns_bind2));
+    writeOptionalXmlTextElement(writer, u"tag", tag);
+    writer->writeEndElement();
+}
+
 }  // namespace QXmpp::Private
 
 namespace QXmpp::Private::Sasl2 {
@@ -280,6 +299,7 @@ std::optional<Authenticate> Authenticate::fromDom(const QDomElement &el)
         el.attribute(QStringLiteral("mechanism")),
         parseBase64(firstChildElement(el, u"initial-response", ns_sasl_2).text()).value_or(QByteArray()),
         UserAgent::fromDom(firstChildElement(el, u"user-agent", ns_sasl_2)),
+        Bind2Request::fromDom(firstChildElement(el, u"bind", ns_bind2)),
     };
 }
 
@@ -291,6 +311,9 @@ void Authenticate::toXml(QXmlStreamWriter *writer) const
     writeOptionalXmlTextElement(writer, u"initial-response", QString::fromUtf8(initialResponse.toBase64()));
     if (userAgent) {
         userAgent->toXml(writer);
+    }
+    if (bindRequest) {
+        bindRequest->toXml(writer);
     }
     writer->writeEndElement();
 }
