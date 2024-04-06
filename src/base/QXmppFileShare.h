@@ -34,6 +34,9 @@ public:
     Disposition disposition() const;
     void setDisposition(Disposition);
 
+    const QString &id() const;
+    void setId(const QString &);
+
     const QXmppFileMetadata &metadata() const;
     void setMetadata(const QXmppFileMetadata &);
 
