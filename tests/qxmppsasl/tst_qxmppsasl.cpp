@@ -289,6 +289,9 @@ void tst_QXmppSasl::sasl2Authenticate()
         "<software>AwesomeXMPP</software>"
         "<device>Kiva&apos;s Phone</device>"
         "</user-agent>"
+        "<bind xmlns='urn:xmpp:bind:0'>"
+        "<tag>AwesomeXMPP</tag>"
+        "</bind>"
         "</authenticate>";
 
     auto auth = Sasl2::Authenticate::fromDom(xmlToDom(xml));
@@ -299,6 +302,8 @@ void tst_QXmppSasl::sasl2Authenticate()
     QCOMPARE(auth->userAgent->id, QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")));
     QCOMPARE(auth->userAgent->software, "AwesomeXMPP");
     QCOMPARE(auth->userAgent->device, "Kiva's Phone");
+    QVERIFY(auth->bindRequest);
+    QCOMPARE(auth->bindRequest->tag, "AwesomeXMPP");
     serializePacket(*auth, xml);
 }
 
