@@ -113,6 +113,13 @@ struct Bind2Request {
     // bind2 extensions may be added here (like carbons, sm, csi)
 };
 
+struct Bind2Bound {
+    static std::optional<Bind2Bound> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    // extensions may be added here (mam, sm, etc.)
+};
+
 }  // namespace QXmpp::Private
 
 namespace QXmpp::Private::Sasl2 {
@@ -166,6 +173,7 @@ struct Success {
     std::optional<QByteArray> additionalData;
     QString authorizationIdentifier;
     // extensions
+    std::optional<Bind2Bound> bound;
 };
 
 struct Failure {

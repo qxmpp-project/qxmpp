@@ -340,13 +340,15 @@ void tst_QXmppSasl::sasl2Success()
         "<additional-data>"
         "dj1tc1ZIcy9CeklPSERxWGVWSDdFbW1EdTlpZDg9"
         "</additional-data>"
-        "<authorization-identifier>user@example.org</authorization-identifier>"
+        "<authorization-identifier>user@example.org/abc</authorization-identifier>"
+        "<bound xmlns='urn:xmpp:bind:0'/>"
         "</success>";
 
     auto success = Sasl2::Success::fromDom(xmlToDom(xml));
     QVERIFY(success.has_value());
     QCOMPARE(success->additionalData, "v=msVHs/BzIOHDqXeVH7EmmDu9id8=");
-    QCOMPARE(success->authorizationIdentifier, "user@example.org");
+    QCOMPARE(success->authorizationIdentifier, "user@example.org/abc");
+    QVERIFY(success->bound);
     serializePacket(*success, xml);
 }
 

@@ -223,6 +223,22 @@ void Bind2Request::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+std::optional<Bind2Bound> Bind2Bound::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"bound" || el.namespaceURI() != ns_bind2) {
+        return {};
+    }
+
+    return Bind2Bound {};
+}
+
+void Bind2Bound::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("bound"));
+    writer->writeDefaultNamespace(toString65(ns_bind2));
+    writer->writeEndElement();
+}
+
 }  // namespace QXmpp::Private
 
 namespace QXmpp::Private::Sasl2 {
@@ -370,6 +386,7 @@ std::optional<Success> Success::fromDom(const QDomElement &el)
     }
 
     output.authorizationIdentifier = firstChildElement(el, u"authorization-identifier", ns_sasl_2).text();
+    output.bound = Bind2Bound::fromDom(firstChildElement(el, u"bound", ns_bind2));
 
     return output;
 }
@@ -382,6 +399,9 @@ void Success::toXml(QXmlStreamWriter *writer) const
         writer->writeTextElement(QSL65("additional-data"), serializeBase64(*additionalData));
     }
     writeXmlTextElement(writer, u"authorization-identifier", authorizationIdentifier);
+    if (bound) {
+        bound->toXml(writer);
+    }
     writer->writeEndElement();
 }
 
