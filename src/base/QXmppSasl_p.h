@@ -96,6 +96,17 @@ struct Success {
 
 }  // namespace QXmpp::Private::Sasl
 
+namespace QXmpp::Private {
+
+struct Bind2Feature {
+    static std::optional<Bind2Feature> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    std::vector<QString> features;
+};
+
+}  // namespace QXmpp::Private
+
 namespace QXmpp::Private::Sasl2 {
 
 struct StreamFeature {
@@ -103,8 +114,8 @@ struct StreamFeature {
     void toXml(QXmlStreamWriter *) const;
 
     QList<QString> mechanisms;
-    bool streamResumptionAvailable;
-    bool bind2Available;
+    std::optional<Bind2Feature> bind2Feature;
+    bool streamResumptionAvailable = false;
 };
 
 struct UserAgent {

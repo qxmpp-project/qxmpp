@@ -239,7 +239,13 @@ void tst_QXmppSasl::sasl2StreamFeature()
         "<mechanism>SCRAM-SHA-1</mechanism>"
         "<mechanism>SCRAM-SHA-1-PLUS</mechanism>"
         "<inline>"
-        "<bind xmlns='urn:xmpp:bind:0'/>"
+        "<bind xmlns='urn:xmpp:bind:0'>"
+        "<inline>"
+        "<feature var='urn:xmpp:carbons:2'/>"
+        "<feature var='urn:xmpp:csi:0'/>"
+        "<feature var='urn:xmpp:sm:3'/>"
+        "</inline>"
+        "</bind>"
         "<sm xmlns='urn:xmpp:sm:3'/>"
         "</inline>"
         "</authentication>";
@@ -249,7 +255,8 @@ void tst_QXmppSasl::sasl2StreamFeature()
     QCOMPARE(feature->mechanisms.size(), 2);
     QCOMPARE(feature->mechanisms, (QList<QString> { "SCRAM-SHA-1", "SCRAM-SHA-1-PLUS" }));
     QCOMPARE(feature->streamResumptionAvailable, true);
-    QCOMPARE(feature->bind2Available, true);
+    QVERIFY(feature->bind2Feature.has_value());
+    QCOMPARE(feature->bind2Feature->features, (std::vector<QString> { "urn:xmpp:carbons:2", "urn:xmpp:csi:0", "urn:xmpp:sm:3" }));
     serializePacket(*feature, xml);
 }
 
@@ -730,7 +737,7 @@ void tst_QXmppSasl::sasl2ManagerPlain()
 
     auto task = test.manager.authenticate(
         config,
-        Sasl2::StreamFeature { { "PLAIN", "SCRAM-SHA-1" }, false, false },
+        Sasl2::StreamFeature { { "PLAIN", "SCRAM-SHA-1" }, {}, false },
         test.loggable.get());
 
     QVERIFY(!task.isFinished());
@@ -757,7 +764,7 @@ void tst_QXmppSasl::sasl2ManagerFailure()
 
     auto task = test.manager.authenticate(
         config,
-        Sasl2::StreamFeature { { "SCRAM-SHA-1" }, false, false },
+        Sasl2::StreamFeature { { "SCRAM-SHA-1" }, {}, false },
         test.loggable.get());
 
     QVERIFY(!task.isFinished());
@@ -788,7 +795,7 @@ void tst_QXmppSasl::sasl2ManagerUnsupportedTasks()
 
     auto task = test.manager.authenticate(
         config,
-        Sasl2::StreamFeature { { "SCRAM-SHA-1" }, false, false },
+        Sasl2::StreamFeature { { "SCRAM-SHA-1" }, {}, false },
         test.loggable.get());
 
     auto handled = test.manager.handleElement(xmlToDom(
