@@ -46,6 +46,7 @@ class QXmppFileSharePrivate : public QSharedData
 {
 public:
     QXmppFileMetadata metadata;
+    QString id;
     QVector<QXmppHttpFileSource> httpSources;
     QVector<QXmppEncryptedFileSource> encryptedSources;
     QXmppFileShare::Disposition disposition = Disposition::Inline;
@@ -88,6 +89,30 @@ QXmppFileShare::Disposition QXmppFileShare::disposition() const
 void QXmppFileShare::setDisposition(Disposition disp)
 {
     d->disposition = disp;
+}
+
+///
+/// Returns the ID of this file element.
+///
+/// This is useful for attaching sources to one of multiple files in a message.
+///
+/// \since QXmpp 1.7
+///
+const QString &QXmppFileShare::id() const
+{
+    return d->id;
+}
+
+///
+/// Sets the ID of this file element.
+///
+/// This is useful for attaching sources to one of multiple files in a message.
+///
+/// \since QXmpp 1.7
+///
+void QXmppFileShare::setId(const QString &id)
+{
+    d->id = id;
 }
 
 /// Returns the metadata of the shared file.
@@ -156,6 +181,7 @@ bool QXmppFileShare::parse(const QDomElement &el)
         // disposition
         d->disposition = dispositionFromString(el.attribute(QStringLiteral("disposition")))
                              .value_or(Disposition::Inline);
+        d->id = el.attribute(QStringLiteral("id"));
 
         // file metadata
         auto fileEl = firstChildElement(el, u"file");
@@ -189,6 +215,7 @@ void QXmppFileShare::toXml(QXmlStreamWriter *writer) const
     writer->writeStartElement(QSL65("file-sharing"));
     writer->writeDefaultNamespace(toString65(ns_sfs));
     writer->writeAttribute(QSL65("disposition"), dispositionToString(d->disposition));
+    writeOptionalXmlAttribute(writer, u"id", d->id);
     d->metadata.toXml(writer);
     writer->writeStartElement(QSL65("sources"));
     for (const auto &source : d->httpSources) {

@@ -1270,7 +1270,7 @@ void tst_QXmppMessage::testFileSharing()
 {
     const QByteArray xml(
         "<message id='sharing-a-file' to='juliet@shakespeare.lit' from='romeo@montague.lit/resource' type='normal'>"
-        "<file-sharing xmlns='urn:xmpp:sfs:0' disposition='inline'>"
+        "<file-sharing xmlns='urn:xmpp:sfs:0' disposition='inline' id='abc23'>"
         "<file xmlns='urn:xmpp:file:metadata:0'>"
         "<desc>Photo from the summit.</desc>"
         "<hash xmlns='urn:xmpp:hashes:2' algo='sha3-256'>2XarmwTlNxDAMkvymloX3S5+VbylNrJt/l5QyPa+YoU=</hash>"
@@ -1289,6 +1289,7 @@ void tst_QXmppMessage::testFileSharing()
     QXmppMessage message1;
     parsePacket(message1, xml);
     QVERIFY(!message1.sharedFiles().empty());
+    QCOMPARE(message1.sharedFiles().first().id(), "abc23");
     serializePacket(message1, xml);
 }
 
