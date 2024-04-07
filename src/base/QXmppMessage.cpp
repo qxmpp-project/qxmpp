@@ -1230,7 +1230,11 @@ bool QXmppMessage::isFallback() const
 ///
 void QXmppMessage::setIsFallback(bool isFallback)
 {
-    d->fallbackMarkers = { QXmppFallback { {}, {} } };
+    if (isFallback) {
+        d->fallbackMarkers = { QXmppFallback { {}, {} } };
+    } else {
+        d->fallbackMarkers.clear();
+    }
 }
 
 ///
