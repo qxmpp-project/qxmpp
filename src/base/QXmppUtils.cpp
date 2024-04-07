@@ -361,15 +361,15 @@ Int stringToInt(QStringView str, bool *ok)
 {
     if constexpr (std::is_same_v<Int, int8_t>) {
         auto result = str.toShort(ok);
-        if (ok && result <= std::numeric_limits<int8_t>().max() && result >= std::numeric_limits<int8_t>().min()) {
-            return int8_t(result);
+        if (*ok && result <= std::numeric_limits<int8_t>::max() && result >= std::numeric_limits<int8_t>::min()) {
+            return Int(result);
         }
         *ok = false;
         return 0;
     } else if constexpr (std::is_same_v<Int, uint8_t>) {
         auto result = str.toUShort(ok);
-        if (ok && result <= std::numeric_limits<int8_t>().max() && result >= std::numeric_limits<int8_t>().min()) {
-            return int8_t(result);
+        if (*ok && result <= std::numeric_limits<int8_t>::max()) {
+            return Int(result);
         }
         *ok = false;
         return 0;
