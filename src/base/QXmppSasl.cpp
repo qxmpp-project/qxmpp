@@ -493,11 +493,11 @@ void QXmppSasl2UserAgent::setDeviceName(const QString &device)
 }
 
 // When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
-static const QMap<QString, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
-    { QStringLiteral("SCRAM-SHA-1"), QCryptographicHash::Sha1 },
-    { QStringLiteral("SCRAM-SHA-256"), QCryptographicHash::Sha256 },
-    { QStringLiteral("SCRAM-SHA-512"), QCryptographicHash::Sha512 },
-    { QStringLiteral("SCRAM-SHA3-512"), QCryptographicHash::RealSha3_512 },
+static const QMap<QStringView, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
+    { u"SCRAM-SHA-1", QCryptographicHash::Sha1 },
+    { u"SCRAM-SHA-256", QCryptographicHash::Sha256 },
+    { u"SCRAM-SHA-512", QCryptographicHash::Sha512 },
+    { u"SCRAM-SHA3-512", QCryptographicHash::RealSha3_512 },
 };
 
 // Calculate digest response for use with XMPP/SASL.
@@ -870,7 +870,7 @@ QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorit
 
 QString QXmppSaslClientScram::mechanism() const
 {
-    return SCRAM_ALGORITHMS.key(m_algorithm);
+    return SCRAM_ALGORITHMS.key(m_algorithm).toString();
 }
 
 std::optional<QByteArray> QXmppSaslClientScram::respond(const QByteArray &challenge)
