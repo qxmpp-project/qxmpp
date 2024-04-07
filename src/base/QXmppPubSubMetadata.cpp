@@ -15,21 +15,21 @@ struct overloaded : Ts... {
 template<class... Ts>
 overloaded(Ts...) -> overloaded<Ts...>;
 
-const auto FORM_TYPE_METADATA = QStringLiteral("http://jabber.org/protocol/pubsub#metadata");
+constexpr QStringView FORM_TYPE_METADATA = u"http://jabber.org/protocol/pubsub#metadata";
 
-const auto CONTACT_JIDS = QStringLiteral("pubsub#contact");
-const auto CREATION_DATE = QStringLiteral("pubsub#creation_date");
-const auto CREATOR_JID = QStringLiteral("pubsub#creator");
-const auto DESCRIPTION = QStringLiteral("pubsub#description");
-const auto LANGUAGE = QStringLiteral("pubsub#language");
-const auto ACCESS_MODEL = QStringLiteral("pubsub#access_model");
-const auto PUBLISH_MODEL = QStringLiteral("pubsub#publish_model");
-const auto SUBSCRIBER_COUNT = QStringLiteral("pubsub#num_subscribers");
-const auto OWNER_JIDS = QStringLiteral("pubsub#owner");
-const auto PUBLISHER_JIDS = QStringLiteral("pubsub#publisher");
-const auto TITLE = QStringLiteral("pubsub#title");
-const auto TYPE = QStringLiteral("pubsub#type");
-const auto MAX_ITEMS = QStringLiteral("pubsub#max_items");
+constexpr QStringView CONTACT_JIDS = u"pubsub#contact";
+constexpr QStringView CREATION_DATE = u"pubsub#creation_date";
+constexpr QStringView CREATOR_JID = u"pubsub#creator";
+constexpr QStringView DESCRIPTION = u"pubsub#description";
+constexpr QStringView LANGUAGE = u"pubsub#language";
+constexpr QStringView ACCESS_MODEL = u"pubsub#access_model";
+constexpr QStringView PUBLISH_MODEL = u"pubsub#publish_model";
+constexpr QStringView SUBSCRIBER_COUNT = u"pubsub#num_subscribers";
+constexpr QStringView OWNER_JIDS = u"pubsub#owner";
+constexpr QStringView PUBLISHER_JIDS = u"pubsub#publisher";
+constexpr QStringView TITLE = u"pubsub#title";
+constexpr QStringView TYPE = u"pubsub#type";
+constexpr QStringView MAX_ITEMS = u"pubsub#max_items";
 
 class QXmppPubSubMetadataPrivate : public QSharedData
 {
@@ -192,7 +192,7 @@ void QXmppPubSubMetadata::setMaxItems(ItemLimit maxItems)
 
 QString QXmppPubSubMetadata::formType() const
 {
-    return FORM_TYPE_METADATA;
+    return FORM_TYPE_METADATA.toString();
 }
 
 bool QXmppPubSubMetadata::parseField(const QXmppDataForm::Field &field)
@@ -255,7 +255,7 @@ void QXmppPubSubMetadata::serializeForm(QXmppDataForm &form) const
     };
 
     serializeEmptyable(form, Type::JidMultiField, CONTACT_JIDS, d->contactJids);
-    serializeDatetime(form, CREATION_DATE, d->creationDate);
+    serializeDatetime(form, CREATION_DATE.toString(), d->creationDate);
     serializeNullable(form, Type::JidSingleField, CREATOR_JID, d->creatorJid);
     serializeNullable(form, Type::TextSingleField, DESCRIPTION, d->description);
     serializeNullable(form, Type::TextSingleField, LANGUAGE, d->language);
