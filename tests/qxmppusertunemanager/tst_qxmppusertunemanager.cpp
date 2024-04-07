@@ -62,7 +62,7 @@ void tst_QXmppUserTuneManager::testPublish()
     item.setSource("Yessongs");
     item.setTitle("Heart of the Sunrise");
     item.setTrack("3");
-    item.setUri({ "http://www.yesworld.com/lyrics/Fragile.html#9" });
+    item.setUri(QUrl("http://www.yesworld.com/lyrics/Fragile.html#9"));
 
     auto future = tuneManager->publish(item);
     test.expect("<iq id='qxmpp1' to='stpeter@jabber.org' type='set'>"
