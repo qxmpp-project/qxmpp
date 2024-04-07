@@ -48,14 +48,14 @@ using namespace QXmpp::Private;
 /// \since QXmpp 1.5
 ///
 
-static const QStringList PUBSUB_EVENTS = {
-    QStringLiteral("configuration"),
-    QStringLiteral("delete"),
-    QStringLiteral("items"),
-    QStringLiteral("items"),  // virtual retract type
-    QStringLiteral("purge"),
-    QStringLiteral("subscription"),
-};
+constexpr auto PUBSUB_EVENTS = to_array<QStringView>({
+    u"configuration",
+    u"delete",
+    u"items",
+    u"items",  // virtual retract type
+    u"purge",
+    u"subscription",
+});
 
 class QXmppPubSubEventPrivate : public QSharedData
 {
@@ -226,16 +226,13 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     auto eventTypeElement = event.firstChildElement();
 
     // check for validity of the event type
-    EventType eventType;
-    if (const auto index = PUBSUB_EVENTS.indexOf(eventTypeElement.tagName());
-        index != -1) {
-        eventType = EventType(index);
-    } else {
+    auto eventType = enumFromString<EventType>(PUBSUB_EVENTS, eventTypeElement.tagName());
+    if (!eventType) {
         return false;
     }
 
     // check for "node" attribute when required
-    switch (eventType) {
+    switch (*eventType) {
     case Delete:
     case Items:
     case Retract:
@@ -250,7 +247,7 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     }
 
     // check individual content
-    switch (eventType) {
+    switch (*eventType) {
     case Delete: {
         if (const auto redirect = eventTypeElement.firstChildElement(QStringLiteral("redirect"));
             !redirect.isNull() && !redirect.hasAttribute(QStringLiteral("uri"))) {
@@ -288,9 +285,8 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
         eventElement.namespaceURI() == ns_pubsub_event) {
         // check that the query type is valid
         const auto eventTypeElement = eventElement.firstChildElement();
-        if (const auto index = PUBSUB_EVENTS.indexOf(eventTypeElement.tagName());
-            index != -1) {
-            d->eventType = EventType(index);
+        if (auto eventType = enumFromString<EventType>(PUBSUB_EVENTS, eventTypeElement.tagName())) {
+            d->eventType = *eventType;
         } else {
             return false;
         }
@@ -376,7 +372,7 @@ void QXmppPubSubEventBase::serializeExtensions(QXmlStreamWriter *writer, QXmpp::
     if (d->eventType == Subscription && d->subscription) {
         d->subscription->toXml(writer);
     } else {
-        writer->writeStartElement(PUBSUB_EVENTS.at(int(d->eventType)));
+        writer->writeStartElement(toString65(PUBSUB_EVENTS.at(size_t(d->eventType))));
 
         // write node attribute
         switch (d->eventType) {

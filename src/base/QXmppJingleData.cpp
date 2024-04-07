@@ -56,17 +56,17 @@ static const char *jingle_reasons[] = {
     "unsupported-transports",
 };
 
-static const QStringList JINGLE_RTP_ERROR_CONDITIONS = {
+constexpr auto JINGLE_RTP_ERROR_CONDITIONS = to_array<QStringView>({
     {},
-    QStringLiteral("invalid-crypto"),
-    QStringLiteral("crypto-required")
-};
+    u"invalid-crypto",
+    u"crypto-required",
+});
 
-static const QStringList JINGLE_RTP_HEADER_EXTENSIONS_SENDERS = {
-    QStringLiteral("both"),
-    QStringLiteral("initiator"),
-    QStringLiteral("responder")
-};
+constexpr auto JINGLE_RTP_HEADER_EXTENSIONS_SENDERS = to_array<QStringView>({
+    u"both",
+    u"initiator",
+    u"responder",
+});
 
 static QString formatFingerprint(const QByteArray &digest)
 {
@@ -1098,10 +1098,8 @@ void QXmppJingleReason::parse(const QDomElement &element)
     }
 
     auto child = firstChildElement(element, {}, ns_jingle_rtp_errors);
-    if (const auto index = JINGLE_RTP_ERROR_CONDITIONS.indexOf(child.tagName());
-        index != -1) {
-        d->m_rtpErrorCondition = RtpErrorCondition(index);
-    }
+    d->m_rtpErrorCondition = enumFromString<RtpErrorCondition>(JINGLE_RTP_ERROR_CONDITIONS, child.tagName())
+                                 .value_or(NoErrorCondition);
 }
 
 void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
@@ -1123,7 +1121,7 @@ void QXmppJingleReason::toXml(QXmlStreamWriter *writer) const
 #endif
 
     if (d->m_rtpErrorCondition != NoErrorCondition) {
-        writer->writeStartElement(JINGLE_RTP_ERROR_CONDITIONS.at(d->m_rtpErrorCondition));
+        writer->writeStartElement(toString65(JINGLE_RTP_ERROR_CONDITIONS.at(d->m_rtpErrorCondition)));
         writer->writeDefaultNamespace(toString65(ns_jingle_rtp_errors));
         writer->writeEndElement();
     }
@@ -2804,10 +2802,8 @@ void QXmppJingleRtpHeaderExtensionProperty::parse(const QDomElement &element)
     if (element.tagName() == QStringLiteral("rtp-hdrext") && element.namespaceURI() == ns_jingle_rtp_header_extensions_negotiation) {
         d->id = element.attribute(QStringLiteral("id")).toUInt();
         d->uri = element.attribute(QStringLiteral("uri"));
-
-        if (const auto senders = JINGLE_RTP_HEADER_EXTENSIONS_SENDERS.indexOf(element.attribute(QStringLiteral("senders"))); senders > QXmppJingleRtpHeaderExtensionProperty::Both) {
-            d->senders = static_cast<QXmppJingleRtpHeaderExtensionProperty::Senders>(senders);
-        }
+        d->senders = enumFromString<Senders>(JINGLE_RTP_HEADER_EXTENSIONS_SENDERS, element.attribute(QStringLiteral("senders")))
+                         .value_or(Both);
 
         parseSdpParameters(element, d->parameters);
     }

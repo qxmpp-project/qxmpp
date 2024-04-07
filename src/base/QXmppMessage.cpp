@@ -32,35 +32,35 @@
 
 using namespace QXmpp::Private;
 
-static const QStringList CHAT_STATES = {
-    QString(),
-    QStringLiteral("active"),
-    QStringLiteral("inactive"),
-    QStringLiteral("gone"),
-    QStringLiteral("composing"),
-    QStringLiteral("paused")
-};
+constexpr auto CHAT_STATES = to_array<QStringView>({
+    {},
+    u"active",
+    u"inactive",
+    u"gone",
+    u"composing",
+    u"paused",
+});
 
-static const QStringList MESSAGE_TYPES = {
-    QStringLiteral("error"),
-    QStringLiteral("normal"),
-    QStringLiteral("chat"),
-    QStringLiteral("groupchat"),
-    QStringLiteral("headline")
-};
+constexpr auto MESSAGE_TYPES = to_array<QStringView>({
+    u"error",
+    u"normal",
+    u"chat",
+    u"groupchat",
+    u"headline",
+});
 
-static const QStringList MARKER_TYPES = {
-    QString(),
-    QStringLiteral("received"),
-    QStringLiteral("displayed"),
-    QStringLiteral("acknowledged")
-};
+constexpr auto MARKER_TYPES = to_array<QStringView>({
+    {},
+    u"received",
+    u"displayed",
+    u"acknowledged",
+});
 
-static const QStringList HINT_TYPES = {
-    QStringLiteral("no-permanent-store"),
-    QStringLiteral("no-store"),
-    QStringLiteral("no-copy"),
-    QStringLiteral("store")
+static const QVector<QStringView> HINT_TYPES = {
+    u"no-permanent-store",
+    u"no-store",
+    u"no-copy",
+    u"store",
 };
 
 static bool checkElement(const QDomElement &element, QStringView tagName, QStringView xmlns)
@@ -1350,13 +1350,8 @@ void QXmppMessage::parse(const QDomElement &element, QXmpp::SceMode sceMode)
 {
     QXmppStanza::parse(element);
 
-    // message type
-    int messageType = MESSAGE_TYPES.indexOf(element.attribute(QStringLiteral("type")));
-    if (messageType != -1) {
-        d->type = static_cast<Type>(messageType);
-    } else {
-        d->type = QXmppMessage::Normal;
-    }
+    d->type = enumFromString<Type>(MESSAGE_TYPES, element.attribute(QStringLiteral("type")))
+                  .value_or(Normal);
 
     parseExtensions(element, sceMode);
 }
@@ -1373,7 +1368,7 @@ void QXmppMessage::toXml(QXmlStreamWriter *writer, QXmpp::SceMode sceMode) const
     writeOptionalXmlAttribute(writer, u"id", id());
     writeOptionalXmlAttribute(writer, u"to", to());
     writeOptionalXmlAttribute(writer, u"from", from());
-    writeOptionalXmlAttribute(writer, u"type", MESSAGE_TYPES.at(d->type));
+    writeOptionalXmlAttribute(writer, u"type", MESSAGE_TYPES.at(size_t(d->type)));
     error().toXml(writer);
 
     // extensions
@@ -1557,10 +1552,7 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         }
         // XEP-0085: Chat State Notifications
         if (element.namespaceURI() == ns_chat_states) {
-            int i = CHAT_STATES.indexOf(element.tagName());
-            if (i > 0) {
-                d->state = static_cast<QXmppMessage::State>(i);
-            }
+            d->state = enumFromString<State>(CHAT_STATES, element.tagName()).value_or(None);
             return true;
         }
         // XEP-0184: Message Delivery Receipts
@@ -1603,12 +1595,11 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         }
         // XEP-0333: Chat Markers
         if (element.namespaceURI() == ns_chat_markers) {
-            if (element.tagName() == QStringLiteral("markable")) {
+            if (element.tagName() == u"markable") {
                 d->markable = true;
             } else {
-                int marker = MARKER_TYPES.indexOf(element.tagName());
-                if (marker != -1) {
-                    d->marker = static_cast<QXmppMessage::Marker>(marker);
+                if (auto marker = enumFromString<Marker>(MARKER_TYPES, element.tagName())) {
+                    d->marker = *marker;
                     d->markedId = element.attribute(QStringLiteral("id"));
                     d->markedThread = element.attribute(QStringLiteral("thread"));
                 }
@@ -1687,7 +1678,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         // XEP-0334: Message Processing Hints
         for (quint8 i = 0; i < HINT_TYPES.size(); i++) {
             if (hasHint(Hint(1 << i))) {
-                writer->writeStartElement(HINT_TYPES.at(i));
+                writer->writeStartElement(toString65(HINT_TYPES.at(i)));
                 writer->writeDefaultNamespace(toString65(ns_message_processing_hints));
                 writer->writeEndElement();
             }
@@ -1787,7 +1778,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
 
         // XEP-0085: Chat State Notifications
         if (d->state > None && d->state <= Paused) {
-            writer->writeStartElement(CHAT_STATES.at(d->state));
+            writer->writeStartElement(toString65(CHAT_STATES.at(d->state)));
             writer->writeDefaultNamespace(toString65(ns_chat_states));
             writer->writeEndElement();
         }
@@ -1866,7 +1857,7 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             writer->writeEndElement();
         }
         if (d->marker != NoMarker) {
-            writer->writeStartElement(MARKER_TYPES.at(d->marker));
+            writer->writeStartElement(toString65(MARKER_TYPES.at(d->marker)));
             writer->writeDefaultNamespace(toString65(ns_chat_markers));
             writer->writeAttribute(QSL65("id"), d->markedId);
             if (!d->markedThread.isNull() && !d->markedThread.isEmpty()) {

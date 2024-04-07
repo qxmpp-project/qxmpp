@@ -26,13 +26,13 @@ using namespace QXmpp::Private;
 /// \since QXmpp 1.5
 ///
 
-static const QStringList SUBSCRIPTION_STATES = {
-    QString(),
-    QStringLiteral("none"),
-    QStringLiteral("pending"),
-    QStringLiteral("subscribed"),
-    QStringLiteral("unconfigured"),
-};
+constexpr auto SUBSCRIPTION_STATES = to_array<QStringView>({
+    {},
+    u"none",
+    u"pending",
+    u"subscribed",
+    u"unconfigured",
+});
 
 class QXmppPubSubSubscriptionPrivate : public QSharedData
 {
@@ -72,7 +72,7 @@ QXmppPubSubSubscriptionPrivate::QXmppPubSubSubscriptionPrivate(const QString &ji
 ///
 QString QXmppPubSubSubscription::stateToString(State state)
 {
-    return SUBSCRIPTION_STATES.at(int(state));
+    return SUBSCRIPTION_STATES.at(int(state)).toString();
 }
 
 ///
@@ -80,10 +80,7 @@ QString QXmppPubSubSubscription::stateToString(State state)
 ///
 QXmppPubSubSubscription::State QXmppPubSubSubscription::stateFromString(const QString &str)
 {
-    if (const auto state = SUBSCRIPTION_STATES.indexOf(str); state != -1) {
-        return State(state);
-    }
-    return Invalid;
+    return enumFromString<State>(SUBSCRIPTION_STATES, str).value_or(Invalid);
 }
 
 ///
@@ -246,7 +243,7 @@ bool QXmppPubSubSubscription::isSubscription(const QDomElement &element)
 
     if (element.hasAttribute(QStringLiteral("subscription"))) {
         const auto subStateStr = element.attribute(QStringLiteral("subscription"));
-        if (!SUBSCRIPTION_STATES.contains(subStateStr)) {
+        if (!enumFromString<State>(SUBSCRIPTION_STATES, subStateStr)) {
             return false;
         }
     }

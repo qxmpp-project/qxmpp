@@ -12,11 +12,11 @@
 
 using namespace QXmpp::Private;
 
-const static QStringList STARTTLS_TYPES = {
-    QStringLiteral("starttls"),
-    QStringLiteral("proceed"),
-    QStringLiteral("failure")
-};
+constexpr auto STARTTLS_TYPES = to_array<QStringView>({
+    u"starttls",
+    u"proceed",
+    u"failure",
+});
 
 ///
 /// Constructs a new QXmppStartTlsPacket
@@ -49,17 +49,13 @@ void QXmppStartTlsPacket::parse(const QDomElement &element)
         return;
     }
 
-    if (auto index = STARTTLS_TYPES.indexOf(element.tagName()); index >= 0) {
-        m_type = Type(index);
-    } else {
-        m_type = Invalid;
-    }
+    m_type = enumFromString<Type>(STARTTLS_TYPES, element.tagName()).value_or(Invalid);
 }
 
 void QXmppStartTlsPacket::toXml(QXmlStreamWriter *writer) const
 {
     if (m_type != Invalid) {
-        writer->writeStartElement(STARTTLS_TYPES.at(int(m_type)));
+        writer->writeStartElement(toString65(STARTTLS_TYPES.at(size_t(m_type))));
         writer->writeDefaultNamespace(toString65(ns_tls));
         writer->writeEndElement();
     }
@@ -76,7 +72,8 @@ void QXmppStartTlsPacket::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppStartTlsPacket::isStartTlsPacket(const QDomElement &element)
 {
-    return element.namespaceURI() == ns_tls && STARTTLS_TYPES.contains(element.tagName());
+    return element.namespaceURI() == ns_tls &&
+        enumFromString<Type>(STARTTLS_TYPES, element.tagName()).has_value();
 }
 
 ///
@@ -91,5 +88,5 @@ bool QXmppStartTlsPacket::isStartTlsPacket(const QDomElement &element)
 ///
 bool QXmppStartTlsPacket::isStartTlsPacket(const QDomElement &element, Type type)
 {
-    return element.namespaceURI() == ns_tls && element.tagName() == STARTTLS_TYPES.at(int(type));
+    return element.namespaceURI() == ns_tls && element.tagName() == STARTTLS_TYPES.at(size_t(type));
 }

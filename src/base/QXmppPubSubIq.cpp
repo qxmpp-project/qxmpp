@@ -61,25 +61,25 @@ using namespace QXmpp::Private;
 /// &lt;item/&gt; is also checked.
 ///
 
-static const QStringList PUBSUB_QUERIES = {
-    QStringLiteral("affiliations"),
-    QStringLiteral("affiliations"),
-    QStringLiteral("configure"),
-    QStringLiteral("create"),
-    QStringLiteral("default"),
-    QStringLiteral("default"),
-    QStringLiteral("delete"),
-    QStringLiteral("items"),
-    QStringLiteral("options"),
-    QStringLiteral("publish"),
-    QStringLiteral("purge"),
-    QStringLiteral("retract"),
-    QStringLiteral("subscribe"),
-    QStringLiteral("subscription"),
-    QStringLiteral("subscriptions"),
-    QStringLiteral("subscriptions"),
-    QStringLiteral("unsubscribe"),
-};
+constexpr auto PUBSUB_QUERIES = to_array<QStringView>({
+    u"affiliations",
+    u"affiliations",
+    u"configure",
+    u"create",
+    u"default",
+    u"default",
+    u"delete",
+    u"items",
+    u"options",
+    u"publish",
+    u"purge",
+    u"retract",
+    u"subscribe",
+    u"subscription",
+    u"subscriptions",
+    u"subscriptions",
+    u"unsubscribe",
+});
 
 namespace QXmpp::Private {
 
@@ -533,7 +533,7 @@ void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
         subscription().value_or(QXmppPubSubSubscription()).toXml(writer);
     } else {
         // write query type
-        writer->writeStartElement(PUBSUB_QUERIES.at(d->queryType));
+        writer->writeStartElement(toString65(PUBSUB_QUERIES.at(size_t(d->queryType))));
         writeOptionalXmlAttribute(writer, u"jid", d->queryJid);
         writeOptionalXmlAttribute(writer, u"node", d->queryNode);
 
@@ -638,8 +638,8 @@ void PubSubIqBase::toXmlElementFromChild(QXmlStreamWriter *writer) const
 std::optional<PubSubIqBase::QueryType> PubSubIqBase::queryTypeFromDomElement(const QDomElement &element)
 {
     QueryType type;
-    if (auto index = PUBSUB_QUERIES.indexOf(element.tagName()); index != -1) {
-        type = QueryType(index);
+    if (auto queryType = enumFromString<QueryType>(PUBSUB_QUERIES, element.tagName())) {
+        type = *queryType;
     } else {
         return std::nullopt;
     }
