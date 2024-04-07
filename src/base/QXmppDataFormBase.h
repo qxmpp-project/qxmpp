@@ -58,35 +58,35 @@ protected:
     }
 
     template<typename T>
-    static void serializeNullable(QXmppDataForm &form, QXmppDataForm::Field::Type type, const QString &name, const T &value)
+    static void serializeNullable(QXmppDataForm &form, QXmppDataForm::Field::Type type, QStringView name, const T &value)
     {
         if (!value.isNull()) {
-            serializeValue(form, type, name, value);
+            serializeValue(form, type, name.toString(), value);
         }
     }
 
     template<typename T>
-    static void serializeEmptyable(QXmppDataForm &form, QXmppDataForm::Field::Type type, const QString &name, const T &value)
+    static void serializeEmptyable(QXmppDataForm &form, QXmppDataForm::Field::Type type, QStringView name, const T &value)
     {
         if (!value.isEmpty()) {
-            serializeValue(form, type, name, value);
+            serializeValue(form, type, name.toString(), value);
         }
     }
 
     template<typename T, typename ValueConverter = T (*)(T)>
     static void serializeOptional(
-        QXmppDataForm &form, QXmppDataForm::Field::Type type, const QString &name, const std::optional<T> &optional, ValueConverter convert = [](T a) { return a; })
+        QXmppDataForm &form, QXmppDataForm::Field::Type type, QStringView name, const std::optional<T> &optional, ValueConverter convert = [](T a) { return a; })
     {
         if (optional.has_value()) {
-            serializeValue(form, type, name, convert(*optional));
+            serializeValue(form, type, name.toString(), convert(*optional));
         }
     }
 
     template<typename T>
-    static void serializeOptionalNumber(QXmppDataForm &form, QXmppDataForm::Field::Type type, const QString &name, std::optional<T> optional)
+    static void serializeOptionalNumber(QXmppDataForm &form, QXmppDataForm::Field::Type type, QStringView name, std::optional<T> optional)
     {
         if (optional.has_value()) {
-            serializeValue(form, type, name, QString::number(*optional));
+            serializeValue(form, type, name.toString(), QString::number(*optional));
         }
     }
 
