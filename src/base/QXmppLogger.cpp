@@ -139,8 +139,17 @@ void QXmppLogger::setLoggingType(QXmppLogger::LoggingType type)
     if (d->loggingType != type) {
         d->loggingType = type;
         reopen();
+        Q_EMIT loggingTypeChanged();
     }
 }
+
+///
+/// \fn QXmppLogger::loggingTypeChanged()
+///
+/// Emitted when the logging type has been changed.
+///
+/// \since QXmpp 1.7
+///
 
 QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 {
@@ -150,8 +159,19 @@ QXmppLogger::MessageTypes QXmppLogger::messageTypes()
 /// Sets the types of messages to log.
 void QXmppLogger::setMessageTypes(QXmppLogger::MessageTypes types)
 {
-    d->messageTypes = types;
+    if (d->messageTypes != types) {
+        d->messageTypes = types;
+        Q_EMIT messageTypesChanged();
+    }
 }
+
+///
+/// \fn QXmppLogger::messageTypesChanged()
+///
+/// Emitted when the message types have been changed.
+///
+/// \since QXmpp 1.7
+///
 
 /// Add a logging message.
 void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
@@ -219,8 +239,17 @@ void QXmppLogger::setLogFilePath(const QString &path)
     if (d->logFilePath != path) {
         d->logFilePath = path;
         reopen();
+        Q_EMIT logFilePathChanged();
     }
 }
+
+///
+/// \fn QXmppLogger::logFilePathChanged()
+///
+/// Emitted when the log file path has been changed.
+///
+/// \since QXmpp 1.7
+///
 
 /// If logging to a file, causes the file to be re-opened.
 void QXmppLogger::reopen()

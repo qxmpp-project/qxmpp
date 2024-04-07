@@ -31,11 +31,11 @@ class QXMPP_EXPORT QXmppLogger : public QObject
     Q_FLAGS(MessageType MessageTypes)
 
     /// The path to which logging messages should be written
-    Q_PROPERTY(QString logFilePath READ logFilePath WRITE setLogFilePath)
+    Q_PROPERTY(QString logFilePath READ logFilePath WRITE setLogFilePath NOTIFY logFilePathChanged)
     /// The handler for logging messages
-    Q_PROPERTY(LoggingType loggingType READ loggingType WRITE setLoggingType)
+    Q_PROPERTY(LoggingType loggingType READ loggingType WRITE setLoggingType NOTIFY loggingTypeChanged)
     /// The types of messages to log
-    Q_PROPERTY(MessageTypes messageTypes READ messageTypes WRITE setMessageTypes)
+    Q_PROPERTY(MessageTypes messageTypes READ messageTypes WRITE setMessageTypes NOTIFY messageTypesChanged)
 
 public:
     /// This enum describes how log message are handled.
@@ -68,6 +68,7 @@ public:
     /// Returns the handler for logging messages.
     QXmppLogger::LoggingType loggingType();
     void setLoggingType(QXmppLogger::LoggingType type);
+    Q_SIGNAL void loggingTypeChanged();
 
     // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
     ///
@@ -77,11 +78,13 @@ public:
     ///
     QString logFilePath();
     void setLogFilePath(const QString &path);
+    Q_SIGNAL void logFilePathChanged();
 
     // documentation needs to be here, see https://stackoverflow.com/questions/49192523/
     /// Returns the types of messages to log.
     QXmppLogger::MessageTypes messageTypes();
     void setMessageTypes(QXmppLogger::MessageTypes types);
+    Q_SIGNAL void messageTypesChanged();
 
 public Q_SLOTS:
     virtual void setGauge(const QString &gauge, double value);
