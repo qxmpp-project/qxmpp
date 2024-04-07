@@ -82,7 +82,7 @@ public:
     Q_SIGNAL void disconnected();
 
     /// This signal is emitted when an error is encountered.
-    Q_SIGNAL void errorOccurred(const QString &text, const ConnectionError &details, QXmppClient::Error oldError);
+    Q_SIGNAL void errorOccurred(const QString &text, const QXmppOutgoingClient::ConnectionError &details, QXmppClient::Error oldError);
 
     /// This signal is emitted when an element is received.
     Q_SIGNAL void elementReceived(const QDomElement &element, bool &handled);
