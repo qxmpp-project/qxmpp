@@ -36,7 +36,7 @@ public:
 
     Q_SIGNAL void invited();
     Q_SIGNAL void accepted(const QString &id, const QString &callPartnerResource);
-    Q_SIGNAL void closed(const Result &result);
+    Q_SIGNAL void closed(const QXmppCallInvite::Result &result);
 
 private:
     QXmppTask<QXmpp::SendResult> invite(
