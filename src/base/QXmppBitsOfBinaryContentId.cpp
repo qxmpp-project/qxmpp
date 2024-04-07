@@ -13,21 +13,21 @@
 #define CONTENTID_POSTFIX_LENGTH 13
 #define CONTENTID_HASH_SEPARATOR QStringLiteral("+")
 
-static const QMap<QCryptographicHash::Algorithm, QString> HASH_ALGORITHMS = {
-    { QCryptographicHash::Sha1, QStringLiteral("sha1") },
-    { QCryptographicHash::Md4, QStringLiteral("md4") },
-    { QCryptographicHash::Md5, QStringLiteral("md5") },
-    { QCryptographicHash::Sha224, QStringLiteral("sha-224") },
-    { QCryptographicHash::Sha256, QStringLiteral("sha-256") },
-    { QCryptographicHash::Sha384, QStringLiteral("sha-384") },
-    { QCryptographicHash::Sha512, QStringLiteral("sha-512") },
-    { QCryptographicHash::Sha3_224, QStringLiteral("sha3-224") },
-    { QCryptographicHash::Sha3_256, QStringLiteral("sha3-256") },
-    { QCryptographicHash::Sha3_384, QStringLiteral("sha3-384") },
-    { QCryptographicHash::Sha3_512, QStringLiteral("sha3-512") },
+static const QMap<QCryptographicHash::Algorithm, QStringView> HASH_ALGORITHMS = {
+    { QCryptographicHash::Sha1, u"sha1" },
+    { QCryptographicHash::Md4, u"md4" },
+    { QCryptographicHash::Md5, u"md5" },
+    { QCryptographicHash::Sha224, u"sha-224" },
+    { QCryptographicHash::Sha256, u"sha-256" },
+    { QCryptographicHash::Sha384, u"sha-384" },
+    { QCryptographicHash::Sha512, u"sha-512" },
+    { QCryptographicHash::Sha3_224, u"sha3-224" },
+    { QCryptographicHash::Sha3_256, u"sha3-256" },
+    { QCryptographicHash::Sha3_384, u"sha3-384" },
+    { QCryptographicHash::Sha3_512, u"sha3-512" },
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    { QCryptographicHash::Blake2b_256, QStringLiteral("blake2b-256") },
-    { QCryptographicHash::Blake2b_512, QStringLiteral("blake2b-512") },
+    { QCryptographicHash::Blake2b_256, u"blake2b-256" },
+    { QCryptographicHash::Blake2b_512, u"blake2b-512" },
 #endif
 };
 
