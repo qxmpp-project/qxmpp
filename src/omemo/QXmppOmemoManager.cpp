@@ -762,7 +762,7 @@ QXmppTask<QXmppPubSubManager::Result> Manager::removeContactDevices(const QStrin
     auto future = d->unsubscribeFromDeviceList(jid);
     future.then(this, [=](QXmppPubSubManager::Result result) mutable {
         if (std::holds_alternative<QXmppError>(result)) {
-            warning(u"Contact '" % jid % u"' could not be removed because the device list subscription could not be removed");
+            warning(u"Contact '" + jid + u"' could not be removed because the device list subscription could not be removed");
             interface.finish(std::move(result));
         } else {
             d->devices.remove(jid);
@@ -865,8 +865,8 @@ QXmppTask<void> Manager::buildMissingSessions(const QList<QString> &jids)
         // Do not exceed the maximum of manageable devices.
         if (devicesCount > d->maximumDevicesPerStanza - devicesCount) {
             warning(u"Sessions could not be built for all JIDs because their devices are "
-                    "altogether more than the maximum of manageable devices " %
-                    QString::number(d->maximumDevicesPerStanza) %
+                    "altogether more than the maximum of manageable devices " +
+                    QString::number(d->maximumDevicesPerStanza) +
                     u" - Use QXmppOmemoManager::setMaximumDevicesPerStanza() to increase the maximum");
             break;
         } else {
@@ -1121,7 +1121,7 @@ bool QXmppOmemoManager::isEncrypted(const QXmppMessage &message)
 QStringList Manager::discoveryFeatures() const
 {
     return {
-        ns_omemo_2_devices % u"+notify"
+        ns_omemo_2_devices + u"+notify"
     };
 }
 

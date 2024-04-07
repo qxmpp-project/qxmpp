@@ -58,7 +58,7 @@ QByteArray QXmppNonSASLAuthIq::digest() const
 ///
 void QXmppNonSASLAuthIq::setDigest(const QString &streamId, const QString &password)
 {
-    m_digest = QCryptographicHash::hash(streamId.toUtf8() + password.toUtf8(), QCryptographicHash::Sha1);
+    m_digest = QCryptographicHash::hash(QByteArray(streamId.toUtf8() + password.toUtf8()), QCryptographicHash::Sha1);
 }
 
 ///

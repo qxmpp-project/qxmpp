@@ -10,7 +10,6 @@
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QSharedData>
-#include <QStringBuilder>
 
 using namespace QXmpp::Private;
 
@@ -389,7 +388,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
     std::sort(sortedFeatures.begin(), sortedFeatures.end());
     sortedFeatures.removeDuplicates();
     for (const auto &identity : sortedIdentities) {
-        S += identity.category() % u'/' % identity.type() % u'/' % identity.language() % u'/' % identity.name() % u'<';
+        S += identity.category() + u'/' + identity.type() + u'/' + identity.language() + u'/' + identity.name() + u'<';
     }
     for (const auto &feature : sortedFeatures) {
         S += feature + u'<';

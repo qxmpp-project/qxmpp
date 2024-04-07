@@ -22,7 +22,6 @@
 #include <QSslConfiguration>
 #include <QSslKey>
 #include <QSslSocket>
-#include <QStringBuilder>
 
 static void helperToXmlAddDomElement(QXmlStreamWriter *stream, const QDomElement &element, const QVector<QStringView> &omitNamespaces)
 {
@@ -110,7 +109,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
 {
     // refuse to route packets to empty destination, own domain or sub-domains
     const QString toDomain = QXmppUtils::jidToDomain(to);
-    if (to.isEmpty() || to == domain || toDomain.endsWith(QString(u"." % domain))) {
+    if (to.isEmpty() || to == domain || toDomain.endsWith(QString(u"." + domain))) {
         return false;
     }
 

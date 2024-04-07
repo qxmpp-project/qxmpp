@@ -13,7 +13,6 @@
 
 #include <QDomElement>
 #include <QMap>
-#include <QStringBuilder>
 
 class QXmppMucManagerPrivate
 {
@@ -24,7 +23,7 @@ public:
 class QXmppMucRoomPrivate
 {
 public:
-    QString ownJid() const { return jid % u'/' % nickName; }
+    QString ownJid() const { return jid + u'/' + nickName; }
     QXmppClient *client;
     QXmppDiscoveryManager *discoManager;
     QXmppMucRoom::Actions allowedActions;
@@ -349,7 +348,7 @@ void QXmppMucRoom::setNickName(const QString &nickName)
     // if we had already joined the room, request nickname change
     if (isJoined()) {
         QXmppPresence packet = d->client->clientPresence();
-        packet.setTo(d->jid % u'/' % nickName);
+        packet.setTo(d->jid + u'/' + nickName);
         packet.setType(QXmppPresence::Available);
         d->client->sendPacket(packet);
     } else {

@@ -13,7 +13,6 @@
 
 #include <QDomElement>
 #include <QMessageAuthenticationCode>
-#include <QStringBuilder>
 #include <QUrlQuery>
 #include <QXmlStreamWriter>
 #include <QtEndian>
@@ -737,7 +736,7 @@ std::optional<QByteArray> QXmppSaslClientDigestMd5::respond(const QByteArray &ch
 
         m_nonce = input.value(QByteArrayLiteral("nonce"));
         m_secret = QCryptographicHash::hash(
-            username().toUtf8() + QByteArrayLiteral(":") + realm + QByteArrayLiteral(":") + password().toUtf8(),
+            QByteArray(username().toUtf8() + QByteArrayLiteral(":") + realm + QByteArrayLiteral(":") + password().toUtf8()),
             QCryptographicHash::Md5);
 
         // Build response
@@ -829,7 +828,7 @@ std::optional<QByteArray> QXmppSaslClientGoogle::respond(const QByteArray &)
     if (m_step == 0) {
         // send initial response
         m_step++;
-        return QString(u'\0' % username() % u'\0' % password()).toUtf8();
+        return QString(u'\0' + username() + u'\0' + password()).toUtf8();
     } else {
         warning(QStringLiteral("QXmppSaslClientGoogle : Invalid step"));
         return {};
@@ -850,7 +849,7 @@ std::optional<QByteArray> QXmppSaslClientPlain::respond(const QByteArray &)
 {
     if (m_step == 0) {
         m_step++;
-        return QString(u'\0' % username() % u'\0' % password()).toUtf8();
+        return QString(u'\0' + username() + u'\0' + password()).toUtf8();
     } else {
         warning(QStringLiteral("QXmppSaslClientPlain : Invalid step"));
         return {};
@@ -1090,7 +1089,7 @@ QXmppSaslServer::Response QXmppSaslServerDigestMd5::respond(const QByteArray &re
         m_cnonce = input.value(QByteArrayLiteral("cnonce"));
         if (!password().isEmpty()) {
             m_secret = QCryptographicHash::hash(
-                username().toUtf8() + QByteArrayLiteral(":") + realm + QByteArrayLiteral(":") + password().toUtf8(),
+                QByteArray(username().toUtf8() + QByteArrayLiteral(":") + realm + QByteArrayLiteral(":") + password().toUtf8()),
                 QCryptographicHash::Md5);
         } else {
             m_secret = passwordDigest();

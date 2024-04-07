@@ -11,7 +11,6 @@
 #include "QXmppPromise.h"
 #include "QXmppUtils.h"
 
-#include <QStringBuilder>
 #include <QUuid>
 
 using namespace QXmpp;
@@ -288,7 +287,7 @@ QXmppTask<QXmppJingleMessageInitiationManager::ProposeResult> QXmppJingleMessage
 
     sendMessage(jmiElement, callPartnerJid).then(this, [this, promise, callPartnerJid](SendResult result) mutable {
         if (auto error = std::get_if<QXmppError>(&result)) {
-            warning(u"Error sending Jingle Message Initiation proposal: " % error->description);
+            warning(u"Error sending Jingle Message Initiation proposal: " + error->description);
             promise.finish(*error);
         } else {
             promise.finish(addJmi(callPartnerJid));

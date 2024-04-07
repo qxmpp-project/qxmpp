@@ -6,7 +6,6 @@
 
 #include <QMap>
 #include <QSharedData>
-#include <QStringBuilder>
 
 #define CONTENTID_URL QStringLiteral("cid:")
 #define CONTENTID_URL_LENGTH 4
@@ -159,9 +158,9 @@ QString QXmppBitsOfBinaryContentId::toContentId() const
         return {};
     }
 
-    return HASH_ALGORITHMS.value(d->algorithm) %
-        CONTENTID_HASH_SEPARATOR %
-        QString::fromUtf8(d->hash.toHex()) %
+    return HASH_ALGORITHMS.value(d->algorithm) +
+        CONTENTID_HASH_SEPARATOR +
+        QString::fromUtf8(d->hash.toHex()) +
         CONTENTID_POSTFIX;
 }
 

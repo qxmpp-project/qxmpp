@@ -16,7 +16,6 @@
 #include <QDomElement>
 #include <QRandomGenerator>
 #include <QRegularExpression>
-#include <QStringBuilder>
 #include <QStringList>
 #include <QUrl>
 #include <QUuid>
@@ -508,7 +507,7 @@ float QXmpp::Private::calculateProgress(qint64 transferred, qint64 total)
 
 std::pair<QString, int> QXmpp::Private::parseHostAddress(const QString &address)
 {
-    QUrl url(u"//" % address);
+    QUrl url(u"//" + address);
     if (url.isValid() && !url.host().isEmpty()) {
         return { url.host(), url.port() };
     }

@@ -13,7 +13,7 @@ template<class T>
 static void parsePacketWithStream(T &packet, const QByteArray &xml)
 {
     QDomDocument doc;
-    const auto wrappedXml =
+    QByteArray wrappedXml =
         QByteArrayLiteral("<stream:stream xmlns:stream='http://etherx.jabber.org/streams'>") +
         xml + QByteArrayLiteral("</stream:stream>");
 

@@ -17,7 +17,6 @@
 #include <QHostAddress>
 #include <QSslKey>
 #include <QSslSocket>
-#include <QStringBuilder>
 #include <QTimer>
 
 using namespace QXmpp::Private;
@@ -77,7 +76,7 @@ QString QXmppIncomingClientPrivate::origin() const
 {
     QSslSocket *socket = q->socket();
     if (socket) {
-        return socket->peerAddress().toString() % u' ' % QString::number(socket->peerPort());
+        return socket->peerAddress().toString() + u' ' + QString::number(socket->peerPort());
     } else {
         return QStringLiteral("<unknown>");
     }

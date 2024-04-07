@@ -11,7 +11,6 @@
 #include <QDateTime>
 #include <QFile>
 #include <QMetaType>
-#include <QStringBuilder>
 #include <QTextStream>
 
 QXmppLogger *QXmppLogger::m_logger = nullptr;
@@ -36,7 +35,7 @@ static QStringView typeName(QXmppLogger::MessageType type)
 
 static QString formatted(QXmppLogger::MessageType type, const QString &text)
 {
-    return QDateTime::currentDateTime().toString() % u' ' % typeName(type) % u' ' % text;
+    return QDateTime::currentDateTime().toString() + u' ' + typeName(type) + u' ' + text;
 }
 
 static void relaySignals(QXmppLoggable *from, QXmppLoggable *to)

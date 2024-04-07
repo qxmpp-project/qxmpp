@@ -251,10 +251,10 @@ void tst_QXmppOmemoManager::testSendMessage()
 
     const auto config1 = IntegrationTests::clientConfiguration();
     auto config2 = config1;
-    config2.setResource(config2.resource() % QStringLiteral("2"));
+    config2.setResource(config2.resource() + QStringLiteral("2"));
 
     const QObject context;
-    QString recipient = "bob@" % config1.domain();
+    QString recipient = "bob@" + config1.domain();
 
     QXmppMessage message1;
     message1.setTo(recipient);
@@ -373,7 +373,7 @@ void tst_QXmppOmemoManager::testSendIq()
 
     const auto config1 = IntegrationTests::clientConfiguration();
     auto config2 = config1;
-    config2.setResource(config2.resource() % QStringLiteral("2"));
+    config2.setResource(config2.resource() + QStringLiteral("2"));
 
     const QObject context;
 

@@ -36,7 +36,6 @@
 #include <QRegularExpression>
 #include <QSslConfiguration>
 #include <QSslSocket>
-#include <QStringBuilder>
 #include <QTimer>
 
 using std::visit;
@@ -57,7 +56,7 @@ QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObje
     QXmppPromise<DnsRecordsResult> p;
     auto task = p.task();
 
-    auto *dns = new QDnsLookup(QDnsLookup::SRV, u"_xmpp-client._tcp." % domain, context);
+    auto *dns = new QDnsLookup(QDnsLookup::SRV, u"_xmpp-client._tcp." + domain, context);
     QObject::connect(dns, &QDnsLookup::finished, context, [dns, p = std::move(p)]() mutable {
         if (auto error = dns->error(); error != QDnsLookup::NoError) {
             p.finish(QXmppError { dns->errorString(), error });

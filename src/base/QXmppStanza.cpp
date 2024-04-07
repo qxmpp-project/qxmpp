@@ -16,7 +16,6 @@
 
 #include <QDateTime>
 #include <QDomElement>
-#include <QStringBuilder>
 #include <QXmlStreamWriter>
 
 using namespace QXmpp::Private;
@@ -1015,7 +1014,7 @@ void QXmppStanza::generateAndSetNextId()
 {
     // get back
     ++s_uniqeIdNo;
-    d->id = u"qxmpp" % QString::number(s_uniqeIdNo);
+    d->id = u"qxmpp" + QString::number(s_uniqeIdNo);
 }
 
 void QXmppStanza::parse(const QDomElement &element)

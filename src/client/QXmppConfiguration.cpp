@@ -11,7 +11,6 @@
 #include <QCoreApplication>
 #include <QNetworkProxy>
 #include <QSslSocket>
-#include <QStringBuilder>
 
 using namespace QXmpp::Private;
 
@@ -211,7 +210,7 @@ QString QXmppConfiguration::jid() const
     if (d->user.isEmpty()) {
         return d->domain;
     } else {
-        return jidBare() % u'/' % d->resource;
+        return jidBare() + u'/' + d->resource;
     }
 }
 
@@ -226,7 +225,7 @@ QString QXmppConfiguration::jidBare() const
     if (d->user.isEmpty()) {
         return d->domain;
     } else {
-        return d->user % u'@' % d->domain;
+        return d->user + u'@' + d->domain;
     }
 }
 

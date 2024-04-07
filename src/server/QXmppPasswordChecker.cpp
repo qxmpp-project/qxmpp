@@ -5,7 +5,6 @@
 #include "QXmppPasswordChecker.h"
 
 #include <QCryptographicHash>
-#include <QStringBuilder>
 #include <QTimer>
 
 /// Returns the requested domain.
@@ -151,7 +150,7 @@ QXmppPasswordReply *QXmppPasswordChecker::getDigest(const QXmppPasswordRequest &
     QXmppPasswordReply::Error error = getPassword(request, secret);
     if (error == QXmppPasswordReply::NoError) {
         reply->setDigest(QCryptographicHash::hash(
-            (request.username() % u':' % request.domain() % u':' % secret).toUtf8(),
+            (request.username() + u':' + request.domain() + u':' + secret).toUtf8(),
             QCryptographicHash::Md5));
     } else {
         reply->setError(error);

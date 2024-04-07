@@ -9,7 +9,6 @@
 #include "QXmppUtils_p.h"
 
 #include <QDomElement>
-#include <QStringBuilder>
 
 constexpr QStringView XMLNS_BLOCKING = u"urn:xmpp:blocking";
 
@@ -553,9 +552,9 @@ QXmppBlocklist::BlockingState QXmppBlocklist::blockingState(const QString &jid) 
         // Partially blocked:
         //  not possible
         checkBlockingJid(jid);
-        checkBlockingJid(user % u'@' % domain);
+        checkBlockingJid(user + u'@' + domain);
         checkBlockingJid(domain);
-        checkBlockingJid(domain % u'/' % resource);
+        checkBlockingJid(domain + u'/' + resource);
         break;
     case BareJid: {
         // Blocking:
@@ -575,7 +574,7 @@ QXmppBlocklist::BlockingState QXmppBlocklist::blockingState(const QString &jid) 
             }
         }
 
-        checkPartiallyBlockingJid(domain % u'/' % resource);
+        checkPartiallyBlockingJid(domain + u'/' + resource);
         break;
     }
     case Domain: {
@@ -588,8 +587,8 @@ QXmppBlocklist::BlockingState QXmppBlocklist::blockingState(const QString &jid) 
         checkBlockingJid(jid);
 
         // look for full/bare jids and domain+resource jids
-        QString userJidSubstring = u'@' % domain;
-        QString domainResourceSubstring = domain % u'/';
+        QString userJidSubstring = u'@' + domain;
+        QString domainResourceSubstring = domain + u'/';
 
         for (const auto &blockedJid : m_blocklist) {
             if (blockedJid.contains(userJidSubstring) || blockedJid.contains(domainResourceSubstring)) {
@@ -610,7 +609,7 @@ QXmppBlocklist::BlockingState QXmppBlocklist::blockingState(const QString &jid) 
         checkBlockingJid(domain);
 
         // look for full/bare jids
-        QString userJidSubstring = u'@' % domain;
+        QString userJidSubstring = u'@' + domain;
         for (const auto &blockedJid : m_blocklist) {
             if (blockedJid.contains(userJidSubstring)) {
                 partiallyBlockingJids.append(blockedJid);

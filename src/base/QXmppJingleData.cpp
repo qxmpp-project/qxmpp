@@ -12,7 +12,6 @@
 #include <QDateTime>
 #include <QDomElement>
 #include <QRegularExpression>
-#include <QStringBuilder>
 
 using namespace QXmpp::Private;
 
@@ -962,7 +961,7 @@ QString QXmppJingleIq::Content::toSdp() const
         if (payload.channels() > 1) {
             rtpmap += u'/' + QString::number(payload.channels());
         }
-        attrs << u"a=rtpmap:" % rtpmap;
+        attrs << u"a=rtpmap:" + rtpmap;
 
         // payload parameters
         QStringList paramList;
@@ -978,7 +977,7 @@ QString QXmppJingleIq::Content::toSdp() const
             }
         }
         if (!paramList.isEmpty()) {
-            attrs << QString(QStringLiteral("a=fmtp:") % QString::number(payload.id()) % u' ' % paramList.join(u"; "));
+            attrs << QString(QStringLiteral("a=fmtp:") + QString::number(payload.id()) + u' ' + paramList.join(u"; "));
         }
     }
     sdp << QStringLiteral("m=%1 %2 RTP/AVP%3").arg(d->description.media(), QString::number(localRtpPort), payloads);
@@ -1002,7 +1001,7 @@ QString QXmppJingleIq::Content::toSdp() const
         sdp << QStringLiteral("a=setup:%1").arg(d->transportFingerprintSetup);
     }
 
-    return sdp.join(u"\r\n") % u"\r\n";
+    return sdp.join(u"\r\n") + u"\r\n";
 }
 
 /// \endcond

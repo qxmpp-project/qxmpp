@@ -11,7 +11,6 @@
 #include <QDataStream>
 #include <QHostInfo>
 #include <QNetworkInterface>
-#include <QStringBuilder>
 #include <QTimer>
 #include <QUdpSocket>
 #include <QVariant>
@@ -1517,7 +1516,7 @@ void QXmppTurnAllocation::transactionFinished()
         m_nonce = reply.nonce();
         m_realm = reply.realm();
         QCryptographicHash hash(QCryptographicHash::Md5);
-        hash.addData((m_username % u':' % m_realm % u':' % m_password).toUtf8());
+        hash.addData((m_username + u':' + m_realm + u':' + m_password).toUtf8());
         m_key = hash.result();
 
         // retry request
