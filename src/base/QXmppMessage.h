@@ -275,6 +275,8 @@ public:
     // XEP-0447: Stateless file sharing
     const QVector<QXmppFileShare> &sharedFiles() const;
     void setSharedFiles(const QVector<QXmppFileShare> &sharedFiles);
+    QVector<QXmppFileSourcesAttachment> fileSourcesAttachments() const;
+    void setFileSourcesAttachments(const QVector<QXmppFileSourcesAttachment> &);
 
     // XEP-0482: Call Invites
     std::optional<QXmppCallInviteElement> callInviteElement() const;

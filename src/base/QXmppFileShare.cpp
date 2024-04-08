@@ -19,6 +19,46 @@
 using namespace QXmpp::Private;
 using Disposition = QXmppFileShare::Disposition;
 
+namespace QXmpp::Private {
+
+struct FileSources {
+    static FileSources fromSourcesDom(const QDomElement &el);
+    void innerToXml(QXmlStreamWriter *writer) const;
+
+    QVector<QXmppHttpFileSource> httpSources;
+    QVector<QXmppEncryptedFileSource> encryptedSources;
+};
+
+FileSources FileSources::fromSourcesDom(const QDomElement &el)
+{
+    FileSources sources;
+    for (const auto &sourceEl : iterChildElements(el, u"url-data", ns_url_data)) {
+        QXmppHttpFileSource source;
+        if (source.parse(sourceEl)) {
+            sources.httpSources.push_back(std::move(source));
+        }
+    }
+    for (const auto &sourceEl : iterChildElements(el, u"encrypted", ns_esfs)) {
+        QXmppEncryptedFileSource source;
+        if (source.parse(sourceEl)) {
+            sources.encryptedSources.push_back(std::move(source));
+        }
+    }
+    return sources;
+}
+
+void FileSources::innerToXml(QXmlStreamWriter *writer) const
+{
+    for (const auto &source : httpSources) {
+        source.toXml(writer);
+    }
+    for (const auto &source : encryptedSources) {
+        source.toXml(writer);
+    }
+}
+
+}  // namespace QXmpp::Private
+
 static std::optional<Disposition> dispositionFromString(const QString &str)
 {
     if (str == u"inline") {
@@ -41,17 +81,106 @@ static QString dispositionToString(Disposition value)
     Q_UNREACHABLE();
 }
 
-/// \cond
+class QXmppFileSourcesAttachmentPrivate : public QSharedData
+{
+public:
+    QString id;
+    FileSources sources;
+};
+
+///
+/// \class QXmppFileSourcesAttachment
+///
+/// Attachment of file sources to a previous file sharing element from \xep{0447, Stateless file
+/// sharing}.
+///
+/// \since QXmpp 1.7
+///
+
+/// Default constructor
+QXmppFileSourcesAttachment::QXmppFileSourcesAttachment()
+    : d(new QXmppFileSourcesAttachmentPrivate)
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppFileSourcesAttachment)
+
+///
+/// Returns the ID of the referenced file-sharing element.
+///
+const QString &QXmppFileSourcesAttachment::id() const
+{
+    return d->id;
+}
+
+///
+/// Sets the ID of the referenced file-sharing element.
+///
+void QXmppFileSourcesAttachment::setId(const QString &id)
+{
+    d->id = id;
+}
+
+///
+/// Returns the HTTP sources for this file.
+///
+const QVector<QXmppHttpFileSource> &QXmppFileSourcesAttachment::httpSources() const
+{
+    return d->sources.httpSources;
+}
+
+///
+/// Sets the HTTP sources for this file.
+///
+void QXmppFileSourcesAttachment::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources)
+{
+    d->sources.httpSources = newHttpSources;
+}
+
+///
+/// Returns the encrypted sources for this file.
+///
+const QVector<QXmppEncryptedFileSource> &QXmppFileSourcesAttachment::encryptedSources() const
+{
+    return d->sources.encryptedSources;
+}
+
+///
+/// Sets the encrypted sources for this file.
+///
+void QXmppFileSourcesAttachment::setEncryptedSources(const QVector<QXmppEncryptedFileSource> &newEncryptedSources)
+{
+    d->sources.encryptedSources = newEncryptedSources;
+}
+
+std::optional<QXmppFileSourcesAttachment> QXmppFileSourcesAttachment::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"sources" || el.namespaceURI() != ns_sfs) {
+        return {};
+    }
+    QXmppFileSourcesAttachment result;
+    result.d->id = el.attribute(QStringLiteral("id"));
+    result.d->sources = FileSources::fromSourcesDom(el);
+    return result;
+}
+
+void QXmppFileSourcesAttachment::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("sources"));
+    writer->writeDefaultNamespace(toString65(ns_sfs));
+    writer->writeAttribute(QSL65("id"), d->id);
+    d->sources.innerToXml(writer);
+    writer->writeEndElement();
+}
+
 class QXmppFileSharePrivate : public QSharedData
 {
 public:
     QXmppFileMetadata metadata;
     QString id;
-    QVector<QXmppHttpFileSource> httpSources;
-    QVector<QXmppEncryptedFileSource> encryptedSources;
+    FileSources sources;
     QXmppFileShare::Disposition disposition = Disposition::Inline;
 };
-/// \endcond
 
 ///
 /// \class QXmppFileShare
@@ -127,39 +256,47 @@ void QXmppFileShare::setMetadata(const QXmppFileMetadata &metadata)
     d->metadata = metadata;
 }
 
+///
 /// Returns the HTTP sources for this file.
+///
 const QVector<QXmppHttpFileSource> &QXmppFileShare::httpSources() const
 {
-    return d->httpSources;
+    return d->sources.httpSources;
 }
 
+///
 /// Sets the HTTP sources for this file.
+///
 void QXmppFileShare::setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources)
 {
-    d->httpSources = newHttpSources;
+    d->sources.httpSources = newHttpSources;
 }
 
+///
 /// Returns the encrypted sources for this file.
+///
 const QVector<QXmppEncryptedFileSource> &QXmppFileShare::encryptedSources() const
 {
-    return d->encryptedSources;
+    return d->sources.encryptedSources;
 }
 
+///
 /// Sets the encrypted sources for this file.
+///
 void QXmppFileShare::setEncryptedSourecs(const QVector<QXmppEncryptedFileSource> &newEncryptedSources)
 {
-    d->encryptedSources = newEncryptedSources;
+    d->sources.encryptedSources = newEncryptedSources;
 }
 
 /// \cond
 void QXmppFileShare::visitSources(std::function<bool(const std::any &)> &&visitor) const
 {
-    for (const auto &httpSource : d->httpSources) {
+    for (const auto &httpSource : d->sources.httpSources) {
         if (visitor(httpSource)) {
             return;
         }
     }
-    for (const auto &encryptedSource : d->encryptedSources) {
+    for (const auto &encryptedSource : d->sources.encryptedSources) {
         if (visitor(encryptedSource)) {
             return;
         }
@@ -169,9 +306,9 @@ void QXmppFileShare::visitSources(std::function<bool(const std::any &)> &&visito
 void QXmppFileShare::addSource(const std::any &source)
 {
     if (source.type() == typeid(QXmppHttpFileSource)) {
-        d->httpSources.push_back(std::any_cast<QXmppHttpFileSource>(source));
+        d->sources.httpSources.push_back(std::any_cast<QXmppHttpFileSource>(source));
     } else if (source.type() == typeid(QXmppEncryptedFileSource)) {
-        d->encryptedSources.push_back(std::any_cast<QXmppEncryptedFileSource>(source));
+        d->sources.encryptedSources.push_back(std::any_cast<QXmppEncryptedFileSource>(source));
     }
 }
 
@@ -190,20 +327,9 @@ bool QXmppFileShare::parse(const QDomElement &el)
             return false;
         }
 
-        // sources:
-        // expect that there's only one sources element with the correct namespace
-        auto sources = firstChildElement(el, u"sources");
-        for (const auto &sourceEl : iterChildElements(sources, u"url-data")) {
-            QXmppHttpFileSource source;
-            if (source.parse(sourceEl)) {
-                d->httpSources.push_back(std::move(source));
-            }
-        }
-        for (const auto &sourceEl : iterChildElements(sources, u"encrypted")) {
-            QXmppEncryptedFileSource source;
-            if (source.parse(sourceEl)) {
-                d->encryptedSources.push_back(std::move(source));
-            }
+        // sources
+        if (auto sourcesEl = firstChildElement(el, u"sources", ns_sfs); !sourcesEl.isNull()) {
+            d->sources = FileSources::fromSourcesDom(sourcesEl);
         }
         return true;
     }
@@ -217,13 +343,10 @@ void QXmppFileShare::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute(QSL65("disposition"), dispositionToString(d->disposition));
     writeOptionalXmlAttribute(writer, u"id", d->id);
     d->metadata.toXml(writer);
+
+    // sources
     writer->writeStartElement(QSL65("sources"));
-    for (const auto &source : d->httpSources) {
-        source.toXml(writer);
-    }
-    for (const auto &source : d->encryptedSources) {
-        source.toXml(writer);
-    }
+    d->sources.innerToXml(writer);
     writer->writeEndElement();
     writer->writeEndElement();
 }

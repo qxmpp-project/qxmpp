@@ -165,8 +165,9 @@ public:
     // XEP-0444: Message Reactions
     std::optional<QXmppMessageReaction> reaction;
 
-    // XEP-0448: Encryption for stateless file sharing
+    // XEP-0447: Stateless file sharing
     QVector<QXmppFileShare> sharedFiles;
+    QVector<QXmppFileSourcesAttachment> fileSourcesAttachments;
 
     // XEP-0482: Call Invites
     std::optional<QXmppCallInviteElement> callInviteElement;
@@ -1325,6 +1326,28 @@ void QXmppMessage::setSharedFiles(const QVector<QXmppFileShare> &sharedFiles)
 }
 
 ///
+/// Returns additional sources to be attached to a file share as defined by \xep{0447, Stateless
+/// file sharing}.
+///
+/// \since QXmpp 1.7
+///
+QVector<QXmppFileSourcesAttachment> QXmppMessage::fileSourcesAttachments() const
+{
+    return d->fileSourcesAttachments;
+}
+
+///
+/// Sets additional sources to be attached to a file share as defined by \xep{0447, Stateless
+/// file sharing}.
+///
+/// \since QXmpp 1.7
+///
+void QXmppMessage::setFileSourcesAttachments(const QVector<QXmppFileSourcesAttachment> &fileSourcesAttachments)
+{
+    d->fileSourcesAttachments = fileSourcesAttachments;
+}
+
+///
 /// Returns a Call Invite element as defined in \xep{0482, Call Invites}.
 ///
 std::optional<QXmppCallInviteElement> QXmppMessage::callInviteElement() const
@@ -1638,11 +1661,17 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             d->reaction = std::move(reaction);
             return true;
         }
-        // XEP-0448: Stateless file sharing
+        // XEP-0447: Stateless file sharing
         if (checkElement(element, u"file-sharing", ns_sfs)) {
             QXmppFileShare share;
             if (share.parse(element)) {
                 d->sharedFiles.push_back(std::move(share));
+            }
+            return true;
+        }
+        if (checkElement(element, u"sources", ns_sfs)) {
+            if (auto fileSources = QXmppFileSourcesAttachment::fromDom(element)) {
+                d->fileSourcesAttachments.push_back(std::move(*fileSources));
             }
             return true;
         }
@@ -1902,9 +1931,12 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             d->reaction->toXml(writer);
         }
 
-        // XEP-0448: Stateless file sharing
+        // XEP-0447: Stateless file sharing
         for (const auto &fileShare : d->sharedFiles) {
             fileShare.toXml(writer);
+        }
+        for (const auto &fileSources : d->fileSourcesAttachments) {
+            fileSources.toXml(writer);
         }
 
         // XEP-0482: Call Invites

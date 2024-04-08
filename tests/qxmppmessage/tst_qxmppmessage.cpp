@@ -1268,7 +1268,7 @@ void tst_QXmppMessage::testE2eeFallbackBody()
 
 void tst_QXmppMessage::testFileSharing()
 {
-    const QByteArray xml(
+    QByteArray xml(
         "<message id='sharing-a-file' to='juliet@shakespeare.lit' from='romeo@montague.lit/resource' type='normal'>"
         "<file-sharing xmlns='urn:xmpp:sfs:0' disposition='inline' id='abc23'>"
         "<file xmlns='urn:xmpp:file:metadata:0'>"
@@ -1286,11 +1286,30 @@ void tst_QXmppMessage::testFileSharing()
         "</file-sharing>"
         "</message>");
 
-    QXmppMessage message1;
-    parsePacket(message1, xml);
-    QVERIFY(!message1.sharedFiles().empty());
-    QCOMPARE(message1.sharedFiles().first().id(), "abc23");
-    serializePacket(message1, xml);
+    QXmppMessage message;
+    parsePacket(message, xml);
+    QVERIFY(!message.sharedFiles().empty());
+    QCOMPARE(message.sharedFiles().first().id(), "abc23");
+    serializePacket(message, xml);
+
+    xml = "<message id='adding-photo1' to='juliet@shakespeare.lit' from='romeo@montague.lit/resource' type='normal'>"
+          "<fallback xmlns='urn:xmpp:fallback:0' for='urn:xmpp:sfs:0'><body/></fallback>"
+          "<body>https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg</body>"
+          "<x xmlns='jabber:x:oob'><url>https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg</url></x>"
+          "<attach-to xmlns='urn:xmpp:message-attaching:1' id='sharing-files'/>"
+          "<sources xmlns='urn:xmpp:sfs:0' id='photo1.jpg'>"
+          "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg'/>"
+          "</sources>"
+          "</message>";
+    message = {};
+
+    parsePacket(message, xml);
+    QVERIFY(message.sharedFiles().empty());
+    QCOMPARE(message.fileSourcesAttachments().size(), 1);
+    auto sources = message.fileSourcesAttachments().first();
+    QCOMPARE(sources.httpSources().size(), 1);
+    QCOMPARE(sources.httpSources().first().url(), QUrl::fromEncoded("https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg"));
+    serializePacket(message, xml);
 }
 
 void tst_QXmppMessage::testEncryptedFileSource()
