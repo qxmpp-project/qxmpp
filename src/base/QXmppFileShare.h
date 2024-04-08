@@ -9,16 +9,42 @@
 
 #include <any>
 #include <functional>
+#include <optional>
 
 #include <QSharedDataPointer>
 
 class QDomElement;
 class QUrl;
 class QXmlStreamWriter;
+class QXmppFileSourcesAttachmentPrivate;
 class QXmppFileSharePrivate;
 class QXmppFileMetadata;
 class QXmppHttpFileSource;
 class QXmppEncryptedFileSource;
+
+class QXMPP_EXPORT QXmppFileSourcesAttachment
+{
+public:
+    QXmppFileSourcesAttachment();
+    QXMPP_PRIVATE_DECLARE_RULE_OF_SIX(QXmppFileSourcesAttachment)
+
+    const QString &id() const;
+    void setId(const QString &);
+
+    const QVector<QXmppHttpFileSource> &httpSources() const;
+    void setHttpSources(const QVector<QXmppHttpFileSource> &newHttpSources);
+
+    const QVector<QXmppEncryptedFileSource> &encryptedSources() const;
+    void setEncryptedSources(const QVector<QXmppEncryptedFileSource> &newEncryptedSources);
+
+private:
+    friend class QXmppMessage;
+
+    static std::optional<QXmppFileSourcesAttachment> fromDom(const QDomElement &el);
+    void toXml(QXmlStreamWriter *writer) const;
+
+    QSharedDataPointer<QXmppFileSourcesAttachmentPrivate> d;
+};
 
 class QXMPP_EXPORT QXmppFileShare
 {
