@@ -946,14 +946,14 @@ void QXmppMixManager::onRegistered(QXmppClient *client)
     connect(d->discoveryManager, &QXmppDiscoveryManager::infoReceived, this, &QXmppMixManager::handleDiscoInfo);
 
     d->pubSubManager = client->findExtension<QXmppPubSubManager>();
-    Q_ASSERT_X(d->discoveryManager, "QXmppMixManager", "QXmppPubSubManager is missing");
+    Q_ASSERT_X(d->pubSubManager, "QXmppMixManager", "QXmppPubSubManager is missing");
 }
 
 void QXmppMixManager::onUnregistered(QXmppClient *client)
 {
     disconnect(d->discoveryManager, &QXmppDiscoveryManager::infoReceived, this, &QXmppMixManager::handleDiscoInfo);
     resetCachedData();
-    disconnect(client, &QXmppClient::disconnected, this, nullptr);
+    disconnect(client, &QXmppClient::connected, this, nullptr);
 }
 
 bool QXmppMixManager::handlePubSubEvent(const QDomElement &element, const QString &pubSubService, const QString &nodeName)

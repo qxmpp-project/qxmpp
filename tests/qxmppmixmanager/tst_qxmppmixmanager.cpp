@@ -557,7 +557,7 @@ void tst_QXmppMixManager::testOnUnregistered()
     manager.setArchivingSupportedByServer(true);
     manager.addService(service);
 
-    Q_EMIT client.disconnected();
+    Q_EMIT client.connected();
     QVERIFY(manager.supportedByServer());
     QVERIFY(manager.archivingSupportedByServer());
     QVERIFY(!manager.services().isEmpty());
