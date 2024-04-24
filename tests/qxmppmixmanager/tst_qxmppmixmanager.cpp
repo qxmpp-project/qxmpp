@@ -544,11 +544,23 @@ void tst_QXmppMixManager::testOnUnregistered()
 
     manager.onUnregistered(&client);
 
-    QXmppDiscoveryIq iq;
-    iq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2") });
-    Q_EMIT manager.client()->findExtension<QXmppDiscoveryManager>()->infoReceived(iq);
     QVERIFY(!manager.supportedByServer());
+    QVERIFY(!manager.archivingSupportedByServer());
+    QVERIFY(manager.services().isEmpty());
 
+    QXmppDiscoveryIq::Identity identity;
+    identity.setCategory(QStringLiteral("conference"));
+    identity.setType(QStringLiteral("mix"));
+
+    QXmppDiscoveryIq iq;
+    iq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2"),
+                     QStringLiteral("urn:xmpp:mix:pam:2#archive"),
+                     QStringLiteral("urn:xmpp:mix:core:1"),
+                     QStringLiteral("urn:xmpp:mix:core:1#searchable"),
+                     QStringLiteral("urn:xmpp:mix:core:1#create-channel") });
+    iq.setIdentities({ identity });
+
+    Q_EMIT manager.client()->findExtension<QXmppDiscoveryManager>()->infoReceived(iq);
     QVERIFY(!manager.supportedByServer());
     QVERIFY(!manager.archivingSupportedByServer());
     QVERIFY(manager.services().isEmpty());

@@ -1109,6 +1109,7 @@ bool QXmppMixManager::handlePubSubEvent(const QDomElement &element, const QStrin
 
     return false;
 }
+/// \endcond
 
 ///
 /// Pepares an IQ stanza for joining a MIX channel.
@@ -1133,7 +1134,6 @@ QXmppMixIq QXmppMixManager::prepareJoinIq(const QString &channelJid, const QStri
 
     return iq;
 }
-/// \endcond
 
 ///
 /// Joins a MIX channel.
@@ -1209,8 +1209,7 @@ void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 
     const auto jid = iq.from().isEmpty() ? client()->configuration().domain() : iq.from();
 
-    // Search for a MIX service and check what it supports.
-    // if none can be found, remove them from the cache.
+    // If no MIX service is provided by the JID, remove it from the cache.
     if (!iq.features().contains(ns_mix)) {
         removeService(jid);
         return;
@@ -1218,8 +1217,9 @@ void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 
     const auto identities = iq.identities();
 
+    // Search for MIX features provided by the determined MIX service.
     for (const QXmppDiscoveryIq::Identity &identity : identities) {
-        // ' || identity.type() == "text"' is a workaround for older ejabberd versions.
+        // ' || identity.type() == u"text"' is a workaround for older ejabberd versions.
         if (identity.category() == u"conference" && (identity.type() == MIX_SERVICE_DISCOVERY_NODE || identity.type() == u"text")) {
             Service service;
             service.jid = iq.from().isEmpty() ? client()->configuration().domain() : iq.from();
