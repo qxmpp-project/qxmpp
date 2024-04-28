@@ -24,6 +24,36 @@ using namespace QXmpp::Private;
 
 namespace QXmpp::Private {
 
+StreamOpen StreamOpen::fromXml(QXmlStreamReader &reader)
+{
+    Q_ASSERT(reader.isStartElement());
+    Q_ASSERT(reader.name() == u"stream");
+    Q_ASSERT(reader.namespaceUri() == ns_stream);
+
+    StreamOpen out;
+    const auto attributes = reader.attributes();
+    auto attribute = [&](QStringView ns, QStringView name) {
+        for (const auto &a : attributes) {
+            if (a.name() == name && a.namespaceUri() == ns) {
+                return a.value().toString();
+            }
+        }
+        return QString();
+    };
+
+    out.from = attribute({}, u"from");
+    out.to = attribute({}, u"to");
+
+    const auto namespaceDeclarations = reader.namespaceDeclarations();
+    for (const auto &ns : namespaceDeclarations) {
+        if (ns.prefix().isEmpty()) {
+            out.xmlns = ns.namespaceUri().toString();
+        }
+    }
+
+    return out;
+}
+
 void StreamOpen::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartDocument();
@@ -33,7 +63,7 @@ void StreamOpen::toXml(QXmlStreamWriter *writer) const
     }
     writer->writeAttribute(QSL65("to"), to);
     writer->writeAttribute(QSL65("version"), QSL65("1.0"));
-    writer->writeDefaultNamespace(toString65(xmlns));
+    writer->writeDefaultNamespace(xmlns);
     writer->writeNamespace(toString65(ns_stream), QSL65("stream"));
     writer->writeCharacters({});
 }
