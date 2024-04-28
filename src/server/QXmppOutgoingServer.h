@@ -16,6 +16,10 @@ class QXmppNonza;
 class QXmppOutgoingServer;
 class QXmppOutgoingServerPrivate;
 
+namespace QXmpp::Private {
+struct StreamOpen;
+}
+
 ///
 /// \brief The QXmppOutgoingServer class represents an outgoing XMPP stream
 /// to another XMPP server.
@@ -52,7 +56,7 @@ public:
 
 private:
     void handleStart();
-    void handleStream(const QDomElement &streamElement);
+    void handleStream(const QXmpp::Private::StreamOpen &streamElement);
     void handleStanza(const QDomElement &stanzaElement);
 
     void onDnsLookupFinished();

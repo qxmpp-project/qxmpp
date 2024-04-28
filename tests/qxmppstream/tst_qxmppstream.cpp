@@ -36,6 +36,7 @@ private:
 void tst_QXmppStream::initTestCase()
 {
     qRegisterMetaType<QDomElement>();
+    qRegisterMetaType<QXmpp::Private::StreamOpen>();
 }
 
 void tst_QXmppStream::testProcessData()
@@ -61,16 +62,12 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(onStarted.size(), 0);
 
     // check stream information
-    const auto streamElement = onStreamReceived[0][0].value<QDomElement>();
-    QCOMPARE(streamElement.tagName(), u"stream"_s);
-    QCOMPARE(streamElement.namespaceURI(), u"http://etherx.jabber.org/streams"_s);
-    QCOMPARE(streamElement.attribute("from"), u"juliet@im.example.com"_s);
-    QCOMPARE(streamElement.attribute("to"), u"im.example.com"_s);
-    QCOMPARE(streamElement.attribute("version"), u"1.0"_s);
-    QCOMPARE(streamElement.attribute("lang"), u"en"_s);
+    const auto streamElement = onStreamReceived[0][0].value<StreamOpen>();
+    QCOMPARE(streamElement.from, QStringLiteral("juliet@im.example.com"));
+    QCOMPARE(streamElement.to, QStringLiteral("im.example.com"));
+    QCOMPARE(streamElement.version, QStringLiteral("1.0"));
 
-    socket.processData(R"(
-        <stream:features>
+    socket.processData(R"(<stream:features>
             <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
                 <required/>
             </starttls>

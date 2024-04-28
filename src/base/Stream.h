@@ -7,6 +7,7 @@
 
 #include <optional>
 
+#include <QMetaType>
 #include <QString>
 
 class QDomElement;
@@ -45,5 +46,7 @@ struct CsiInactive {
 };
 
 }  // namespace QXmpp::Private
+
+Q_DECLARE_METATYPE(QXmpp::Private::StreamOpen)
 
 #endif  // STREAM_H
