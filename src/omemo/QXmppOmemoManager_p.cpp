@@ -1354,7 +1354,8 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
     if (const auto omemoEnvelope = omemoElement.searchEnvelope(ownBareJid(), ownDevice.id)) {
         QXmppPromise<std::optional<QXmppMessage>> interface;
 
-        const auto senderJid = QXmppUtils::jidToBareJid(stanza.from());
+        const auto mixUserJid = stanza.mixUserJid();
+        const auto senderJid = mixUserJid.isEmpty() ? QXmppUtils::jidToBareJid(stanza.from()) : mixUserJid;
         const auto senderDeviceId = omemoElement.senderDeviceId();
         const auto omemoPayload = omemoElement.payload();
 
@@ -1474,13 +1475,14 @@ QXmppTask<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanz
                 q->info(u"Sender '" + senderJid + u"' of stanza does not match SCE 'from' affix element '" + sceEnvelopeReader.from() + u"'");
             }
 
-            if (const auto recipientJid = QXmppUtils::jidToBareJid(stanza.to()); isMessageStanza) {
-                if (const auto &message = dynamic_cast<const QXmppMessage &>(stanza); message.type() == QXmppMessage::GroupChat && (sceEnvelopeReader.to() != recipientJid)) {
+            if (isMessageStanza) {
+                // For messages from group chats, their "from" element corresponds to the SCE affix element "to".
+                if (const auto &message = dynamic_cast<const QXmppMessage &>(stanza); message.type() == QXmppMessage::GroupChat && (sceEnvelopeReader.to() != QXmppUtils::jidToBareJid(stanza.from()))) {
                     warning(QStringLiteral("Recipient of group chat message does not match SCE affix element '<to/>'"));
                     interface.finish(std::nullopt);
                     return;
                 }
-            } else if (sceEnvelopeReader.to() != recipientJid) {
+            } else if (sceEnvelopeReader.to() != QXmppUtils::jidToBareJid(stanza.to())) {
                 q->info(QStringLiteral("Recipient of IQ does not match SCE affix element '<to/>'"));
             }
 
