@@ -47,6 +47,10 @@ bool QXmppMessageReceiptManager::handleMessage(const QXmppMessage &message)
         QXmppMessage receipt;
         receipt.setTo(message.from());
         receipt.setReceiptId(message.id());
+
+        // Advise the server to store the receipt even if the message has no body.
+        receipt.addHint(QXmppMessage::Store);
+
         client()->reply(std::move(receipt), message.e2eeMetadata());
     }
 
