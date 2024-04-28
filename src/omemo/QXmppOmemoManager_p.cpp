@@ -7,6 +7,7 @@
 
 #include "QXmppOmemoManager_p.h"
 
+#include "QXmppFallback.h"
 #include "QXmppOmemoDeviceElement_p.h"
 #include "QXmppOmemoElement_p.h"
 #include "QXmppOmemoEnvelope_p.h"
@@ -991,9 +992,11 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
                 // client.
                 // That facilitates a consistent handling of message processing hints.
                 if (!message.body().isEmpty() || message.trustMessageElement()) {
+                    QXmppFallback fallback { ns_omemo_2.toString(), { { QXmppFallback::Body } } };
+
                     message.setEncryptionMethod(QXmpp::Omemo2);
                     message.setE2eeFallbackBody(QStringLiteral("This message is encrypted with %1 but could not be decrypted").arg(message.encryptionName()));
-                    message.setIsFallback(true);
+                    message.setFallbackMarkers({ fallback });
                 }
 
                 message.setOmemoElement(omemoElement);
