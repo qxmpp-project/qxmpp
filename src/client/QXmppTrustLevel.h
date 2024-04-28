@@ -40,7 +40,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(TrustLevels)
 
 /// \cond
 // Scoped enums (enum class) are not implicitly converted to int
-inline uint qHash(QXmpp::TrustLevel key, uint seed) noexcept { return ::qHash(std::underlying_type_t<QXmpp::TrustLevel>(key), seed); }
+inline auto qHash(QXmpp::TrustLevel key, uint seed) noexcept { return ::qHash(std::underlying_type_t<QXmpp::TrustLevel>(key), seed); }
 /// \endcond
 
 }  // namespace QXmpp
