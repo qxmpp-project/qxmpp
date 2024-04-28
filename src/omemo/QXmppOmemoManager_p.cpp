@@ -15,6 +15,7 @@
 #include "QXmppPubSubBaseItem.h"
 #include "QXmppSceEnvelope_p.h"
 #include "QXmppTrustManager.h"
+#include "QXmppTrustMessageElement.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
@@ -967,29 +968,32 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
                 };
                 interface.finish(error);
             } else {
-                const auto deliveryReceiptsUsed = message.isReceiptRequested() || !message.receiptId().isEmpty();
-                const auto chatMarkerUsed = message.marker() != QXmppMessage::NoMarker;
-
-                // The following cases are covered:
-                // 1. Message with body (optionally including a chat state, chat marker or used for
-                //    delivery) => usage of EME and fallback body
-                // 2. Message without body
-                //  2.1. Message with chat state, chat marker or used for delivery receipts
-                //       => neither usage of EME nor fallback body, but hint for server-side storage
-                //       in case of delivery receipts or chat marker usage
-                //  2.2. Other message (e.g., trust message) => usage of EME and fallback body to
-                //       look like a normal message
-                if (!message.body().isEmpty() || (message.state() == QXmppMessage::None && !deliveryReceiptsUsed && !chatMarkerUsed)) {
+                // Messages with a body or trust messages use
+                // \xep{0380, Explicit Message Encryption} and a fallback body.
+                //
+                // In the former case, a client can display the fallback body to its user if it does
+                // not support the used encrpytion.
+                // Furthermore, a message processing hint for instructing the server to store the
+                // message is not needed because of the unencrypted (i.e., public) fallback body.
+                // Without a public (fallback) body and a message processing hint, the server could
+                // not determine whether the message should be stored because the encrypted body
+                // would not be visible to the server.
+                //
+                // In the latter case, a trust message could otherwise be detected by an attacker.
+                // By applying the same rules as for a message with a body, the trust message looks
+                // like a normal message.
+                // An attacker can therefore either stop all communication or none.
+                // But the attacker cannot prevent the chat partners from authenticating their keys
+                // while allowing them to exchange encrypted messages that can be read by an active
+                // attack.
+                //
+                // Whether to advise the server to store other kinds of messages is up to the
+                // client.
+                // That facilitates a consistent handling of message processing hints.
+                if (!message.body().isEmpty() || message.trustMessageElement()) {
                     message.setEncryptionMethod(QXmpp::Omemo2);
-
-                    // A message processing hint for instructing the server to store the message is
-                    // not needed because of the public fallback body.
                     message.setE2eeFallbackBody(QStringLiteral("This message is encrypted with %1 but could not be decrypted").arg(message.encryptionName()));
                     message.setIsFallback(true);
-                } else if (deliveryReceiptsUsed || chatMarkerUsed) {
-                    // A message processing hint for instructing the server to store the message is
-                    // needed because of the missing public fallback body.
-                    message.addHint(QXmppMessage::Store);
                 }
 
                 message.setOmemoElement(omemoElement);
