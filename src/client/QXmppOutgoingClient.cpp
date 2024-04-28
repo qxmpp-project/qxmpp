@@ -536,20 +536,22 @@ void QXmppOutgoingClient::handleStart()
     d->socket.sendData(serializeXml(StreamOpen {
         d->config.domain(),
         d->config.user().isEmpty() ? QString() : d->config.jidBare(),
+        {},
+        QStringLiteral("1.0"),
         ns_client.toString(),
     }));
 }
 
-void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
+void QXmppOutgoingClient::handleStream(const StreamOpen &stream)
 {
     if (d->streamId.isEmpty()) {
-        d->streamId = streamElement.attribute(QStringLiteral("id"));
+        d->streamId = stream.id;
     }
     if (d->streamFrom.isEmpty()) {
-        d->streamFrom = streamElement.attribute(QStringLiteral("from"));
+        d->streamFrom = stream.from;
     }
     if (d->streamVersion.isEmpty()) {
-        d->streamVersion = streamElement.attribute(QStringLiteral("version"));
+        d->streamVersion = stream.version;
 
         // no version specified, signals XMPP Version < 1.0.
         // switch to old auth mechanism if enabled

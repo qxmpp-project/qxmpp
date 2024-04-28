@@ -11,10 +11,14 @@ class QXmppDialback;
 class QXmppIncomingServerPrivate;
 class QXmppOutgoingServer;
 
+namespace QXmpp::Private {
+struct StreamOpen;
+}
+
+///
 /// \brief The QXmppIncomingServer class represents an incoming XMPP stream
 /// from an XMPP server.
 ///
-
 class QXMPP_EXPORT QXmppIncomingServer : public QXmppStream
 {
     Q_OBJECT
@@ -36,7 +40,7 @@ Q_SIGNALS:
 protected:
     /// \cond
     void handleStanza(const QDomElement &stanzaElement) override;
-    void handleStream(const QDomElement &streamElement) override;
+    void handleStream(const QXmpp::Private::StreamOpen &) override;
     /// \endcond
 
 private Q_SLOTS:

@@ -7,16 +7,39 @@
 
 #include "QXmppLogger.h"
 
+#include <QDomDocument>
+#include <QXmlStreamReader>
+
 class QDomElement;
 class QSslSocket;
 class TestStream;
 
 namespace QXmpp::Private {
 
+struct StreamOpen;
+
 class SendDataInterface
 {
 public:
     virtual bool sendData(const QByteArray &) = 0;
+};
+
+class DomReader
+{
+public:
+    enum State {
+        Finished,
+        Unfinished,
+        ErrorOccurred,
+    };
+
+    State process(QXmlStreamReader &);
+    QDomElement element() const { return doc.documentElement(); }
+
+private:
+    QDomDocument doc;
+    QDomElement currentElement;
+    uint depth = 0;
 };
 
 class QXMPP_EXPORT XmppSocket : public QXmppLoggable, public SendDataInterface
@@ -35,7 +58,7 @@ public:
 
     Q_SIGNAL void started();
     Q_SIGNAL void stanzaReceived(const QDomElement &);
-    Q_SIGNAL void streamReceived(const QDomElement &);
+    Q_SIGNAL void streamReceived(const QXmpp::Private::StreamOpen &);
     Q_SIGNAL void streamClosed();
 
 private:
@@ -43,7 +66,10 @@ private:
 
     friend class ::TestStream;
 
-    QString m_dataBuffer;
+    QXmlStreamReader m_reader;
+    std::optional<DomReader> m_domReader;
+    bool m_streamReceived = false;
+
     QSslSocket *m_socket = nullptr;
 
     // incoming stream state

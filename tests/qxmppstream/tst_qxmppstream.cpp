@@ -32,9 +32,9 @@ public:
         Q_EMIT started();
     }
 
-    void handleStream(const QDomElement &element) override
+    void handleStream(const StreamOpen &stream) override
     {
-        Q_EMIT streamReceived(element);
+        Q_EMIT streamReceived(stream);
     }
 
     void handleStanza(const QDomElement &element) override
@@ -48,7 +48,7 @@ public:
     }
 
     Q_SIGNAL void started();
-    Q_SIGNAL void streamReceived(const QDomElement &element);
+    Q_SIGNAL void streamReceived(const QXmpp::Private::StreamOpen &);
     Q_SIGNAL void stanzaReceived(const QDomElement &element);
 };
 
@@ -72,6 +72,7 @@ private:
 void tst_QXmppStream::initTestCase()
 {
     qRegisterMetaType<QDomElement>();
+    qRegisterMetaType<QXmpp::Private::StreamOpen>();
 }
 
 void tst_QXmppStream::testProcessData()
@@ -97,16 +98,12 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(onStarted.size(), 0);
 
     // check stream information
-    const auto streamElement = onStreamReceived[0][0].value<QDomElement>();
-    QCOMPARE(streamElement.tagName(), QStringLiteral("stream"));
-    QCOMPARE(streamElement.namespaceURI(), QStringLiteral("http://etherx.jabber.org/streams"));
-    QCOMPARE(streamElement.attribute("from"), QStringLiteral("juliet@im.example.com"));
-    QCOMPARE(streamElement.attribute("to"), QStringLiteral("im.example.com"));
-    QCOMPARE(streamElement.attribute("version"), QStringLiteral("1.0"));
-    QCOMPARE(streamElement.attribute("lang"), QStringLiteral("en"));
+    const auto streamElement = onStreamReceived[0][0].value<StreamOpen>();
+    QCOMPARE(streamElement.from, QStringLiteral("juliet@im.example.com"));
+    QCOMPARE(streamElement.to, QStringLiteral("im.example.com"));
+    QCOMPARE(streamElement.version, QStringLiteral("1.0"));
 
-    stream.processData(R"(
-        <stream:features>
+    stream.processData(R"(<stream:features>
             <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
                 <required/>
             </starttls>
@@ -142,19 +139,24 @@ void tst_QXmppStream::testProcessData()
 #ifdef BUILD_INTERNAL_TESTS
 void tst_QXmppStream::streamOpen()
 {
-    auto xml = "<?xml version='1.0' encoding='UTF-8'?><stream:stream from='juliet@im.example.com' to='im.example.com' version='1.0' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>";
+    auto xml = "<?xml version='1.0' encoding='UTF-8'?><stream:stream from='juliet@im.example.com' to='im.example.com' id='abcdefg' version='1.0' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>";
 
-    StreamOpen s { "im.example.com", "juliet@im.example.com", ns_client.toString() };
+    StreamOpen s {
+        .to = "im.example.com",
+        .from = "juliet@im.example.com",
+        .id = "abcdefg",
+        .version = "1.0",
+        .xmlns = ns_client.toString(),
+    };
     serializePacket(s, xml);
 
     QXmlStreamReader r(xml);
     QCOMPARE(r.readNext(), QXmlStreamReader::StartDocument);
     QCOMPARE(r.readNext(), QXmlStreamReader::StartElement);
     auto streamOpen = StreamOpen::fromXml(r);
-    QVERIFY(streamOpen.has_value());
-    QCOMPARE(streamOpen->from, "juliet@im.example.com");
-    QCOMPARE(streamOpen->to, "im.example.com");
-    QCOMPARE(streamOpen->xmlns, ns_client);
+    QCOMPARE(streamOpen.from, "juliet@im.example.com");
+    QCOMPARE(streamOpen.to, "im.example.com");
+    QCOMPARE(streamOpen.xmlns, ns_client);
 }
 
 void tst_QXmppStream::testStreamError()

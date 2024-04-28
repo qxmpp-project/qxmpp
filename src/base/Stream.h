@@ -18,6 +18,8 @@ struct StreamOpen {
 
     QString to;
     QString from;
+    QString id;
+    QString version;
     QString xmlns;
 };
 
@@ -30,5 +32,7 @@ struct CsiInactive {
 };
 
 }  // namespace QXmpp::Private
+
+Q_DECLARE_METATYPE(QXmpp::Private::StreamOpen)
 
 #endif  // STREAM_H

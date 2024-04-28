@@ -10,13 +10,18 @@
 class QXmppIncomingClientPrivate;
 class QXmppPasswordChecker;
 
+namespace QXmpp::Private {
+struct StreamOpen;
+}
+
+///
 /// \brief Interface for password checkers.
 ///
 
+///
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream
 /// from an XMPP client.
 ///
-
 class QXMPP_EXPORT QXmppIncomingClient : public QXmppStream
 {
     Q_OBJECT
@@ -37,7 +42,7 @@ Q_SIGNALS:
 
 protected:
     /// \cond
-    void handleStream(const QDomElement &element) override;
+    void handleStream(const QXmpp::Private::StreamOpen &) override;
     void handleStanza(const QDomElement &element) override;
     /// \endcond
 

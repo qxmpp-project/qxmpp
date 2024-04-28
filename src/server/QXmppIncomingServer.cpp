@@ -11,10 +11,14 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 
+#include "Stream.h"
+
 #include <QDomElement>
 #include <QHostAddress>
 #include <QSslKey>
 #include <QSslSocket>
+
+using namespace QXmpp::Private;
 
 class QXmppIncomingServerPrivate
 {
@@ -79,11 +83,10 @@ QString QXmppIncomingServer::localStreamId() const
 }
 
 /// \cond
-void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
+void QXmppIncomingServer::handleStream(const StreamOpen &stream)
 {
-    const QString from = streamElement.attribute(QStringLiteral("from"));
-    if (!from.isEmpty()) {
-        info(QStringLiteral("Incoming server stream from %1 on %2").arg(from, d->origin()));
+    if (!stream.from.isEmpty()) {
+        info(QStringLiteral("Incoming server stream from %1 on %2").arg(stream.from, d->origin()));
     }
 
     // start stream
