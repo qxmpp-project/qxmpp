@@ -44,6 +44,8 @@ class QXMPP_EXPORT QXmppVCardManager : public QXmppClientExtension
     Q_OBJECT
 
 public:
+    /// Success or QXmppError
+    using Result = std::variant<QXmpp::Success, QXmppError>;
     /// QXmppVCardIq or QXmppError
     using VCardIqResult = std::variant<QXmppVCardIq, QXmppError>;
 
@@ -51,6 +53,7 @@ public:
     ~QXmppVCardManager() override;
 
     QXmppTask<VCardIqResult> fetchVCard(const QString &bareJid);
+    QXmppTask<Result> setVCard(const QXmppVCardIq &);
 
     QString requestVCard(const QString &bareJid = QString());
 

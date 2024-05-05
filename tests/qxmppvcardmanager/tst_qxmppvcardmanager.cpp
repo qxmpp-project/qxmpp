@@ -17,6 +17,8 @@
 
 Q_DECLARE_METATYPE(QXmppVCardIq);
 
+using namespace QXmpp;
+
 class tst_QXmppVCardManager : public QObject
 {
     Q_OBJECT
@@ -25,6 +27,7 @@ private:
     Q_SLOT void testHandleStanza_data();
     Q_SLOT void testHandleStanza();
     Q_SLOT void fetchVCard();
+    Q_SLOT void setVCard();
 
     // integration tests
     Q_SLOT void testSetClientVCard();
@@ -151,6 +154,34 @@ void tst_QXmppVCardManager::fetchVCard()
 
     auto vCardIq = expectFutureVariant<QXmppVCardIq>(task);
     QCOMPARE(vCardIq.birthday(), QDate(1966, 8, 6));
+}
+
+void tst_QXmppVCardManager::setVCard()
+{
+    TestClient test;
+    test.configuration().setJid("stpeter@jabber.org");
+    auto *manager = test.addNewExtension<QXmppVCardManager>();
+
+    QXmppVCardIq v;
+    v.setFirstName("Peter");
+    v.setLastName("Saint-Andre");
+    v.setFullName("Peter Saint-Andre");
+
+    auto task = manager->setVCard(v);
+    QVERIFY(!task.isFinished());
+    test.expect("<iq id='qxmpp2' to='stpeter@jabber.org' type='set'>"
+                "<vCard xmlns='vcard-temp'>"
+                "<FN>Peter Saint-Andre</FN>"
+                "<N>"
+                "<GIVEN>Peter</GIVEN>"
+                "<FAMILY>Saint-Andre</FAMILY>"
+                "</N>"
+                "<TITLE/><ROLE/>"
+                "</vCard>"
+                "</iq>");
+    test.inject("<iq id='qxmpp2' type='result'/>");
+
+    expectFutureVariant<Success>(task);
 }
 
 void tst_QXmppVCardManager::testSetClientVCard()

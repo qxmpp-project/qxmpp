@@ -40,6 +40,20 @@ QXmppTask<QXmppVCardManager::VCardIqResult> QXmppVCardManager::fetchVCard(const 
 }
 
 ///
+/// Sets the VCard of the currently connected account.
+///
+/// \since QXmpp 1.8
+///
+QXmppTask<QXmppVCardManager::Result> QXmppVCardManager::setVCard(const QXmppVCardIq &vCard)
+{
+    auto vCardIq = vCard;
+    vCardIq.setTo(client()->configuration().jidBare());
+    vCardIq.setFrom({});
+    vCardIq.setType(QXmppIq::Set);
+    return client()->sendGenericIq(std::move(vCardIq));
+}
+
+///
 /// This function requests the server for vCard of the specified jid.
 /// Once received the signal vCardReceived() is emitted.
 ///
