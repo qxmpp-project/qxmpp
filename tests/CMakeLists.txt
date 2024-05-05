@@ -82,7 +82,7 @@ add_simple_test(qxmpptrustmemorystorage)
 add_simple_test(qxmppuserlocationmanager TestClient.h)
 add_simple_test(qxmppusertunemanager TestClient.h)
 add_simple_test(qxmppvcardiq)
-add_simple_test(qxmppvcardmanager)
+add_simple_test(qxmppvcardmanager TestClient.h)
 add_simple_test(qxmppversioniq)
 add_simple_test(qxmppversionmanager TestClient.h)
 

@@ -8,6 +8,7 @@
 #include "QXmppVCardManager.h"
 
 #include "IntegrationTesting.h"
+#include "TestClient.h"
 #include "util.h"
 
 #include <memory>
@@ -23,6 +24,7 @@ class tst_QXmppVCardManager : public QObject
 private:
     Q_SLOT void testHandleStanza_data();
     Q_SLOT void testHandleStanza();
+    Q_SLOT void fetchVCard();
 
     // integration tests
     Q_SLOT void testSetClientVCard();
@@ -90,6 +92,65 @@ void tst_QXmppVCardManager::testHandleStanza()
 
     // clean up (client deletes manager)
     m_client.removeExtension(manager);
+}
+
+void tst_QXmppVCardManager::fetchVCard()
+{
+    TestClient test;
+    auto *manager = test.addNewExtension<QXmppVCardManager>();
+    auto task = manager->fetchVCard("stpeter@jabber.org");
+    QVERIFY(!task.isFinished());
+
+    test.expect("<iq id='qxmpp2' to='stpeter@jabber.org' type='get'><vCard xmlns='vcard-temp'><TITLE/><ROLE/></vCard></iq>");
+    test.inject("<iq id='qxmpp2' type='result'>"
+                "<vCard xmlns='vcard-temp'>"
+                "<FN>Peter Saint-Andre</FN>"
+                "<N>"
+                "<FAMILY>Saint-Andre</FAMILY>"
+                "<GIVEN>Peter</GIVEN>"
+                "<MIDDLE/>"
+                "</N>"
+                "<NICKNAME>stpeter</NICKNAME>"
+                "<URL>http://www.xmpp.org/xsf/people/stpeter.shtml</URL>"
+                "<BDAY>1966-08-06</BDAY>"
+                "<ORG>"
+                "<ORGNAME>XMPP Standards Foundation</ORGNAME>"
+                "<ORGUNIT/>"
+                "</ORG>"
+                "<TITLE>Executive Director</TITLE>"
+                "<ROLE>Patron Saint</ROLE>"
+                "<TEL><WORK/><VOICE/><NUMBER>303-308-3282</NUMBER></TEL>"
+                "<TEL><WORK/><FAX/><NUMBER/></TEL>"
+                "<TEL><WORK/><MSG/><NUMBER/></TEL>"
+                "<ADR>"
+                "<WORK/>"
+                "<EXTADD>Suite 600</EXTADD>"
+                "<STREET>1899 Wynkoop Street</STREET>"
+                "<LOCALITY>Denver</LOCALITY>"
+                "<REGION>CO</REGION>"
+                "<PCODE>80202</PCODE>"
+                "<CTRY>USA</CTRY>"
+                "</ADR>"
+                "<TEL><HOME/><VOICE/><NUMBER>303-555-1212</NUMBER></TEL>"
+                "<TEL><HOME/><FAX/><NUMBER/></TEL>"
+                "<TEL><HOME/><MSG/><NUMBER/></TEL>"
+                "<ADR>"
+                "<HOME/>"
+                "<EXTADD/>"
+                "<STREET/>"
+                "<LOCALITY>Denver</LOCALITY>"
+                "<REGION>CO</REGION>"
+                "<PCODE>80209</PCODE>"
+                "<CTRY>USA</CTRY>"
+                "</ADR>"
+                "<EMAIL><INTERNET/><PREF/><USERID>stpeter@jabber.org</USERID></EMAIL>"
+                "<JABBERID>stpeter@jabber.org</JABBERID>"
+                "<DESC>More information about me is located on my personal website: http://www.saint-andre.com/</DESC>"
+                "</vCard>"
+                "</iq>");
+
+    auto vCardIq = expectFutureVariant<QXmppVCardIq>(task);
+    QCOMPARE(vCardIq.birthday(), QDate(1966, 8, 6));
 }
 
 void tst_QXmppVCardManager::testSetClientVCard()

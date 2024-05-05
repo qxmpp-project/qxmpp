@@ -6,8 +6,13 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
+#include "QXmppError.h"
+#include "QXmppFutureUtils_p.h"
+#include "QXmppTask.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardIq.h"
+
+using namespace QXmpp::Private;
 
 class QXmppVCardManagerPrivate
 {
@@ -23,6 +28,16 @@ QXmppVCardManager::QXmppVCardManager()
 }
 
 QXmppVCardManager::~QXmppVCardManager() = default;
+
+///
+/// Fetches the VCard of a bare JID.
+///
+/// \since QXmpp 1.8
+///
+QXmppTask<QXmppVCardManager::VCardIqResult> QXmppVCardManager::fetchVCard(const QString &bareJid)
+{
+    return chainIq<VCardIqResult>(client()->sendIq(QXmppVCardIq(bareJid)), this);
+}
 
 ///
 /// This function requests the server for vCard of the specified jid.
