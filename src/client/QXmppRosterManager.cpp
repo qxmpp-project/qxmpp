@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2020 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -10,6 +11,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
+#include "QXmppMovedManager.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 #include "QXmppUtils.h"
@@ -70,7 +72,9 @@ static void serializeRosterData(const RosterData &d, QXmlStreamWriter &writer)
 /// by calling refuseSubscription().
 ///
 /// \note If QXmppConfiguration::autoAcceptSubscriptions() is set to true, this
-/// signal will not be emitted.
+/// signal will not be emitted. This is only valid for non moved or verified moved subscription.
+/// If the subscription is a moved one and the roster's old-jid's subscription is not either from
+/// or both, then the subscription will be ignored entirely.
 ///
 /// \param subscriberBareJid bare JID that wants to subscribe to the user's presence
 /// \param presence presence stanza containing the reason / message (presence.statusText())
@@ -260,19 +264,60 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
         Q_EMIT presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Subscribe:
-        if (client()->configuration().autoAcceptSubscriptions()) {
-            // accept subscription request
-            acceptSubscription(bareJid);
+        // XEP-0283: Moved
+        if (!presence.oldJid().isEmpty()) {
+            const auto entry = getRosterEntry(presence.oldJid());
 
-            // ask for reciprocal subscription
-            subscribe(bareJid);
-        } else {
-            Q_EMIT subscriptionReceived(bareJid);
-            Q_EMIT subscriptionRequestReceived(bareJid, presence);
+            switch (entry.subscriptionType()) {
+            case QXmppRosterIq::Item::From:
+            case QXmppRosterIq::Item::Both:
+                break;
+            case QXmppRosterIq::Item::None:
+            case QXmppRosterIq::Item::To:
+            case QXmppRosterIq::Item::Remove:
+            case QXmppRosterIq::Item::NotSet:
+                // We need to be either from or both, else ignore the request
+                return;
+            }
+
+            if (auto movedManager = client()->findExtension<QXmppMovedManager>()) {
+                movedManager->verifyStatement(presence.oldJid(), QXmppUtils::jidToBareJid(presence.from())).then(this, [=, this](QXmppClient::EmptyResult &&result) {
+                    if (std::holds_alternative<QXmpp::Success>(result)) {
+                        handlePresenceReceived(bareJid, presence, true);
+                    }
+
+                    // Ignore the request entirely if we can't verify authenticity
+                });
+            } else {
+                auto updatedPresence = presence;
+
+                updatedPresence.setStatusText(tr("You received a contact *moved* subscription, but your client does not support it, thus verification for legitimity can not be done. Please carefully review it before accepting the request.\\n") + updatedPresence.statusText());
+
+                // Fix up status text presented to user and disable auto accept mode
+                handlePresenceReceived(bareJid, updatedPresence, false);
+            }
+
+            return;
         }
+
+        handlePresenceReceived(bareJid, presence, true);
         break;
     default:
         break;
+    }
+}
+
+void QXmppRosterManager::handlePresenceReceived(const QString &bareJid, const QXmppPresence &presence, bool honorAutoAccept)
+{
+    if (honorAutoAccept && client()->configuration().autoAcceptSubscriptions()) {
+        // accept subscription request
+        acceptSubscription(bareJid);
+
+        // ask for reciprocal subscription
+        subscribe(bareJid);
+    } else {
+        Q_EMIT subscriptionReceived(bareJid);
+        Q_EMIT subscriptionRequestReceived(bareJid, presence);
     }
 }
 
