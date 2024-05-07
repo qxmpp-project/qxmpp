@@ -58,6 +58,16 @@ QList<QXmppRosterIq::Item> QXmppRosterIq::items() const
 }
 
 ///
+/// Sets the roster IQ's items.
+///
+/// \since QXmpp 1.8
+///
+void QXmppRosterIq::setItems(const QList<Item> &items)
+{
+    d->items = items;
+}
+
+///
 /// Returns the roster version of IQ.
 ///
 /// \return version as a QString

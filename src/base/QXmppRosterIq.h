@@ -97,8 +97,9 @@ public:
     QString version() const;
     void setVersion(const QString &);
 
-    void addItem(const Item &);
     QList<Item> items() const;
+    void setItems(const QList<Item> &);
+    void addItem(const Item &);
 
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     bool mixAnnotate() const;
