@@ -421,7 +421,15 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
 
 void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer) const
 {
+    toXml(writer, false);
+}
+
+void QXmppRosterIq::Item::toXml(QXmlStreamWriter *writer, bool external) const
+{
     writer->writeStartElement(QSL65("item"));
+    if (external) {
+        writer->writeDefaultNamespace(toString65(ns_roster));
+    }
     writeOptionalXmlAttribute(writer, u"jid", d->bareJid);
     writeOptionalXmlAttribute(writer, u"name", d->name);
     writeOptionalXmlAttribute(writer, u"subscription", getSubscriptionTypeStr());

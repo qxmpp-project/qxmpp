@@ -14,10 +14,11 @@
 
 class QXmppRosterIqPrivate;
 
+///
 /// \brief The QXmppRosterIq class represents a roster IQ.
 ///
 /// \ingroup Stanzas
-
+///
 class QXMPP_EXPORT QXmppRosterIq : public QXmppIq
 {
 public:
@@ -77,6 +78,8 @@ public:
         /// \endcond
 
     private:
+        void toXml(QXmlStreamWriter *writer, bool external) const;
+
         QString getSubscriptionTypeStr() const;
         void setSubscriptionTypeFromStr(const QString &);
 
