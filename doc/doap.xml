@@ -3,6 +3,7 @@
 
 <!--
 SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
+SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 
 SPDX-License-Identifier: CC0-1.0
 -->
@@ -422,6 +423,14 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>complete</xmpp:status>
         <xmpp:version>0.10</xmpp:version>
         <xmpp:since>1.0</xmpp:since>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0283.html'/>
+        <xmpp:status>complete</xmpp:status>
+        <xmpp:version>0.2.0</xmpp:version>
+        <xmpp:since>1.7</xmpp:since>
       </xmpp:SupportedXep>
     </implements>
     <implements>
