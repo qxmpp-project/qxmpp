@@ -218,6 +218,7 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(const QXmppConfig
         result.saslClient->mechanism(),
         result.initialResponse,
         {},
+        feature.bind2Feature.has_value() ? Bind2Request { config.resourcePrefix() } : std::optional<Bind2Request>(),
     };
 
     // set user-agent if enabled
