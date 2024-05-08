@@ -78,6 +78,9 @@ public:
     QString resource() const;
     void setResource(const QString &);
 
+    QString resourcePrefix() const;
+    void setResourcePrefix(const QString &);
+
     QString jid() const;
     void setJid(const QString &jid);
 

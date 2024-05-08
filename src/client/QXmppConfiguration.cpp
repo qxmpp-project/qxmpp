@@ -23,6 +23,7 @@ public:
     QString password;
     QString domain;
     QString resource = QStringLiteral("QXmpp");
+    QString resourcePrefix;
 
     // Facebook
     QString facebookAccessToken;
@@ -146,6 +147,26 @@ void QXmppConfiguration::setPassword(const QString &password)
 void QXmppConfiguration::setResource(const QString &resource)
 {
     d->resource = resource;
+}
+
+///
+/// Returns the resource prefix ('tag' for this client) used when \xep{0386, Bind 2} is available.
+///
+/// \since QXmpp 1.8
+///
+QString QXmppConfiguration::resourcePrefix() const
+{
+    return d->resourcePrefix;
+}
+
+///
+/// Sets the resource prefix ('tag' for this client) used when \xep{0386, Bind 2} is available.
+///
+/// \since QXmpp 1.8
+///
+void QXmppConfiguration::setResourcePrefix(const QString &resourcePrefix)
+{
+    d->resourcePrefix = resourcePrefix;
 }
 
 ///
