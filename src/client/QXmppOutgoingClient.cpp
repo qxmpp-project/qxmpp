@@ -213,6 +213,7 @@ public:
     bool isAuthenticated = false;
     bool bindModeAvailable = false;
     bool sessionStarted = false;
+    std::optional<Bind2Bound> bind2Bound;
 
     // Client State Indication
     bool clientStateIndicationEnabled = false;
@@ -464,6 +465,8 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
         if (auto success = std::get_if<Sasl2::Success>(&result)) {
             debug(QStringLiteral("Authenticated"));
             d->isAuthenticated = true;
+            d->config.setJid(success->authorizationIdentifier);
+            d->bind2Bound = std::move(success->bound);
 
             // new stream features will be sent by the server now
         } else {
@@ -567,7 +570,9 @@ void QXmppOutgoingClient::openSession()
     SessionBegin session {
         d->c2sStreamManager.enabled(),
         d->c2sStreamManager.streamResumed(),
+        d->bind2Bound.has_value(),
     };
+    d->bind2Bound.reset();
 
     d->iqManager.onSessionOpened(session);
     Q_EMIT connected(session);

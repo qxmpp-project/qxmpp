@@ -43,6 +43,7 @@ enum HandleElementResult {
 struct SessionBegin {
     bool smEnabled;
     bool smResumed;
+    bool bind2Used;
 };
 
 struct SessionEnd {
