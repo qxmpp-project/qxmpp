@@ -557,7 +557,7 @@ void QXmppOutgoingClient::startResourceBinding()
         } else if (auto *protocolError = std::get_if<ProtocolError>(&r)) {
             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
 
-            auto text = QStringLiteral("Resource binding failed: ") + protocolError->text;
+            QString text = QStringLiteral("Resource binding failed: ") + protocolError->text;
 
             Q_EMIT errorOccurred(text, StreamError::UndefinedCondition, QXmppClient::XmppStreamError);
             warning(text);
@@ -565,7 +565,7 @@ void QXmppOutgoingClient::startResourceBinding()
         } else if (auto *stanzaError = std::get_if<QXmppStanza::Error>(&r)) {
             d->xmppStreamError = stanzaError->condition();
 
-            auto text = QStringLiteral("Resource binding failed: ") + stanzaError->text();
+            QString text = QStringLiteral("Resource binding failed: ") + stanzaError->text();
             Q_EMIT errorOccurred(text, BindError { *stanzaError }, QXmppClient::XmppStreamError);
             warning(text);
             disconnectFromHost();
