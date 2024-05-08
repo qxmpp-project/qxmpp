@@ -21,6 +21,8 @@
 
 using namespace QXmpp::Private;
 
+constexpr uint RESOURCE_RANDOM_SUFFIX_LENGTH = 8;
+
 class QXmppIncomingClientPrivate
 {
 public:
@@ -36,6 +38,7 @@ public:
         Sasl,
         Sasl2
     } saslVersion = Sasl;
+    std::optional<Sasl2::Authenticate> sasl2AuthRequest;
 
     void checkCredentials(const QByteArray &response);
     QString origin() const;
@@ -198,7 +201,9 @@ void QXmppIncomingClient::sendStreamFeatures()
         features.setTlsMode(QXmppStreamFeatures::Enabled);
     }
     if (!d->jid.isEmpty()) {
-        features.setBindMode(QXmppStreamFeatures::Required);
+        if (d->resource.isEmpty()) {
+            features.setBindMode(QXmppStreamFeatures::Required);
+        }
         features.setSessionMode(QXmppStreamFeatures::Enabled);
     } else if (d->passwordChecker) {
         QStringList mechanisms;
@@ -207,7 +212,11 @@ void QXmppIncomingClient::sendStreamFeatures()
             mechanisms << QStringLiteral("DIGEST-MD5");
         }
         features.setAuthMechanisms(mechanisms);
-        features.setSasl2Feature(Sasl2::StreamFeature { mechanisms, {}, false });
+        features.setSasl2Feature(Sasl2::StreamFeature {
+            mechanisms,
+            d->resource.isEmpty() ? Bind2Feature {} : std::optional<Bind2Feature>(),
+            false,
+        });
     }
     sendPacket(features);
 }
@@ -235,7 +244,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
         if (auto auth = Sasl2::Authenticate::fromDom(nodeRecv)) {
             d->saslVersion = QXmppIncomingClientPrivate::Sasl2;
-            d->saslServer = QXmppSaslServer::create(auth->mechanism, this);
+            d->sasl2AuthRequest = std::move(auth);
+            d->saslServer = QXmppSaslServer::create(d->sasl2AuthRequest->mechanism, this);
             if (!d->saslServer) {
                 sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::InvalidMechanism, QString() }));
                 disconnectFromHost();
@@ -245,14 +255,15 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             d->saslServer->setRealm(d->domain);
 
             QByteArray challenge;
-            QXmppSaslServer::Response result = d->saslServer->respond(auth->initialResponse, challenge);
+            QXmppSaslServer::Response result = d->saslServer->respond(d->sasl2AuthRequest->initialResponse, challenge);
 
             if (result == QXmppSaslServer::InputNeeded) {
                 // check credentials
-                d->checkCredentials(auth->initialResponse);
+                d->checkCredentials(d->sasl2AuthRequest->initialResponse);
             } else if (result == QXmppSaslServer::Challenge) {
                 sendData(serializeXml(Sasl2::Challenge { challenge }));
             } else {
+                d->sasl2AuthRequest.reset();
                 sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::NotAuthorized, {} }));
                 disconnectFromHost();
                 return;
@@ -275,14 +286,14 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
                 d->jid = QStringLiteral("%1@%2").arg(d->saslServer->username(), d->domain);
                 info(QStringLiteral("Authentication succeeded for '%1' from %2").arg(d->jid, d->origin()));
                 Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.success"));
-                sendData(serializeXml(Sasl2::Success { {}, d->jid }));
-                sendStreamFeatures();
-                handleStart();
+                onSasl2Authenticated();
             } else {
+                d->sasl2AuthRequest.reset();
                 sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::NotAuthorized, {} }));
                 disconnectFromHost();
             }
         } else if (auto abort = Sasl2::Abort::fromDom(nodeRecv)) {
+            d->sasl2AuthRequest.reset();
             sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::Aborted, {} }));
         }
     } else if (ns == ns_sasl) {
@@ -295,6 +306,7 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
         if (auto auth = Sasl::Auth::fromDom(nodeRecv)) {
             d->saslVersion = QXmppIncomingClientPrivate::Sasl;
+            d->sasl2AuthRequest.reset();
             d->saslServer = QXmppSaslServer::create(auth->mechanism, this);
             if (!d->saslServer) {
                 sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::InvalidMechanism, QString() }));
@@ -427,6 +439,7 @@ void QXmppIncomingClient::onDigestReply()
         if (d->saslVersion == QXmppIncomingClientPrivate::Sasl) {
             sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
         } else {
+            d->sasl2AuthRequest.reset();
             sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
         }
         disconnectFromHost();
@@ -443,6 +456,7 @@ void QXmppIncomingClient::onDigestReply()
         if (d->saslVersion == QXmppIncomingClientPrivate::Sasl) {
             sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::NotAuthorized, QString() }));
         } else {
+            d->sasl2AuthRequest.reset();
             sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::NotAuthorized, QString() }));
         }
         disconnectFromHost();
@@ -473,11 +487,10 @@ void QXmppIncomingClient::onPasswordReply()
         Q_EMIT updateCounter(QStringLiteral("incoming-client.auth.success"));
         if (d->saslVersion == QXmppIncomingClientPrivate::Sasl) {
             sendData(serializeXml(Sasl::Success {}));
+            handleStart();
         } else {
-            sendData(serializeXml(Sasl2::Success { {}, d->jid }));
-            sendStreamFeatures();
+            onSasl2Authenticated();
         }
-        handleStart();
         break;
     case QXmppPasswordReply::AuthorizationError:
         warning(QStringLiteral("Authentication failed for '%1' from %2").arg(jid, d->origin()));
@@ -485,6 +498,7 @@ void QXmppIncomingClient::onPasswordReply()
         if (d->saslVersion == QXmppIncomingClientPrivate::Sasl) {
             sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::NotAuthorized, QString() }));
         } else {
+            d->sasl2AuthRequest.reset();
             sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::NotAuthorized, QString() }));
         }
         disconnectFromHost();
@@ -495,6 +509,7 @@ void QXmppIncomingClient::onPasswordReply()
         if (d->saslVersion == QXmppIncomingClientPrivate::Sasl) {
             sendData(serializeXml(Sasl::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
         } else {
+            d->sasl2AuthRequest.reset();
             sendData(serializeXml(Sasl2::Failure { Sasl::ErrorCondition::TemporaryAuthFailure, QString() }));
         }
         disconnectFromHost();
@@ -515,4 +530,32 @@ void QXmppIncomingClient::onTimeout()
 
     // make sure disconnected() gets emitted no matter what
     QTimer::singleShot(30, this, &QXmppStream::disconnected);
+}
+
+void QXmppIncomingClient::onSasl2Authenticated()
+{
+    Q_ASSERT(d->sasl2AuthRequest);
+
+    if (d->sasl2AuthRequest->bindRequest) {
+        // resource binding
+        const auto &tag = d->sasl2AuthRequest->bindRequest->tag;
+        if (tag.isEmpty()) {
+            d->resource = QXmppUtils::generateStanzaHash(RESOURCE_RANDOM_SUFFIX_LENGTH);
+        } else {
+            d->resource = tag + u'.' + QXmppUtils::generateStanzaHash(RESOURCE_RANDOM_SUFFIX_LENGTH);
+        }
+        d->jid = QStringLiteral("%1/%2").arg(QXmppUtils::jidToBareJid(d->jid), d->resource);
+
+        sendData(serializeXml(Sasl2::Success { {}, d->jid, Bind2Bound {} }));
+
+        // resource is bound now
+        Q_EMIT connected();
+    } else {
+        sendData(serializeXml(Sasl2::Success { {}, d->jid, {} }));
+    }
+    // clean up
+    d->sasl2AuthRequest.reset();
+
+    sendStreamFeatures();
+    handleStart();
 }

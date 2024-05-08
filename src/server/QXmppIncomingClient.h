@@ -48,6 +48,7 @@ private Q_SLOTS:
     void onTimeout();
 
 private:
+    void onSasl2Authenticated();
     void sendStreamFeatures();
 
     const std::unique_ptr<QXmppIncomingClientPrivate> d;
