@@ -21,6 +21,10 @@
     if (!QTest::qVerify(statement, #statement, description, __FILE__, __LINE__)) \
         return {};
 
+#define VERIFY2(statement, description)                                                                           \
+    if (!QTest::qVerify(bool(statement), #statement, static_cast<const char *>(description), __FILE__, __LINE__)) \
+        throw std::runtime_error(description);
+
 template<typename String>
 inline QDomElement xmlToDom(const String &xml)
 {
@@ -96,35 +100,26 @@ template<typename T, typename Variant>
 T expectVariant(Variant var)
 {
     using namespace std::string_literals;
-    [&]() {
-        std::string message =
-            "Variant ("s + typeid(Variant).name() +
-            ") contains wrong type ("s + std::to_string(var.index()) +
-            "); expected '"s + typeid(T).name() + "'."s;
-        QVERIFY2(std::holds_alternative<T>(var), message.c_str());
-    }();
+    std::string message =
+        "Variant ("s + typeid(Variant).name() +
+        ") contains wrong type ("s + std::to_string(var.index()) +
+        "); expected '"s + typeid(T).name() + "'."s;
+    VERIFY2(std::holds_alternative<T>(var), message.c_str());
     return std::get<T>(std::move(var));
 }
 
 template<typename T, typename Input>
 T expectFutureVariant(const QFuture<Input> &future)
 {
-    [&]() {
-        QVERIFY(future.isFinished());
-    }();
+    VERIFY2(future.isFinished(), "Future is still running!");
     return expectVariant<T>(future.result());
 }
 
 template<typename T, typename Input>
-T expectFutureVariant(QXmppTask<Input> &future)
+T expectFutureVariant(QXmppTask<Input> &task)
 {
-#define return \
-    return     \
-    {          \
-    }
-    QVERIFY(future.isFinished());
-#undef return
-    return expectVariant<T>(future.result());
+    VERIFY2(task.isFinished(), "Task is still running!");
+    return expectVariant<T>(task.result());
 }
 
 template<typename T>
