@@ -200,8 +200,11 @@ public:
     void onStreamFeatures(const QXmppStreamFeatures &);
 
 private:
+    void sendState();
+
     QXmppOutgoingClient *m_client;
     State m_state = Active;
+    bool m_synced = true;
     bool m_featureAvailable = false;
 };
 
