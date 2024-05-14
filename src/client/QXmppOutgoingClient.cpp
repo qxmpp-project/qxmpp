@@ -1366,20 +1366,44 @@ CsiManager::CsiManager(QXmppOutgoingClient *client)
 
 void CsiManager::setState(State state)
 {
-    if (m_state != state && m_client->isAuthenticated() && m_featureAvailable) {
+    if (m_state != state) {
         m_state = state;
-        m_client->xmppSocket().sendData(state == Active ? serializeXml(CsiActive()) : serializeXml(CsiInactive()));
+        sendState();
     }
 }
 
 void CsiManager::onSessionOpened(const SessionBegin &)
 {
-    m_state = Active;
+    if (m_client->c2sStreamManager().streamResumed()) {
+        // stream could be resumed, previous state is still correct
+        // if sending of the previous state did not succeed, resend
+        if (!m_synced) {
+            sendState();
+        }
+    } else {
+        // new stream (implicitly sets state to 'active')
+        if (m_state == Active) {
+            m_synced = true;
+        } else {
+            // restore 'inactive' state
+            sendState();
+        }
+    }
 }
 
 void CsiManager::onStreamFeatures(const QXmppStreamFeatures &features)
 {
     m_featureAvailable = features.clientStateIndicationMode() == QXmppStreamFeatures::Enabled;
+}
+
+void CsiManager::sendState()
+{
+    if (m_client->isAuthenticated() && m_featureAvailable) {
+        auto xml = m_state == Active ? serializeXml(CsiActive()) : serializeXml(CsiInactive());
+        m_synced = m_client->xmppSocket().sendData(xml);
+    } else {
+        m_synced = false;
+    }
 }
 
 }  // namespace QXmpp::Private
