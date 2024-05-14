@@ -18,6 +18,12 @@ auto transform(InputVector &input, Converter convert)
     return output;
 }
 
+template<typename Vec, typename T>
+auto contains(const Vec &vec, const T &value)
+{
+    return std::find(std::begin(vec), std::end(vec), value) != std::end(vec);
+}
+
 }  // namespace QXmpp::Private
 
 #endif  // ALGORITHMS_H
