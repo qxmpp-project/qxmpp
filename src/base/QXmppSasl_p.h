@@ -110,7 +110,8 @@ struct Bind2Request {
     void toXml(QXmlStreamWriter *) const;
 
     QString tag;
-    // bind2 extensions may be added here (like carbons, sm, csi)
+    // bind2 extensions
+    bool csiInactive = false;
 };
 
 struct Bind2Bound {
