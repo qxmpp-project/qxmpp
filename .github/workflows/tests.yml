@@ -62,7 +62,6 @@ jobs:
         with:
           version: ${{ matrix.qt_version }}
           modules: ${{ matrix.qt_version[0] == '6' && 'qt5compat' || '' }}
-          setup-python: false
       - name: Install extra packages
         run: tests/travis/install-build-depends-macos
       - name: Disable OS X firewall
