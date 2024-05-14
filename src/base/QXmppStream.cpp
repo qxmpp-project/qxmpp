@@ -138,6 +138,16 @@ void StreamOpen::toXml(QXmlStreamWriter *writer) const
     writer->writeCharacters({});
 }
 
+void CsiActive::toXml(QXmlStreamWriter *w) const
+{
+    writeEmptyElement(w, u"active", ns_csi);
+}
+
+void CsiInactive::toXml(QXmlStreamWriter *w) const
+{
+    writeEmptyElement(w, u"inactive", ns_csi);
+}
+
 constexpr auto STREAM_ERROR_CONDITIONS = to_array<QStringView>({
     u"bad-format",
     u"bad-namespace-prefix",

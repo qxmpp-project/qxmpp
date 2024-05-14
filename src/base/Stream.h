@@ -19,6 +19,14 @@ struct StreamOpen {
     QStringView xmlns;
 };
 
+struct CsiActive {
+    void toXml(QXmlStreamWriter *w) const;
+};
+
+struct CsiInactive {
+    void toXml(QXmlStreamWriter *w) const;
+};
+
 }  // namespace QXmpp::Private
 
 #endif  // STREAM_H
