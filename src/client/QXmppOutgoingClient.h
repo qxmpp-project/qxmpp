@@ -29,8 +29,10 @@ class TestClient;
 
 namespace QXmpp::Private {
 class C2sStreamManager;
+class CsiManager;
 class OutgoingIqManager;
 class PingManager;
+class SendDataInterface;
 class StreamAckManager;
 class XmppSocket;
 
@@ -71,7 +73,6 @@ public:
     void disconnectFromHost();
     bool isAuthenticated() const;
     bool isConnected() const;
-    bool isClientStateIndicationEnabled() const;
     QXmppTask<IqResult> sendIq(QXmppIq &&);
 
     /// Returns the used socket
@@ -83,7 +84,8 @@ public:
     QXmpp::Private::XmppSocket &xmppSocket() const;
     QXmpp::Private::StreamAckManager &streamAckManager() const;
     QXmpp::Private::OutgoingIqManager &iqManager() const;
-    QXmpp::Private::C2sStreamManager &c2sStreamManager();
+    QXmpp::Private::C2sStreamManager &c2sStreamManager() const;
+    QXmpp::Private::CsiManager &csiManager() const;
 
     /// This signal is emitted when the stream is connected.
     Q_SIGNAL void connected(const QXmpp::Private::SessionBegin &);
@@ -179,6 +181,28 @@ private:
     quint16 m_resumePort = 0;
     bool m_enabled = false;
     bool m_streamResumed = false;
+};
+
+// XEP-0352: Client State Indication
+class CsiManager
+{
+public:
+    enum State {
+        Active,
+        Inactive,
+    };
+
+    explicit CsiManager(QXmppOutgoingClient *client);
+
+    State state() const { return m_state; }
+    void setState(State);
+    void onSessionOpened(const SessionBegin &);
+    void onStreamFeatures(const QXmppStreamFeatures &);
+
+private:
+    QXmppOutgoingClient *m_client;
+    State m_state = Active;
+    bool m_featureAvailable = false;
 };
 
 }  // namespace QXmpp::Private

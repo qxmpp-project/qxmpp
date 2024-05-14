@@ -215,11 +215,9 @@ public:
     bool sessionStarted = false;
     std::optional<Bind2Bound> bind2Bound;
 
-    // Client State Indication
-    bool clientStateIndicationEnabled = false;
-
     std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, BindManager> manager;
     C2sStreamManager c2sStreamManager;
+    CsiManager csiManager;
     PingManager pingManager;
 
 private:
@@ -232,6 +230,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       iqManager(qq, streamAckManager),
       manager(qq),
       c2sStreamManager(qq),
+      csiManager(qq),
       pingManager(qq),
       q(qq)
 {
@@ -326,9 +325,15 @@ OutgoingIqManager &QXmppOutgoingClient::iqManager() const
 }
 
 /// Returns the manager for C2s Stream Management.
-C2sStreamManager &QXmppOutgoingClient::c2sStreamManager()
+C2sStreamManager &QXmppOutgoingClient::c2sStreamManager() const
 {
     return d->c2sStreamManager;
+}
+
+/// Returns the manager for \xep{0352, Client State Indication}.
+CsiManager &QXmppOutgoingClient::csiManager() const
+{
+    return d->csiManager;
 }
 
 /// Attempts to connect to the XMPP server.
@@ -397,16 +402,6 @@ bool QXmppOutgoingClient::isAuthenticated() const
 bool QXmppOutgoingClient::isConnected() const
 {
     return d->socket.isConnected() && d->sessionStarted;
-}
-
-///
-/// Returns true if client state indication (xep-0352) is supported by the server
-///
-/// \since QXmpp 1.0
-///
-bool QXmppOutgoingClient::isClientStateIndicationEnabled() const
-{
-    return d->clientStateIndicationEnabled;
 }
 
 ///
@@ -575,6 +570,7 @@ void QXmppOutgoingClient::openSession()
     d->bind2Bound.reset();
 
     d->iqManager.onSessionOpened(session);
+    d->csiManager.onSessionOpened(session);
     Q_EMIT connected(session);
 }
 
@@ -710,10 +706,6 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
         QXmppStreamFeatures features;
         features.parse(nodeRecv);
 
-        if (features.clientStateIndicationMode() == QXmppStreamFeatures::Enabled) {
-            d->clientStateIndicationEnabled = true;
-        }
-
         // handle authentication
         const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
         const bool saslAvailable = !features.authMechanisms().isEmpty();
@@ -754,6 +746,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
         // store which features are available
         d->bindModeAvailable = (features.bindMode() != QXmppStreamFeatures::Disabled);
         d->c2sStreamManager.onStreamFeatures(features);
+        d->csiManager.onStreamFeatures(features);
 
         // check whether the stream can be resumed
         if (d->c2sStreamManager.canRequestResume()) {
@@ -1364,6 +1357,29 @@ bool C2sStreamManager::setResumeAddress(const QString &address)
     m_resumeHost.clear();
     m_resumePort = 0;
     return false;
+}
+
+CsiManager::CsiManager(QXmppOutgoingClient *client)
+    : m_client(client)
+{
+}
+
+void CsiManager::setState(State state)
+{
+    if (m_state != state && m_client->isAuthenticated() && m_featureAvailable) {
+        m_state = state;
+        m_client->xmppSocket().sendData(state == Active ? serializeXml(CsiActive()) : serializeXml(CsiInactive()));
+    }
+}
+
+void CsiManager::onSessionOpened(const SessionBegin &)
+{
+    m_state = Active;
+}
+
+void CsiManager::onStreamFeatures(const QXmppStreamFeatures &features)
+{
+    m_featureAvailable = features.clientStateIndicationMode() == QXmppStreamFeatures::Enabled;
 }
 
 }  // namespace QXmpp::Private

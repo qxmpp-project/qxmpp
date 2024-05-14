@@ -48,9 +48,6 @@ public:
     int reconnectionTries;
     QTimer *reconnectionTimer;
 
-    // Client state indication
-    bool isActive;
-
     void addProperCapability(QXmppPresence &presence);
     std::chrono::milliseconds getNextReconnectTime() const;
 

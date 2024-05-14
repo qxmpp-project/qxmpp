@@ -56,7 +56,6 @@ QXmppClientPrivate::QXmppClientPrivate(QXmppClient *qq)
       receivedConflict(false),
       reconnectionTries(0),
       reconnectionTimer(nullptr),
-      isActive(true),
       q(qq)
 {
 }
@@ -687,7 +686,7 @@ bool QXmppClient::isConnected() const
 
 ///
 /// Returns true if the current client state is "active", false if it is
-/// "inactive". See \xep{0352}: Client State Indication for details.
+/// "inactive". See \xep{0352, Client State Indication} for details.
 ///
 /// On connect this is always reset to true.
 ///
@@ -695,11 +694,11 @@ bool QXmppClient::isConnected() const
 ///
 bool QXmppClient::isActive() const
 {
-    return d->isActive;
+    return d->stream->csiManager().state() == CsiManager::Active;
 }
 
 ///
-/// Sets the client state as described in \xep{0352}: Client State Indication.
+/// Sets the client state as described in \xep{0352, Client State Indication}.
 ///
 /// On connect this is always reset to true.
 ///
@@ -707,11 +706,7 @@ bool QXmppClient::isActive() const
 ///
 void QXmppClient::setActive(bool active)
 {
-    if (active != d->isActive && isConnected() && d->stream->isClientStateIndicationEnabled()) {
-        d->isActive = active;
-        QStringView packet = u"<%1 xmlns='%2'/>";
-        d->stream->xmppSocket().sendData(packet.arg(active ? u"active" : u"inactive", ns_csi).toUtf8());
-    }
+    d->stream->csiManager().setState(active ? CsiManager::Active : CsiManager::Inactive);
 }
 
 ///
@@ -905,7 +900,6 @@ void QXmppClient::_q_streamConnected()
 {
     d->receivedConflict = false;
     d->reconnectionTries = 0;
-    d->isActive = true;
 
     // notify managers
     Q_EMIT connected();
