@@ -35,6 +35,8 @@ class PingManager;
 class SendDataInterface;
 class StreamAckManager;
 class XmppSocket;
+struct Bind2Request;
+struct Bind2Bound;
 
 enum HandleElementResult {
     Accepted,
@@ -198,6 +200,7 @@ public:
     void setState(State);
     void onSessionOpened(const SessionBegin &);
     void onStreamFeatures(const QXmppStreamFeatures &);
+    void onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features);
 
 private:
     void sendState();
@@ -206,6 +209,7 @@ private:
     State m_state = Active;
     bool m_synced = true;
     bool m_featureAvailable = false;
+    bool m_bind2InactiveSet = false;
 };
 
 }  // namespace QXmpp::Private

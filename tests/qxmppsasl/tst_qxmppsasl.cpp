@@ -745,6 +745,7 @@ void tst_QXmppSasl::sasl2ManagerPlain()
     auto task = test.manager.authenticate(
         config,
         Sasl2::StreamFeature { { "PLAIN", "SCRAM-SHA-1" }, {}, false },
+        {},
         test.loggable.get());
 
     QVERIFY(!task.isFinished());
@@ -772,6 +773,7 @@ void tst_QXmppSasl::sasl2ManagerFailure()
     auto task = test.manager.authenticate(
         config,
         Sasl2::StreamFeature { { "SCRAM-SHA-1" }, {}, false },
+        {},
         test.loggable.get());
 
     QVERIFY(!task.isFinished());
@@ -803,6 +805,7 @@ void tst_QXmppSasl::sasl2ManagerUnsupportedTasks()
     auto task = test.manager.authenticate(
         config,
         Sasl2::StreamFeature { { "SCRAM-SHA-1" }, {}, false },
+        {},
         test.loggable.get());
 
     auto handled = test.manager.handleElement(xmlToDom(

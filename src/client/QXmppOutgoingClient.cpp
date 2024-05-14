@@ -25,6 +25,7 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
 #include "Stream.h"
 #include "XmppSocket.h"
 
@@ -456,7 +457,23 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
 void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Feature)
 {
     d->manager = Sasl2Manager(&d->socket);
-    std::get<Sasl2Manager>(d->manager).authenticate(d->config, sasl2Feature, this).then(this, [this](auto result) {
+
+    // prepare bind2 request
+    auto createBind2Request = [this](const auto &bind2Features) {
+        Bind2Request request;
+        request.tag = d->config.resourcePrefix();
+        // extensions
+        d->csiManager.onBind2Request(request, bind2Features);
+        return request;
+    };
+
+    auto bind2Request = sasl2Feature.bind2Feature
+        ? createBind2Request(sasl2Feature.bind2Feature->features)
+        : std::optional<Bind2Request>();
+
+    // start authentication
+    auto &sasl2 = std::get<Sasl2Manager>(d->manager);
+    sasl2.authenticate(d->config, sasl2Feature, std::move(bind2Request), this).then(this, [this](auto result) {
         if (auto success = std::get_if<Sasl2::Success>(&result)) {
             debug(QStringLiteral("Authenticated"));
             d->isAuthenticated = true;
@@ -1372,7 +1389,7 @@ void CsiManager::setState(State state)
     }
 }
 
-void CsiManager::onSessionOpened(const SessionBegin &)
+void CsiManager::onSessionOpened(const SessionBegin &session)
 {
     if (m_client->c2sStreamManager().streamResumed()) {
         // stream could be resumed, previous state is still correct
@@ -1381,11 +1398,13 @@ void CsiManager::onSessionOpened(const SessionBegin &)
             sendState();
         }
     } else {
-        // new stream (implicitly sets state to 'active')
-        if (m_state == Active) {
+        // new stream starts with Active if not set to Inactive via bind2
+        auto initialState = session.bind2Used && m_bind2InactiveSet ? Inactive : Active;
+
+        if (m_state == initialState) {
             m_synced = true;
         } else {
-            // restore 'inactive' state
+            // update state
             sendState();
         }
     }
@@ -1394,6 +1413,15 @@ void CsiManager::onSessionOpened(const SessionBegin &)
 void CsiManager::onStreamFeatures(const QXmppStreamFeatures &features)
 {
     m_featureAvailable = features.clientStateIndicationMode() == QXmppStreamFeatures::Enabled;
+}
+
+void CsiManager::onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features)
+{
+    // The state in the bind2 request is only used for new streams.
+    // If the stream is resumed, the bind2 request is ignored.
+
+    request.csiInactive = (m_state == Inactive && contains(bind2Features, ns_csi));
+    m_bind2InactiveSet = request.csiInactive;
 }
 
 void CsiManager::sendState()

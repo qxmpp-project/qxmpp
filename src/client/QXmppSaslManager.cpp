@@ -204,7 +204,7 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
     return Rejected;
 }
 
-QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(const QXmppConfiguration &config, const Sasl2::StreamFeature &feature, QXmppLoggable *loggable)
+QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(const QXmppConfiguration &config, const Sasl2::StreamFeature &feature, std::optional<Bind2Request> &&bind2Request, QXmppLoggable *loggable)
 {
     Q_ASSERT(!m_state.has_value());
 
@@ -218,7 +218,7 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(const QXmppConfig
         result.saslClient->mechanism(),
         result.initialResponse,
         {},
-        feature.bind2Feature.has_value() ? Bind2Request { config.resourcePrefix() } : std::optional<Bind2Request>(),
+        std::move(bind2Request),
     };
 
     // set user-agent if enabled
