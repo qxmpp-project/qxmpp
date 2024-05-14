@@ -86,7 +86,7 @@ void tst_QXmppCallManager::testCall()
     // connect call
     qDebug() << "======== CONNECT ========";
     QEventLoop loop;
-    QXmppCall *senderCall = senderManager->call("receiver@localhost/QXmpp");
+    QXmppCall *senderCall = senderManager->call(receiver.configuration().jid());
     QVERIFY(senderCall);
     connect(senderCall, &QXmppCall::connected, &loop, &QEventLoop::quit);
     loop.exec();
