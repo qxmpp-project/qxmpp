@@ -31,9 +31,9 @@ public:
         resetIdCount();
     }
 
-    ~TestClient() override
-    {
-    }
+    ~TestClient() override = default;
+
+    QXmppOutgoingClient *stream() const { return d->stream; }
 
     template<typename String>
     void inject(const String &xml)
