@@ -1147,11 +1147,8 @@ HandleElementResult C2sStreamManager::handleElement(const QDomElement &el)
 
     // resume
     if (std::holds_alternative<ResumeRequest>(m_request)) {
-        if (QXmppStreamManagementResumed::isStreamManagementResumed(el)) {
-            QXmppStreamManagementResumed streamManagementResumed;
-            streamManagementResumed.parse(el);
-
-            q->streamAckManager().setAcknowledgedSequenceNumber(streamManagementResumed.h());
+        if (auto resumed = SmResumed::fromDom(el)) {
+            q->streamAckManager().setAcknowledgedSequenceNumber(resumed->h);
             m_streamResumed = true;
             m_enabled = true;
             q->streamAckManager().enableStreamManagement(false);
@@ -1161,27 +1158,21 @@ HandleElementResult C2sStreamManager::handleElement(const QDomElement &el)
             return Finished;
         }
 
-        if (QXmppStreamManagementFailed::isStreamManagementFailed(el)) {
-            QXmppStreamManagementFailed failed;
-            failed.parse(el);
-
+        if (auto failed = SmFailed::fromDom(el)) {
             finishResume(QXmppError {
-                QStringLiteral("Stream resumption failed (%1)").arg(failed.error()),
-                failed.error(),
+                QStringLiteral("Stream resumption failed"),
+                {},
             });
             return Finished;
         }
     }
     // enable
     if (std::holds_alternative<EnableRequest>(m_request)) {
-        if (QXmppStreamManagementEnabled::isStreamManagementEnabled(el)) {
-            QXmppStreamManagementEnabled streamManagementEnabled;
-            streamManagementEnabled.parse(el);
-
-            m_smId = streamManagementEnabled.id();
-            m_canResume = streamManagementEnabled.resume();
-            if (streamManagementEnabled.resume() && !streamManagementEnabled.location().isEmpty()) {
-                setResumeAddress(streamManagementEnabled.location());
+        if (auto enabled = SmEnabled::fromDom(el)) {
+            m_smId = enabled->id;
+            m_canResume = enabled->resume;
+            if (enabled->resume && !enabled->location.isEmpty()) {
+                setResumeAddress(enabled->location);
             }
 
             m_enabled = true;
@@ -1191,13 +1182,10 @@ HandleElementResult C2sStreamManager::handleElement(const QDomElement &el)
             return Finished;
         }
 
-        if (QXmppStreamManagementFailed::isStreamManagementFailed(el)) {
-            QXmppStreamManagementFailed failed;
-            failed.parse(el);
-
+        if (auto failed = SmFailed::fromDom(el)) {
             finishEnable(QXmppError {
-                QStringLiteral("Enabling stream management failed (%1)").arg(failed.error()),
-                failed.error(),
+                QStringLiteral("Enabling stream management failed"),
+                {},
             });
             return Finished;
         }
@@ -1229,7 +1217,7 @@ QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestResume()
     m_request = ResumeRequest();
 
     auto lastAckNumber = q->streamAckManager().lastIncomingSequenceNumber();
-    q->xmppSocket().sendData(serializeXml(QXmppStreamManagementResume(lastAckNumber, m_smId)));
+    q->xmppSocket().sendData(serializeXml(SmResume { lastAckNumber, m_smId }));
 
     return std::get<ResumeRequest>(m_request).p.task();
 }
@@ -1239,7 +1227,7 @@ QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestEnable()
     Q_ASSERT(std::holds_alternative<NoRequest>(m_request));
     m_request = EnableRequest();
 
-    q->xmppSocket().sendData(serializeXml(QXmppStreamManagementEnable(true)));
+    q->xmppSocket().sendData(serializeXml(SmEnable { true }));
 
     return std::get<EnableRequest>(m_request).p.task();
 }
