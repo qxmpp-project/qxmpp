@@ -213,6 +213,7 @@ std::optional<Bind2Request> Bind2Request::fromDom(const QDomElement &el)
     return Bind2Request {
         firstChildElement(el, u"tag", ns_bind2).text(),
         !firstChildElement(el, u"inactive", ns_csi).isNull(),
+        SmEnable::fromDom(firstChildElement(el, u"enable", ns_stream_management)),
     };
 }
 
@@ -224,6 +225,9 @@ void Bind2Request::toXml(QXmlStreamWriter *writer) const
     if (csiInactive) {
         writeEmptyElement(writer, u"inactive", ns_csi);
     }
+    if (smEnable) {
+        smEnable->toXml(writer);
+    }
     writer->writeEndElement();
 }
 
@@ -233,13 +237,22 @@ std::optional<Bind2Bound> Bind2Bound::fromDom(const QDomElement &el)
         return {};
     }
 
-    return Bind2Bound {};
+    return Bind2Bound {
+        .smFailed = SmFailed::fromDom(firstChildElement(el, u"failed", ns_stream_management)),
+        .smEnabled = SmEnabled::fromDom(firstChildElement(el, u"enabled", ns_stream_management)),
+    };
 }
 
 void Bind2Bound::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement(QSL65("bound"));
     writer->writeDefaultNamespace(toString65(ns_bind2));
+    if (smFailed) {
+        smFailed->toXml(writer);
+    }
+    if (smEnabled) {
+        smEnabled->toXml(writer);
+    }
     writer->writeEndElement();
 }
 

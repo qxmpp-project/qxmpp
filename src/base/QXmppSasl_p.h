@@ -11,6 +11,7 @@
 #include "QXmppGlobal.h"
 #include "QXmppLogger.h"
 #include "QXmppNonza.h"
+#include "QXmppStreamManagement_p.h"
 
 #include <optional>
 
@@ -112,13 +113,16 @@ struct Bind2Request {
     QString tag;
     // bind2 extensions
     bool csiInactive = false;
+    std::optional<SmEnable> smEnable;
 };
 
 struct Bind2Bound {
     static std::optional<Bind2Bound> fromDom(const QDomElement &);
     void toXml(QXmlStreamWriter *) const;
 
-    // extensions may be added here (mam, sm, etc.)
+    // extensions
+    std::optional<SmFailed> smFailed;
+    std::optional<SmEnabled> smEnabled;
 };
 
 }  // namespace QXmpp::Private
