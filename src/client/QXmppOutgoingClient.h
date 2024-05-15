@@ -113,6 +113,7 @@ private:
     void startSasl2Auth(const QXmpp::Private::Sasl2::StreamFeature &sasl2Feature);
     void startNonSaslAuth();
     void startResourceBinding();
+    void openSession();
     void onSMResumeFinished();
     void onSMEnableFinished();
     void throwKeepAliveError();
