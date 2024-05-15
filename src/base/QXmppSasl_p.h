@@ -155,6 +155,7 @@ struct Authenticate {
     QByteArray initialResponse;
     std::optional<UserAgent> userAgent;
     std::optional<Bind2Request> bindRequest;
+    std::optional<SmResume> smResume;
 };
 
 struct Challenge {
@@ -179,6 +180,8 @@ struct Success {
     QString authorizationIdentifier;
     // extensions
     std::optional<Bind2Bound> bound;
+    std::optional<SmResumed> smResumed;
+    std::optional<SmFailed> smFailed;
 };
 
 struct Failure {
