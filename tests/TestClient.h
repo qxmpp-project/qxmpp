@@ -34,6 +34,7 @@ public:
     ~TestClient() override = default;
 
     QXmppOutgoingClient *stream() const { return d->stream; }
+    QXmppOutgoingClientPrivate *streamPrivate() const { return d->stream->d.get(); }
 
     template<typename String>
     void inject(const String &xml)
@@ -58,6 +59,16 @@ public:
     {
         [this]() { QVERIFY(!m_sentPackets.isEmpty()); }();
         return m_sentPackets.takeLast();
+    }
+    void expectNoPacket() const
+    {
+        if (!m_sentPackets.empty()) {
+            qDebug() << "Unexpected:";
+            for (const auto &packet : m_sentPackets) {
+                qDebug().noquote() << " *" << packet;
+            }
+        }
+        VERIFY2(m_sentPackets.empty(), "Unexpected packet sent!");
     }
     void ignore()
     {
