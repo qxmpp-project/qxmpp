@@ -448,7 +448,7 @@ void QXmppOutgoingClient::_q_socketDisconnected()
         d->connectToHost(d->redirect->host, d->redirect->port);
         d->redirect.reset();
     } else {
-        Q_EMIT disconnected();
+        closeSession();
     }
 }
 
@@ -575,7 +575,22 @@ void QXmppOutgoingClient::openSession()
     Q_ASSERT(!d->sessionStarted);
     d->sessionStarted = true;
 
-    Q_EMIT connected();
+    SessionBegin session {
+        d->c2sStreamManager.enabled(),
+        d->c2sStreamManager.streamResumed(),
+    };
+
+    Q_EMIT connected(session);
+}
+
+void QXmppOutgoingClient::closeSession()
+{
+    d->sessionStarted = false;
+
+    SessionEnd session {
+        d->c2sStreamManager.canResume(),
+    };
+    Q_EMIT disconnected(session);
 }
 
 void QXmppOutgoingClient::onSMResumeFinished()
@@ -624,9 +639,6 @@ void QXmppOutgoingClient::handleStart()
 
     // reset active manager (e.g. authentication)
     d->manager = this;
-
-    // reset session information
-    d->sessionStarted = false;
 
     d->c2sStreamManager.onStreamStart();
 
