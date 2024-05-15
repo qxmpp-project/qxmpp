@@ -658,11 +658,6 @@ void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
     // if we receive any kind of data, stop the timeout timer
     d->pingManager.onDataReceived();
 
-    // handle possible stream management packets first
-    if (streamAckManager().handleStanza(nodeRecv) || iqManager().handleStanza(nodeRecv)) {
-        return;
-    }
-
     switch (visit(overloaded {
                       [&](auto *manager) { return manager->handleElement(nodeRecv); },
                       [&](auto &manager) { return manager.handleElement(nodeRecv); },
@@ -684,6 +679,11 @@ void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
 
 HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRecv)
 {
+    // handle SM acks, stanza counter and IQ responses
+    if (streamAckManager().handleStanza(nodeRecv) || iqManager().handleStanza(nodeRecv)) {
+        return Accepted;
+    }
+
     const QString ns = nodeRecv.namespaceURI();
 
     // give client opportunity to handle stanza
