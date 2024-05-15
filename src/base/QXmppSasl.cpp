@@ -333,6 +333,7 @@ std::optional<Authenticate> Authenticate::fromDom(const QDomElement &el)
         parseBase64(firstChildElement(el, u"initial-response", ns_sasl_2).text()).value_or(QByteArray()),
         UserAgent::fromDom(firstChildElement(el, u"user-agent", ns_sasl_2)),
         Bind2Request::fromDom(firstChildElement(el, u"bind", ns_bind2)),
+        SmResume::fromDom(firstChildElement(el, u"resume", ns_stream_management)),
     };
 }
 
@@ -347,6 +348,9 @@ void Authenticate::toXml(QXmlStreamWriter *writer) const
     }
     if (bindRequest) {
         bindRequest->toXml(writer);
+    }
+    if (smResume) {
+        smResume->toXml(writer);
     }
     writer->writeEndElement();
 }
@@ -404,6 +408,8 @@ std::optional<Success> Success::fromDom(const QDomElement &el)
 
     output.authorizationIdentifier = firstChildElement(el, u"authorization-identifier", ns_sasl_2).text();
     output.bound = Bind2Bound::fromDom(firstChildElement(el, u"bound", ns_bind2));
+    output.smResumed = SmResumed::fromDom(firstChildElement(el, u"resumed", ns_stream_management));
+    output.smFailed = SmFailed::fromDom(firstChildElement(el, u"failed", ns_stream_management));
 
     return output;
 }
@@ -418,6 +424,12 @@ void Success::toXml(QXmlStreamWriter *writer) const
     writeXmlTextElement(writer, u"authorization-identifier", authorizationIdentifier);
     if (bound) {
         bound->toXml(writer);
+    }
+    if (smResumed) {
+        smResumed->toXml(writer);
+    }
+    if (smFailed) {
+        smFailed->toXml(writer);
     }
     writer->writeEndElement();
 }
