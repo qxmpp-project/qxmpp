@@ -518,8 +518,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
                     d->isAuthenticated = true;
 
                     // xmpp connection made
-                    d->sessionStarted = true;
-                    Q_EMIT connected();
+                    openSession();
                 } else {
                     // TODO: errors: should trigger error signal
                     auto &error = std::get<QXmppError>(result);
@@ -546,13 +545,11 @@ void QXmppOutgoingClient::startResourceBinding()
             d->config.setDomain(addr->domain);
             d->config.setResource(addr->resource);
 
-            d->sessionStarted = true;
-
             if (d->c2sStreamManager.canRequestEnable()) {
                 d->c2sStreamManager.requestEnable();
             } else {
                 // we are connected now
-                Q_EMIT connected();
+                openSession();
             }
         } else if (auto *protocolError = std::get_if<ProtocolError>(&r)) {
             d->xmppStreamError = QXmppStanza::Error::UndefinedCondition;
@@ -573,11 +570,19 @@ void QXmppOutgoingClient::startResourceBinding()
     });
 }
 
+void QXmppOutgoingClient::openSession()
+{
+    Q_ASSERT(!d->sessionStarted);
+    d->sessionStarted = true;
+
+    Q_EMIT connected();
+}
+
 void QXmppOutgoingClient::onSMResumeFinished()
 {
     if (d->c2sStreamManager.streamResumed()) {
         // we are connected now
-        Q_EMIT connected();
+        openSession();
     } else {
         // check whether bind is available
         if (d->bindModeAvailable) {
@@ -586,8 +591,7 @@ void QXmppOutgoingClient::onSMResumeFinished()
         }
 
         // otherwise we are done
-        d->sessionStarted = true;
-        Q_EMIT connected();
+        openSession();
     }
 }
 
@@ -595,7 +599,7 @@ void QXmppOutgoingClient::onSMEnableFinished()
 {
     // enabling of stream management may or may not have succeeded
     // we are connected now
-    Q_EMIT connected();
+    openSession();
 }
 
 void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
@@ -755,8 +759,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
         }
 
         // otherwise we are done
-        d->sessionStarted = true;
-        Q_EMIT connected();
+        openSession();
         return Accepted;
     } else if (ns == ns_stream && nodeRecv.tagName() == u"error") {
         visit(
