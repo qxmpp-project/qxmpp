@@ -7,31 +7,22 @@
 #include "QXmppOutgoingClient.h"
 
 #include "QXmppBindIq.h"
-#include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
-#include "QXmppIq.h"
 #include "QXmppMessage.h"
 #include "QXmppNonSASLAuth.h"
+#include "QXmppOutgoingClient_p.h"
 #include "QXmppPacket_p.h"
 #include "QXmppPingIq.h"
-#include "QXmppPresence.h"
-#include "QXmppPromise.h"
-#include "QXmppSaslManager_p.h"
-#include "QXmppSasl_p.h"
-#include "QXmppStreamError_p.h"
 #include "QXmppStreamFeatures.h"
-#include "QXmppStreamManagement_p.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
 #include "Algorithms.h"
 #include "Stream.h"
-#include "XmppSocket.h"
 
 #include <unordered_map>
 
-#include <QDnsLookup>
 #include <QHostAddress>
 #include <QNetworkProxy>
 #include <QRegularExpression>
@@ -44,15 +35,9 @@ using namespace std::chrono_literals;
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
-namespace QXmpp::Private {
-
-struct ProtocolError {
-    QString text;
-};
-
 using DnsRecordsResult = std::variant<QList<QDnsServiceRecord>, QXmppError>;
 
-QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObject *context)
+static QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObject *context)
 {
     QXmppPromise<DnsRecordsResult> p;
     auto task = p.task();
@@ -69,161 +54,6 @@ QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObje
     dns->lookup();
     return task;
 }
-
-struct BoundAddress {
-    QString user;
-    QString domain;
-    QString resource;
-};
-
-// Resource Binding
-class BindManager
-{
-public:
-    using Result = std::variant<BoundAddress, QXmppStanza::Error, ProtocolError>;
-
-    explicit BindManager(SendDataInterface *socket) : m_socket(socket) { }
-
-    QXmppTask<Result> bindAddress(const QString &resource);
-    HandleElementResult handleElement(const QDomElement &el);
-
-private:
-    SendDataInterface *m_socket;
-    QString m_iqId;
-    std::optional<QXmppPromise<Result>> m_promise;
-};
-
-struct NonSaslAuthOptions {
-    bool plain;
-    bool digest;
-};
-
-// Authentication using Non-SASL auth
-class NonSaslAuthManager
-{
-public:
-    using OptionsResult = std::variant<NonSaslAuthOptions, QXmppError>;
-    using AuthResult = std::variant<Success, QXmppError>;
-
-    explicit NonSaslAuthManager(SendDataInterface *socket) : m_socket(socket) { }
-
-    QXmppTask<OptionsResult> queryOptions(const QString &streamFrom, const QString &username);
-    QXmppTask<AuthResult> authenticate(bool plainText, const QString &username, const QString &password, const QString &resource, const QString &streamId);
-    HandleElementResult handleElement(const QDomElement &el);
-
-private:
-    struct NoQuery {
-    };
-    struct OptionsQuery {
-        QXmppPromise<OptionsResult> p;
-    };
-    struct AuthQuery {
-        QXmppPromise<AuthResult> p;
-        QString id;
-    };
-
-    SendDataInterface *m_socket;
-    std::variant<NoQuery, OptionsQuery, AuthQuery> m_query;
-};
-
-// XEP-0199: XMPP Ping
-class PingManager
-{
-public:
-    explicit PingManager(QXmppOutgoingClient *q);
-
-    void onDataReceived();
-    bool handleIq(const QDomElement &el);
-
-private:
-    void sendPing();
-
-    QXmppOutgoingClient *q;
-    QTimer *pingTimer;
-    QTimer *timeoutTimer;
-};
-
-using IqResult = QXmppOutgoingClient::IqResult;
-
-struct IqState {
-    QXmppPromise<IqResult> interface;
-    QString jid;
-};
-
-// Manager for creating tasks for outgoing IQ requests
-class OutgoingIqManager
-{
-public:
-    OutgoingIqManager(QXmppLoggable *l, StreamAckManager &streamAckMananger);
-    ~OutgoingIqManager();
-
-    QXmppTask<IqResult> sendIq(QXmppIq &&, const QString &to);
-    QXmppTask<IqResult> sendIq(QXmppPacket &&, const QString &id, const QString &to);
-
-    bool hasId(const QString &id) const;
-    bool isIdValid(const QString &id) const;
-
-    QXmppTask<IqResult> start(const QString &id, const QString &to);
-    void finish(const QString &id, IqResult &&result);
-    void cancelAll();
-
-    void onSessionOpened(const SessionBegin &);
-    void onSessionClosed(const SessionEnd &);
-    bool handleStanza(const QDomElement &stanza);
-
-private:
-    void warning(const QString &message);
-
-    QXmppLoggable *l;
-    StreamAckManager &m_streamAckManager;
-    std::unordered_map<QString, IqState> m_requests;
-};
-
-}  // namespace QXmpp::Private
-
-class QXmppOutgoingClientPrivate
-{
-public:
-    explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
-    void connectToHost(const QString &host, quint16 port);
-    void connectToNextDNSHost();
-
-    // This object provides the configuration
-    // required for connecting to the XMPP server.
-    QXmppConfiguration config;
-    QXmppStanza::Error::Condition xmppStreamError;
-
-    // Core stream
-    XmppSocket socket;
-    StreamAckManager streamAckManager;
-    OutgoingIqManager iqManager;
-
-    // DNS
-    QList<QDnsServiceRecord> srvRecords;
-    int nextSrvRecordIdx = 0;
-
-    // Stream
-    QString streamId;
-    QString streamFrom;
-    QString streamVersion;
-
-    // Redirection
-    std::optional<StreamErrorElement::SeeOtherHost> redirect;
-
-    // Authentication & Session
-    bool isAuthenticated = false;
-    bool bindModeAvailable = false;
-    bool sessionStarted = false;
-    std::optional<Bind2Bound> bind2Bound;
-
-    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, BindManager> manager;
-    C2sStreamManager c2sStreamManager;
-    CsiManager csiManager;
-    PingManager pingManager;
-
-private:
-    QXmppOutgoingClient *q;
-};
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : socket(qq),
