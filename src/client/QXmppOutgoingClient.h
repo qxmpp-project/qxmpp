@@ -40,6 +40,7 @@ struct Bind2Request;
 struct Bind2Bound;
 struct SmEnabled;
 struct SmFailed;
+struct SmResumed;
 
 enum HandleElementResult {
     Accepted,
@@ -59,7 +60,9 @@ struct SessionEnd {
 }  // namespace QXmpp::Private
 
 namespace QXmpp::Private::Sasl2 {
+struct Authenticate;
 struct StreamFeature;
+struct Success;
 }
 
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
@@ -163,6 +166,8 @@ public:
     void onStreamStart();
     void onStreamFeatures(const QXmppStreamFeatures &);
     void onDisconnecting();
+    void onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl2::StreamFeature &feature);
+    void onSasl2Success(const Sasl2::Success &success);
     void onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features);
     void onBind2Bound(const Bind2Bound &);
     bool canResume() const { return m_canResume; }
@@ -178,6 +183,8 @@ private:
 
     void onEnabled(const SmEnabled &enabled);
     void onEnableFailed(const SmFailed &failed);
+    void onResumed(const SmResumed &resumed);
+    void onResumeFailed(const SmFailed &failed);
     bool setResumeAddress(const QString &address);
     void setEnabled(bool enabled) { m_enabled = enabled; }
     void setResumed(bool resumed) { m_streamResumed = resumed; }
