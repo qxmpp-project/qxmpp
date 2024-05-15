@@ -560,6 +560,7 @@ void QXmppOutgoingClient::startResourceBinding()
 
 void QXmppOutgoingClient::openSession()
 {
+    info(QStringLiteral("Session established"));
     Q_ASSERT(!d->sessionStarted);
     d->sessionStarted = true;
 
