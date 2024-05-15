@@ -10,6 +10,7 @@
 #include "QXmppAuthenticationError.h"
 #include "QXmppBindError.h"
 #include "QXmppClient.h"
+#include "QXmppPromise.h"
 #include "QXmppStanza.h"
 #include "QXmppStreamError.h"
 
@@ -126,11 +127,11 @@ private:
 
     void startSasl2Auth(const QXmpp::Private::Sasl2::StreamFeature &sasl2Feature);
     void startNonSaslAuth();
+    void startSmResume();
+    void startSmEnable();
     void startResourceBinding();
     void openSession();
     void closeSession();
-    void onSMResumeFinished();
-    void onSMEnableFinished();
     void throwKeepAliveError();
 
     // for unit tests, see TestClient
@@ -150,9 +151,11 @@ namespace QXmpp::Private {
 class C2sStreamManager
 {
 public:
+    using Result = std::variant<Success, QXmppError>;
+
     explicit C2sStreamManager(QXmppOutgoingClient *q);
 
-    bool handleElement(const QDomElement &);
+    HandleElementResult handleElement(const QDomElement &);
     bool hasResumeAddress() const { return m_canResume && !m_resumeHost.isEmpty() && m_resumePort; }
     std::pair<QString, quint16> resumeAddress() const { return { m_resumeHost, m_resumePort }; }
     void onStreamStart();
@@ -162,9 +165,9 @@ public:
     bool enabled() const { return m_enabled; }
     bool streamResumed() const { return m_streamResumed; }
     bool canRequestResume() const { return m_smAvailable && m_canResume; }
-    void requestResume();
+    QXmppTask<Result> requestResume();
     bool canRequestEnable() const { return m_smAvailable; }
-    void requestEnable();
+    QXmppTask<Result> requestEnable();
 
 private:
     friend class ::TestClient;
@@ -173,12 +176,20 @@ private:
     void setEnabled(bool enabled) { m_enabled = enabled; }
     void setResumed(bool resumed) { m_streamResumed = resumed; }
 
+    struct NoRequest { };
+    struct ResumeRequest {
+        QXmppPromise<Result> p;
+    };
+    struct EnableRequest {
+        QXmppPromise<Result> p;
+    };
+
     QXmppOutgoingClient *q;
 
+    std::variant<NoRequest, ResumeRequest, EnableRequest> m_request;
     bool m_smAvailable = false;
     QString m_smId;
     bool m_canResume = false;
-    bool m_isResuming = false;
     QString m_resumeHost;
     quint16 m_resumePort = 0;
     bool m_enabled = false;

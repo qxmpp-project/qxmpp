@@ -175,7 +175,7 @@ public:
     bool sessionStarted = false;
     std::optional<Bind2Bound> bind2Bound;
 
-    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, BindManager> manager;
+    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> manager;
     C2sStreamManager c2sStreamManager;
     CsiManager csiManager;
     PingManager pingManager;
