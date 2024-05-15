@@ -8,12 +8,16 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
+#include "QXmppOutgoingClient.h"
+#include "QXmppOutgoingClient_p.h"
 #include "QXmppPromise.h"
 #include "QXmppRegisterIq.h"
 #include "QXmppRosterManager.h"
+#include "QXmppStreamFeatures.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
+#include "TestClient.h"
 #include "util.h"
 
 #include <QObject>
@@ -30,6 +34,11 @@ private:
     Q_SLOT void testE2eeExtension();
     Q_SLOT void testTaskDirect();
     Q_SLOT void testTaskStore();
+
+    // outgoing client
+#if BUILD_INTERNAL_TESTS
+    Q_SLOT void csiManager();
+#endif
 };
 
 void tst_QXmppClient::testSendMessage()
@@ -217,6 +226,45 @@ void tst_QXmppClient::testTaskStore()
     QVERIFY(p.task().isFinished());
     QVERIFY(!p.task().hasResult());
 }
+
+#if BUILD_INTERNAL_TESTS
+void tst_QXmppClient::csiManager()
+{
+    TestClient client;
+    auto &csi = client.stream()->csiManager();
+
+    QCOMPARE(client.isActive(), true);
+    QCOMPARE(csi.state(), CsiManager::Active);
+
+    client.setActive(false);
+    client.expectNoPacket();
+
+    // enable CSI and authenticate client
+    client.streamPrivate()->isAuthenticated = true;
+    QXmppStreamFeatures features;
+    features.setClientStateIndicationMode(QXmppStreamFeatures::Enabled);
+    csi.onStreamFeatures(features);
+    csi.onSessionOpened({});
+
+    client.expect("<inactive xmlns='urn:xmpp:csi:0'/>");
+
+    // we currently can't really test stream resumption because the socket is not actually
+    // connected
+
+    // bind2
+    Bind2Request r;
+    csi.onBind2Request(r, { "urn:xmpp:csi:0" });
+    QCOMPARE(r.csiInactive, true);
+
+    SessionBegin session {
+        false,
+        false,
+        true,
+    };
+    csi.onSessionOpened(session);
+    client.expectNoPacket();
+}
+#endif
 
 QTEST_MAIN(tst_QXmppClient)
 #include "tst_qxmppclient.moc"
