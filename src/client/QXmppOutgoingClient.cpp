@@ -298,13 +298,18 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
         return request;
     };
 
-    auto bind2Request = sasl2Feature.bind2Feature
-        ? createBind2Request(sasl2Feature.bind2Feature->features)
-        : std::optional<Bind2Request>();
+    // prepare authenticate request
+    Sasl2::Authenticate sasl2Request;
+    // bind2
+    if (sasl2Feature.bind2Feature) {
+        sasl2Request.bindRequest = createBind2Request(sasl2Feature.bind2Feature->features);
+    }
+    // other extensions
+    d->c2sStreamManager.onSasl2Authenticate(sasl2Request, sasl2Feature);
 
     // start authentication
     auto &sasl2 = std::get<Sasl2Manager>(d->manager);
-    sasl2.authenticate(d->config, sasl2Feature, std::move(bind2Request), this).then(this, [this](auto result) {
+    sasl2.authenticate(std::move(sasl2Request), d->config, sasl2Feature, this).then(this, [this](auto result) {
         if (auto success = std::get_if<Sasl2::Success>(&result)) {
             debug(QStringLiteral("Authenticated"));
             d->isAuthenticated = true;
@@ -312,11 +317,18 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
             d->bind2Bound = std::move(success->bound);
 
             // extensions
+            d->c2sStreamManager.onSasl2Success(*success);
             if (d->bind2Bound) {
                 d->c2sStreamManager.onBind2Bound(*d->bind2Bound);
             }
 
-            // new stream features will be sent by the server now
+            if (success->smResumed) {
+                // If the stream could be resumed, the session is immediately started and no stream
+                // features are sent.
+                openSession();
+            } else {
+                // new stream features will be sent by the server now
+            }
         } else {
             auto [text, err] = std::get<Sasl2Manager::AuthError>(std::move(result));
 
@@ -380,11 +392,8 @@ void QXmppOutgoingClient::startSmResume()
     d->manager = &d->c2sStreamManager;
     d->c2sStreamManager.requestResume().then(this, [this](auto &&result) {
         if (std::holds_alternative<Success>(result)) {
-            debug(QStringLiteral("Stream resumed"));
             openSession();
         } else {
-            debug(std::get<QXmppError>(result).description);
-
             // check whether bind is available
             if (d->bindModeAvailable) {
                 startResourceBinding();
@@ -1148,17 +1157,13 @@ HandleElementResult C2sStreamManager::handleElement(const QDomElement &el)
     // resume
     if (std::holds_alternative<ResumeRequest>(m_request)) {
         if (auto resumed = SmResumed::fromDom(el)) {
-            q->streamAckManager().setAcknowledgedSequenceNumber(resumed->h);
-            m_streamResumed = true;
-            m_enabled = true;
-            q->streamAckManager().enableStreamManagement(false);
-
+            onResumed(*resumed);
             finishResume(Success());
-
             return Finished;
         }
 
         if (auto failed = SmFailed::fromDom(el)) {
+            onResumeFailed(*failed);
             finishResume(QXmppError {
                 QStringLiteral("Stream resumption failed"),
                 {},
@@ -1203,6 +1208,24 @@ void C2sStreamManager::onStreamFeatures(const QXmppStreamFeatures &features)
 void C2sStreamManager::onDisconnecting()
 {
     m_canResume = false;
+}
+
+void C2sStreamManager::onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl2::StreamFeature &feature)
+{
+    if (feature.streamResumptionAvailable && !m_enabled && m_canResume) {
+        auto lastAckNumber = q->streamAckManager().lastIncomingSequenceNumber();
+        auth.smResume = SmResume { lastAckNumber, m_smId };
+    }
+}
+
+void C2sStreamManager::onSasl2Success(const Sasl2::Success &success)
+{
+    if (success.smResumed) {
+        onResumed(*success.smResumed);
+    }
+    if (success.smFailed) {
+        onResumeFailed(*success.smFailed);
+    }
 }
 
 void C2sStreamManager::onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features)
@@ -1260,6 +1283,20 @@ void C2sStreamManager::onEnabled(const SmEnabled &enabled)
 void C2sStreamManager::onEnableFailed(const SmFailed &)
 {
     q->warning(QStringLiteral("Failed to enable stream management"));
+}
+
+void C2sStreamManager::onResumed(const SmResumed &resumed)
+{
+    q->debug(QStringLiteral("Stream resumed"));
+    q->streamAckManager().setAcknowledgedSequenceNumber(resumed.h);
+    m_streamResumed = true;
+    m_enabled = true;
+    q->streamAckManager().enableStreamManagement(false);
+}
+
+void C2sStreamManager::onResumeFailed(const SmFailed &)
+{
+    q->debug(QStringLiteral("Stream resumption failed"));
 }
 
 bool C2sStreamManager::setResumeAddress(const QString &address)

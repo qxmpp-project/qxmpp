@@ -48,7 +48,7 @@ public:
 
     explicit Sasl2Manager(SendDataInterface *socket) : m_socket(socket) { }
 
-    QXmppTask<AuthResult> authenticate(const QXmppConfiguration &config, const Sasl2::StreamFeature &feature, std::optional<Bind2Request> &&bind2Request, QXmppLoggable *loggable);
+    QXmppTask<AuthResult> authenticate(Sasl2::Authenticate &&authenticate, const QXmppConfiguration &config, const Sasl2::StreamFeature &feature, QXmppLoggable *loggable);
     HandleElementResult handleElement(const QDomElement &);
 
 private:
