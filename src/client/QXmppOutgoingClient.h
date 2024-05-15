@@ -38,6 +38,8 @@ class StreamAckManager;
 class XmppSocket;
 struct Bind2Request;
 struct Bind2Bound;
+struct SmEnabled;
+struct SmFailed;
 
 enum HandleElementResult {
     Accepted,
@@ -161,17 +163,21 @@ public:
     void onStreamStart();
     void onStreamFeatures(const QXmppStreamFeatures &);
     void onDisconnecting();
+    void onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features);
+    void onBind2Bound(const Bind2Bound &);
     bool canResume() const { return m_canResume; }
     bool enabled() const { return m_enabled; }
     bool streamResumed() const { return m_streamResumed; }
-    bool canRequestResume() const { return m_smAvailable && m_canResume; }
+    bool canRequestResume() const { return m_smAvailable && !m_enabled && m_canResume; }
     QXmppTask<Result> requestResume();
-    bool canRequestEnable() const { return m_smAvailable; }
+    bool canRequestEnable() const { return m_smAvailable && !m_enabled; }
     QXmppTask<Result> requestEnable();
 
 private:
     friend class ::TestClient;
 
+    void onEnabled(const SmEnabled &enabled);
+    void onEnableFailed(const SmFailed &failed);
     bool setResumeAddress(const QString &address);
     void setEnabled(bool enabled) { m_enabled = enabled; }
     void setResumed(bool resumed) { m_streamResumed = resumed; }
