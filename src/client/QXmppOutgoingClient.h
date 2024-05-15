@@ -39,6 +39,15 @@ enum HandleElementResult {
     Rejected,
     Finished,
 };
+
+struct SessionBegin {
+    bool smEnabled;
+    bool smResumed;
+};
+
+struct SessionEnd {
+    bool smCanResume;
+};
 }  // namespace QXmpp::Private
 
 namespace QXmpp::Private::Sasl2 {
@@ -76,10 +85,10 @@ public:
     QXmpp::Private::C2sStreamManager &c2sStreamManager();
 
     /// This signal is emitted when the stream is connected.
-    Q_SIGNAL void connected();
+    Q_SIGNAL void connected(const QXmpp::Private::SessionBegin &);
 
     /// This signal is emitted when the stream is disconnected.
-    Q_SIGNAL void disconnected();
+    Q_SIGNAL void disconnected(const QXmpp::Private::SessionEnd &);
 
     /// This signal is emitted when an error is encountered.
     Q_SIGNAL void errorOccurred(const QString &text, const QXmppOutgoingClient::ConnectionError &details, QXmppClient::Error oldError);
@@ -114,6 +123,7 @@ private:
     void startNonSaslAuth();
     void startResourceBinding();
     void openSession();
+    void closeSession();
     void onSMResumeFinished();
     void onSMEnableFinished();
     void throwKeepAliveError();
