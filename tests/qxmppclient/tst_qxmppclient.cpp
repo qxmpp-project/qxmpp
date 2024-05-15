@@ -25,42 +25,31 @@ class tst_QXmppClient : public QObject
     Q_OBJECT
 
 private:
-    Q_SLOT void initTestCase();
-
-    Q_SLOT void handleMessageSent(QXmppLogger::MessageType type, const QString &text) const;
     Q_SLOT void testSendMessage();
     Q_SLOT void testIndexOfExtension();
     Q_SLOT void testE2eeExtension();
     Q_SLOT void testTaskDirect();
     Q_SLOT void testTaskStore();
-
-    QXmppClient *client;
 };
-
-void tst_QXmppClient::handleMessageSent(QXmppLogger::MessageType type, const QString &text) const
-{
-    QCOMPARE(type, QXmppLogger::MessageType::SentMessage);
-
-    QXmppMessage msg;
-    parsePacket(msg, text.toUtf8());
-
-    QCOMPARE(msg.from(), QString());
-    QCOMPARE(msg.to(), QStringLiteral("support@qxmpp.org"));
-    QCOMPARE(msg.body(), QStringLiteral("implement XEP-* plz"));
-}
-
-void tst_QXmppClient::initTestCase()
-{
-    client = new QXmppClient(this);
-}
 
 void tst_QXmppClient::testSendMessage()
 {
+    auto client = std::make_unique<QXmppClient>();
+
     QXmppLogger logger;
     logger.setLoggingType(QXmppLogger::SignalLogging);
     client->setLogger(&logger);
 
-    connect(&logger, &QXmppLogger::message, this, &tst_QXmppClient::handleMessageSent);
+    connect(&logger, &QXmppLogger::message, this, [](QXmppLogger::MessageType type, const QString &text) {
+        QCOMPARE(type, QXmppLogger::MessageType::SentMessage);
+
+        QXmppMessage msg;
+        parsePacket(msg, text.toUtf8());
+
+        QCOMPARE(msg.from(), QString());
+        QCOMPARE(msg.to(), QStringLiteral("support@qxmpp.org"));
+        QCOMPARE(msg.body(), QStringLiteral("implement XEP-* plz"));
+    });
 
     client->sendMessage(
         QStringLiteral("support@qxmpp.org"),
