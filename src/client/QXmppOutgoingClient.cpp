@@ -626,6 +626,12 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
             return Accepted;
         }
 
+        // check whether SM is available
+        if (d->c2sStreamManager.canRequestEnable()) {
+            startSmEnable();
+            return Accepted;
+        }
+
         // otherwise we are done
         openSession();
         return Accepted;
