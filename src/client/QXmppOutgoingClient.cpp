@@ -294,6 +294,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
         request.tag = d->config.resourcePrefix();
         // extensions
         d->csiManager.onBind2Request(request, bind2Features);
+        d->c2sStreamManager.onBind2Request(request, bind2Features);
         return request;
     };
 
@@ -309,6 +310,11 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
             d->isAuthenticated = true;
             d->config.setJid(success->authorizationIdentifier);
             d->bind2Bound = std::move(success->bound);
+
+            // extensions
+            if (d->bind2Bound) {
+                d->c2sStreamManager.onBind2Bound(*d->bind2Bound);
+            }
 
             // new stream features will be sent by the server now
         } else {
@@ -394,13 +400,7 @@ void QXmppOutgoingClient::startSmResume()
 void QXmppOutgoingClient::startSmEnable()
 {
     d->manager = &d->c2sStreamManager;
-    d->c2sStreamManager.requestEnable().then(this, [this](auto &&result) {
-        if (std::holds_alternative<Success>(result)) {
-            debug(QStringLiteral("Stream Management enabled"));
-        } else {
-            warning(std::get<QXmppError>(result).description);
-        }
-
+    d->c2sStreamManager.requestEnable().then(this, [this](auto &&) {
         // enabling of stream management may or may not have succeeded
         // we are connected now
         openSession();
@@ -1169,20 +1169,14 @@ HandleElementResult C2sStreamManager::handleElement(const QDomElement &el)
     // enable
     if (std::holds_alternative<EnableRequest>(m_request)) {
         if (auto enabled = SmEnabled::fromDom(el)) {
-            m_smId = enabled->id;
-            m_canResume = enabled->resume;
-            if (enabled->resume && !enabled->location.isEmpty()) {
-                setResumeAddress(enabled->location);
-            }
-
-            m_enabled = true;
-            q->streamAckManager().enableStreamManagement(true);
+            onEnabled(*enabled);
 
             finishEnable(Success());
             return Finished;
         }
 
         if (auto failed = SmFailed::fromDom(el)) {
+            onEnableFailed(*failed);
             finishEnable(QXmppError {
                 QStringLiteral("Enabling stream management failed"),
                 {},
@@ -1211,6 +1205,23 @@ void C2sStreamManager::onDisconnecting()
     m_canResume = false;
 }
 
+void C2sStreamManager::onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features)
+{
+    if (contains(bind2Features, ns_stream_management)) {
+        request.smEnable = SmEnable { true };
+    }
+}
+
+void C2sStreamManager::onBind2Bound(const Bind2Bound &bound)
+{
+    if (bound.smEnabled) {
+        onEnabled(*bound.smEnabled);
+    }
+    if (bound.smFailed) {
+        onEnableFailed(*bound.smFailed);
+    }
+}
+
 QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestResume()
 {
     Q_ASSERT(std::holds_alternative<NoRequest>(m_request));
@@ -1230,6 +1241,25 @@ QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestEnable()
     q->xmppSocket().sendData(serializeXml(SmEnable { true }));
 
     return std::get<EnableRequest>(m_request).p.task();
+}
+
+void C2sStreamManager::onEnabled(const SmEnabled &enabled)
+{
+    // Called whenever stream management is enabled, either by requestEnable() or by onBind2Bound()
+    q->debug(QStringLiteral("Stream management enabled"));
+    m_smId = enabled.id;
+    m_canResume = enabled.resume;
+    if (enabled.resume && !enabled.location.isEmpty()) {
+        setResumeAddress(enabled.location);
+    }
+
+    m_enabled = true;
+    q->streamAckManager().enableStreamManagement(true);
+}
+
+void C2sStreamManager::onEnableFailed(const SmFailed &)
+{
+    q->warning(QStringLiteral("Failed to enable stream management"));
 }
 
 bool C2sStreamManager::setResumeAddress(const QString &address)
