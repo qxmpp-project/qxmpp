@@ -166,6 +166,8 @@ public:
     void finish(const QString &id, IqResult &&result);
     void cancelAll();
 
+    void onSessionOpened(const SessionBegin &);
+    void onSessionClosed(const SessionEnd &);
     bool handleStanza(const QDomElement &stanza);
 
 private:
@@ -289,20 +291,6 @@ QXmppOutgoingClient::QXmppOutgoingClient(QObject *parent)
     connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppOutgoingClient::handlePacketReceived);
     connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppOutgoingClient::handleStream);
     connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppOutgoingClient::disconnectFromHost);
-
-    // IQ response handling
-    connect(this, &QXmppOutgoingClient::connected, this, [=]() {
-        if (!d->c2sStreamManager.streamResumed()) {
-            // we can't expect a response because this is a new stream
-            iqManager().cancelAll();
-        }
-    });
-    connect(this, &QXmppOutgoingClient::disconnected, this, [=]() {
-        if (!d->c2sStreamManager.canResume()) {
-            // this stream can't be resumed; we can cancel all ongoing IQs
-            iqManager().cancelAll();
-        }
-    });
 }
 
 QXmppOutgoingClient::~QXmppOutgoingClient()
@@ -580,6 +568,7 @@ void QXmppOutgoingClient::openSession()
         d->c2sStreamManager.streamResumed(),
     };
 
+    d->iqManager.onSessionOpened(session);
     Q_EMIT connected(session);
 }
 
@@ -590,6 +579,8 @@ void QXmppOutgoingClient::closeSession()
     SessionEnd session {
         d->c2sStreamManager.canResume(),
     };
+
+    d->iqManager.onSessionClosed(session);
     Q_EMIT disconnected(session);
 }
 
@@ -1189,6 +1180,22 @@ void OutgoingIqManager::cancelAll()
             QXmpp::SendError::Disconnected });
     }
     m_requests.clear();
+}
+
+void OutgoingIqManager::onSessionOpened(const SessionBegin &session)
+{
+    if (!session.smResumed) {
+        // we can't expect a response because this is a new stream
+        cancelAll();
+    }
+}
+
+void OutgoingIqManager::onSessionClosed(const SessionEnd &session)
+{
+    if (!session.smCanResume) {
+        // this stream can't be resumed; we can cancel all ongoing IQs
+        cancelAll();
+    }
 }
 
 bool OutgoingIqManager::handleStanza(const QDomElement &stanza)
