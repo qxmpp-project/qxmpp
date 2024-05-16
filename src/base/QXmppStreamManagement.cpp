@@ -169,30 +169,6 @@ StreamAckManager::StreamAckManager(XmppSocket &socket)
 {
 }
 
-StreamAckManager::~StreamAckManager()
-{
-}
-
-bool StreamAckManager::enabled() const
-{
-    return m_enabled;
-}
-
-unsigned int StreamAckManager::lastIncomingSequenceNumber() const
-{
-    return m_lastIncomingSequenceNumber;
-}
-
-void StreamAckManager::handleDisconnect()
-{
-    m_enabled = false;
-}
-
-void StreamAckManager::handleStart()
-{
-    m_enabled = false;
-}
-
 bool StreamAckManager::handleStanza(const QDomElement &stanza)
 {
     if (auto ack = SmAck::fromDom(stanza)) {
@@ -209,6 +185,11 @@ bool StreamAckManager::handleStanza(const QDomElement &stanza)
         m_lastIncomingSequenceNumber++;
     }
     return false;
+}
+
+void StreamAckManager::onSessionClosed()
+{
+    m_enabled = false;
 }
 
 void StreamAckManager::enableStreamManagement(bool resetSequenceNumber)
