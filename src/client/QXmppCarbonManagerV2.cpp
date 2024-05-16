@@ -6,8 +6,8 @@
 
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
-#include "QXmppFutureUtils_p.h"
 #include "QXmppMessage.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppUtils_p.h"
 
 #include <QDomElement>
@@ -19,7 +19,6 @@ class CarbonEnableIq : public QXmppIq
 {
 public:
     CarbonEnableIq()
-        : QXmppIq()
     {
         setType(QXmppIq::Set);
     }
@@ -62,11 +61,11 @@ auto parseIq(std::variant<QDomElement, QXmppError> &&sendResult) -> std::optiona
 /// \brief The QXmppCarbonManagerV2 class handles message carbons as described in \xep{0280,
 /// Message Carbons}.
 ///
-/// The manager automatically enables carbons when a connection is established. If the connection
-/// could be resumed, no new request is done. Carbon copied messages from other devices of the same
-/// account and carbon copied messages from other accounts are injected into the QXmppClient. This
-/// way you can handle them like any other incoming message by implementing QXmppMessageHandler or
-/// using QXmppClient::messageReceived().
+/// The manager automatically enables carbons when a connection is established. Either by using
+/// \xep{0386, Bind 2} if available or by sending a normal IQ request on connection.
+/// Carbon copied messages from other devices of the same account and carbon copied messages from
+/// other accounts are injected into the QXmppClient. This way you can handle them like any other
+/// incoming message by implementing QXmppMessageHandler or using QXmppClient::messageReceived().
 ///
 /// Checks are done to ensure that the entity sending the carbon copy is allowed to send the
 /// forwarded message.
@@ -78,6 +77,8 @@ auto parseIq(std::variant<QDomElement, QXmppError> &&sendResult) -> std::optiona
 /// \endcode
 ///
 /// To distinguish carbon messages, you can use QXmppMessage::isCarbonMessage().
+///
+/// \note Enabling via Bind 2 has been added in QXmpp 1.8.
 ///
 /// \ingroup Managers
 ///
@@ -121,18 +122,21 @@ bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::o
 
 void QXmppCarbonManagerV2::onRegistered(QXmppClient *client)
 {
+    client->stream()->carbonManager().setEnableViaBind2(true);
     connect(client, &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
 }
 
 void QXmppCarbonManagerV2::onUnregistered(QXmppClient *client)
 {
+    client->stream()->carbonManager().setEnableViaBind2(false);
     disconnect(client, &QXmppClient::connected, this, &QXmppCarbonManagerV2::enableCarbons);
 }
 
 void QXmppCarbonManagerV2::enableCarbons()
 {
-    if (client()->streamManagementState() == QXmppClient::ResumedStream) {
-        // skip re-enabling for resumed streams
+    // skip if stream could be resumed or carbons have been enabled via bind2 already
+    if (client()->streamManagementState() == QXmppClient::ResumedStream ||
+        client()->stream()->carbonManager().enabled()) {
         return;
     }
 

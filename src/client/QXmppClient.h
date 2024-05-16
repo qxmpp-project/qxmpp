@@ -352,6 +352,7 @@ private:
 
     friend class QXmppClientExtension;
     friend class QXmppInternalClientExtension;
+    friend class QXmppCarbonManagerV2;
     friend class TestClient;
 };
 
