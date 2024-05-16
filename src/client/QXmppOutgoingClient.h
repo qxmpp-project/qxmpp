@@ -42,6 +42,7 @@ struct Bind2Bound;
 struct SmEnabled;
 struct SmFailed;
 struct SmResumed;
+struct StreamErrorElement;
 
 enum HandleElementResult {
     Accepted,
@@ -124,9 +125,12 @@ public:
 
 private:
     void handleStart();
+    void handleStream(const QDomElement &element);
     void handlePacketReceived(const QDomElement &element);
     QXmpp::Private::HandleElementResult handleElement(const QDomElement &nodeRecv);
-    void handleStream(const QDomElement &element);
+    void handleStreamFeatures(const QXmppStreamFeatures &features);
+    void handleStreamError(const QXmpp::Private::StreamErrorElement &streamError);
+    bool handleStanza(const QDomElement &);
 
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);
