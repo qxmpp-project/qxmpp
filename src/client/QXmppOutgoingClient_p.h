@@ -25,6 +25,8 @@ using namespace QXmpp::Private;
 
 namespace QXmpp::Private {
 
+using LegacyError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmppStanza::Error::Condition>;
+
 struct ProtocolError {
     QString text;
 };
@@ -146,7 +148,7 @@ public:
     struct Error {
         QString text;
         QXmppOutgoingClient::ConnectionError details;
-        QXmppOutgoingClient::LegacyError legacyError;
+        LegacyError legacyError;
     };
 
     explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
