@@ -213,6 +213,7 @@ std::optional<Bind2Request> Bind2Request::fromDom(const QDomElement &el)
     return Bind2Request {
         firstChildElement(el, u"tag", ns_bind2).text(),
         !firstChildElement(el, u"inactive", ns_csi).isNull(),
+        !firstChildElement(el, u"enable", ns_carbons).isNull(),
         SmEnable::fromDom(firstChildElement(el, u"enable", ns_stream_management)),
     };
 }
@@ -224,6 +225,9 @@ void Bind2Request::toXml(QXmlStreamWriter *writer) const
     writeOptionalXmlTextElement(writer, u"tag", tag);
     if (csiInactive) {
         writeEmptyElement(writer, u"inactive", ns_csi);
+    }
+    if (carbonsEnable) {
+        writeEmptyElement(writer, u"enable", ns_carbons);
     }
     if (smEnable) {
         smEnable->toXml(writer);

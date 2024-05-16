@@ -113,6 +113,7 @@ struct Bind2Request {
     QString tag;
     // bind2 extensions
     bool csiInactive = false;
+    bool carbonsEnable = false;
     std::optional<SmEnable> smEnable;
 };
 
