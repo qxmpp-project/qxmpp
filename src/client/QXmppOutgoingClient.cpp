@@ -161,6 +161,12 @@ C2sStreamManager &QXmppOutgoingClient::c2sStreamManager() const
     return d->c2sStreamManager;
 }
 
+/// Returns the manager for enabling of message carbons via bind2.
+CarbonManager &QXmppOutgoingClient::carbonManager() const
+{
+    return d->carbonManager;
+}
+
 /// Returns the manager for \xep{0352, Client State Indication}.
 CsiManager &QXmppOutgoingClient::csiManager() const
 {
@@ -293,6 +299,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
         Bind2Request request;
         request.tag = d->config.resourcePrefix();
         // extensions
+        d->carbonManager.onBind2Request(request, bind2Features);
         d->csiManager.onBind2Request(request, bind2Features);
         d->c2sStreamManager.onBind2Request(request, bind2Features);
         return request;
@@ -464,6 +471,7 @@ void QXmppOutgoingClient::openSession()
     d->bind2Bound.reset();
 
     d->iqManager.onSessionOpened(session);
+    d->carbonManager.onSessionOpened(session);
     d->csiManager.onSessionOpened(session);
     Q_EMIT connected(session);
 }
@@ -1316,6 +1324,24 @@ bool C2sStreamManager::setResumeAddress(const QString &address)
     m_resumeHost.clear();
     m_resumePort = 0;
     return false;
+}
+
+void CarbonManager::onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features)
+{
+    request.carbonsEnable = m_enableViaBind2 && contains(bind2Features, ns_carbons);
+    m_requested = request.carbonsEnable;
+}
+
+void CarbonManager::onSessionOpened(const SessionBegin &session)
+{
+    // reset state for new streams
+    if (!session.smResumed) {
+        m_enabled = false;
+    }
+    // set if enabled via bind2
+    if (session.bind2Used) {
+        m_enabled = m_requested;
+    }
 }
 
 CsiManager::CsiManager(QXmppOutgoingClient *client)
