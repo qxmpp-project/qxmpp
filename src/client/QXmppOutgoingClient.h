@@ -74,6 +74,7 @@ class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
 public:
     using IqResult = std::variant<QDomElement, QXmppError>;
     using ConnectionError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmpp::StreamError, QXmpp::AuthenticationError, QXmpp::BindError>;
+    using LegacyError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmppStanza::Error::Condition>;
 
     explicit QXmppOutgoingClient(QObject *parent);
     ~QXmppOutgoingClient() override;
@@ -139,6 +140,7 @@ private:
     void startResourceBinding();
     void openSession();
     void closeSession();
+    void setError(const QString &text, ConnectionError &&details, LegacyError oldError);
     void throwKeepAliveError();
 
     // for unit tests, see TestClient
