@@ -94,7 +94,6 @@ public:
     explicit PingManager(QXmppOutgoingClient *q);
 
     void onDataReceived();
-    bool handleIq(const QDomElement &el);
 
 private:
     void sendPing();
