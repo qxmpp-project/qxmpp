@@ -59,7 +59,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
     : socket(qq),
       streamAckManager(socket),
       iqManager(qq, streamAckManager),
-      manager(qq),
+      listener(qq),
       c2sStreamManager(qq),
       csiManager(qq),
       pingManager(qq),
@@ -291,8 +291,6 @@ void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
 
 void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Feature)
 {
-    d->manager = Sasl2Manager(&d->socket);
-
     // prepare bind2 request
     auto createBind2Request = [this](const auto &bind2Features) {
         Bind2Request request;
@@ -314,8 +312,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
     d->c2sStreamManager.onSasl2Authenticate(sasl2Request, sasl2Feature);
 
     // start authentication
-    auto &sasl2 = std::get<Sasl2Manager>(d->manager);
-    sasl2.authenticate(std::move(sasl2Request), d->config, sasl2Feature, this).then(this, [this](auto result) {
+    d->setListener<Sasl2Manager>(&d->socket).authenticate(std::move(sasl2Request), d->config, sasl2Feature, this).then(this, [this](auto result) {
         if (auto success = std::get_if<Sasl2::Success>(&result)) {
             debug(QStringLiteral("Authenticated"));
             d->isAuthenticated = true;
@@ -345,8 +342,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
 
 void QXmppOutgoingClient::startNonSaslAuth()
 {
-    d->manager = NonSaslAuthManager(&d->socket);
-    std::get<NonSaslAuthManager>(d->manager).queryOptions(d->streamFrom, d->config.user()).then(this, [this](auto result) {
+    d->setListener<NonSaslAuthManager>(&d->socket).queryOptions(d->streamFrom, d->config.user()).then(this, [this](auto result) {
         if (auto *options = std::get_if<NonSaslAuthOptions>(&result)) {
             bool plainText = false;
 
@@ -363,7 +359,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
                 return;
             }
 
-            auto task = std::get<NonSaslAuthManager>(d->manager).authenticate(plainText, d->config.user(), d->config.password(), d->config.resource(), d->streamId);
+            auto task = std::get<NonSaslAuthManager>(d->listener).authenticate(plainText, d->config.user(), d->config.password(), d->config.resource(), d->streamId);
             task.then(this, [this](auto result) {
                 if (std::holds_alternative<Success>(result)) {
                     // successful Non-SASL Authentication
@@ -391,7 +387,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
 
 void QXmppOutgoingClient::startSmResume()
 {
-    d->manager = &d->c2sStreamManager;
+    d->listener = &d->c2sStreamManager;
     d->c2sStreamManager.requestResume().then(this, [this] {
         if (d->c2sStreamManager.streamResumed()) {
             openSession();
@@ -410,7 +406,7 @@ void QXmppOutgoingClient::startSmResume()
 
 void QXmppOutgoingClient::startSmEnable()
 {
-    d->manager = &d->c2sStreamManager;
+    d->listener = &d->c2sStreamManager;
     d->c2sStreamManager.requestEnable().then(this, [this] {
         // enabling of stream management may or may not have succeeded
         // we are connected now
@@ -420,8 +416,7 @@ void QXmppOutgoingClient::startSmEnable()
 
 void QXmppOutgoingClient::startResourceBinding()
 {
-    d->manager = BindManager(&d->socket);
-    std::get<BindManager>(d->manager).bindAddress(d->config.resource()).then(this, [this](BindManager::Result r) {
+    d->setListener<BindManager>(&d->socket).bindAddress(d->config.resource()).then(this, [this](BindManager::Result r) {
         if (auto *addr = std::get_if<BoundAddress>(&r)) {
             d->config.setUser(addr->user);
             d->config.setDomain(addr->domain);
@@ -533,7 +528,7 @@ void QXmppOutgoingClient::handleStart()
     d->streamVersion.clear();
 
     // reset active manager (e.g. authentication)
-    d->manager = this;
+    d->listener = this;
 
     d->c2sStreamManager.onStreamStart();
 
@@ -569,13 +564,13 @@ void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
     // if we receive any kind of data, stop the timeout timer
     d->pingManager.onDataReceived();
 
-    auto index = d->manager.index();
+    auto index = d->listener.index();
 
     switch (visit(overloaded {
                       [&](auto *manager) { return manager->handleElement(nodeRecv); },
                       [&](auto &manager) { return manager.handleElement(nodeRecv); },
                   },
-                  d->manager)) {
+                  d->listener)) {
     case Accepted:
         return;
     case Rejected:
@@ -584,8 +579,8 @@ void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
         return;
     case Finished:
         // if the job is done, set OutgoingClient, but do not override a continuation job
-        if (d->manager.index() == index) {
-            d->manager = this;
+        if (d->listener.index() == index) {
+            d->listener = this;
         }
         return;
     }
@@ -637,8 +632,7 @@ void QXmppOutgoingClient::handleStreamFeatures(const QXmppStreamFeatures &featur
     }
     // SASL
     if (saslAvailable && configuration().useSASLAuthentication()) {
-        d->manager = SaslManager(&d->socket);
-        std::get<SaslManager>(d->manager).authenticate(d->config, features.authMechanisms(), this).then(this, [this](auto result) {
+        d->setListener<SaslManager>(&d->socket).authenticate(d->config, features.authMechanisms(), this).then(this, [this](auto result) {
             if (std::holds_alternative<Success>(result)) {
                 debug(QStringLiteral("Authenticated"));
                 d->isAuthenticated = true;
