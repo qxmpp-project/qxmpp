@@ -966,10 +966,15 @@ void PingManager::onDataReceived()
 
 void PingManager::sendPing()
 {
-    // send ping packet
-    QXmppPingIq ping;
-    ping.setTo(q->configuration().domain());
-    q->streamAckManager().send(ping);
+    // use smaller stream management ack requests if possible
+    if (q->streamAckManager().enabled()) {
+        q->streamAckManager().sendAcknowledgementRequest();
+    } else {
+        // send ping packet
+        QXmppPingIq ping;
+        ping.setTo(q->configuration().domain());
+        q->streamAckManager().send(ping);
+    }
 
     // start timeout timer
     const int timeout = q->configuration().keepAliveTimeout();
