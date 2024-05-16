@@ -22,7 +22,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppTask.h"
-#include "QXmppTlsManager_p.h"
 #include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
@@ -267,9 +266,6 @@ QXmppClient::QXmppClient(InitialExtensions initialExtensions, QObject *parent)
 
     // logging
     setLogger(QXmppLogger::getLogger());
-
-    // always add TLS manager (it is private and can't be added by the user)
-    addNewExtension<QXmppTlsManager>();
 
     switch (initialExtensions) {
     case NoExtensions:

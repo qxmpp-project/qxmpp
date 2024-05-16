@@ -27,6 +27,17 @@ namespace QXmpp::Private {
 
 using LegacyError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmppStanza::Error::Condition>;
 
+// STARTTLS
+class StarttlsManager
+{
+public:
+    QXmppTask<void> task() { return m_promise.task(); }
+    HandleElementResult handleElement(const QDomElement &el);
+
+private:
+    QXmppPromise<void> m_promise;
+};
+
 struct ProtocolError {
     QString text;
 };
@@ -182,7 +193,7 @@ public:
     bool sessionStarted = false;
     std::optional<Bind2Bound> bind2Bound;
 
-    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> listener;
+    std::variant<QXmppOutgoingClient *, StarttlsManager, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> listener;
     C2sStreamManager c2sStreamManager;
     CarbonManager carbonManager;
     CsiManager csiManager;
