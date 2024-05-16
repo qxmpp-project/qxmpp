@@ -177,6 +177,7 @@ public:
 
     std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> manager;
     C2sStreamManager c2sStreamManager;
+    CarbonManager carbonManager;
     CsiManager csiManager;
     PingManager pingManager;
 

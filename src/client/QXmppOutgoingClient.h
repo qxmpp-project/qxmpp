@@ -30,6 +30,7 @@ class TestClient;
 
 namespace QXmpp::Private {
 class C2sStreamManager;
+class CarbonManager;
 class CsiManager;
 class OutgoingIqManager;
 class PingManager;
@@ -63,7 +64,7 @@ namespace QXmpp::Private::Sasl2 {
 struct Authenticate;
 struct StreamFeature;
 struct Success;
-}
+}  // namespace QXmpp::Private::Sasl2
 
 // The QXmppOutgoingClient class represents an outgoing XMPP stream to an XMPP server.
 class QXMPP_EXPORT QXmppOutgoingClient : public QXmppLoggable
@@ -93,6 +94,7 @@ public:
     QXmpp::Private::StreamAckManager &streamAckManager() const;
     QXmpp::Private::OutgoingIqManager &iqManager() const;
     QXmpp::Private::C2sStreamManager &c2sStreamManager() const;
+    QXmpp::Private::CarbonManager &carbonManager() const;
     QXmpp::Private::CsiManager &csiManager() const;
 
     /// This signal is emitted when the stream is connected.
@@ -207,6 +209,23 @@ private:
     quint16 m_resumePort = 0;
     bool m_enabled = false;
     bool m_streamResumed = false;
+};
+
+// XEP-0280: Message Carbons
+class CarbonManager
+{
+public:
+    void setEnableViaBind2(bool enable) { m_enableViaBind2 = enable; }
+    bool enabled() const { return m_enabled; }
+    void onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features);
+    void onSessionOpened(const SessionBegin &session);
+
+private:
+    // whether to enable carbons via bind2 if available
+    bool m_enableViaBind2 = false;
+    // whether carbons have been enabled via bind2
+    bool m_enabled = false;
+    bool m_requested = false;
 };
 
 // XEP-0352: Client State Indication
