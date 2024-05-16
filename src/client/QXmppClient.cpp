@@ -760,6 +760,11 @@ void QXmppClient::sendMessage(const QString &bareJid, const QString &message)
     }
 }
 
+QXmppOutgoingClient *QXmppClient::stream() const
+{
+    return d->stream;
+}
+
 QXmppClient::State QXmppClient::state() const
 {
     if (d->stream->isConnected()) {
