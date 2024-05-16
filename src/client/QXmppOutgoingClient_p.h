@@ -182,11 +182,18 @@ public:
     bool sessionStarted = false;
     std::optional<Bind2Bound> bind2Bound;
 
-    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> manager;
+    std::variant<QXmppOutgoingClient *, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> listener;
     C2sStreamManager c2sStreamManager;
     CarbonManager carbonManager;
     CsiManager csiManager;
     PingManager pingManager;
+
+    template<typename T, typename... Args>
+    T &setListener(Args... args)
+    {
+        listener = T { args... };
+        return std::get<T>(listener);
+    }
 
 private:
     QXmppOutgoingClient *q;
