@@ -338,7 +338,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
             }
         } else {
             auto [text, err] = std::get<Sasl2Manager::AuthError>(std::move(result));
-            setError(text, err, QXmppStanza::Error::NotAuthorized);
+            setError(text, std::move(err));
             disconnectFromHost();
         }
     });
@@ -436,12 +436,11 @@ void QXmppOutgoingClient::startResourceBinding()
             }
         } else if (auto *protocolError = std::get_if<ProtocolError>(&r)) {
             setError(QStringLiteral("Resource binding failed: ") + protocolError->text,
-                     StreamError::UndefinedCondition,
-                     QXmppStanza::Error::UndefinedCondition);
+                     StreamError::UndefinedCondition);
             disconnectFromHost();
         } else if (auto *stanzaError = std::get_if<QXmppStanza::Error>(&r)) {
             QString text = QStringLiteral("Resource binding failed: ") + stanzaError->text();
-            setError(text, BindError { *stanzaError }, stanzaError->condition());
+            setError(text, BindError { *stanzaError });
             disconnectFromHost();
         }
     });
@@ -478,21 +477,40 @@ void QXmppOutgoingClient::closeSession()
     Q_EMIT disconnected(session);
 }
 
-void QXmppOutgoingClient::setError(const QString &text, ConnectionError &&details, LegacyError legacyError)
+void QXmppOutgoingClient::setError(const QString &text, ConnectionError &&details)
 {
-    d->error = {
-        text,
-        std::move(details),
-        legacyError,
-    };
+    auto legacyError = visit<LegacyError>(
+        overloaded {
+            [](QAbstractSocket::SocketError e) { return e; },
+            [](TimeoutError e) { return e; },
+            [](StreamError e) {
+                switch (e) {
+                case StreamError::Conflict:
+                    return QXmppStanza::Error::Conflict;
+                case StreamError::NotAuthorized:
+                    return QXmppStanza::Error::NotAuthorized;
+                default:
+                    return QXmppStanza::Error::UndefinedCondition;
+                }
+            },
+            [](const AuthenticationError &) {
+                return QXmppStanza::Error::NotAuthorized;
+            },
+            [](const BindError &e) {
+                return e.stanzaError.condition();
+            },
+        },
+        details);
+    auto clientError = visit(
+        overloaded {
+            [](QAbstractSocket::SocketError) { return QXmppClient::SocketError; },
+            [](TimeoutError) { return QXmppClient::KeepAliveError; },
+            [](QXmppStanza::Error::Condition) { return QXmppClient::XmppStreamError; },
+        },
+        legacyError);
+
+    d->error = { text, std::move(details), legacyError };
     warning(text);
-    auto clientError =
-        visit(overloaded {
-                  [](QAbstractSocket::SocketError) { return QXmppClient::SocketError; },
-                  [](TimeoutError) { return QXmppClient::KeepAliveError; },
-                  [](QXmppStanza::Error::Condition) { return QXmppClient::XmppStreamError; },
-              },
-              d->error->legacyError);
     Q_EMIT errorOccurred(d->error->text, d->error->details, clientError);
 }
 
@@ -503,7 +521,7 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
         // some network error occurred during startup -> try next available SRV record server
         d->connectToNextDNSHost();
     } else {
-        setError(d->socket.socket()->errorString(), socketError, socketError);
+        setError(d->socket.socket()->errorString(), socketError);
     }
 }
 
@@ -563,7 +581,7 @@ void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
     case Accepted:
         return;
     case Rejected:
-        setError(QStringLiteral("Unexpected element received."), StreamError::UndefinedCondition, QXmppStanza::Error::UndefinedCondition);
+        setError(QStringLiteral("Unexpected element received."), StreamError::UndefinedCondition);
         disconnectFromHost();
         return;
     case Finished:
@@ -611,17 +629,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
                     handleStart();
                 } else {
                     auto [text, err] = std::get<SaslManager::AuthError>(std::move(result));
-
-                    auto legacyError = QXmppStanza::Error::UndefinedCondition;
-                    try {
-                        if (std::any_cast<Sasl::Failure &>(err.details).condition == Sasl::ErrorCondition::NotAuthorized) {
-                            legacyError = QXmppStanza::Error::NotAuthorized;
-                        }
-                    } catch (std::bad_any_cast) {
-                        // fallback to UndefinedCondition set above
-                    }
-
-                    setError(text, err, legacyError);
+                    setError(text, std::move(err));
                     disconnectFromHost();
                 }
             });
@@ -670,30 +678,16 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
                                   .arg(redirect->host, redirect->port));
                     } else {
                         auto condition = std::get<StreamError>(streamError.condition);
-
-                        // backwards compat
-                        auto legacyError = [&] {
-                            switch (condition) {
-                            case StreamError::Conflict:
-                                return QXmppStanza::Error::Conflict;
-                            case StreamError::NotAuthorized:
-                                return QXmppStanza::Error::NotAuthorized;
-                            default:
-                                return QXmppStanza::Error::UndefinedCondition;
-                            }
-                        }();
-
                         auto text = QStringLiteral("Received stream error (%1): %2")
                                         .arg(StreamErrorElement::streamErrorToString(condition), streamError.text);
 
-                        setError(text, condition, legacyError);
+                        setError(text, condition);
                     }
                 },
                 [&](QXmppError &&err) {
                     // invalid stream error element received
                     setError(QStringLiteral("Received invalid stream error (%1)").arg(err.description),
-                             StreamError::UndefinedCondition,
-                             QXmppStanza::Error::UndefinedCondition);
+                             StreamError::UndefinedCondition);
                 },
             },
             StreamErrorElement::fromDom(nodeRecv));
@@ -745,7 +739,7 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
 
 void QXmppOutgoingClient::throwKeepAliveError()
 {
-    setError(QStringLiteral("Ping timeout"), TimeoutError(), TimeoutError());
+    setError(QStringLiteral("Ping timeout"), TimeoutError());
     disconnectFromHost();
 }
 
