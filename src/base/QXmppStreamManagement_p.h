@@ -114,11 +114,11 @@ public:
     bool sendPacketCompat(QXmppPacket &&);
     std::tuple<bool, QXmppTask<QXmpp::SendResult>> internalSend(QXmppPacket &&);
 
+    void sendAcknowledgementRequest();
+
 private:
     void handleAcknowledgement(const SmAck &ack);
-
     void sendAcknowledgement();
-    void sendAcknowledgementRequest();
 
     QXmpp::Private::XmppSocket &socket;
 
