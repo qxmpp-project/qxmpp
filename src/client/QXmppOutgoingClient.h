@@ -176,9 +176,9 @@ public:
     bool enabled() const { return m_enabled; }
     bool streamResumed() const { return m_streamResumed; }
     bool canRequestResume() const { return m_smAvailable && !m_enabled && m_canResume; }
-    QXmppTask<Result> requestResume();
+    QXmppTask<void> requestResume();
     bool canRequestEnable() const { return m_smAvailable && !m_enabled; }
-    QXmppTask<Result> requestEnable();
+    QXmppTask<void> requestEnable();
 
 private:
     friend class ::TestClient;
@@ -193,10 +193,10 @@ private:
 
     struct NoRequest { };
     struct ResumeRequest {
-        QXmppPromise<Result> p;
+        QXmppPromise<void> p;
     };
     struct EnableRequest {
-        QXmppPromise<Result> p;
+        QXmppPromise<void> p;
     };
 
     QXmppOutgoingClient *q;
