@@ -4,6 +4,18 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.6.1 (May 16, 2024)
+--------------------------
+
+Fixes:
+ - Fix handling of XMPP redirects (introduced in aaa6497) (@lnjX)
+ - Fix compilation with Qt 6 + C++17 (not C++20) in OmemoData (@lnjX)
+ - Fix OMEMO decryption of group chat messages (@melvo, #617)
+ - Fix stream resumption (@lnjX)<br/>
+   This has been an issue since the initial implementation of stream mangement. The xmlns was
+   missing in the &lt;resume/&gt; element and the stream ID was not parsed in the &lt;enabled/&gt;
+   element.
+
 QXmpp 1.6.0 (Feb 6, 2024)
 -------------------------
 
