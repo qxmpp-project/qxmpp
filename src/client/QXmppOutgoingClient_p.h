@@ -143,6 +143,12 @@ private:
 class QXmppOutgoingClientPrivate
 {
 public:
+    struct Error {
+        QString text;
+        QXmppOutgoingClient::ConnectionError details;
+        QXmppOutgoingClient::LegacyError legacyError;
+    };
+
     explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
     void connectToHost(const QString &host, quint16 port);
     void connectToNextDNSHost();
@@ -150,7 +156,7 @@ public:
     // This object provides the configuration
     // required for connecting to the XMPP server.
     QXmppConfiguration config;
-    QXmppStanza::Error::Condition xmppStreamError;
+    std::optional<Error> error;
 
     // Core stream
     XmppSocket socket;
