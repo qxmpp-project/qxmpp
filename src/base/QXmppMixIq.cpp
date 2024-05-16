@@ -40,18 +40,17 @@ static const QMap<QXmppMixConfigItem::Node, QStringView> NODES = {
     { QXmppMixConfigItem::Node::Presence, ns_mix_node_presence },
 };
 
-///
-/// \class QXmppMixSubscriptionUpdateIq
-///
-/// This class represents an IQ used to subscribe to nodes and unsubcribe from nodes of a MIX
-/// channel as defined by \xep{0369, Mediated Information eXchange (MIX)}.
-///
-/// \since QXmpp 1.7
-///
-/// \ingroup Stanzas
-///
+//
+// \class QXmppMixSubscriptionUpdateIq
+//
+// This class represents an IQ used to subscribe to nodes and unsubcribe from nodes of a MIX
+// channel as defined by \xep{0369, Mediated Information eXchange (MIX)}.
+//
+// \since QXmpp 1.7
+//
+// \ingroup Stanzas
+//
 
-/// \cond
 ///
 /// Constructs a MIX subscription update IQ.
 ///
@@ -146,20 +145,18 @@ void QXmppMixSubscriptionUpdateIq::toXmlElementFromChild(QXmlStreamWriter *write
 
     writer->writeEndElement();
 }
-/// \endcond
 
-///
-/// \class QXmppMixInvitationRequestIq
-///
-/// This class represents an IQ used to request an invitation to a MIX channel as defined by
-/// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
-///
-/// \since QXmpp 1.7
-///
-/// \ingroup Stanzas
-///
+//
+// \class QXmppMixInvitationRequestIq
+//
+// This class represents an IQ used to request an invitation to a MIX channel as defined by
+// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
+//
+// \since QXmpp 1.7
+//
+// \ingroup Stanzas
+//
 
-/// \cond
 ///
 /// Constructs a MIX invitation request IQ.
 ///
@@ -209,20 +206,18 @@ void QXmppMixInvitationRequestIq::toXmlElementFromChild(QXmlStreamWriter *writer
     writeXmlTextElement(writer, u"invitee", m_inviteeJid);
     writer->writeEndElement();
 }
-/// \endcond
 
-///
-/// \class QXmppMixInvitationResponseIq
-///
-/// This class represents an IQ that contains a requested invitation to a MIX channel as defined by
-/// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
-///
-/// \since QXmpp 1.7
-///
-/// \ingroup Stanzas
-///
+//
+// \class QXmppMixInvitationResponseIq
+//
+// This class represents an IQ that contains a requested invitation to a MIX channel as defined by
+// \xep{0407, Mediated Information eXchange (MIX): Miscellaneous Capabilities}.
+//
+// \since QXmpp 1.7
+//
+// \ingroup Stanzas
+//
 
-/// \cond
 ///
 /// Constructs a MIX invitation response IQ.
 ///
@@ -273,7 +268,6 @@ void QXmppMixInvitationResponseIq::toXmlElementFromChild(QXmlStreamWriter *write
     m_invitation.toXml(writer);
     writer->writeEndElement();
 }
-/// \endcond
 
 class QXmppMixIqPrivate : public QSharedData
 {

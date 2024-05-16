@@ -21,13 +21,13 @@
 
 class QXmppOutgoingClient;
 
-///
-/// \brief The QXmppInternalClientExtension class is used to access private
-/// components of the QXmppClient.
-///
-/// It is not exposed to the public API and is only used to split up internal
-/// parts of the QXmppClient, like TLS negotiation.
-///
+//
+// \brief The QXmppInternalClientExtension class is used to access private
+// components of the QXmppClient.
+//
+// It is not exposed to the public API and is only used to split up internal
+// parts of the QXmppClient, like TLS negotiation.
+//
 class QXmppInternalClientExtension : public QXmppClientExtension
 {
     Q_OBJECT
