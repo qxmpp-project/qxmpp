@@ -22,9 +22,9 @@ class QTimer;
 // We mean it.
 //
 
-///
-/// The QXmppStunTransaction class represents a STUN transaction.
-///
+//
+// The QXmppStunTransaction class represents a STUN transaction.
+//
 class QXMPP_EXPORT QXmppStunTransaction : public QXmppLoggable
 {
     Q_OBJECT
@@ -70,10 +70,10 @@ Q_SIGNALS:
     void datagramReceived(const QByteArray &data, const QHostAddress &host, quint16 port);
 };
 
-///
-/// The QXmppTurnAllocation class represents a TURN allocation as defined
-/// by RFC 5766 Traversal Using Relays around NAT (TURN).
-///
+//
+// The QXmppTurnAllocation class represents a TURN allocation as defined
+// by RFC 5766 Traversal Using Relays around NAT (TURN).
+//
 class QXMPP_EXPORT QXmppTurnAllocation : public QXmppIceTransport
 {
     Q_OBJECT
@@ -146,9 +146,9 @@ private:
     QList<QXmppStunTransaction *> m_transactions;
 };
 
-///
-/// The QXmppUdpTransport class represents a UDP transport.
-///
+//
+// The QXmppUdpTransport class represents a UDP transport.
+//
 class QXMPP_EXPORT QXmppUdpTransport : public QXmppIceTransport
 {
     Q_OBJECT

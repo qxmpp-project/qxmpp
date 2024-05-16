@@ -15,7 +15,7 @@ HTML_EXTRA_FILES       = @PROJECT_SOURCE_DIR@/doc/doap.xml \
 ALIASES                = "xep{1}=<a href=\"https://xmpp.org/extensions/xep-\1.html\">XEP-\1</a>" \
                          "xep{2}=<a href=\"https://xmpp.org/extensions/xep-\1.html\">XEP-\1: \2</a>"
 ALPHABETICAL_INDEX     = NO
-EXCLUDE_PATTERNS       = */moc_* */mod_* */*_p.h */QXmppCodec.cpp */QXmppSasl.cpp
+EXCLUDE_PATTERNS       = */moc_* */mod_* */QXmppCodec.cpp */QXmppSasl.cpp
 FULL_PATH_NAMES        = NO
 HIDE_UNDOC_CLASSES     = YES
 GENERATE_LATEX         = NO

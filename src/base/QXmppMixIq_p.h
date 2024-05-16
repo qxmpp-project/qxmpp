@@ -22,13 +22,11 @@ public:
     QXmppMixConfigItem::Nodes removals() const;
     void setRemovals(QXmppMixConfigItem::Nodes);
 
-    /// \cond
     static bool isMixSubscriptionUpdateIq(const QDomElement &);
 
 protected:
     void parseElementFromChild(const QDomElement &) override;
     void toXmlElementFromChild(QXmlStreamWriter *) const override;
-    /// \endcond
 
 private:
     QXmppMixConfigItem::Nodes m_additions;
@@ -45,13 +43,11 @@ public:
     QString inviteeJid() const;
     void setInviteeJid(const QString &);
 
-    /// \cond
     static bool isMixInvitationRequestIq(const QDomElement &);
 
 protected:
     void parseElementFromChild(const QDomElement &) override;
     void toXmlElementFromChild(QXmlStreamWriter *) const override;
-    /// \endcond
 
 private:
     QString m_inviteeJid;
@@ -67,13 +63,11 @@ public:
     QXmppMixInvitation invitation() const;
     void setInvitation(const QXmppMixInvitation &);
 
-    /// \cond
     static bool isMixInvitationResponseIq(const QDomElement &);
 
 protected:
     void parseElementFromChild(const QDomElement &) override;
     void toXmlElementFromChild(QXmlStreamWriter *) const override;
-    /// \endcond
 
 private:
     QXmppMixInvitation m_invitation;
