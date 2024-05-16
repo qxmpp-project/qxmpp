@@ -224,8 +224,7 @@ void QXmppOutgoingClient::connectToHost()
 ///
 void QXmppOutgoingClient::disconnectFromHost()
 {
-    d->c2sStreamManager.onDisconnecting();
-    d->streamAckManager.handleDisconnect();
+    d->c2sStreamManager.onStreamClosed();
     d->socket.disconnectFromHost();
 }
 
@@ -473,6 +472,7 @@ void QXmppOutgoingClient::closeSession()
         d->c2sStreamManager.canResume(),
     };
 
+    d->streamAckManager.onSessionClosed();
     d->iqManager.onSessionClosed(session);
     Q_EMIT disconnected(session);
 }
@@ -527,8 +527,6 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 
 void QXmppOutgoingClient::handleStart()
 {
-    d->streamAckManager.handleStart();
-
     // reset stream information
     d->streamId.clear();
     d->streamFrom.clear();
@@ -1205,7 +1203,7 @@ void C2sStreamManager::onStreamFeatures(const QXmppStreamFeatures &features)
     m_smAvailable = features.streamManagementMode() != QXmppStreamFeatures::Disabled;
 }
 
-void C2sStreamManager::onDisconnecting()
+void C2sStreamManager::onStreamClosed()
 {
     m_canResume = false;
 }

@@ -89,22 +89,20 @@ struct SmRequest {
 };
 
 //
-// This manager is used in the QXmppStream. It contains the parts of stream
-// management that are shared between server and client connections.
+// This manager handles sending and receiving of stream management acks.
+// Enabling of stream management and stream resumption is done in the C2sStreamManager.
 //
 class StreamAckManager
 {
 public:
     explicit StreamAckManager(XmppSocket &socket);
-    ~StreamAckManager();
 
-    bool enabled() const;
-    unsigned int lastIncomingSequenceNumber() const;
+    bool enabled() const { return m_enabled; }
+    unsigned int lastIncomingSequenceNumber() const { return m_lastIncomingSequenceNumber; }
 
-    void handleDisconnect();
-    void handleStart();
     void handlePacketSent(QXmppPacket &packet, bool sentData);
     bool handleStanza(const QDomElement &stanza);
+    void onSessionClosed();
 
     void resetCache();
     void enableStreamManagement(bool resetSequenceNumber);

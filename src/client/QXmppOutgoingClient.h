@@ -172,7 +172,7 @@ public:
     std::pair<QString, quint16> resumeAddress() const { return { m_resumeHost, m_resumePort }; }
     void onStreamStart();
     void onStreamFeatures(const QXmppStreamFeatures &);
-    void onDisconnecting();
+    void onStreamClosed();
     void onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl2::StreamFeature &feature);
     void onSasl2Success(const Sasl2::Success &success);
     void onBind2Request(Bind2Request &request, const std::vector<QString> &bind2Features);
