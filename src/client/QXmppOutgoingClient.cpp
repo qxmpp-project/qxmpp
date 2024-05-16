@@ -397,8 +397,8 @@ void QXmppOutgoingClient::startNonSaslAuth()
 void QXmppOutgoingClient::startSmResume()
 {
     d->manager = &d->c2sStreamManager;
-    d->c2sStreamManager.requestResume().then(this, [this](auto &&result) {
-        if (std::holds_alternative<Success>(result)) {
+    d->c2sStreamManager.requestResume().then(this, [this] {
+        if (d->c2sStreamManager.streamResumed()) {
             openSession();
         } else {
             // check whether bind is available
@@ -416,7 +416,7 @@ void QXmppOutgoingClient::startSmResume()
 void QXmppOutgoingClient::startSmEnable()
 {
     d->manager = &d->c2sStreamManager;
-    d->c2sStreamManager.requestEnable().then(this, [this](auto &&) {
+    d->c2sStreamManager.requestEnable().then(this, [this] {
         // enabling of stream management may or may not have succeeded
         // we are connected now
         openSession();
@@ -1151,49 +1151,37 @@ C2sStreamManager::C2sStreamManager(QXmppOutgoingClient *q)
 
 HandleElementResult C2sStreamManager::handleElement(const QDomElement &el)
 {
-    auto finishResume = [this](Result &&result) {
-        auto request = std::get<ResumeRequest>(std::move(m_request));
-        m_request = {};
-        request.p.finish(std::move(result));
-    };
-    auto finishEnable = [this](Result &&result) {
-        auto request = std::get<EnableRequest>(std::move(m_request));
-        m_request = {};
-        request.p.finish(std::move(result));
-    };
-
     // resume
     if (std::holds_alternative<ResumeRequest>(m_request)) {
+        auto request = std::get<ResumeRequest>(std::move(m_request));
+        m_request = {};
+
         if (auto resumed = SmResumed::fromDom(el)) {
             onResumed(*resumed);
-            finishResume(Success());
+            request.p.finish();
             return Finished;
         }
 
         if (auto failed = SmFailed::fromDom(el)) {
             onResumeFailed(*failed);
-            finishResume(QXmppError {
-                QStringLiteral("Stream resumption failed"),
-                {},
-            });
+            request.p.finish();
             return Finished;
         }
     }
     // enable
     if (std::holds_alternative<EnableRequest>(m_request)) {
+        auto request = std::get<EnableRequest>(std::move(m_request));
+        m_request = {};
+
         if (auto enabled = SmEnabled::fromDom(el)) {
             onEnabled(*enabled);
-
-            finishEnable(Success());
+            request.p.finish();
             return Finished;
         }
 
         if (auto failed = SmFailed::fromDom(el)) {
             onEnableFailed(*failed);
-            finishEnable(QXmppError {
-                QStringLiteral("Enabling stream management failed"),
-                {},
-            });
+            request.p.finish();
             return Finished;
         }
     }
@@ -1253,7 +1241,7 @@ void C2sStreamManager::onBind2Bound(const Bind2Bound &bound)
     }
 }
 
-QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestResume()
+QXmppTask<void> C2sStreamManager::requestResume()
 {
     Q_ASSERT(std::holds_alternative<NoRequest>(m_request));
     m_request = ResumeRequest();
@@ -1264,7 +1252,7 @@ QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestResume()
     return std::get<ResumeRequest>(m_request).p.task();
 }
 
-QXmppTask<C2sStreamManager::Result> C2sStreamManager::requestEnable()
+QXmppTask<void> C2sStreamManager::requestEnable()
 {
     Q_ASSERT(std::holds_alternative<NoRequest>(m_request));
     m_request = EnableRequest();
