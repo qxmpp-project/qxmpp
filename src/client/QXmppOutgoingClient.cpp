@@ -709,30 +709,30 @@ bool QXmppOutgoingClient::handleStanza(const QDomElement &stanza)
     Q_ASSERT(stanza.namespaceURI() == ns_client);
 
     if (stanza.tagName() == u"iq") {
-        QString type = stanza.attribute(QStringLiteral("type"));
-        if (type.isEmpty()) {
-            warning(QStringLiteral("QXmppStream: iq type can't be empty"));
+        if (d->pingManager.handleIq(stanza)) {
+            return true;
         }
 
-        if (!d->pingManager.handleIq(stanza)) {
+        const auto type = stanza.attribute(QStringLiteral("type"));
+
+        if (type == u"result" || type == u"error") {
+            // emit iq responses
             QXmppIq iqPacket;
             iqPacket.parse(stanza);
-
-            // if we didn't understant the iq, reply with error
-            // except for "result" and "error" iqs
-            if (type != u"result" && type != u"error") {
-                QXmppIq iq(QXmppIq::Error);
-                iq.setId(iqPacket.id());
-                iq.setTo(iqPacket.from());
-                QXmppStanza::Error error(QXmppStanza::Error::Cancel,
-                                         QXmppStanza::Error::FeatureNotImplemented);
-                iq.setError(error);
-                d->streamAckManager.send(iq);
-            } else {
-                Q_EMIT iqReceived(iqPacket);
-            }
+            Q_EMIT iqReceived(iqPacket);
+            return true;
+        } else if (type == u"get" || type == u"set") {
+            // respond with error if we didn't understand the iq request
+            QXmppIq iq(QXmppIq::Error);
+            iq.setId(stanza.attribute(QStringLiteral("id")));
+            iq.setTo(stanza.attribute(QStringLiteral("from")));
+            iq.setError(QXmppStanza::Error {
+                QXmppStanza::Error::Cancel,
+                QXmppStanza::Error::FeatureNotImplemented,
+            });
+            d->streamAckManager.send(iq);
+            return true;
         }
-        return true;
     } else if (stanza.tagName() == u"presence") {
         QXmppPresence presence;
         presence.parse(stanza);
