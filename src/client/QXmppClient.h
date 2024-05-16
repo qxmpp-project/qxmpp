@@ -25,8 +25,9 @@ class QXmppTask;
 class QXmppE2eeExtension;
 class QXmppClientExtension;
 class QXmppClientPrivate;
-class QXmppPresence;
 class QXmppMessage;
+class QXmppOutgoingClient;
+class QXmppPresence;
 class QXmppIq;
 class QXmppStream;
 class QXmppInternalClientExtension;
@@ -335,6 +336,7 @@ public Q_SLOTS:
     void sendMessage(const QString &bareJid, const QString &message);
 
 private:
+    QXmppOutgoingClient *stream() const;
     void injectIq(const QDomElement &element, const std::optional<QXmppE2eeMetadata> &e2eeMetadata);
     bool injectMessage(QXmppMessage &&message);
 
