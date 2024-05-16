@@ -98,8 +98,6 @@ QStringList QXmppClientPrivate::discoveryFeatures()
         ns_chat_states.toString(),
         // XEP-0115: Entity Capabilities
         ns_capabilities.toString(),
-        // XEP-0199: XMPP Ping
-        ns_ping.toString(),
         // XEP-0249: Direct MUC Invitations
         ns_conference.toString(),
         // XEP-0308: Last Message Correction

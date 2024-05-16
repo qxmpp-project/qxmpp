@@ -709,10 +709,6 @@ bool QXmppOutgoingClient::handleStanza(const QDomElement &stanza)
     Q_ASSERT(stanza.namespaceURI() == ns_client);
 
     if (stanza.tagName() == u"iq") {
-        if (d->pingManager.handleIq(stanza)) {
-            return true;
-        }
-
         const auto type = stanza.attribute(QStringLiteral("type"));
 
         if (type == u"result" || type == u"error") {
@@ -966,21 +962,6 @@ PingManager::PingManager(QXmppOutgoingClient *q)
 void PingManager::onDataReceived()
 {
     timeoutTimer->stop();
-}
-
-bool PingManager::handleIq(const QDomElement &el)
-{
-    if (QXmppPingIq::isPingIq(el)) {
-        QXmppPingIq req;
-        req.parse(el);
-
-        QXmppIq iq(QXmppIq::Result);
-        iq.setId(req.id());
-        iq.setTo(req.from());
-        q->streamAckManager().send(iq);
-        return true;
-    }
-    return false;
 }
 
 void PingManager::sendPing()
