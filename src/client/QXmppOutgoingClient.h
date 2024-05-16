@@ -131,6 +131,7 @@ private:
     void handleStreamFeatures(const QXmppStreamFeatures &features);
     void handleStreamError(const QXmpp::Private::StreamErrorElement &streamError);
     bool handleStanza(const QDomElement &);
+    bool handleStarttls(const QXmppStreamFeatures &features);
 
     void _q_socketDisconnected();
     void socketError(QAbstractSocket::SocketError);

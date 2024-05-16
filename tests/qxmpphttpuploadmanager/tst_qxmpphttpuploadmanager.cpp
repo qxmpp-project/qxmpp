@@ -7,7 +7,6 @@
 #include "QXmppDiscoveryManager.h"
 #include "QXmppHttpUploadIq.h"
 #include "QXmppHttpUploadManager.h"
-#include "QXmppTlsManager_p.h"
 #include "QXmppUploadRequestManager.h"
 
 #include "Algorithms.h"
@@ -369,7 +368,6 @@ void tst_QXmppHttpUploadManager::testUpload()
     SKIP_IF_INTEGRATION_TESTS_DISABLED()
 
     TestClient test;
-    test.addNewExtension<QXmppTlsManager>();
     auto *disco = test.addNewExtension<QXmppDiscoveryManager>();
     test.addNewExtension<QXmppUploadRequestManager>();
     auto *uploadManager = test.addNewExtension<QXmppHttpUploadManager>();

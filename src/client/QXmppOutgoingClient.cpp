@@ -14,6 +14,7 @@
 #include "QXmppOutgoingClient_p.h"
 #include "QXmppPacket_p.h"
 #include "QXmppPingIq.h"
+#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
@@ -621,6 +622,11 @@ HandleElementResult QXmppOutgoingClient::handleElement(const QDomElement &nodeRe
 
 void QXmppOutgoingClient::handleStreamFeatures(const QXmppStreamFeatures &features)
 {
+    // STARTTLS
+    if (handleStarttls(features)) {
+        return;
+    }
+
     // handle authentication
     const bool nonSaslAvailable = features.nonSaslAuthMode() != QXmppStreamFeatures::Disabled;
     const bool saslAvailable = !features.authMechanisms().isEmpty();
@@ -740,6 +746,42 @@ bool QXmppOutgoingClient::handleStanza(const QDomElement &stanza)
     return false;
 }
 
+bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
+{
+    if (!socket()->isEncrypted()) {
+        // determine TLS mode to use
+        auto localSecurity = configuration().streamSecurityMode();
+        auto remoteSecurity = features.tlsMode();
+
+        // TLS required by config but not offered by server
+        if (localSecurity == QXmppConfiguration::TLSRequired && remoteSecurity == QXmppStreamFeatures::Disabled) {
+            warning(QStringLiteral("Server does not support TLS"));
+            disconnectFromHost();
+            return true;
+        }
+
+        // TLS not available locally, but required by server/config
+        if (!socket()->supportsSsl() &&
+            (localSecurity == QXmppConfiguration::TLSRequired || remoteSecurity == QXmppStreamFeatures::Required)) {
+            warning(QStringLiteral("TLS is required to connect but not available locally"));
+            disconnectFromHost();
+            return true;
+        }
+
+        // supported by server, locally and enabled in config
+        if (socket()->supportsSsl() &&
+            (localSecurity != QXmppConfiguration::TLSDisabled && remoteSecurity != QXmppStreamFeatures::Disabled)) {
+            // enable TLS as it is support by both parties
+            d->socket.sendData(serializeXml(QXmppStartTlsPacket()));
+            d->setListener<StarttlsManager>().task().then(this, [this] {
+                socket()->startClientEncryption();
+            });
+            return true;
+        }
+    }
+    return false;
+}
+
 void QXmppOutgoingClient::throwKeepAliveError()
 {
     setError(QStringLiteral("Ping timeout"), TimeoutError());
@@ -768,6 +810,15 @@ QXmppStanza::Error::Condition QXmppOutgoingClient::xmppStreamError()
 }
 
 namespace QXmpp::Private {
+
+HandleElementResult StarttlsManager::handleElement(const QDomElement &el)
+{
+    if (el.tagName() == u"proceed" && el.namespaceURI() == ns_tls) {
+        m_promise.finish();
+        return Finished;
+    }
+    return Rejected;
+}
 
 QXmppTask<BindManager::Result> BindManager::bindAddress(const QString &resource)
 {
