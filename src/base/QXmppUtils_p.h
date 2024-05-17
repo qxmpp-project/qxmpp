@@ -125,6 +125,8 @@ struct DomChildElements {
 
 inline DomChildElements iterChildElements(const QDomElement &el, QStringView tagName = {}, QStringView namespaceUri = {}) { return DomChildElements { el, tagName, namespaceUri }; }
 
+std::vector<QString> parseTextElements(DomChildElements elements);
+
 QByteArray serializeXml(const void *packet, void (*toXml)(const void *, QXmlStreamWriter *));
 template<typename T>
 inline QByteArray serializeXml(const T &packet)
