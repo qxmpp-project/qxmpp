@@ -6,15 +6,20 @@
 #define ALGORITHMS_H
 
 #include <algorithm>
+#include <functional>
 
 namespace QXmpp::Private {
 
 template<typename OutputVector, typename InputVector, typename Converter>
-auto transform(InputVector &input, Converter convert)
+auto transform(const InputVector &input, Converter convert)
 {
     OutputVector output;
-    output.reserve(input.size());
-    std::transform(input.begin(), input.end(), std::back_inserter(output), std::forward<Converter>(convert));
+    if constexpr (std::ranges::sized_range<InputVector>) {
+        output.reserve(input.size());
+    }
+    for (const auto &value : input) {
+        output.push_back(std::invoke(convert, value));
+    }
     return output;
 }
 
