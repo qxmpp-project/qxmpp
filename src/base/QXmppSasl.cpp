@@ -270,6 +270,91 @@ void Bind2Bound::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
+std::optional<FastFeature> FastFeature::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"fast" || el.namespaceURI() != ns_fast) {
+        return {};
+    }
+
+    return FastFeature {
+        .mechanisms = parseTextElements(iterChildElements(el, u"mechanism", ns_fast)),
+        .tls0rtt = parseBoolean(el.attribute(QStringLiteral("tls-0rtt"))).value_or(false),
+    };
+}
+
+void FastFeature::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("fast"));
+    writer->writeDefaultNamespace(toString65(ns_fast));
+    for (const auto &mechanism : mechanisms) {
+        writer->writeStartElement(QSL65("mechanism"));
+        writer->writeCharacters(mechanism);
+        writer->writeEndElement();
+    }
+    writer->writeEndElement();
+}
+
+std::optional<FastTokenRequest> FastTokenRequest::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"request-token" || el.namespaceURI() != ns_fast) {
+        return {};
+    }
+    return FastTokenRequest { el.attribute(QStringLiteral("mechanism")) };
+}
+
+void FastTokenRequest::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("request-token"));
+    writer->writeDefaultNamespace(toString65(ns_fast));
+    writer->writeAttribute(QSL65("mechanism"), mechanism);
+    writer->writeEndElement();
+}
+
+std::optional<FastToken> FastToken::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"token" || el.namespaceURI() != ns_fast) {
+        return {};
+    }
+
+    return FastToken {
+        QXmppUtils::datetimeFromString(el.attribute(QStringLiteral("expiry"))),
+        el.attribute(QStringLiteral("token")),
+    };
+}
+
+void FastToken::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("token"));
+    writer->writeDefaultNamespace(toString65(ns_fast));
+    writer->writeAttribute(QSL65("expiry"), QXmppUtils::datetimeToString(expiry));
+    writer->writeAttribute(QSL65("token"), token);
+    writer->writeEndElement();
+}
+
+std::optional<FastRequest> FastRequest::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"fast" || el.namespaceURI() != ns_fast) {
+        return {};
+    }
+    return FastRequest {
+        parseInt<uint64_t>(el.attribute(QStringLiteral("count"))),
+        parseBoolean(el.attribute(QStringLiteral("invalidate"))).value_or(false),
+    };
+}
+
+void FastRequest::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(QSL65("fast"));
+    writer->writeDefaultNamespace(toString65(ns_fast));
+    if (count) {
+        writer->writeAttribute(QSL65("count"), QString::number(*count));
+    }
+    if (invalidate) {
+        writer->writeAttribute(QSL65("invalidate"), QSL65("true"));
+    }
+    writer->writeEndElement();
+}
+
 namespace Sasl2 {
 
 std::optional<StreamFeature> StreamFeature::fromDom(const QDomElement &el)
