@@ -91,6 +91,10 @@ std::optional<Int> parseInt(QStringView str);
 template<typename Int>
 inline QString serializeInt(Int value) { return QString::number(value); }
 
+// Booleans
+std::optional<bool> parseBoolean(const QString &str);
+QString serializeBoolean(bool);
+
 //
 // DOM
 //
