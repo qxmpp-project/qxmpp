@@ -16,6 +16,7 @@
 #include <optional>
 
 #include <QCryptographicHash>
+#include <QDateTime>
 #include <QMap>
 #include <QUuid>
 
@@ -123,6 +124,37 @@ struct Bind2Bound {
     // extensions
     std::optional<SmFailed> smFailed;
     std::optional<SmEnabled> smEnabled;
+};
+
+struct FastFeature {
+    static std::optional<FastFeature> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    std::vector<QString> mechanisms;
+    bool tls0rtt = false;
+};
+
+struct FastTokenRequest {
+    static std::optional<FastTokenRequest> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QString mechanism;
+};
+
+struct FastToken {
+    static std::optional<FastToken> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    QDateTime expiry;
+    QString token;
+};
+
+struct FastRequest {
+    static std::optional<FastRequest> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
+
+    std::optional<uint64_t> count;
+    bool invalidate = false;
 };
 
 namespace Sasl2 {
