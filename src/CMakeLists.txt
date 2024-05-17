@@ -75,6 +75,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppResultSet.h
     base/QXmppRosterIq.h
     base/QXmppRpcIq.h
+    base/QXmppSasl2UserAgent.h
     base/QXmppSendResult.h
     base/QXmppSocks.h
     base/QXmppStanza.h
