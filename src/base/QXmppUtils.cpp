@@ -420,6 +420,22 @@ template std::optional<uint32_t> QXmpp::Private::parseInt<uint32_t>(QStringView)
 template std::optional<int64_t> QXmpp::Private::parseInt<int64_t>(QStringView);
 template std::optional<uint64_t> QXmpp::Private::parseInt<uint64_t>(QStringView);
 
+std::optional<bool> QXmpp::Private::parseBoolean(const QString &str)
+{
+    if (str == u"1" || str == u"true") {
+        return true;
+    }
+    if (str == u"0" || str == u"false") {
+        return false;
+    }
+    return {};
+}
+
+QString QXmpp::Private::serializeBoolean(bool value)
+{
+    return value ? QStringLiteral("true") : QStringLiteral("false");
+}
+
 bool QXmpp::Private::isIqType(const QDomElement &element, QStringView tagName, QStringView xmlns)
 {
     // IQs must have only one child element, so we do not need to iterate over the child elements.
