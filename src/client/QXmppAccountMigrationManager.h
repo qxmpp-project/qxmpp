@@ -109,8 +109,6 @@ void QXmppAccountMigrationManager::registerExportData(ImportFunc importFunc, Exp
     static_assert(std::is_constructible_v<std::function<QXmppTask<Result<DataType>>()>, ExportFunc>);
     static_assert(std::is_invocable_v<ImportFunc, const DataType &>);
     static_assert(std::is_invocable_v<ExportFunc>);
-    static_assert(std::is_same_v<std::result_of_t<ImportFunc(DataType)>, QXmppTask<Result<>>>);
-    static_assert(std::is_same_v<std::result_of_t<ExportFunc()>, QXmppTask<Result<DataType>>>);
     static_assert(std::is_same_v<first_argument_t<ImportFunc>, const DataType &>);
 
     auto importInternal = [importFunc = std::move(importFunc)](std::any data) -> QXmppTask<Result<>> {
