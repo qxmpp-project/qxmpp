@@ -83,7 +83,7 @@ QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, c
     QXmppPromise<void> promise;
 
     auto future = keys(encryption, TrustLevel::Authenticated | TrustLevel::ManuallyDistrusted);
-    future.then(this, [=](QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys) mutable {
+    future.then(this, [=, this](QHash<TrustLevel, QMultiHash<QString, QByteArray>> keys) mutable {
         const auto authenticatedKeys = keys.value(TrustLevel::Authenticated);
         const auto manuallyDistrustedKeys = keys.value(TrustLevel::ManuallyDistrusted);
         const auto ownJid = client()->configuration().jidBare();
@@ -171,7 +171,7 @@ QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, c
                 }
 
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                future.then(this, [=]() mutable {
+                future.then(this, [=, this]() mutable {
                     // Send a trust message for all authenticated or distrusted
                     // keys to the own endpoints whose keys have been
                     // authenticated.
@@ -224,7 +224,7 @@ QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, c
                 }
 
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
-                future.then(this, [=]() mutable {
+                future.then(this, [=, this]() mutable {
                     // Send a trust message for own authenticated or distrusted
                     // keys to the contact's endpoints whose keys have been
                     // authenticated.
@@ -275,7 +275,7 @@ QXmppTask<void> QXmppAtmManager::makeTrustDecisions(const QString &encryption, c
 
     auto future = authenticate(encryption, keyIdsForAuthentication);
 
-    future.then(this, [=]() mutable {
+    future.then(this, [=, this]() mutable {
         auto future = distrust(encryption, keyIdsForDistrusting);
         future.then(this, [=]() mutable {
             promise.finish();
@@ -305,7 +305,7 @@ QXmppTask<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
         const auto encryption = trustMessageElement->encryption();
 
         auto future = trustLevel(encryption, senderJid, senderKey);
-        future.then(this, [=](const auto &&senderKeyTrustLevel) mutable {
+        future.then(this, [=, this](const auto &&senderKeyTrustLevel) mutable {
             const auto isSenderKeyAuthenticated = senderKeyTrustLevel == TrustLevel::Authenticated;
 
             // key owner JIDs mapped to key IDs
@@ -351,7 +351,7 @@ QXmppTask<void> QXmppAtmManager::handleMessage(const QXmppMessage &message)
             }
 
             auto future = trustStorage()->addKeysForPostponedTrustDecisions(encryption, senderKey, keyOwnersForPostponedTrustDecisions);
-            future.then(this, [=]() mutable {
+            future.then(this, [=, this]() mutable {
                 auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
                 future.then(this, [=]() mutable {
                     promise.finish();
@@ -384,20 +384,20 @@ QXmppTask<void> QXmppAtmManager::authenticate(const QString &encryption, const Q
     QXmppPromise<void> promise;
 
     auto future = setTrustLevel(encryption, keyIds, TrustLevel::Authenticated);
-    future.then(this, [=]() mutable {
+    future.then(this, [=, this]() mutable {
         auto future = securityPolicy(encryption);
-        future.then(this, [=](auto securityPolicy) mutable {
+        future.then(this, [=, this](auto securityPolicy) mutable {
             if (securityPolicy == Toakafa) {
                 auto future = distrustAutomaticallyTrustedKeys(encryption, keyIds.uniqueKeys());
-                future.then(this, [=]() mutable {
+                future.then(this, [=, this]() mutable {
                     auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                    future.then(this, [=]() mutable {
+                    future.then(this, [=, this]() mutable {
                         promise.finish();
                     });
                 });
             } else {
                 auto future = makePostponedTrustDecisions(encryption, keyIds.values());
-                future.then(this, [=]() mutable {
+                future.then(this, [=, this]() mutable {
                     promise.finish();
                 });
             }
@@ -422,7 +422,7 @@ QXmppTask<void> QXmppAtmManager::distrust(const QString &encryption, const QMult
     QXmppPromise<void> promise;
 
     auto future = setTrustLevel(encryption, keyIds, TrustLevel::ManuallyDistrusted);
-    future.then(this, [=]() mutable {
+    future.then(this, [=, this]() mutable {
         auto future = trustStorage()->removeKeysForPostponedTrustDecisions(encryption, keyIds.values());
         future.then(this, [=]() mutable {
             promise.finish();
@@ -459,13 +459,13 @@ QXmppTask<void> QXmppAtmManager::makePostponedTrustDecisions(const QString &encr
     QXmppPromise<void> promise;
 
     auto future = trustStorage()->keysForPostponedTrustDecisions(encryption, senderKeyIds);
-    future.then(this, [=](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) mutable {
+    future.then(this, [=, this](const QHash<bool, QMultiHash<QString, QByteArray>> &&keysForPostponedTrustDecisions) mutable {
         // JIDs of key owners mapped to the IDs of their keys
         const auto keysBeingAuthenticated = keysForPostponedTrustDecisions.value(true);
         const auto keysBeingDistrusted = keysForPostponedTrustDecisions.value(false);
 
         auto future = trustStorage()->removeKeysForPostponedTrustDecisions(encryption, keysBeingAuthenticated.values(), keysBeingDistrusted.values());
-        future.then(this, [=]() mutable {
+        future.then(this, [=, this]() mutable {
             auto future = makeTrustDecisions(encryption, keysBeingAuthenticated, keysBeingDistrusted);
             future.then(this, [=]() mutable {
                 promise.finish();

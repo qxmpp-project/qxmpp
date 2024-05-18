@@ -243,7 +243,7 @@ void QXmppHttpUploadSlotIq::toXmlElementFromChild(QXmlStreamWriter *writer) cons
 #else
     writer->writeAttribute(QStringLiteral("url"), QString::fromUtf8(d->putUrl.toEncoded()));
 #endif
-    std::for_each(d->putHeaders.keyBegin(), d->putHeaders.keyEnd(), [=](const QString &name) {
+    std::for_each(d->putHeaders.keyBegin(), d->putHeaders.keyEnd(), [&](const QString &name) {
         writer->writeStartElement(QSL65("header"));
         writer->writeAttribute(QSL65("name"), name);
         writer->writeCharacters(d->putHeaders.value(name));

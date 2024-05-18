@@ -356,7 +356,7 @@ QXmppTask<bool> Manager::load()
     QXmppPromise<bool> interface;
 
     auto future = d->omemoStorage->allData();
-    future.then(this, [=](QXmppOmemoStorage::OmemoData omemoData) mutable {
+    future.then(this, [=, this](QXmppOmemoStorage::OmemoData omemoData) mutable {
         const auto &optionalOwnDevice = omemoData.ownDevice;
         if (optionalOwnDevice) {
             d->ownDevice = *optionalOwnDevice;
@@ -407,7 +407,7 @@ QXmppTask<bool> Manager::setUp()
     QXmppPromise<bool> interface;
 
     auto future = d->setUpDeviceId();
-    future.then(this, [=](bool isDeviceIdSetUp) mutable {
+    future.then(this, [=, this](bool isDeviceIdSetUp) mutable {
         if (isDeviceIdSetUp) {
             // The identity key pair in its deserialized form is not stored as a
             // member variable because it is only needed by
@@ -418,9 +418,9 @@ QXmppTask<bool> Manager::setUp()
                 d->updateSignedPreKeyPair(identityKeyPair.get()) &&
                 d->updatePreKeyPairs(PRE_KEY_INITIAL_CREATION_COUNT)) {
                 auto future = d->omemoStorage->setOwnDevice(d->ownDevice);
-                future.then(this, [=]() mutable {
+                future.then(this, [=, this]() mutable {
                     auto future = d->publishOmemoData();
-                    future.then(this, [=](bool isPublished) mutable {
+                    future.then(this, [=, this](bool isPublished) mutable {
                         d->isStarted = isPublished;
                         interface.finish(std::move(isPublished));
                     });
@@ -711,7 +711,7 @@ QXmppTask<QVector<QXmppOmemoDevice>> Manager::devices(const QList<QString> &jids
     QXmppPromise<QVector<QXmppOmemoDevice>> interface;
 
     auto future = keys(jids);
-    future.then(this, [=](QHash<QString, QHash<QByteArray, TrustLevel>> keys) mutable {
+    future.then(this, [=, this](QHash<QString, QHash<QByteArray, TrustLevel>> keys) mutable {
         QVector<QXmppOmemoDevice> devices;
 
         for (const auto &jid : jids) {
@@ -760,7 +760,7 @@ QXmppTask<QXmppPubSubManager::Result> Manager::removeContactDevices(const QStrin
     Q_ASSERT_X(jid != d->ownBareJid(), "Removing contact device", "Own JID passed");
 
     auto future = d->unsubscribeFromDeviceList(jid);
-    future.then(this, [=](QXmppPubSubManager::Result result) mutable {
+    future.then(this, [=, this](QXmppPubSubManager::Result result) mutable {
         if (std::holds_alternative<QXmppError>(result)) {
             warning(u"Contact '" + jid + u"' could not be removed because the device list subscription could not be removed");
             interface.finish(std::move(result));
@@ -768,9 +768,9 @@ QXmppTask<QXmppPubSubManager::Result> Manager::removeContactDevices(const QStrin
             d->devices.remove(jid);
 
             auto future = d->omemoStorage->removeDevices(jid);
-            future.then(this, [=]() mutable {
+            future.then(this, [=, this]() mutable {
                 auto future = d->trustManager->removeKeys(ns_omemo_2.toString(), jid);
-                future.then(this, [=]() mutable {
+                future.then(this, [=, this]() mutable {
                     interface.finish(std::move(result));
                     Q_EMIT devicesRemoved(jid);
                 });
@@ -1143,7 +1143,7 @@ bool Manager::handleStanza(const QDomElement &stanza)
         return false;
     }
 
-    d->decryptIq(stanza).then(this, [=](auto result) {
+    d->decryptIq(stanza).then(this, [=, this](auto result) {
         if (result) {
             injectIq(result->iq, result->e2eeMetadata);
         } else {
@@ -1157,7 +1157,7 @@ bool Manager::handleMessage(const QXmppMessage &message)
 {
     if (d->isStarted && message.omemoElement()) {
         auto future = d->decryptMessage(message);
-        future.then(this, [=](std::optional<QXmppMessage> optionalDecryptedMessage) mutable {
+        future.then(this, [=, this](std::optional<QXmppMessage> optionalDecryptedMessage) mutable {
             if (optionalDecryptedMessage) {
                 injectMessage(std::move(*optionalDecryptedMessage));
             }
@@ -1232,7 +1232,7 @@ void Manager::onRegistered(QXmppClient *client)
         qFatal("QXmppPubSubManager is not available, it must be added to the client before adding QXmppOmemoManager");
     }
 
-    connect(d->trustManager, &QXmppTrustManager::trustLevelsChanged, this, [=](const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys) {
+    connect(d->trustManager, &QXmppTrustManager::trustLevelsChanged, this, [=, this](const QHash<QString, QMultiHash<QString, QByteArray>> &modifiedKeys) {
         const auto &modifiedOmemoKeys = modifiedKeys.value(ns_omemo_2.toString());
 
         if (!modifiedOmemoKeys.isEmpty()) {

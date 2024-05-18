@@ -1021,7 +1021,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsNoKeys()
     const QObject context;
 
     // unexpected trust message
-    connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &) {
+    connect(&m_logger, &QXmppLogger::message, &context, [this](QXmppLogger::MessageType type, const QString &) {
         if (type == QXmppLogger::SentMessage) {
             Q_EMIT unexpectedTrustMessageSent();
         }
@@ -1663,7 +1663,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
     });
 
     // unexpected trust message for contacts' keys to own endpoint
-    connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &text) {
+    connect(&m_logger, &QXmppLogger::message, &context, [this](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
@@ -1794,7 +1794,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeys()
     });
 
     // unexpected trust message to Carol
-    connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &text) {
+    connect(&m_logger, &QXmppLogger::message, &context, [this](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
@@ -1845,7 +1845,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpoints()
     const QObject context;
 
     // unexpected trust message
-    connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &text) {
+    connect(&m_logger, &QXmppLogger::message, &context, [this](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
@@ -1923,7 +1923,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAut
     });
 
     // unexpected trust message
-    connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &text) {
+    connect(&m_logger, &QXmppLogger::message, &context, [this](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
@@ -2007,7 +2007,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
     });
 
     // unexpected trust message
-    connect(&m_logger, &QXmppLogger::message, &context, [=](QXmppLogger::MessageType type, const QString &text) {
+    connect(&m_logger, &QXmppLogger::message, &context, [this](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
