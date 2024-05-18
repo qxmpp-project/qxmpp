@@ -6,9 +6,11 @@
 
 #include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
-#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
+
+#include "Stream.h"
 
 #include <QDnsLookup>
 #include <QDomElement>
@@ -17,6 +19,8 @@
 #include <QSslKey>
 #include <QSslSocket>
 #include <QTimer>
+
+using namespace QXmpp::Private;
 
 class QXmppOutgoingServerPrivate
 {
@@ -158,7 +162,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             // enable TLS if possible
             if (socket()->supportsSsl() &&
                 features.tlsMode() != QXmppStreamFeatures::Disabled) {
-                sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::StartTls));
+                sendData(serializeXml(StarttlsRequest()));
                 return;
             }
         }
@@ -166,7 +170,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         // send dialback if needed
         d->dialbackTimer->stop();
         sendDialback();
-    } else if (QXmppStartTlsPacket::isStartTlsPacket(stanza, QXmppStartTlsPacket::Proceed)) {
+    } else if (StarttlsProceed::fromDom(stanza)) {
         debug(QStringLiteral("Starting encryption"));
         socket()->startClientEncryption();
         return;

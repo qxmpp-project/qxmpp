@@ -62,6 +62,7 @@ private:
 #ifdef BUILD_INTERNAL_TESTS
     Q_SLOT void streamOpen();
     Q_SLOT void testStreamError();
+    Q_SLOT void starttlsPackets();
 #endif
 
     // parsing
@@ -181,6 +182,17 @@ void tst_QXmppStream::testStreamError()
         }
         QCOMPARE(parsed, error);
     }
+}
+
+void tst_QXmppStream::starttlsPackets()
+{
+    auto xml1 = "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>";
+    auto request = unwrap(StarttlsRequest::fromDom(xmlToDom(xml1)));
+    serializePacket(request, xml1);
+
+    auto xml2 = "<proceed xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>";
+    auto proceed = unwrap(StarttlsProceed::fromDom(xmlToDom(xml2)));
+    serializePacket(proceed, xml2);
 }
 #endif
 
