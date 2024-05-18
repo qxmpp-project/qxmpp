@@ -13,6 +13,8 @@
 ///
 /// \ingroup Stanzas
 ///
+/// \deprecated STARTTLS packets will be removed from the public API.
+///
 class QXMPP_EXPORT QXmppStartTlsPacket : public QXmppNonza
 {
 public:
@@ -24,7 +26,7 @@ public:
         Invalid,   ///< Invalid type
     };
 
-    QXmppStartTlsPacket(Type type = StartTls);
+    [[deprecated]] QXmppStartTlsPacket(Type type = StartTls);
     ~QXmppStartTlsPacket() override;
 
     Type type() const;
@@ -35,8 +37,8 @@ public:
     void toXml(QXmlStreamWriter *writer) const override;
     /// \endcond
 
-    static bool isStartTlsPacket(const QDomElement &element);
-    static bool isStartTlsPacket(const QDomElement &element, Type type);
+    [[deprecated]] static bool isStartTlsPacket(const QDomElement &element);
+    [[deprecated]] static bool isStartTlsPacket(const QDomElement &element, Type type);
 
 private:
     Type m_type;

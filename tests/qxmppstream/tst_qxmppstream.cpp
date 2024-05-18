@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppConstants_p.h"
-#include "QXmppStartTlsPacket.h"
 #include "QXmppStream.h"
 #include "QXmppStreamError_p.h"
 
 #include "Stream.h"
 #include "XmppSocket.h"
+#include "compat/QXmppStartTlsPacket.h"
 #include "util.h"
 
 using namespace QXmpp;
@@ -198,6 +198,8 @@ void tst_QXmppStream::starttlsPackets()
 
 void tst_QXmppStream::testStartTlsPacket_data()
 {
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     QTest::addColumn<QByteArray>("xml");
     QTest::addColumn<bool>("valid");
     QTest::addColumn<QXmppStartTlsPacket::Type>("type");
@@ -215,10 +217,14 @@ void tst_QXmppStream::testStartTlsPacket_data()
     ROW("invalid-tag", R"(<invalid-tag-name xmlns="urn:ietf:params:xml:ns:xmpp-tls"/>)", false, QXmppStartTlsPacket::StartTls);
 
 #undef ROW
+    QT_WARNING_POP
 }
 
 void tst_QXmppStream::testStartTlsPacket()
 {
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
+
     QFETCH(QByteArray, xml);
     QFETCH(bool, valid);
     QFETCH(QXmppStartTlsPacket::Type, type);
@@ -248,6 +254,7 @@ void tst_QXmppStream::testStartTlsPacket()
         packet3.setType(type);
         serializePacket(packet2, xml);
     }
+    QT_WARNING_POP
 }
 
 QTEST_MAIN(tst_QXmppStream)
