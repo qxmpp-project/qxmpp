@@ -18,6 +18,7 @@ class QXmppStreamPrivate;
 
 namespace QXmpp::Private {
 class XmppSocket;
+struct StreamOpen;
 }
 
 ///
@@ -58,9 +59,7 @@ protected:
     virtual void handleStanza(const QDomElement &element) = 0;
 
     /// Handles an incoming XMPP stream start.
-    ///
-    /// \param element
-    virtual void handleStream(const QDomElement &element) = 0;
+    virtual void handleStream(const QXmpp::Private::StreamOpen &) = 0;
 
 public Q_SLOTS:
     virtual void disconnectFromHost();

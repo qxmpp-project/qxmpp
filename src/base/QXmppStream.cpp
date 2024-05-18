@@ -124,16 +124,47 @@ void QXmppStream::setSocket(QSslSocket *socket)
 
 namespace QXmpp::Private {
 
+StreamOpen StreamOpen::fromXml(QXmlStreamReader &reader)
+{
+    Q_ASSERT(reader.isStartElement());
+    Q_ASSERT(reader.name() == u"stream");
+    Q_ASSERT(reader.namespaceUri() == ns_stream);
+
+    StreamOpen out;
+    const auto attributes = reader.attributes();
+    auto attribute = [&](QStringView ns, QStringView name) {
+        for (const auto &a : attributes) {
+            if (a.name() == name && a.namespaceUri() == ns) {
+                return a.value().toString();
+            }
+        }
+        return QString();
+    };
+
+    out.from = attribute({}, u"from");
+    out.to = attribute({}, u"to");
+    out.id = attribute({}, u"id");
+    out.version = attribute({}, u"version");
+
+    const auto namespaceDeclarations = reader.namespaceDeclarations();
+    for (const auto &ns : namespaceDeclarations) {
+        if (ns.prefix().isEmpty()) {
+            out.xmlns = ns.namespaceUri().toString();
+        }
+    }
+
+    return out;
+}
+
 void StreamOpen::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartDocument();
     writer->writeStartElement(QSL65("stream:stream"));
-    if (!from.isEmpty()) {
-        writer->writeAttribute(QSL65("from"), from);
-    }
-    writer->writeAttribute(QSL65("to"), to);
-    writer->writeAttribute(QSL65("version"), QSL65("1.0"));
-    writer->writeDefaultNamespace(toString65(xmlns));
+    writeOptionalXmlAttribute(writer, u"from", from);
+    writeOptionalXmlAttribute(writer, u"to", to);
+    writeOptionalXmlAttribute(writer, u"id", id);
+    writeOptionalXmlAttribute(writer, u"version", version);
+    writer->writeDefaultNamespace(xmlns);
     writer->writeNamespace(toString65(ns_stream), QSL65("stream"));
     writer->writeCharacters({});
 }
@@ -214,6 +245,88 @@ std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const Q
 }
 /// \endcond
 
+DomReader::State DomReader::process(QXmlStreamReader &r)
+{
+    while (true) {
+        switch (r.tokenType()) {
+        case QXmlStreamReader::Invalid:
+            // error received
+            if (r.error() == QXmlStreamReader::PrematureEndOfDocumentError) {
+                return Unfinished;
+            }
+            return ErrorOccurred;
+        case QXmlStreamReader::StartElement: {
+            qDebug() << "start element token";
+            auto child = r.prefix().isNull()
+                ? doc.createElement(r.name().toString())
+                : doc.createElementNS(r.namespaceUri().toString(), r.qualifiedName().toString());
+
+            // xmlns attribute
+            const auto nsDeclarations = r.namespaceDeclarations();
+            for (const auto &ns : nsDeclarations) {
+                if (ns.prefix().isEmpty()) {
+                    child.setAttribute(QStringLiteral("xmlns"), ns.namespaceUri().toString());
+                } else {
+                    // namespace declarations are not supported in XMPP
+                    qDebug() << "err namespace decl";
+                    return ErrorOccurred;
+                }
+            }
+
+            // other attributes
+            const auto attributes = r.attributes();
+            for (const auto &a : attributes) {
+                child.setAttribute(a.name().toString(), a.value().toString());
+            }
+
+            if (currentElement.isNull()) {
+                doc.appendChild(child);
+            } else {
+                currentElement.appendChild(child);
+            }
+            depth++;
+            currentElement = child;
+            break;
+        }
+        case QXmlStreamReader::EndElement:
+            qDebug() << "end element token";
+            if (depth == 0) {
+                qDebug() << "depth == 0";
+                return ErrorOccurred;
+            }
+
+            currentElement = currentElement.parentNode().toElement();
+            depth--;
+            qDebug() << "depth" << depth;
+            if (depth == 0) {
+                return Finished;
+            }
+            break;
+        case QXmlStreamReader::Characters:
+            if (depth == 0) {
+                qDebug() << "depth == 0";
+                return ErrorOccurred;
+            }
+
+            currentElement.appendChild(doc.createTextNode(r.text().toString()));
+            break;
+        case QXmlStreamReader::NoToken:
+            // skip
+            break;
+        case QXmlStreamReader::StartDocument:
+        case QXmlStreamReader::EndDocument:
+        case QXmlStreamReader::Comment:
+        case QXmlStreamReader::DTD:
+        case QXmlStreamReader::EntityReference:
+        case QXmlStreamReader::ProcessingInstruction:
+            qDebug() << "not allowed";
+            // not allowed or unexpected
+            return ErrorOccurred;
+        }
+        r.readNext();
+    }
+}
+
 XmppSocket::XmppSocket(QObject *parent)
     : QXmppLoggable(parent)
 {
@@ -230,14 +343,14 @@ void XmppSocket::setSocket(QSslSocket *socket)
         info(QStringLiteral("Socket connected to %1 %2")
                  .arg(m_socket->peerAddress().toString(),
                       QString::number(m_socket->peerPort())));
-        m_dataBuffer.clear();
-        m_streamOpenElement.clear();
+        m_reader.clear();
+        m_streamReceived = false;
         Q_EMIT started();
     });
     QObject::connect(socket, &QSslSocket::encrypted, this, [this]() {
         debug(QStringLiteral("Socket encrypted"));
-        m_dataBuffer.clear();
-        m_streamOpenElement.clear();
+        m_reader.clear();
+        m_streamReceived = false;
         Q_EMIT started();
     });
     QObject::connect(socket, &QSslSocket::errorOccurred, this, [this](QAbstractSocket::SocketError) {
@@ -277,102 +390,99 @@ bool XmppSocket::sendData(const QByteArray &data)
 
 void XmppSocket::processData(const QString &data)
 {
-    // As we may only have partial XML content, we need to cache the received
-    // data until it has been successfully parsed. In case it can't be parsed,
-    //
-    // There are only two small problems with the current strategy:
-    //  * When we receive a full stanza + a partial one, we can't parse the
-    //    first stanza until another stanza arrives that is complete.
-    //  * We don't know when we received invalid XML (would cause a growing
-    //    cache and a timeout after some time).
-    // However, both issues could only be solved using an XML stream reader
-    // which would cause many other problems since we don't actually use it for
-    // parsing the content.
-    m_dataBuffer.append(data);
-
-    //
     // Check for whitespace pings
-    //
-    if (m_dataBuffer.isEmpty() || m_dataBuffer.trimmed().isEmpty()) {
-        m_dataBuffer.clear();
-
+    if (data.isEmpty()) {
+        qDebug() << "empty ping received";
         logReceived({});
         Q_EMIT stanzaReceived(QDomElement());
         return;
     }
 
-    //
-    // Check whether we received a stream open or closing tag
-    //
-    static const QRegularExpression streamStartRegex(QStringLiteral(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)"));
-    static const QRegularExpression streamEndRegex(QStringLiteral("</stream:stream>$"));
+    // log data received and process
+    logReceived(data);
+    m_reader.addData(data);
 
-    auto streamOpenMatch = streamStartRegex.match(m_dataBuffer);
-    bool hasStreamOpen = streamOpenMatch.hasMatch();
-
-    bool hasStreamClose = streamEndRegex.match(m_dataBuffer).hasMatch();
-
-    //
-    // The stream start/end and stanza packets can't be parsed without any
-    // modifications with QDomDocument. This is because of multiple reasons:
-    //  * The <stream:stream> open element is not considered valid without the
-    //    closing tag.
-    //  * Only the closing tag is of course not valid too.
-    //  * Stanzas/Nonzas need to have the correct stream namespaces set:
-    //     * For being able to parse <stream:features/>
-    //     * For having the correct namespace (e.g. 'jabber:client') set to
-    //       stanzas and their child elements (e.g. <body/> of a message).
-    //
-    // The wrapping strategy looks like this:
-    //  * The stream open tag is cached once it arrives, for later access
-    //  * Incoming XML that has no <stream> open tag will be prepended by the
-    //    cached <stream> tag.
-    //  * Incoming XML that has no <stream> close tag will be appended by a
-    //    generic string "</stream:stream>"
-    //
-    // The result is parsed by QDomDocument and the child elements of the stream
-    // are processed. In case the received data contained a stream open tag,
-    // the stream is processed (before the stanzas are processed). In case we
-    // received a </stream> closing tag, the connection is closed.
-    //
-    auto wrappedStanzas = m_dataBuffer;
-    if (!hasStreamOpen) {
-        wrappedStanzas.prepend(m_streamOpenElement);
-    }
-    if (!hasStreamClose) {
-        wrappedStanzas.append(QStringLiteral("</stream:stream>"));
+    // we're still reading a previously started top-level element
+    if (m_domReader) {
+        m_reader.readNext();
+        switch (m_domReader->process(m_reader)) {
+        case DomReader::Finished:
+            Q_EMIT stanzaReceived(m_domReader->element());
+            m_domReader.reset();
+            break;
+        case DomReader::Unfinished:
+            return;
+        case DomReader::ErrorOccurred:
+            // emit error
+            break;
+        }
     }
 
-    //
-    // Try to parse the wrapped XML
-    //
-    QDomDocument doc;
-    if (!doc.setContent(wrappedStanzas, true)) {
-        return;
-    }
+    do {
+        switch (m_reader.readNext()) {
+        case QXmlStreamReader::Invalid:
+            // error received
+            if (m_reader.error() != QXmlStreamReader::PrematureEndOfDocumentError) {
+                // emit error
+            }
+            break;
+        case QXmlStreamReader::StartDocument:
+            // pre-stream open
+            break;
+        case QXmlStreamReader::EndDocument:
+            // post-stream close
+            break;
+        case QXmlStreamReader::StartElement:
+            // stream open or stream-level element
+            if (m_reader.name() == u"stream" && m_reader.namespaceUri() == ns_stream) {
+                m_streamReceived = true;
+                Q_EMIT streamReceived(StreamOpen::fromXml(m_reader));
+            } else if (!m_streamReceived) {
+                // error: expected stream open element
+                qDebug() << "err no stream recevied";
+            } else {
+                qDebug() << "start el";
+                // parse top-level stream element
+                m_domReader = DomReader();
 
-    //
-    // Success: We can clear the buffer and send a 'received' log message
-    //
-    logReceived(m_dataBuffer);
-    m_dataBuffer.clear();
-
-    // process stream start
-    if (hasStreamOpen) {
-        m_streamOpenElement = streamOpenMatch.captured();
-        Q_EMIT streamReceived(doc.documentElement());
-    }
-
-    // process stanzas
-    auto stanza = doc.documentElement().firstChildElement();
-    for (; !stanza.isNull(); stanza = stanza.nextSiblingElement()) {
-        Q_EMIT stanzaReceived(stanza);
-    }
-
-    // process stream end
-    if (hasStreamClose) {
-        Q_EMIT streamClosed();
-    }
+                switch (m_domReader->process(m_reader)) {
+                case DomReader::Finished:
+                    Q_EMIT stanzaReceived(m_domReader->element());
+                    m_domReader.reset();
+                    break;
+                case DomReader::Unfinished:
+                    qDebug() << "unfi";
+                    return;
+                case DomReader::ErrorOccurred:
+                    qDebug() << "el err";
+                    // emit error
+                    break;
+                }
+            }
+            break;
+        case QXmlStreamReader::EndElement:
+            // end of stream
+            Q_EMIT streamClosed();
+            break;
+        case QXmlStreamReader::Characters:
+            if (m_reader.isWhitespace()) {
+                logReceived({});
+                Q_EMIT stanzaReceived(QDomElement());
+            } else {
+                // invalid: emit error
+            }
+            break;
+        case QXmlStreamReader::NoToken:
+            // skip
+            break;
+        case QXmlStreamReader::Comment:
+        case QXmlStreamReader::DTD:
+        case QXmlStreamReader::EntityReference:
+        case QXmlStreamReader::ProcessingInstruction:
+            // not allowed in XMPP: emit error
+            break;
+        }
+    } while (!m_reader.hasError());
 }
 
 }  // namespace QXmpp::Private

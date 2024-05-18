@@ -13,6 +13,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Stream.h"
+
 #include <QDomElement>
 #include <QHostAddress>
 #include <QSslKey>
@@ -158,7 +160,7 @@ void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 }
 
 /// \cond
-void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
+void QXmppIncomingClient::handleStream(const StreamOpen &stream)
 {
     if (d->idleTimer->interval()) {
         d->idleTimer->start();
@@ -178,14 +180,14 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     sendData(response.toUtf8());
 
     // check requested domain
-    if (streamElement.attribute(QStringLiteral("to")) != d->domain) {
+    if (stream.to != d->domain) {
         QString response = QStringLiteral("<stream:error>"
                                           "<host-unknown xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\"/>"
                                           "<text xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\">"
                                           "This server does not serve %1"
                                           "</text>"
                                           "</stream:error>")
-                               .arg(streamElement.attribute(QStringLiteral("to")));
+                               .arg(stream.to);
         sendData(response.toUtf8());
         disconnectFromHost();
         return;
