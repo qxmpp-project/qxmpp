@@ -14,8 +14,6 @@ class QXmppDataForm;
 class QXMPP_EXPORT QXmppDataFormBase
 {
 public:
-    virtual ~QXmppDataFormBase() = default;
-
     virtual QXmppDataForm toDataForm() const;
 
 protected:

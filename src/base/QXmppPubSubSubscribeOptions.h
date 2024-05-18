@@ -48,7 +48,7 @@ public:
     QXmppPubSubSubscribeOptions();
     QXmppPubSubSubscribeOptions(const QXmppPubSubSubscribeOptions &);
     QXmppPubSubSubscribeOptions(QXmppPubSubSubscribeOptions &&);
-    virtual ~QXmppPubSubSubscribeOptions();
+    ~QXmppPubSubSubscribeOptions() override;
 
     QXmppPubSubSubscribeOptions &operator=(const QXmppPubSubSubscribeOptions &);
     QXmppPubSubSubscribeOptions &operator=(QXmppPubSubSubscribeOptions &&);

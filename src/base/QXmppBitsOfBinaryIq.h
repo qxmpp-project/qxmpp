@@ -12,7 +12,7 @@ class QXMPP_EXPORT QXmppBitsOfBinaryIq : public QXmppIq, public QXmppBitsOfBinar
 {
 public:
     QXmppBitsOfBinaryIq();
-    ~QXmppBitsOfBinaryIq();
+    ~QXmppBitsOfBinaryIq() override;
 
     static bool isBitsOfBinaryIq(const QDomElement &element);
 

@@ -39,7 +39,7 @@ public:
     QXmppMixConfigItem();
     QXmppMixConfigItem(const QXmppMixConfigItem &);
     QXmppMixConfigItem(QXmppMixConfigItem &&);
-    ~QXmppMixConfigItem();
+    ~QXmppMixConfigItem() override;
 
     QXmppMixConfigItem &operator=(const QXmppMixConfigItem &);
     QXmppMixConfigItem &operator=(QXmppMixConfigItem &&);

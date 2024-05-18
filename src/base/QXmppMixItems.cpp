@@ -86,8 +86,6 @@ public:
     std::optional<bool> invitationsPermitted;
     std::optional<bool> privateMessagesPermitted;
 
-    ~QXmppMixConfigItemPrivate() override = default;
-
     void reset()
     {
         dataFormType = QXmppDataForm::None;
@@ -961,8 +959,6 @@ public:
     QString name;
     QString description;
     QStringList contactJids;
-
-    ~QXmppMixInfoItemPrivate() override = default;
 
     void reset()
     {

@@ -19,7 +19,7 @@ public:
     QXmppGeolocItem();
     QXmppGeolocItem(const QXmppGeolocItem &other);
     QXmppGeolocItem(QXmppGeolocItem &&);
-    ~QXmppGeolocItem();
+    ~QXmppGeolocItem() override;
 
     QXmppGeolocItem &operator=(const QXmppGeolocItem &other);
     QXmppGeolocItem &operator=(QXmppGeolocItem &&);

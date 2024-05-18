@@ -193,7 +193,7 @@ public:
     QXmppStanza(const QString &from = QString(), const QString &to = QString());
     QXmppStanza(const QXmppStanza &other);
     QXmppStanza(QXmppStanza &&);
-    virtual ~QXmppStanza();
+    ~QXmppStanza() override;
 
     QXmppStanza &operator=(const QXmppStanza &other);
     QXmppStanza &operator=(QXmppStanza &&);

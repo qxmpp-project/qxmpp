@@ -26,7 +26,7 @@ public:
     QXmppPushEnableIq();
     QXmppPushEnableIq(const QXmppPushEnableIq &);
     QXmppPushEnableIq(QXmppPushEnableIq &&);
-    ~QXmppPushEnableIq();
+    ~QXmppPushEnableIq() override;
     QXmppPushEnableIq &operator=(const QXmppPushEnableIq &);
     QXmppPushEnableIq &operator=(QXmppPushEnableIq &&);
 

@@ -79,7 +79,7 @@ public:
     QXmppPubSubNodeConfig();
     QXmppPubSubNodeConfig(const QXmppPubSubNodeConfig &);
     QXmppPubSubNodeConfig(QXmppPubSubNodeConfig &&);
-    ~QXmppPubSubNodeConfig();
+    ~QXmppPubSubNodeConfig() override;
 
     QXmppPubSubNodeConfig &operator=(const QXmppPubSubNodeConfig &);
     QXmppPubSubNodeConfig &operator=(QXmppPubSubNodeConfig &&);

@@ -25,7 +25,7 @@ public:
     QXmppRegisterIq();
     QXmppRegisterIq(const QXmppRegisterIq &other);
     QXmppRegisterIq(QXmppRegisterIq &&);
-    ~QXmppRegisterIq();
+    ~QXmppRegisterIq() override;
 
     QXmppRegisterIq &operator=(const QXmppRegisterIq &other);
     QXmppRegisterIq &operator=(QXmppRegisterIq &&);

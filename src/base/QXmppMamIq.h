@@ -20,7 +20,7 @@ public:
     QXmppMamQueryIq();
     QXmppMamQueryIq(const QXmppMamQueryIq &);
     QXmppMamQueryIq(QXmppMamQueryIq &&);
-    ~QXmppMamQueryIq();
+    ~QXmppMamQueryIq() override;
 
     QXmppMamQueryIq &operator=(const QXmppMamQueryIq &);
     QXmppMamQueryIq &operator=(QXmppMamQueryIq &&);
@@ -52,7 +52,7 @@ public:
     QXmppMamResultIq();
     QXmppMamResultIq(const QXmppMamResultIq &);
     QXmppMamResultIq(QXmppMamResultIq &&);
-    ~QXmppMamResultIq();
+    ~QXmppMamResultIq() override;
 
     QXmppMamResultIq &operator=(const QXmppMamResultIq &);
     QXmppMamResultIq &operator=(QXmppMamResultIq &&);

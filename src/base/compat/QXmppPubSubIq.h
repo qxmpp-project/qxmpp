@@ -33,7 +33,7 @@ public:
 
     [[deprecated]] QXmppPubSubIq();
     QXmppPubSubIq(const QXmppPubSubIq &iq);
-    ~QXmppPubSubIq();
+    ~QXmppPubSubIq() override;
 
     QXmppPubSubIq &operator=(const QXmppPubSubIq &iq);
 

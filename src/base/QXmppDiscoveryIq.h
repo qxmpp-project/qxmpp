@@ -71,7 +71,7 @@ public:
     QXmppDiscoveryIq();
     QXmppDiscoveryIq(const QXmppDiscoveryIq &);
     QXmppDiscoveryIq(QXmppDiscoveryIq &&);
-    ~QXmppDiscoveryIq();
+    ~QXmppDiscoveryIq() override;
 
     QXmppDiscoveryIq &operator=(const QXmppDiscoveryIq &);
     QXmppDiscoveryIq &operator=(QXmppDiscoveryIq &&);
