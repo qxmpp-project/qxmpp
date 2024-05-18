@@ -11,12 +11,12 @@
 
 using namespace QXmpp::Private;
 
-static const char *iq_types[] = {
-    "error",
-    "get",
-    "set",
-    "result"
-};
+constexpr auto IQ_TYPES = to_array<QStringView>({
+    u"error",
+    u"get",
+    u"set",
+    u"result",
+});
 
 class QXmppIqPrivate : public QSharedData
 {
@@ -81,13 +81,8 @@ void QXmppIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    const auto type = element.attribute(QStringLiteral("type")).toStdString();
-    for (int i = Error; i <= Result; i++) {
-        if (type == iq_types[i]) {
-            d->type = static_cast<Type>(i);
-            break;
-        }
-    }
+    d->type = enumFromString<Type>(IQ_TYPES, element.attribute(QStringLiteral("type")))
+                  .value_or(Get);
 
     parseElementFromChild(element);
 }
@@ -109,7 +104,7 @@ void QXmppIq::toXml(QXmlStreamWriter *xmlWriter) const
     writeOptionalXmlAttribute(xmlWriter, u"id", id());
     writeOptionalXmlAttribute(xmlWriter, u"to", to());
     writeOptionalXmlAttribute(xmlWriter, u"from", from());
-    writeOptionalXmlAttribute(xmlWriter, u"type", QString::fromLocal8Bit(iq_types[d->type]));
+    writeOptionalXmlAttribute(xmlWriter, u"type", IQ_TYPES.at(d->type));
     toXmlElementFromChild(xmlWriter);
     error().toXml(xmlWriter);
     xmlWriter->writeEndElement();
