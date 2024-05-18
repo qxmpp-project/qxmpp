@@ -865,6 +865,7 @@ void QXmppDataForm::parse(const QDomElement &element)
                                      firstChildElement(element, u"value").text());
             }
             field.setOptions(options);
+            break;
         }
         default:
             break;
@@ -969,6 +970,7 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
                 writeXmlTextElement(writer, u"value", option.second);
                 writer->writeEndElement();
             }
+            break;
         }
         default:
             break;
