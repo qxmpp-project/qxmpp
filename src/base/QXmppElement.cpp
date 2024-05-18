@@ -219,7 +219,7 @@ QXmppElement QXmppElement::nextSiblingElement(const QString &name) const
         return QXmppElement();
     }
     const QList<QXmppElementPrivate *> &siblings_d = d->parent->children;
-    for (int i = siblings_d.indexOf(d) + 1; i < siblings_d.size(); i++) {
+    for (qsizetype i = siblings_d.indexOf(d) + 1; i < siblings_d.size(); i++) {
         if (name.isEmpty() || siblings_d[i]->name == name) {
             return QXmppElement(siblings_d[i]);
         }

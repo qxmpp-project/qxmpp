@@ -629,13 +629,13 @@ static QByteArray calculateDigest(const QByteArray &method, const QByteArray &di
 
 static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm,
                                   const QByteArray &data, const QByteArray &salt,
-                                  int iterations, quint64 dkLen)
+                                  int iterations, uint32_t dkLen)
 {
     QByteArray key;
     quint32 currentIteration = 1;
     QMessageAuthenticationCode hmac(algorithm, data);
     QByteArray index(4, Qt::Uninitialized);
-    while (quint64(key.length()) < dkLen) {
+    while (key.length() < dkLen) {
         hmac.addData(salt);
         qToBigEndian(currentIteration, reinterpret_cast<uchar *>(index.data()));
         hmac.addData(index);

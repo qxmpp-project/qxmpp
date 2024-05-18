@@ -72,7 +72,7 @@ QXmppPubSubSubscriptionPrivate::QXmppPubSubSubscriptionPrivate(const QString &ji
 ///
 QString QXmppPubSubSubscription::stateToString(State state)
 {
-    return SUBSCRIPTION_STATES.at(int(state)).toString();
+    return SUBSCRIPTION_STATES.at(size_t(state)).toString();
 }
 
 ///

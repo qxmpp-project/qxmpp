@@ -817,7 +817,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
             line.resize(line.size() - 1);
         }
         if (line.startsWith(QStringLiteral("a="))) {
-            int idx = line.indexOf(u':');
+            qsizetype idx = line.indexOf(u':');
             const QString attrName = idx != -1 ? line.mid(2, idx - 2) : line.mid(2);
             const QString attrValue = idx != -1 ? line.mid(idx + 1) : QString();
 
@@ -835,7 +835,7 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     d->transportFingerprint = parseFingerprint(bits[1]);
                 }
             } else if (attrName == QStringLiteral("fmtp")) {
-                int spIdx = attrValue.indexOf(u' ');
+                qsizetype spIdx = attrValue.indexOf(u' ');
                 if (spIdx == -1) {
                     qWarning() << "Could not parse payload parameters" << line;
                     return false;
