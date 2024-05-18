@@ -79,7 +79,6 @@ set(INSTALL_HEADER_FILES
     base/QXmppSendResult.h
     base/QXmppSocks.h
     base/QXmppStanza.h
-    base/QXmppStartTlsPacket.h
     base/QXmppStream.h
     base/QXmppStreamError.h
     base/QXmppStreamFeatures.h
@@ -94,6 +93,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
     base/compat/QXmppSessionIq.h
+    base/compat/QXmppStartTlsPacket.h
     base/compat/QXmppPubSubIq.h
     base/compat/QXmppPubSubItem.h
 
@@ -221,7 +221,6 @@ set(SOURCE_FILES
     base/QXmppSasl.cpp
     base/QXmppSocks.cpp
     base/QXmppStanza.cpp
-    base/QXmppStartTlsPacket.cpp
     base/QXmppStream.cpp
     base/QXmppStreamFeatures.cpp
     base/QXmppStreamInitiationIq.cpp
