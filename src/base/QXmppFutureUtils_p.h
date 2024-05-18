@@ -144,11 +144,11 @@ auto parseIq(Input &&sendResult, Converter convert) -> decltype(convert({}))
                               iq.parse(element);
                               return convert(std::move(iq));
                           },
-                          [](QXmppError error) -> Result {
+                          [](QXmppError &&error) -> Result {
                               return error;
                           },
                       },
-                      sendResult);
+                      std::move(sendResult));
 }
 
 template<typename IqType, typename Result, typename Input>

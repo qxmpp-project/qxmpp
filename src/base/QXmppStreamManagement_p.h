@@ -115,7 +115,8 @@ public:
     void sendAcknowledgementRequest();
 
 private:
-    void handleAcknowledgement(const SmAck &ack);
+    void handleAcknowledgement(SmAck ack);
+
     void sendAcknowledgement();
 
     QXmpp::Private::XmppSocket &socket;

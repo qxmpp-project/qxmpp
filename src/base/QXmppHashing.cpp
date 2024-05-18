@@ -189,7 +189,7 @@ auto deviceSize(QIODevice &device) -> std::optional<std::size_t>
     return std::nullopt;
 }
 
-HashingResult calculateHashesSync(std::unique_ptr<QIODevice> data, std::vector<QCryptographicHash::Algorithm> algorithms)
+HashingResult calculateHashesSync(std::unique_ptr<QIODevice> data, const std::vector<QCryptographicHash::Algorithm> &algorithms)
 {
     std::vector<QXmppHash> results;
     results.reserve(algorithms.size());

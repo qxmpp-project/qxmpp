@@ -179,7 +179,7 @@ void QXmppGeolocItem::parsePayload(const QDomElement &tune)
     }
 }
 
-auto writeTextEl(QXmlStreamWriter *writer, const QString &name, const std::optional<double> &val)
+auto writeTextEl(QXmlStreamWriter *writer, const QString &name, std::optional<double> val)
 {
     if (val.has_value()) {
         writer->writeTextElement(name, QString::number(*val));

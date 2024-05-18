@@ -271,7 +271,7 @@ std::tuple<bool, QXmppTask<SendResult>> StreamAckManager::internalSend(QXmppPack
     return { writtenToSocket, packet.task() };
 }
 
-void StreamAckManager::handleAcknowledgement(const SmAck &ack)
+void StreamAckManager::handleAcknowledgement(SmAck ack)
 {
     if (!m_enabled) {
         return;
