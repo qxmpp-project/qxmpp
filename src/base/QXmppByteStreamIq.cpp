@@ -200,7 +200,7 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
         StreamHost streamHost;
         streamHost.setHost(hostElement.attribute(QStringLiteral("host")));
         streamHost.setJid(hostElement.attribute(QStringLiteral("jid")));
-        streamHost.setPort(hostElement.attribute(QStringLiteral("port")).toInt());
+        streamHost.setPort(parseInt<quint16>(hostElement.attribute(QStringLiteral("port"))).value_or(0));
         streamHost.setZeroconf(hostElement.attribute(QStringLiteral("zeroconf")));
         m_streamHosts.append(streamHost);
     }

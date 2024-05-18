@@ -703,7 +703,7 @@ void QXmppJingleIq::Content::parse(const QDomElement &element)
     QDomElement descriptionElement = element.firstChildElement(QStringLiteral("description"));
     d->description.setType(descriptionElement.namespaceURI());
     d->description.setMedia(descriptionElement.attribute(QStringLiteral("media")));
-    d->description.setSsrc(descriptionElement.attribute(QStringLiteral("ssrc")).toULong());
+    d->description.setSsrc(parseInt<uint32_t>(descriptionElement.attribute(QStringLiteral("ssrc"))).value_or(0));
     d->isRtpMultiplexingSupported = !descriptionElement.firstChildElement(QStringLiteral("rtcp-mux")).isNull();
 
     for (const auto &childElement : iterChildElements(descriptionElement)) {
@@ -877,10 +877,10 @@ bool QXmppJingleIq::Content::parseSdp(const QString &sdp)
                     if (payload.id() == id) {
                         payload.setName(args[0]);
                         if (args.size() > 1) {
-                            payload.setClockrate(args[1].toInt());
+                            payload.setClockrate(args[1].toUInt());
                         }
                         if (args.size() > 2) {
-                            payload.setChannels(args[2].toInt());
+                            payload.setChannels(parseInt<uint8_t>(args[2]).value_or(0));
                         }
                     }
                 }
@@ -1911,15 +1911,12 @@ void QXmppJinglePayloadType::setRtpFeedbackIntervals(const QVector<QXmppJingleRt
 /// \cond
 void QXmppJinglePayloadType::parse(const QDomElement &element)
 {
-    d->id = element.attribute(QStringLiteral("id")).toInt();
+    d->id = parseInt<uint8_t>(element.attribute(QStringLiteral("id"))).value_or(0);
     d->name = element.attribute(QStringLiteral("name"));
-    d->channels = element.attribute(QStringLiteral("channels")).toInt();
-    if (!d->channels) {
-        d->channels = 1;
-    }
-    d->clockrate = element.attribute(QStringLiteral("clockrate")).toInt();
-    d->maxptime = element.attribute(QStringLiteral("maxptime")).toInt();
-    d->ptime = element.attribute(QStringLiteral("ptime")).toInt();
+    d->channels = parseInt<uint8_t>(element.attribute(QStringLiteral("channels"))).value_or(1);
+    d->clockrate = element.attribute(QStringLiteral("clockrate")).toUInt();
+    d->maxptime = element.attribute(QStringLiteral("maxptime")).toUInt();
+    d->ptime = element.attribute(QStringLiteral("ptime")).toUInt();
 
     for (const auto &child : iterChildElements(element, u"parameter")) {
         d->parameters.insert(child.attribute(QStringLiteral("name")), child.attribute(QStringLiteral("value")));

@@ -96,7 +96,7 @@ void QXmppOmemoEnvelope::setData(const QByteArray &data)
 
 void QXmppOmemoEnvelope::parse(const QDomElement &element)
 {
-    m_recipientDeviceId = element.attribute(QStringLiteral("rid")).toInt();
+    m_recipientDeviceId = element.attribute(QStringLiteral("rid")).toUInt();
 
     const auto isUsedForKeyExchange = element.attribute(QStringLiteral("kex"));
     if (isUsedForKeyExchange == QStringLiteral("true") ||
@@ -226,7 +226,7 @@ void QXmppOmemoElement::parse(const QDomElement &element)
 {
     const auto header = element.firstChildElement(QStringLiteral("header"));
 
-    m_senderDeviceId = header.attribute(QStringLiteral("sid")).toInt();
+    m_senderDeviceId = header.attribute(QStringLiteral("sid")).toUInt();
 
     for (const auto &recipient : iterChildElements(header, u"keys")) {
         const auto recipientJid = recipient.attribute(QStringLiteral("jid"));

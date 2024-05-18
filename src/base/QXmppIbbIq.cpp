@@ -218,7 +218,7 @@ void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement dataElement = firstChildElement(element, u"data");
     m_sid = dataElement.attribute(QStringLiteral("sid"));
-    m_seq = dataElement.attribute(QStringLiteral("seq")).toLong();
+    m_seq = parseInt<uint16_t>(dataElement.attribute(QStringLiteral("seq"))).value_or(0);
     m_payload = QByteArray::fromBase64(dataElement.text().toLatin1());
 }
 
