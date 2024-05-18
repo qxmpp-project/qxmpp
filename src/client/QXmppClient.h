@@ -30,7 +30,6 @@ class QXmppOutgoingClient;
 class QXmppPresence;
 class QXmppIq;
 class QXmppStream;
-class QXmppInternalClientExtension;
 
 // managers
 class QXmppDiscoveryIq;
@@ -351,7 +350,6 @@ private:
     const std::unique_ptr<QXmppClientPrivate> d;
 
     friend class QXmppClientExtension;
-    friend class QXmppInternalClientExtension;
     friend class QXmppCarbonManagerV2;
     friend class TestClient;
 };
