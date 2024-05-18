@@ -919,6 +919,8 @@ QXmppTask<void> Manager::buildMissingSessions(const QList<QString> &jids)
 /// Existing sessions are reset, which might lead to undecryptable incoming
 /// stanzas until everything is set up again.
 ///
+/// \return whether the action was successful
+///
 QXmppTask<bool> Manager::resetOwnDevice()
 {
     return d->resetOwnDevice();
@@ -940,6 +942,8 @@ QXmppTask<bool> Manager::resetOwnDevice()
 /// everything again.
 /// Existing sessions are reset, which might lead to undecryptable incoming
 /// stanzas until everything is set up again.
+///
+/// \return whether the action was successful
 ///
 QXmppTask<bool> Manager::resetAll()
 {
