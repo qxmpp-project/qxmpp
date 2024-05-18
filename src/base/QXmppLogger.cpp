@@ -207,8 +207,8 @@ void QXmppLogger::log(QXmppLogger::MessageType type, const QString &text)
 ///
 void QXmppLogger::setGauge(const QString &gauge, double value)
 {
-    Q_UNUSED(gauge);
-    Q_UNUSED(value);
+    Q_UNUSED(gauge)
+    Q_UNUSED(value)
 }
 
 ///
@@ -218,8 +218,8 @@ void QXmppLogger::setGauge(const QString &gauge, double value)
 ///
 void QXmppLogger::updateCounter(const QString &counter, qint64 amount)
 {
-    Q_UNUSED(counter);
-    Q_UNUSED(amount);
+    Q_UNUSED(counter)
+    Q_UNUSED(amount)
 }
 
 QString QXmppLogger::logFilePath()

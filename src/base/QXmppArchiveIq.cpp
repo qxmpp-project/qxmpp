@@ -384,7 +384,7 @@ bool QXmppArchivePrefIq::isArchivePrefIq(const QDomElement &element)
 void QXmppArchivePrefIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = firstChildElement(element, u"pref");
-    Q_UNUSED(queryElement);
+    Q_UNUSED(queryElement)
 }
 
 void QXmppArchivePrefIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

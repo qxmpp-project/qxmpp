@@ -254,7 +254,7 @@ void QXmppPubSubSubscribeOptions::serializeForm(QXmppDataForm &form) const
             return QStringLiteral("1");
         case Recursive:
             return QStringLiteral("all");
-        };
+        }
         return {};
     };
 

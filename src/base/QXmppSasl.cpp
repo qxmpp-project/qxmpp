@@ -822,7 +822,6 @@ QString QXmppSaslClientDigestMd5::mechanism() const
 
 std::optional<QByteArray> QXmppSaslClientDigestMd5::respond(const QByteArray &challenge)
 {
-    Q_UNUSED(challenge);
     const QByteArray digestUri = QStringLiteral("%1/%2").arg(serviceType(), host()).toUtf8();
 
     if (m_step == 0) {
