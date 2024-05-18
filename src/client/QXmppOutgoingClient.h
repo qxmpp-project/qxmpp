@@ -154,6 +154,7 @@ private:
     friend class QXmppOutgoingClientPrivate;
     friend class QXmpp::Private::PingManager;
     friend class QXmpp::Private::C2sStreamManager;
+    friend class QXmppRegistrationManager;
     friend class TestClient;
 
     const std::unique_ptr<QXmppOutgoingClientPrivate> d;

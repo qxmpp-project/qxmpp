@@ -8,6 +8,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppDiscoveryManager.h"
+#include "QXmppOutgoingClient.h"
 #include "QXmppRegisterIq.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
@@ -179,6 +180,12 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
     if (d->registerOnConnectEnabled && QXmppStreamFeatures::isStreamFeatures(stanza)) {
         QXmppStreamFeatures features;
         features.parse(stanza);
+
+        // handle STARTTLS first (this is a workaround, registration management should better be
+        // integrated into the OutgoingClient)
+        if (client()->stream()->handleStarttls(features)) {
+            return true;
+        }
 
         if (features.registerMode() == QXmppStreamFeatures::Disabled) {
             warning(QStringLiteral("Could not request the registration form, because the server does not advertise the register stream feature."));
