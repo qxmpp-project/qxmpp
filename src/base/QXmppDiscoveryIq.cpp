@@ -403,7 +403,7 @@ QByteArray QXmppDiscoveryIq::verificationString() const
 
         if (fieldMap.contains(QStringLiteral("FORM_TYPE"))) {
             const QXmppDataForm::Field field = fieldMap.take(QStringLiteral("FORM_TYPE"));
-            S += field.value().toString() + QLatin1String("<");
+            S += field.value().toString() + u"<";
 
             QStringList keys = fieldMap.keys();
             std::sort(keys.begin(), keys.end());

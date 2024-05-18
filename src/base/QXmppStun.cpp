@@ -526,7 +526,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
     }
 
     if (buffer.size() < STUN_HEADER) {
-        *errors << QLatin1String("Received a truncated STUN packet");
+        *errors << QStringLiteral("Received a truncated STUN packet");
         return false;
     }
 
@@ -539,7 +539,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
     stream.readRawData(m_id.data(), m_id.size());
 
     if (length != buffer.size() - STUN_HEADER) {
-        *errors << QLatin1String("Received an invalid STUN packet");
+        *errors << QStringLiteral("Received an invalid STUN packet");
         return false;
     }
 
@@ -673,7 +673,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // MAPPED-ADDRESS
             if (!decodeAddress(stream, a_length, mappedHost, mappedPort)) {
-                *errors << QLatin1String("Bad MAPPED-ADDRESS");
+                *errors << QStringLiteral("Bad MAPPED-ADDRESS");
                 return false;
             }
 
@@ -690,7 +690,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // SOURCE-ADDRESS
             if (!decodeAddress(stream, a_length, sourceHost, sourcePort)) {
-                *errors << QLatin1String("Bad SOURCE-ADDRESS");
+                *errors << QStringLiteral("Bad SOURCE-ADDRESS");
                 return false;
             }
 
@@ -698,7 +698,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // CHANGED-ADDRESS
             if (!decodeAddress(stream, a_length, changedHost, changedPort)) {
-                *errors << QLatin1String("Bad CHANGED-ADDRESS");
+                *errors << QStringLiteral("Bad CHANGED-ADDRESS");
                 return false;
             }
 
@@ -706,7 +706,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // OTHER-ADDRESS
             if (!decodeAddress(stream, a_length, otherHost, otherPort)) {
-                *errors << QLatin1String("Bad OTHER-ADDRESS");
+                *errors << QStringLiteral("Bad OTHER-ADDRESS");
                 return false;
             }
 
@@ -714,7 +714,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // XOR-MAPPED-ADDRESS
             if (!decodeAddress(stream, a_length, xorMappedHost, xorMappedPort, m_id)) {
-                *errors << QLatin1String("Bad XOR-MAPPED-ADDRESS");
+                *errors << QStringLiteral("Bad XOR-MAPPED-ADDRESS");
                 return false;
             }
 
@@ -722,7 +722,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // XOR-PEER-ADDRESS
             if (!decodeAddress(stream, a_length, xorPeerHost, xorPeerPort, m_id)) {
-                *errors << QLatin1String("Bad XOR-PEER-ADDRESS");
+                *errors << QStringLiteral("Bad XOR-PEER-ADDRESS");
                 return false;
             }
 
@@ -730,7 +730,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
 
             // XOR-RELAYED-ADDRESS
             if (!decodeAddress(stream, a_length, xorRelayedHost, xorRelayedPort, m_id)) {
-                *errors << QLatin1String("Bad XOR-RELAYED-ADDRESS");
+                *errors << QStringLiteral("Bad XOR-RELAYED-ADDRESS");
                 return false;
             }
 
@@ -748,7 +748,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
                 QByteArray copy = buffer.left(STUN_HEADER + done);
                 setBodyLength(copy, done + 24);
                 if (integrity != QXmppUtils::generateHmacSha1(key, copy)) {
-                    *errors << QLatin1String("Bad message integrity");
+                    *errors << QStringLiteral("Bad message integrity");
                     return false;
                 }
             }
@@ -770,7 +770,7 @@ bool QXmppStunMessage::decode(const QByteArray &buffer, const QByteArray &key, Q
             setBodyLength(copy, done + 8);
             const quint32 expected = QXmppUtils::generateCrc32(copy) ^ 0x5354554eL;
             if (fingerprint != expected) {
-                *errors << QLatin1String("Bad fingerprint");
+                *errors << QStringLiteral("Bad fingerprint");
                 return false;
             }
 
@@ -1214,7 +1214,7 @@ void QXmppStunTransaction::retry()
 {
     if (m_tries >= STUN_RTO_MAX) {
         m_response.setType(QXmppStunMessage::Error);
-        m_response.errorPhrase = QLatin1String("Request timed out");
+        m_response.errorPhrase = QStringLiteral("Request timed out");
         Q_EMIT finished();
         return;
     }
