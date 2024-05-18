@@ -14,7 +14,6 @@
 #include "QXmppOutgoingClient_p.h"
 #include "QXmppPacket_p.h"
 #include "QXmppPingIq.h"
-#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
@@ -772,7 +771,7 @@ bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
         if (socket()->supportsSsl() &&
             (localSecurity != QXmppConfiguration::TLSDisabled && remoteSecurity != QXmppStreamFeatures::Disabled)) {
             // enable TLS as it is support by both parties
-            d->socket.sendData(serializeXml(QXmppStartTlsPacket()));
+            d->socket.sendData(serializeXml(StarttlsRequest()));
             d->setListener<StarttlsManager>().task().then(this, [this] {
                 socket()->startClientEncryption();
             });
@@ -813,7 +812,7 @@ namespace QXmpp::Private {
 
 HandleElementResult StarttlsManager::handleElement(const QDomElement &el)
 {
-    if (el.tagName() == u"proceed" && el.namespaceURI() == ns_tls) {
+    if (StarttlsProceed::fromDom(el)) {
         m_promise.finish();
         return Finished;
     }

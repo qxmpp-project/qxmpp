@@ -138,6 +138,32 @@ void StreamOpen::toXml(QXmlStreamWriter *writer) const
     writer->writeCharacters({});
 }
 
+std::optional<StarttlsRequest> StarttlsRequest::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"starttls" || el.namespaceURI() != ns_tls) {
+        return {};
+    }
+    return StarttlsRequest {};
+}
+
+void StarttlsRequest::toXml(QXmlStreamWriter *w) const
+{
+    writeEmptyElement(w, u"starttls", ns_tls);
+}
+
+std::optional<StarttlsProceed> StarttlsProceed::fromDom(const QDomElement &el)
+{
+    if (el.tagName() != u"proceed" || el.namespaceURI() != ns_tls) {
+        return {};
+    }
+    return StarttlsProceed {};
+}
+
+void StarttlsProceed::toXml(QXmlStreamWriter *w) const
+{
+    writeEmptyElement(w, u"proceed", ns_tls);
+}
+
 void CsiActive::toXml(QXmlStreamWriter *w) const
 {
     writeEmptyElement(w, u"active", ns_csi);

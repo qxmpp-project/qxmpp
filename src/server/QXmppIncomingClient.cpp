@@ -8,10 +8,11 @@
 #include "QXmppConstants_p.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppSasl_p.h"
-#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
+
+#include "Stream.h"
 
 #include <QDomElement>
 #include <QHostAddress>
@@ -229,8 +230,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         d->idleTimer->start();
     }
 
-    if (QXmppStartTlsPacket::isStartTlsPacket(nodeRecv, QXmppStartTlsPacket::StartTls)) {
-        sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::Proceed));
+    if (StarttlsRequest::fromDom(nodeRecv)) {
+        sendData(serializeXml(StarttlsProceed()));
         socket()->flush();
         socket()->startServerEncryption();
         return;

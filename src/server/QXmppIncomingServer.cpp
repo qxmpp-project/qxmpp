@@ -7,14 +7,18 @@
 #include "QXmppConstants_p.h"
 #include "QXmppDialback.h"
 #include "QXmppOutgoingServer.h"
-#include "QXmppStartTlsPacket.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
+
+#include "Stream.h"
 
 #include <QDomElement>
 #include <QHostAddress>
 #include <QSslKey>
 #include <QSslSocket>
+
+using namespace QXmpp::Private;
 
 class QXmppIncomingServerPrivate
 {
@@ -108,8 +112,8 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 
 void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 {
-    if (QXmppStartTlsPacket::isStartTlsPacket(stanza, QXmppStartTlsPacket::StartTls)) {
-        sendPacket(QXmppStartTlsPacket(QXmppStartTlsPacket::Proceed));
+    if (StarttlsRequest::fromDom(stanza)) {
+        sendData(serializeXml(StarttlsProceed()));
         socket()->flush();
         socket()->startServerEncryption();
         return;
