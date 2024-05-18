@@ -67,24 +67,6 @@ QXmppFileMetadata::QXmppFileMetadata()
 QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppFileMetadata)
 
 /// \cond
-QVector<QDomElement> allChildElements(const QDomElement &el, const QString &name)
-{
-    QVector<QDomElement> out;
-
-    for (const auto &childEl : iterChildElements(el, name)) {
-        out.push_back(childEl);
-    }
-
-    return out;
-}
-
-template<typename Func>
-QVector<std::invoke_result_t<Func, QDomElement>> forAllChildElements(const QDomElement &el, const QString &name, Func func)
-{
-    return transform<std::vector<std::invoke_result_t<Func, QDomElement>>>(
-        allChildElements(el, name), std::forward<Func>(func));
-}
-
 template<typename ElementType>
 QVector<ElementType> parseChildElements(const QDomElement &el, QStringView tagName, QStringView namespaceUri)
 {
