@@ -1285,7 +1285,7 @@ void QXmppTurnAllocation::connectToHost()
 
     // send allocate request
     QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Allocate | QXmppStunMessage::Request);
+    request.setType(int(QXmppStunMessage::Allocate) | int(QXmppStunMessage::Request));
     request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
     request.setLifetime(m_lifetime);
     request.setRequestedTransport(0x11);
@@ -1311,7 +1311,7 @@ void QXmppTurnAllocation::disconnectFromHost()
     // end allocation
     if (m_state == ConnectedState) {
         QXmppStunMessage request;
-        request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
+        request.setType(int(QXmppStunMessage::Refresh) | int(QXmppStunMessage::Request));
         request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
@@ -1400,7 +1400,7 @@ void QXmppTurnAllocation::handleDatagram(const QByteArray &buffer, const QHostAd
 void QXmppTurnAllocation::refresh()
 {
     QXmppStunMessage request;
-    request.setType(QXmppStunMessage::Refresh | QXmppStunMessage::Request);
+    request.setType(int(QXmppStunMessage::Refresh) | int(QXmppStunMessage::Request));
     request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
     request.setNonce(m_nonce);
     request.setRealm(m_realm);
@@ -1415,7 +1415,7 @@ void QXmppTurnAllocation::refreshChannels()
 {
     for (auto itr = m_channels.cbegin(); itr != m_channels.cend(); itr++) {
         QXmppStunMessage request;
-        request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
+        request.setType(int(QXmppStunMessage::ChannelBind) | int(QXmppStunMessage::Request));
         request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
@@ -1602,7 +1602,7 @@ qint64 QXmppTurnAllocation::writeDatagram(const QByteArray &data, const QHostAdd
 
         // bind channel
         QXmppStunMessage request;
-        request.setType(QXmppStunMessage::ChannelBind | QXmppStunMessage::Request);
+        request.setType(int(QXmppStunMessage::ChannelBind) | int(QXmppStunMessage::Request));
         request.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
         request.setNonce(m_nonce);
         request.setRealm(m_realm);
@@ -1905,7 +1905,7 @@ void QXmppIceComponentPrivate::performCheck(CandidatePair *pair, bool nominate)
 {
     QXmppStunMessage message;
     message.setId(QXmppUtils::generateRandomBytes(STUN_ID_SIZE));
-    message.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+    message.setType(int(QXmppStunMessage::Binding) | int(QXmppStunMessage::Request));
     message.setPriority(peerReflexivePriority);
     message.setUsername(QStringLiteral("%1:%2").arg(config->remoteUser, config->localUser));
     if (config->iceControlling) {
@@ -1950,7 +1950,7 @@ void QXmppIceComponentPrivate::setSockets(QList<QUdpSocket *> sockets)
     stunTransactions.clear();
     for (auto &stunServer : config->stunServers) {
         QXmppStunMessage request;
-        request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
+        request.setType(int(QXmppStunMessage::Binding) | int(QXmppStunMessage::Request));
         for (auto *transport : std::as_const(transports)) {
             const QXmppJingleCandidate local = transport->localCandidate(component);
             if (!isCompatibleAddress(local.host(), stunServer.first)) {
@@ -2184,7 +2184,7 @@ void QXmppIceComponent::handleDatagram(const QByteArray &buffer, const QHostAddr
         // send a binding response
         QXmppStunMessage response;
         response.setId(message.id());
-        response.setType(QXmppStunMessage::Binding | QXmppStunMessage::Response);
+        response.setType(int(QXmppStunMessage::Binding) | int(QXmppStunMessage::Response));
         response.xorMappedHost = remoteHost;
         response.xorMappedPort = remotePort;
         d->writeStun(response, transport, remoteHost, remotePort);
