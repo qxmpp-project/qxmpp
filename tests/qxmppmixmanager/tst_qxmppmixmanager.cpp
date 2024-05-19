@@ -123,19 +123,19 @@ void tst_QXmppMixManager::testService()
     QVERIFY(!service1.channelsSearchable);
     QVERIFY(!service1.channelCreationAllowed);
 
-    service1.jid = QStringLiteral("mix.shakespeare.example");
+    service1.jid = u"mix.shakespeare.example"_s;
     service1.channelsSearchable = true;
     service1.channelCreationAllowed = false;
 
     QXmppMixManager::Service service2;
-    service2.jid = QStringLiteral("mix.shakespeare.example");
+    service2.jid = u"mix.shakespeare.example"_s;
     service2.channelsSearchable = true;
     service2.channelCreationAllowed = false;
 
     QCOMPARE(service1, service2);
 
     QXmppMixManager::Service service3;
-    service3.jid = QStringLiteral("mix.shakespeare.example");
+    service3.jid = u"mix.shakespeare.example"_s;
     service3.channelsSearchable = true;
     service3.channelCreationAllowed = true;
 
@@ -148,7 +148,7 @@ void tst_QXmppMixManager::testServices()
     QSignalSpy spy(&manager, &QXmppMixManager::servicesChanged);
 
     QXmppMixManager::Service service;
-    service.jid = QStringLiteral("mix.shakespeare.example");
+    service.jid = u"mix.shakespeare.example"_s;
 
     QVERIFY(manager.services().isEmpty());
 
@@ -158,7 +158,7 @@ void tst_QXmppMixManager::testServices()
     manager.addService(service);
     QCOMPARE(spy.size(), 1);
 
-    manager.removeService(QStringLiteral("mix1.shakespeare.example"));
+    manager.removeService(u"mix1.shakespeare.example"_s);
     QCOMPARE(manager.services().size(), 1);
     QCOMPARE(spy.size(), 1);
 
@@ -174,7 +174,7 @@ void tst_QXmppMixManager::testServices()
     QCOMPARE(manager.services().at(0).channelsSearchable, service.channelsSearchable);
     QCOMPARE(spy.size(), 4);
 
-    service.jid = QStringLiteral("mix1.shakespeare.example");
+    service.jid = u"mix1.shakespeare.example"_s;
     manager.addService(service);
     manager.removeServices();
     QVERIFY(manager.services().isEmpty());
@@ -186,7 +186,7 @@ void tst_QXmppMixManager::testResetCachedData()
     QXmppMixManager manager;
 
     QXmppMixManager::Service service;
-    service.jid = QStringLiteral("mix.shakespeare.example");
+    service.jid = u"mix.shakespeare.example"_s;
 
     manager.setSupportedByServer(true);
     manager.setArchivingSupportedByServer(true);
@@ -201,25 +201,25 @@ void tst_QXmppMixManager::testResetCachedData()
 
 void tst_QXmppMixManager::testHandleDiscoInfo()
 {
-    auto [client, manager] = Tester(QStringLiteral("hag66@shakespeare.example"));
+    auto [client, manager] = Tester(u"hag66@shakespeare.example"_s);
 
     QXmppDiscoveryIq::Identity identity;
-    identity.setCategory(QStringLiteral("conference"));
-    identity.setType(QStringLiteral("mix"));
+    identity.setCategory(u"conference"_s);
+    identity.setType(u"mix"_s);
 
     QXmppDiscoveryIq iq;
-    iq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2"),
-                     QStringLiteral("urn:xmpp:mix:pam:2#archive"),
-                     QStringLiteral("urn:xmpp:mix:core:1"),
-                     QStringLiteral("urn:xmpp:mix:core:1#searchable"),
-                     QStringLiteral("urn:xmpp:mix:core:1#create-channel") });
+    iq.setFeatures({ u"urn:xmpp:mix:pam:2"_s,
+                     u"urn:xmpp:mix:pam:2#archive"_s,
+                     u"urn:xmpp:mix:core:1"_s,
+                     u"urn:xmpp:mix:core:1#searchable"_s,
+                     u"urn:xmpp:mix:core:1#create-channel"_s });
     iq.setIdentities({ identity });
 
     manager->handleDiscoInfo(iq);
 
     QVERIFY(manager->supportedByServer());
     QVERIFY(manager->archivingSupportedByServer());
-    QCOMPARE(manager->services().at(0).jid, QStringLiteral("shakespeare.example"));
+    QCOMPARE(manager->services().at(0).jid, u"shakespeare.example"_s);
     QVERIFY(manager->services().at(0).channelsSearchable);
     QVERIFY(manager->services().at(0).channelCreationAllowed);
 
@@ -240,7 +240,7 @@ void tst_QXmppMixManager::testAddJidToNode()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->addJidToNode(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("alice@wonderland.example"));
+        return manager->addJidToNode(u"coven@mix.shakespeare.example"_s, u"urn:xmpp:mix:nodes:allowed"_s, u"alice@wonderland.example"_s);
     };
 
     auto task = call();
@@ -252,7 +252,7 @@ void tst_QXmppMixManager::testAddJidToNode()
                                  "</publish>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -266,7 +266,7 @@ void tst_QXmppMixManager::testRequestJids()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->requestJids(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("urn:xmpp:mix:nodes:allowed"));
+        return manager->requestJids(u"coven@mix.shakespeare.example"_s, u"urn:xmpp:mix:nodes:allowed"_s);
     };
 
     auto task = call();
@@ -286,8 +286,8 @@ void tst_QXmppMixManager::testRequestJids()
                                  "</iq>"));
 
     auto jids = expectFutureVariant<QVector<QXmppMixManager::Jid>>(task);
-    QCOMPARE(jids.at(0), QStringLiteral("shakespeare.example"));
-    QCOMPARE(jids.at(1), QStringLiteral("alice@wonderland.example"));
+    QCOMPARE(jids.at(0), u"shakespeare.example"_s);
+    QCOMPARE(jids.at(1), u"alice@wonderland.example"_s);
 
     testErrorFromChannel(task = call(), client);
 }
@@ -300,17 +300,17 @@ void tst_QXmppMixManager::testJoinChannelPrivate()
 
     auto call = [manager]() {
         QXmppMixInvitation invitation;
-        invitation.setInviterJid(QStringLiteral("hag66@shakespeare.example"));
-        invitation.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
-        invitation.setChannelJid(QStringLiteral("coven@mix.shakespeare.example"));
-        invitation.setToken(QStringLiteral("ABCDEF"));
+        invitation.setInviterJid(u"hag66@shakespeare.example"_s);
+        invitation.setInviteeJid(u"cat@shakespeare.example"_s);
+        invitation.setChannelJid(u"coven@mix.shakespeare.example"_s);
+        invitation.setToken(u"ABCDEF"_s);
 
         QXmppMixIq iq;
         iq.setType(QXmppIq::Set);
-        iq.setTo(QStringLiteral("hag66@shakespeare.example"));
+        iq.setTo(u"hag66@shakespeare.example"_s);
         iq.setActionType(QXmppMixIq::ClientJoin);
         iq.setChannelJid(invitation.channelJid());
-        iq.setNick(QStringLiteral("third witch"));
+        iq.setNick(u"third witch"_s);
         iq.setSubscriptions(QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids);
         iq.setInvitation(invitation);
 
@@ -344,23 +344,23 @@ void tst_QXmppMixManager::testJoinChannelPrivate()
                                  "</iq>"));
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
-    QCOMPARE(result.participantId, QStringLiteral("123456"));
-    QCOMPARE(result.nickname, QStringLiteral("third witch 2"));
+    QCOMPARE(result.participantId, u"123456"_s);
+    QCOMPARE(result.nickname, u"third witch 2"_s);
     QCOMPARE(result.subscriptions, QXmppMixConfigItem::Node::AllowedJids);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("hag66@shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"hag66@shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testPrepareJoinIq()
 {
-    auto [client, manager] = Tester(QStringLiteral("hag66@shakespeare.example"));
-    auto iq = manager->prepareJoinIq(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("third witch"), QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
+    auto [client, manager] = Tester(u"hag66@shakespeare.example"_s);
+    auto iq = manager->prepareJoinIq(u"coven@mix.shakespeare.example"_s, u"third witch"_s, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
     QCOMPARE(iq.type(), QXmppIq::Set);
-    QCOMPARE(iq.to(), QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(iq.to(), u"hag66@shakespeare.example"_s);
     QCOMPARE(iq.actionType(), QXmppMixIq::ClientJoin);
-    QCOMPARE(iq.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
-    QCOMPARE(iq.nick(), QStringLiteral("third witch"));
+    QCOMPARE(iq.channelJid(), u"coven@mix.shakespeare.example"_s);
+    QCOMPARE(iq.nick(), u"third witch"_s);
     QCOMPARE(iq.subscriptions(), QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 }
 
@@ -381,13 +381,13 @@ void tst_QXmppMixManager::testHandlePubSubEvent()
     QSignalSpy participantLeftSpy(&manager, &QXmppMixManager::participantLeft);
     QSignalSpy channelDeletedSpy(&manager, &QXmppMixManager::channelDeleted);
 
-    const auto channelJid = QStringLiteral("coven@mix.shakespeare.example");
-    const auto channelName = QStringLiteral("The Coven");
-    const QStringList nodes = { QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("urn:xmpp:mix:nodes:banned") };
-    const auto configurationNode = QStringLiteral("urn:xmpp:mix:nodes:config");
-    const auto informationNode = QStringLiteral("urn:xmpp:mix:nodes:info");
-    const auto participantNode = QStringLiteral("urn:xmpp:mix:nodes:participants");
-    const QStringList jids = { QStringLiteral("hag66@shakespeare.example"), QStringLiteral("cat@shakespeare.example") };
+    const auto channelJid = u"coven@mix.shakespeare.example"_s;
+    const auto channelName = u"The Coven"_s;
+    const QStringList nodes = { u"urn:xmpp:mix:nodes:allowed"_s, u"urn:xmpp:mix:nodes:banned"_s };
+    const auto configurationNode = u"urn:xmpp:mix:nodes:config"_s;
+    const auto informationNode = u"urn:xmpp:mix:nodes:info"_s;
+    const auto participantNode = u"urn:xmpp:mix:nodes:participants"_s;
+    const QStringList jids = { u"hag66@shakespeare.example"_s, u"cat@shakespeare.example"_s };
 
     const QVector<QXmppPubSubEventBase::EventType> eventTypes = { QXmppPubSubEventBase::EventType::Configuration,
                                                                   QXmppPubSubEventBase::EventType::Delete,
@@ -502,11 +502,11 @@ void tst_QXmppMixManager::testOnRegistered()
     client.addNewExtension<QXmppDiscoveryManager>();
     client.addNewExtension<QXmppPubSubManager>();
 
-    client.configuration().setJid(QStringLiteral("hag66@shakespeare.example"));
+    client.configuration().setJid(u"hag66@shakespeare.example"_s);
     client.addExtension(&manager);
 
     QXmppMixManager::Service service;
-    service.jid = QStringLiteral("mix.shakespeare.example");
+    service.jid = u"mix.shakespeare.example"_s;
 
     manager.setSupportedByServer(true);
     manager.setArchivingSupportedByServer(true);
@@ -519,7 +519,7 @@ void tst_QXmppMixManager::testOnRegistered()
     QVERIFY(manager.services().isEmpty());
 
     QXmppDiscoveryIq iq;
-    iq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2") });
+    iq.setFeatures({ u"urn:xmpp:mix:pam:2"_s });
     Q_EMIT manager.client()->findExtension<QXmppDiscoveryManager>()->infoReceived(iq);
     QVERIFY(manager.supportedByServer());
 }
@@ -532,11 +532,11 @@ void tst_QXmppMixManager::testOnUnregistered()
     client.addNewExtension<QXmppDiscoveryManager>();
     client.addNewExtension<QXmppPubSubManager>();
 
-    client.configuration().setJid(QStringLiteral("hag66@shakespeare.example"));
+    client.configuration().setJid(u"hag66@shakespeare.example"_s);
     client.addExtension(&manager);
 
     QXmppMixManager::Service service;
-    service.jid = QStringLiteral("mix.shakespeare.example");
+    service.jid = u"mix.shakespeare.example"_s;
 
     manager.setSupportedByServer(true);
     manager.setArchivingSupportedByServer(true);
@@ -549,15 +549,15 @@ void tst_QXmppMixManager::testOnUnregistered()
     QVERIFY(manager.services().isEmpty());
 
     QXmppDiscoveryIq::Identity identity;
-    identity.setCategory(QStringLiteral("conference"));
-    identity.setType(QStringLiteral("mix"));
+    identity.setCategory(u"conference"_s);
+    identity.setType(u"mix"_s);
 
     QXmppDiscoveryIq iq;
-    iq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2"),
-                     QStringLiteral("urn:xmpp:mix:pam:2#archive"),
-                     QStringLiteral("urn:xmpp:mix:core:1"),
-                     QStringLiteral("urn:xmpp:mix:core:1#searchable"),
-                     QStringLiteral("urn:xmpp:mix:core:1#create-channel") });
+    iq.setFeatures({ u"urn:xmpp:mix:pam:2"_s,
+                     u"urn:xmpp:mix:pam:2#archive"_s,
+                     u"urn:xmpp:mix:core:1"_s,
+                     u"urn:xmpp:mix:core:1#searchable"_s,
+                     u"urn:xmpp:mix:core:1#create-channel"_s });
     iq.setIdentities({ identity });
 
     Q_EMIT manager.client()->findExtension<QXmppDiscoveryManager>()->infoReceived(iq);
@@ -582,7 +582,7 @@ void tst_QXmppMixManager::testCreateChannel()
     auto manager = tester.manager;
 
     auto call = [manager]() {
-        return manager->createChannel(QStringLiteral("mix.shakespeare.example"));
+        return manager->createChannel(u"mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -595,9 +595,9 @@ void tst_QXmppMixManager::testCreateChannel()
                                  "</iq>"));
 
     auto channelJid = expectFutureVariant<QXmppMixManager::ChannelJid>(task);
-    QCOMPARE(channelJid, QStringLiteral("A1B2C345@mix.shakespeare.example"));
+    QCOMPARE(channelJid, u"A1B2C345@mix.shakespeare.example"_s);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("mix.shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"mix.shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testCreateChannelWithId()
@@ -607,7 +607,7 @@ void tst_QXmppMixManager::testCreateChannelWithId()
     auto manager = tester.manager;
 
     auto call = [manager]() {
-        return manager->createChannel(QStringLiteral("mix.shakespeare.example"), QStringLiteral("coven"));
+        return manager->createChannel(u"mix.shakespeare.example"_s, u"coven"_s);
     };
 
     auto task = call();
@@ -620,9 +620,9 @@ void tst_QXmppMixManager::testCreateChannelWithId()
                                  "</iq>"));
 
     auto channelJid = expectFutureVariant<QXmppMixManager::ChannelJid>(task);
-    QCOMPARE(channelJid, QStringLiteral("coven@mix.shakespeare.example"));
+    QCOMPARE(channelJid, u"coven@mix.shakespeare.example"_s);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("mix.shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"mix.shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testRequestChannelJids()
@@ -632,7 +632,7 @@ void tst_QXmppMixManager::testRequestChannelJids()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->requestChannelJids(QStringLiteral("mix.shakespeare.example"));
+        return manager->requestChannelJids(u"mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -650,11 +650,11 @@ void tst_QXmppMixManager::testRequestChannelJids()
 
     auto jids = expectFutureVariant<QVector<QXmppMixManager::ChannelJid>>(task);
     QCOMPARE(jids.size(), 3);
-    QCOMPARE(jids.at(0), QStringLiteral("coven@mix.shakespeare.example"));
-    QCOMPARE(jids.at(1), QStringLiteral("spells@mix.shakespeare.example"));
-    QCOMPARE(jids.at(2), QStringLiteral("wizards@mix.shakespeare.example"));
+    QCOMPARE(jids.at(0), u"coven@mix.shakespeare.example"_s);
+    QCOMPARE(jids.at(1), u"spells@mix.shakespeare.example"_s);
+    QCOMPARE(jids.at(2), u"wizards@mix.shakespeare.example"_s);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("mix.shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"mix.shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testRequestChannelNodes()
@@ -664,7 +664,7 @@ void tst_QXmppMixManager::testRequestChannelNodes()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->requestChannelNodes(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->requestChannelNodes(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -692,7 +692,7 @@ void tst_QXmppMixManager::testRequestChannelConfiguration()
     auto manager = tester.manager;
 
     auto call = [manager]() {
-        return manager->requestChannelConfiguration(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->requestChannelConfiguration(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -720,7 +720,7 @@ void tst_QXmppMixManager::testRequestChannelConfiguration()
                                  "</iq>"));
 
     auto configuration = expectFutureVariant<QXmppMixConfigItem>(task);
-    QCOMPARE(configuration.lastEditorJid(), QStringLiteral("greymalkin@shakespeare.example"));
+    QCOMPARE(configuration.lastEditorJid(), u"greymalkin@shakespeare.example"_s);
 
     testErrorFromChannel(task = call(), client);
 }
@@ -732,11 +732,11 @@ void tst_QXmppMixManager::testUpdateChannelConfiguration()
     auto manager = tester.manager;
 
     QXmppMixConfigItem configuration;
-    configuration.setId(QStringLiteral("2016-05-30T09:00:00"));
-    configuration.setOwnerJids({ QStringLiteral("greymalkin@shakespeare.example") });
+    configuration.setId(u"2016-05-30T09:00:00"_s);
+    configuration.setOwnerJids({ u"greymalkin@shakespeare.example"_s });
 
     auto call = [manager, configuration]() {
-        return manager->updateChannelConfiguration(QStringLiteral("coven@mix.shakespeare.example"), configuration);
+        return manager->updateChannelConfiguration(u"coven@mix.shakespeare.example"_s, configuration);
     };
 
     auto task = call();
@@ -777,7 +777,7 @@ void tst_QXmppMixManager::testRequestChannelInformation()
     auto manager = tester.manager;
 
     auto call = [manager]() {
-        return manager->requestChannelInformation(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->requestChannelInformation(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -805,7 +805,7 @@ void tst_QXmppMixManager::testRequestChannelInformation()
                                  "</iq>"));
 
     auto information = expectFutureVariant<QXmppMixInfoItem>(task);
-    QCOMPARE(information.name(), QStringLiteral("Witches Coven"));
+    QCOMPARE(information.name(), u"Witches Coven"_s);
 
     testErrorFromChannel(task = call(), client);
 }
@@ -817,11 +817,11 @@ void tst_QXmppMixManager::testUpdateChannelInformation()
     auto manager = tester.manager;
 
     QXmppMixInfoItem information;
-    information.setId(QStringLiteral("2016-05-30T09:00:00"));
-    information.setName(QStringLiteral("The Coven"));
+    information.setId(u"2016-05-30T09:00:00"_s);
+    information.setName(u"The Coven"_s);
 
     auto call = [manager, information]() {
-        return manager->updateChannelInformation(QStringLiteral("coven@mix.shakespeare.example"), information);
+        return manager->updateChannelInformation(u"coven@mix.shakespeare.example"_s, information);
     };
 
     auto task = call();
@@ -857,12 +857,12 @@ void tst_QXmppMixManager::testUpdateChannelInformation()
 
 void tst_QXmppMixManager::testJoinChannel()
 {
-    auto tester = Tester(QStringLiteral("hag66@shakespeare.example"));
+    auto tester = Tester(u"hag66@shakespeare.example"_s);
     auto &client = tester.client;
     auto manager = tester.manager;
 
     auto call = [manager]() {
-        return manager->joinChannel(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->joinChannel(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -893,18 +893,18 @@ void tst_QXmppMixManager::testJoinChannel()
                                  "</iq>"));
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
-    QCOMPARE(result.participantId, QStringLiteral("123456"));
+    QCOMPARE(result.participantId, u"123456"_s);
     QVERIFY(result.nickname.isEmpty());
     QCOMPARE(result.subscriptions, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("hag66@shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"hag66@shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testJoinChannelWithNickname()
 {
-    auto [client, manager] = Tester(QStringLiteral("hag66@shakespeare.example"));
+    auto [client, manager] = Tester(u"hag66@shakespeare.example"_s);
 
-    auto task = manager->joinChannel(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("third witch"));
+    auto task = manager->joinChannel(u"coven@mix.shakespeare.example"_s, u"third witch"_s);
 
     client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
                                  "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
@@ -934,16 +934,16 @@ void tst_QXmppMixManager::testJoinChannelWithNickname()
                                  "</iq>"));
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
-    QCOMPARE(result.participantId, QStringLiteral("123456"));
-    QCOMPARE(result.nickname, QStringLiteral("third witch"));
+    QCOMPARE(result.participantId, u"123456"_s);
+    QCOMPARE(result.nickname, u"third witch"_s);
     QCOMPARE(result.subscriptions, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 }
 
 void tst_QXmppMixManager::testJoinChannelWithNodes()
 {
-    auto [client, manager] = Tester(QStringLiteral("hag66@shakespeare.example"));
+    auto [client, manager] = Tester(u"hag66@shakespeare.example"_s);
 
-    auto task = manager->joinChannel(QStringLiteral("coven@mix.shakespeare.example"), {}, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
+    auto task = manager->joinChannel(u"coven@mix.shakespeare.example"_s, {}, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
     client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
                                  "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
@@ -970,16 +970,16 @@ void tst_QXmppMixManager::testJoinChannelWithNodes()
 
 void tst_QXmppMixManager::testJoinChannelViaInvitation()
 {
-    auto tester = Tester(QStringLiteral("cat@shakespeare.example"));
+    auto tester = Tester(u"cat@shakespeare.example"_s);
     auto &client = tester.client;
     auto manager = tester.manager;
 
     auto call = [manager]() {
         QXmppMixInvitation invitation;
-        invitation.setInviterJid(QStringLiteral("hag66@shakespeare.example"));
-        invitation.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
-        invitation.setChannelJid(QStringLiteral("coven@mix.shakespeare.example"));
-        invitation.setToken(QStringLiteral("ABCDEF"));
+        invitation.setInviterJid(u"hag66@shakespeare.example"_s);
+        invitation.setInviteeJid(u"cat@shakespeare.example"_s);
+        invitation.setChannelJid(u"coven@mix.shakespeare.example"_s);
+        invitation.setToken(u"ABCDEF"_s);
 
         return manager->joinChannel(invitation);
     };
@@ -1018,24 +1018,24 @@ void tst_QXmppMixManager::testJoinChannelViaInvitation()
                                  "</iq>"));
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
-    QCOMPARE(result.participantId, QStringLiteral("123457"));
+    QCOMPARE(result.participantId, u"123457"_s);
     QVERIFY(result.nickname.isEmpty());
     QCOMPARE(result.subscriptions, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("cat@shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"cat@shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testJoinChannelViaInvitationWithNickname()
 {
-    auto [client, manager] = Tester(QStringLiteral("cat@shakespeare.example"));
+    auto [client, manager] = Tester(u"cat@shakespeare.example"_s);
 
     QXmppMixInvitation invitation;
-    invitation.setInviterJid(QStringLiteral("hag66@shakespeare.example"));
-    invitation.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
-    invitation.setChannelJid(QStringLiteral("coven@mix.shakespeare.example"));
-    invitation.setToken(QStringLiteral("ABCDEF"));
+    invitation.setInviterJid(u"hag66@shakespeare.example"_s);
+    invitation.setInviteeJid(u"cat@shakespeare.example"_s);
+    invitation.setChannelJid(u"coven@mix.shakespeare.example"_s);
+    invitation.setToken(u"ABCDEF"_s);
 
-    auto task = manager->joinChannel(invitation, QStringLiteral("fourth witch"));
+    auto task = manager->joinChannel(invitation, u"fourth witch"_s);
 
     client.expect(QStringLiteral("<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
                                  "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
@@ -1071,20 +1071,20 @@ void tst_QXmppMixManager::testJoinChannelViaInvitationWithNickname()
                                  "</iq>"));
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
-    QCOMPARE(result.participantId, QStringLiteral("123457"));
-    QCOMPARE(result.nickname, QStringLiteral("fourth witch"));
+    QCOMPARE(result.participantId, u"123457"_s);
+    QCOMPARE(result.nickname, u"fourth witch"_s);
     QCOMPARE(result.subscriptions, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 }
 
 void tst_QXmppMixManager::testJoinChannelViaInvitationWithNodes()
 {
-    auto [client, manager] = Tester(QStringLiteral("cat@shakespeare.example"));
+    auto [client, manager] = Tester(u"cat@shakespeare.example"_s);
 
     QXmppMixInvitation invitation;
-    invitation.setInviterJid(QStringLiteral("hag66@shakespeare.example"));
-    invitation.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
-    invitation.setChannelJid(QStringLiteral("coven@mix.shakespeare.example"));
-    invitation.setToken(QStringLiteral("ABCDEF"));
+    invitation.setInviterJid(u"hag66@shakespeare.example"_s);
+    invitation.setInviteeJid(u"cat@shakespeare.example"_s);
+    invitation.setChannelJid(u"coven@mix.shakespeare.example"_s);
+    invitation.setToken(u"ABCDEF"_s);
 
     auto task = manager->joinChannel(invitation, {}, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
@@ -1124,7 +1124,7 @@ void tst_QXmppMixManager::testUpdateNickname()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->updateNickname(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("third witch"));
+        return manager->updateNickname(u"coven@mix.shakespeare.example"_s, u"third witch"_s);
     };
 
     auto task = call();
@@ -1153,7 +1153,7 @@ void tst_QXmppMixManager::testUpdateSubscriptions()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->updateSubscriptions(QStringLiteral("coven@mix.shakespeare.example"), QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence, QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information);
+        return manager->updateSubscriptions(u"coven@mix.shakespeare.example"_s, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence, QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information);
     };
 
     auto task = call();
@@ -1190,7 +1190,7 @@ void tst_QXmppMixManager::testRequestInvitation()
     auto logger = client.logger();
 
     auto call = [&client, manager]() {
-        return manager->requestInvitation(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("cat@shakespeare.example"));
+        return manager->requestInvitation(u"coven@mix.shakespeare.example"_s, u"cat@shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1212,7 +1212,7 @@ void tst_QXmppMixManager::testRequestInvitation()
                                  "</iq>"));
 
     const auto invitation = expectFutureVariant<QXmppMixInvitation>(task);
-    QCOMPARE(invitation.token(), QStringLiteral("ABCDEF"));
+    QCOMPARE(invitation.token(), u"ABCDEF"_s);
 
     testErrorFromChannel(task = call(), client);
 }
@@ -1224,7 +1224,7 @@ void tst_QXmppMixManager::testRequestAllowedJids()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->requestAllowedJids(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->requestAllowedJids(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1244,8 +1244,8 @@ void tst_QXmppMixManager::testRequestAllowedJids()
                                  "</iq>"));
 
     auto allowedJids = expectFutureVariant<QVector<QXmppMixManager::Jid>>(task);
-    QCOMPARE(allowedJids.at(0), QStringLiteral("shakespeare.example"));
-    QCOMPARE(allowedJids.at(1), QStringLiteral("alice@wonderland.example"));
+    QCOMPARE(allowedJids.at(0), u"shakespeare.example"_s);
+    QCOMPARE(allowedJids.at(1), u"alice@wonderland.example"_s);
 
     testErrorFromChannel(task = call(), client);
 }
@@ -1257,7 +1257,7 @@ void tst_QXmppMixManager::testAllowJid()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->allowJid(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("alice@wonderland.example"));
+        return manager->allowJid(u"coven@mix.shakespeare.example"_s, u"alice@wonderland.example"_s);
     };
 
     auto task = call();
@@ -1269,7 +1269,7 @@ void tst_QXmppMixManager::testAllowJid()
                                  "</publish>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1283,7 +1283,7 @@ void tst_QXmppMixManager::testDisallowJid()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->disallowJid(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("alice@wonderland.example"));
+        return manager->disallowJid(u"coven@mix.shakespeare.example"_s, u"alice@wonderland.example"_s);
     };
 
     auto task = call();
@@ -1295,7 +1295,7 @@ void tst_QXmppMixManager::testDisallowJid()
                                  "</retract>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1309,7 +1309,7 @@ void tst_QXmppMixManager::testDisallowAllJids()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->disallowAllJids(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->disallowAllJids(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1319,7 +1319,7 @@ void tst_QXmppMixManager::testDisallowAllJids()
                                  "<purge node='urn:xmpp:mix:nodes:allowed'/>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1333,7 +1333,7 @@ void tst_QXmppMixManager::testRequestBannedJids()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->requestBannedJids(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->requestBannedJids(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1353,8 +1353,8 @@ void tst_QXmppMixManager::testRequestBannedJids()
                                  "</iq>"));
 
     auto allowedJids = expectFutureVariant<QVector<QXmppMixManager::Jid>>(task);
-    QCOMPARE(allowedJids.at(0), QStringLiteral("lear@shakespeare.example"));
-    QCOMPARE(allowedJids.at(1), QStringLiteral("macbeth@shakespeare.example"));
+    QCOMPARE(allowedJids.at(0), u"lear@shakespeare.example"_s);
+    QCOMPARE(allowedJids.at(1), u"macbeth@shakespeare.example"_s);
 
     testErrorFromChannel(task = call(), client);
 }
@@ -1366,7 +1366,7 @@ void tst_QXmppMixManager::testBanJid()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->banJid(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("macbeth@shakespeare.example"));
+        return manager->banJid(u"coven@mix.shakespeare.example"_s, u"macbeth@shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1378,7 +1378,7 @@ void tst_QXmppMixManager::testBanJid()
                                  "</publish>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1392,7 +1392,7 @@ void tst_QXmppMixManager::testUnbanJid()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->unbanJid(QStringLiteral("coven@mix.shakespeare.example"), QStringLiteral("macbeth@shakespeare.example"));
+        return manager->unbanJid(u"coven@mix.shakespeare.example"_s, u"macbeth@shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1404,7 +1404,7 @@ void tst_QXmppMixManager::testUnbanJid()
                                  "</retract>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1418,7 +1418,7 @@ void tst_QXmppMixManager::testUnbanAllJids()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->unbanAllJids(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->unbanAllJids(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1428,7 +1428,7 @@ void tst_QXmppMixManager::testUnbanAllJids()
                                  "<purge node='urn:xmpp:mix:nodes:banned'/>"
                                  "</pubsub>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1442,7 +1442,7 @@ void tst_QXmppMixManager::testRequestParticipants()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->requestParticipants(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->requestParticipants(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1472,20 +1472,20 @@ void tst_QXmppMixManager::testRequestParticipants()
                                  "</iq>"));
 
     auto participants = expectFutureVariant<QVector<QXmppMixParticipantItem>>(task);
-    QCOMPARE(participants.at(0).jid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(participants.at(1).jid(), QStringLiteral("hag67@shakespeare.example"));
+    QCOMPARE(participants.at(0).jid(), u"hag66@shakespeare.example"_s);
+    QCOMPARE(participants.at(1).jid(), u"hag67@shakespeare.example"_s);
 
     testErrorFromChannel(task = call(), client);
 }
 
 void tst_QXmppMixManager::testLeaveChannel()
 {
-    auto tester = Tester(QStringLiteral("hag66@shakespeare.example"));
+    auto tester = Tester(u"hag66@shakespeare.example"_s);
     auto &client = tester.client;
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->leaveChannel(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->leaveChannel(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1503,7 +1503,7 @@ void tst_QXmppMixManager::testLeaveChannel()
 
     expectFutureVariant<QXmpp::Success>(task);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("hag66@shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"hag66@shakespeare.example"_s);
 }
 
 void tst_QXmppMixManager::testDeleteChannel()
@@ -1513,7 +1513,7 @@ void tst_QXmppMixManager::testDeleteChannel()
     auto manager = tester.manager;
 
     auto call = [&client, manager]() {
-        return manager->deleteChannel(QStringLiteral("coven@mix.shakespeare.example"));
+        return manager->deleteChannel(u"coven@mix.shakespeare.example"_s);
     };
 
     auto task = call();
@@ -1521,23 +1521,23 @@ void tst_QXmppMixManager::testDeleteChannel()
     client.expect(QStringLiteral("<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
                                  "<destroy xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
                                  "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='mix.shakespeare.example' type='result'/>"));
+    client.inject(u"<iq id='qxmpp1' from='mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
 
-    testError(task = call(), client, QStringLiteral("qxmpp1"), QStringLiteral("mix.shakespeare.example"));
+    testError(task = call(), client, u"qxmpp1"_s, u"mix.shakespeare.example"_s);
 }
 
 template<typename T>
 void tst_QXmppMixManager::testErrorFromChannel(QXmppTask<T> &task, TestClient &client)
 {
-    testErrorFromChannel(task, client, QStringLiteral("qxmpp1"));
+    testErrorFromChannel(task, client, u"qxmpp1"_s);
 }
 
 template<typename T>
 void tst_QXmppMixManager::testErrorFromChannel(QXmppTask<T> &task, TestClient &client, const QString &id)
 {
-    testError(task, client, id, QStringLiteral("coven@mix.shakespeare.example"));
+    testError(task, client, id, u"coven@mix.shakespeare.example"_s);
 }
 
 template<typename T>

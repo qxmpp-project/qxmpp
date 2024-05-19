@@ -8,6 +8,8 @@
 #include "QXmppCall_p.h"
 #include "QXmppStun.h"
 
+#include "StringLiterals.h"
+
 #include <cstring>
 #include <gst/gst.h>
 
@@ -34,8 +36,8 @@ QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstEleme
 {
     localSsrc = QRandomGenerator::global()->generate();
 
-    iceReceiveBin = gst_bin_new(QStringLiteral("receive_%1").arg(id).toLatin1().data());
-    iceSendBin = gst_bin_new(QStringLiteral("send_%1").arg(id).toLatin1().data());
+    iceReceiveBin = gst_bin_new(u"receive_%1"_s.arg(id).toLatin1().data());
+    iceSendBin = gst_bin_new(u"send_%1"_s.arg(id).toLatin1().data());
     gst_bin_add_many(GST_BIN(pipeline), iceReceiveBin, iceSendBin, nullptr);
 
     internalRtpPad = gst_ghost_pad_new_no_target(nullptr, GST_PAD_SINK);
@@ -87,8 +89,8 @@ QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstEleme
         qFatal("Failed to add appsrcs to receive bin");
     }
 
-    if (!gst_element_link_pads(apprtpsrc, "src", rtpbin, QStringLiteral("recv_rtp_sink_%1").arg(id).toLatin1().data()) ||
-        !gst_element_link_pads(apprtcpsrc, "src", rtpbin, QStringLiteral("recv_rtcp_sink_%1").arg(id).toLatin1().data())) {
+    if (!gst_element_link_pads(apprtpsrc, "src", rtpbin, u"recv_rtp_sink_%1"_s.arg(id).toLatin1().data()) ||
+        !gst_element_link_pads(apprtcpsrc, "src", rtpbin, u"recv_rtcp_sink_%1"_s.arg(id).toLatin1().data())) {
         qFatal("Failed to link receive pads");
     }
 
@@ -169,7 +171,7 @@ void QXmppCallStreamPrivate::addEncoder(QXmppCallPrivate::GstCodec &codec)
             qFatal("Failed to remove existing encoder bin");
         }
     }
-    encoderBin = gst_bin_new(QStringLiteral("encoder_%1").arg(id).toLatin1().data());
+    encoderBin = gst_bin_new(u"encoder_%1"_s.arg(id).toLatin1().data());
     if (!gst_bin_add(GST_BIN(pipeline), encoderBin)) {
         qFatal("Failed to add encoder bin to wrapper");
         return;
@@ -203,7 +205,7 @@ void QXmppCallStreamPrivate::addEncoder(QXmppCallPrivate::GstCodec &codec)
 
     gst_bin_add_many(GST_BIN(encoderBin), queue, encoder, pay, nullptr);
 
-    if (!gst_element_link_pads(pay, "src", rtpbin, QStringLiteral("send_rtp_sink_%1").arg(id).toLatin1().data()) ||
+    if (!gst_element_link_pads(pay, "src", rtpbin, u"send_rtp_sink_%1"_s.arg(id).toLatin1().data()) ||
         !gst_element_link_many(queue, encoder, pay, nullptr)) {
         qFatal("Could not link all encoder pads");
         return;
@@ -221,9 +223,9 @@ void QXmppCallStreamPrivate::addEncoder(QXmppCallPrivate::GstCodec &codec)
     gst_element_sync_state_with_parent(encoderBin);
 
 #if GST_CHECK_VERSION(1, 20, 0)
-    addRtcpSender(gst_element_request_pad_simple(rtpbin, QStringLiteral("send_rtcp_src_%1").arg(id).toLatin1().data()));
+    addRtcpSender(gst_element_request_pad_simple(rtpbin, u"send_rtcp_src_%1"_s.arg(id).toLatin1().data()));
 #else
-    addRtcpSender(gst_element_get_request_pad(rtpbin, QStringLiteral("send_rtcp_src_%1").arg(id).toLatin1().data()));
+    addRtcpSender(gst_element_get_request_pad(rtpbin, u"send_rtcp_src_%1"_s.arg(id).toLatin1().data()));
 #endif
 }
 
@@ -235,7 +237,7 @@ void QXmppCallStreamPrivate::addDecoder(GstPad *pad, QXmppCallPrivate::GstCodec 
             qFatal("Failed to remove existing decoder bin");
         }
     }
-    decoderBin = gst_bin_new(QStringLiteral("decoder_%1").arg(id).toLatin1().data());
+    decoderBin = gst_bin_new(u"decoder_%1"_s.arg(id).toLatin1().data());
     if (!gst_bin_add(GST_BIN(pipeline), decoderBin)) {
         qFatal("Failed to add decoder bin to wrapper");
         return;

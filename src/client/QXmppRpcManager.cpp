@@ -10,6 +10,8 @@
 #include "QXmppRemoteMethod.h"
 #include "QXmppRpcIq.h"
 
+#include "StringLiterals.h"
+
 /// Constructs a QXmppRpcManager.
 
 QXmppRpcManager::QXmppRpcManager()
@@ -148,8 +150,8 @@ QStringList QXmppRpcManager::discoveryFeatures() const
 QList<QXmppDiscoveryIq::Identity> QXmppRpcManager::discoveryIdentities() const
 {
     QXmppDiscoveryIq::Identity identity;
-    identity.setCategory(QStringLiteral("automation"));
-    identity.setType(QStringLiteral("rpc"));
+    identity.setCategory(u"automation"_s);
+    identity.setType(u"rpc"_s);
     return QList<QXmppDiscoveryIq::Identity>() << identity;
 }
 

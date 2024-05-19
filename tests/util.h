@@ -10,6 +10,8 @@
 #include "QXmppPasswordChecker.h"
 #include "QXmppTask.h"
 
+#include "StringLiterals.h"
+
 #include <memory>
 #include <variant>
 

@@ -10,6 +10,7 @@
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
 #include "XmppSocket.h"
 
 namespace QXmpp::Private {
@@ -20,10 +21,10 @@ std::optional<SmEnable> SmEnable::fromDom(const QDomElement &el)
         return {};
     }
 
-    const auto resume = el.attribute(QStringLiteral("resume"));
+    const auto resume = el.attribute(u"resume"_s);
     return SmEnable {
         .resume = resume == u"true" || resume == u"1",
-        .max = el.attribute(QStringLiteral("max")).toULongLong(),
+        .max = el.attribute(u"max"_s).toULongLong(),
     };
 }
 
@@ -32,7 +33,7 @@ void SmEnable::toXml(QXmlStreamWriter *w) const
     w->writeStartElement(QSL65("enable"));
     w->writeDefaultNamespace(toString65(ns_stream_management));
     if (resume) {
-        w->writeAttribute(QSL65("resume"), QStringLiteral("true"));
+        w->writeAttribute(QSL65("resume"), u"true"_s);
     }
     if (max > 0) {
         w->writeAttribute(QSL65("max"), QString::number(max));
@@ -46,12 +47,12 @@ std::optional<SmEnabled> SmEnabled::fromDom(const QDomElement &el)
         return {};
     }
 
-    const auto resume = el.attribute(QStringLiteral("resume"));
+    const auto resume = el.attribute(u"resume"_s);
     return SmEnabled {
         .resume = (resume == u"true" || resume == u"1"),
-        .id = el.attribute(QStringLiteral("id")),
-        .max = el.attribute(QStringLiteral("max")).toULongLong(),
-        .location = el.attribute(QStringLiteral("location")),
+        .id = el.attribute(u"id"_s),
+        .max = el.attribute(u"max"_s).toULongLong(),
+        .location = el.attribute(u"location"_s),
     };
 }
 
@@ -60,7 +61,7 @@ void SmEnabled::toXml(QXmlStreamWriter *w) const
     w->writeStartElement(QSL65("enable"));
     w->writeDefaultNamespace(toString65(ns_stream_management));
     if (resume) {
-        w->writeAttribute(QSL65("resume"), QStringLiteral("true"));
+        w->writeAttribute(QSL65("resume"), u"true"_s);
     }
     writeOptionalXmlAttribute(w, u"id", id);
     if (max > 0) {
@@ -78,8 +79,8 @@ std::optional<SmResume> SmResume::fromDom(const QDomElement &el)
         return {};
     }
     return SmResume {
-        el.attribute(QStringLiteral("h")).toUInt(),
-        el.attribute(QStringLiteral("previd")),
+        el.attribute(u"h"_s).toUInt(),
+        el.attribute(u"previd"_s),
     };
 }
 
@@ -98,8 +99,8 @@ std::optional<SmResumed> SmResumed::fromDom(const QDomElement &el)
         return {};
     }
     return SmResumed {
-        el.attribute(QStringLiteral("h")).toUInt(),
-        el.attribute(QStringLiteral("previd")),
+        el.attribute(u"h"_s).toUInt(),
+        el.attribute(u"previd"_s),
     };
 }
 
@@ -138,7 +139,7 @@ std::optional<SmAck> SmAck::fromDom(const QDomElement &el)
     if (el.tagName() != u"a" || el.namespaceURI() != ns_stream_management) {
         return {};
     }
-    return SmAck { el.attribute(QStringLiteral("h")).toUInt() };
+    return SmAck { el.attribute(u"h"_s).toUInt() };
 }
 
 void SmAck::toXml(QXmlStreamWriter *w) const
@@ -262,7 +263,7 @@ std::tuple<bool, QXmppTask<SendResult>> StreamAckManager::internalSend(QXmppPack
             packet.reportFinished(QXmpp::SendSuccess { false });
         } else {
             packet.reportFinished(QXmppError {
-                QStringLiteral("Couldn't write data to socket. No stream management enabled."),
+                u"Couldn't write data to socket. No stream management enabled."_s,
                 QXmpp::SendError::SocketWriteError,
             });
         }
@@ -303,7 +304,7 @@ void StreamAckManager::resetCache()
 {
     for (auto &packet : m_unacknowledgedStanzas) {
         packet.reportFinished(QXmppError {
-            QStringLiteral("Disconnected"),
+            u"Disconnected"_s,
             QXmpp::SendError::Disconnected });
     }
 

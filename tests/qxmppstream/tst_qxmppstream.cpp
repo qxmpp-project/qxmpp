@@ -99,12 +99,12 @@ void tst_QXmppStream::testProcessData()
 
     // check stream information
     const auto streamElement = onStreamReceived[0][0].value<QDomElement>();
-    QCOMPARE(streamElement.tagName(), QStringLiteral("stream"));
-    QCOMPARE(streamElement.namespaceURI(), QStringLiteral("http://etherx.jabber.org/streams"));
-    QCOMPARE(streamElement.attribute("from"), QStringLiteral("juliet@im.example.com"));
-    QCOMPARE(streamElement.attribute("to"), QStringLiteral("im.example.com"));
-    QCOMPARE(streamElement.attribute("version"), QStringLiteral("1.0"));
-    QCOMPARE(streamElement.attribute("lang"), QStringLiteral("en"));
+    QCOMPARE(streamElement.tagName(), u"stream"_s);
+    QCOMPARE(streamElement.namespaceURI(), u"http://etherx.jabber.org/streams"_s);
+    QCOMPARE(streamElement.attribute("from"), u"juliet@im.example.com"_s);
+    QCOMPARE(streamElement.attribute("to"), u"im.example.com"_s);
+    QCOMPARE(streamElement.attribute("version"), u"1.0"_s);
+    QCOMPARE(streamElement.attribute("lang"), u"en"_s);
 
     stream.processData(R"(
         <stream:features>
@@ -118,8 +118,8 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(onStarted.size(), 0);
 
     const auto features = onStanzaReceived[0][0].value<QDomElement>();
-    QCOMPARE(features.tagName(), QStringLiteral("features"));
-    QCOMPARE(features.namespaceURI(), QStringLiteral("http://etherx.jabber.org/streams"));
+    QCOMPARE(features.tagName(), u"features"_s);
+    QCOMPARE(features.namespaceURI(), u"http://etherx.jabber.org/streams"_s);
 
     // test partial data
     stream.processData(R"(<message from="juliet@im.example.co)");
@@ -134,8 +134,8 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(onStarted.size(), 0);
 
     const auto message = onStanzaReceived[1][0].value<QDomElement>();
-    QCOMPARE(message.tagName(), QStringLiteral("message"));
-    QCOMPARE(message.namespaceURI(), QStringLiteral("jabber:client"));
+    QCOMPARE(message.tagName(), u"message"_s);
+    QCOMPARE(message.namespaceURI(), u"jabber:client"_s);
 
     stream.processData(R"(</stream:stream>)");
 }
@@ -167,7 +167,7 @@ void tst_QXmppStream::testStreamError()
         },
     };
     const auto streamWrapper =
-        QStringLiteral("<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>%1</stream:stream>");
+        u"<stream:stream xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>%1</stream:stream>"_s;
 
     for (const auto &[xml, error] : values) {
         auto result = StreamErrorElement::fromDom(xmlToDom(streamWrapper.arg(xml)).firstChildElement());

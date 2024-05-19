@@ -36,18 +36,18 @@ void tst_QXmppHttpUploadIq::testRequest()
 
     QXmppHttpUploadRequestIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.fileName(), QStringLiteral("très cool.jpg"));
+    QCOMPARE(iq.fileName(), u"très cool.jpg"_s);
     QCOMPARE(iq.size(), 23456);
-    QCOMPARE(iq.contentType().name(), QStringLiteral("image/jpeg"));
+    QCOMPARE(iq.contentType().name(), u"image/jpeg"_s);
     serializePacket(iq, xml);
 
     // test setters
     iq.setFileName("icon.png");
-    QCOMPARE(iq.fileName(), QStringLiteral("icon.png"));
+    QCOMPARE(iq.fileName(), u"icon.png"_s);
     iq.setSize(23421337);
     QCOMPARE(iq.size(), 23421337);
     iq.setContentType(QMimeDatabase().mimeTypeForName("image/png"));
-    QCOMPARE(iq.contentType().name(), QStringLiteral("image/png"));
+    QCOMPARE(iq.contentType().name(), u"image/png"_s);
 }
 
 void tst_QXmppHttpUploadIq::testIsRequest_data()

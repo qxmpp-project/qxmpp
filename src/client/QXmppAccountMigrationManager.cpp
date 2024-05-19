@@ -11,6 +11,8 @@
 #include "QXmppTask.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp;
@@ -72,13 +74,13 @@ QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppExportData)
 std::variant<QXmppExportData, QXmppError> QXmppExportData::fromDom(const QDomElement &el)
 {
     if (el.tagName() != u"account-data" || el.namespaceURI() != ns_qxmpp_export) {
-        return QXmppError { QStringLiteral("Invalid XML document provided."), {} };
+        return QXmppError { u"Invalid XML document provided."_s, {} };
     }
 
     const auto &parsers = accountDataParsers();
 
     QXmppExportData data;
-    data.setAccountJid(el.attribute(QStringLiteral("jid")));
+    data.setAccountJid(el.attribute(u"jid"_s));
 
     for (const auto &extension : iterChildElements(el)) {
         const auto parser = parsers.find(XmlElementId::fromDom(extension));

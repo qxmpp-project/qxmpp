@@ -4,6 +4,8 @@
 
 #include "QXmppPubSubMetadata.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 
 // helper for std::visit
@@ -270,7 +272,7 @@ void QXmppPubSubMetadata::serializeForm(QXmppDataForm &form) const
                       std::visit(overloaded {
                                      [](Unset) { return QString(); },
                                      [](quint64 value) { return QString::number(value); },
-                                     [](Max) { return QStringLiteral("max"); },
+                                     [](Max) { return u"max"_s; },
                                  },
                                  d->maxItems));
 }

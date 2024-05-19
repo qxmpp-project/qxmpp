@@ -68,11 +68,11 @@ void tst_QXmppPubSub::testAffiliation_data()
 #define ROW(name, xml, type, jid, node) \
     QTest::newRow(name) << QByteArrayLiteral(xml) << type << jid << node
 
-    ROW("owner", "<affiliation affiliation='owner' node='node1'/>", AffiliationType::Owner, QString(), QStringLiteral("node1"));
-    ROW("publisher", "<affiliation affiliation='publisher' node='node2'/>", AffiliationType::Publisher, QString(), QStringLiteral("node2"));
-    ROW("outcast", "<affiliation affiliation='outcast' node='noise'/>", AffiliationType::Outcast, QString(), QStringLiteral("noise"));
-    ROW("none", "<affiliation affiliation='none' node='stuff'/>", AffiliationType::None, QString(), QStringLiteral("stuff"));
-    ROW("with-jid", "<affiliation affiliation='owner' jid='snob@qxmpp.org'/>", AffiliationType::Owner, QStringLiteral("snob@qxmpp.org"), QString());
+    ROW("owner", "<affiliation affiliation='owner' node='node1'/>", AffiliationType::Owner, QString(), u"node1"_s);
+    ROW("publisher", "<affiliation affiliation='publisher' node='node2'/>", AffiliationType::Publisher, QString(), u"node2"_s);
+    ROW("outcast", "<affiliation affiliation='outcast' node='noise'/>", AffiliationType::Outcast, QString(), u"noise"_s);
+    ROW("none", "<affiliation affiliation='none' node='stuff'/>", AffiliationType::None, QString(), u"stuff"_s);
+    ROW("with-jid", "<affiliation affiliation='owner' jid='snob@qxmpp.org'/>", AffiliationType::Owner, u"snob@qxmpp.org"_s, QString());
 
 #undef ROW
 }
@@ -148,12 +148,12 @@ void tst_QXmppPubSub::testSubscription_data()
 #define ROW(name, xmlns, xml, state, jid, node, subid, configSupport) \
     QTest::newRow(name) << QByteArrayLiteral(xml) << xmlns << state << jid << node << subid << configSupport
 
-    ROW("subscribed", PubSubNs, "<subscription jid='francisco@denmark.lit' node='node1' subscription='subscribed'/>", SubscriptionState::Subscribed, QStringLiteral("francisco@denmark.lit"), QStringLiteral("node1"), QString(), SubscriptionConfig::Unavailable);
-    ROW("unconfigured", PubSubNs, "<subscription jid='francisco@denmark.lit' node='node5' subscription='unconfigured'/>", SubscriptionState::Unconfigured, QStringLiteral("francisco@denmark.lit"), QStringLiteral("node5"), QString(), SubscriptionConfig::Unavailable);
-    ROW("subscribed-subid", PubSubNs, "<subscription jid='francisco@denmark.lit' node='node6' subscription='subscribed' subid='123-abc'/>", SubscriptionState::Subscribed, QStringLiteral("francisco@denmark.lit"), QStringLiteral("node6"), QStringLiteral("123-abc"), SubscriptionConfig::Unavailable);
-    ROW("pending", PubSubNs, "<subscription jid='francisco@denmark.lit' node='princely_musings' subscription='pending'/>", SubscriptionState::Pending, QStringLiteral("francisco@denmark.lit"), QStringLiteral("princely_musings"), QString(), SubscriptionConfig::Unavailable);
-    ROW("config-required", PubSubNs, "<subscription jid='francisco@denmark.lit' node='princely_musings' subscription='unconfigured'><subscribe-options><required/></subscribe-options></subscription>", SubscriptionState::Unconfigured, QStringLiteral("francisco@denmark.lit"), QStringLiteral("princely_musings"), QString(), SubscriptionConfig::Required);
-    ROW("config-available", PubSubNs, "<subscription jid='francisco@denmark.lit' node='princely_musings' subscription='unconfigured'><subscribe-options/></subscription>", SubscriptionState::Unconfigured, QStringLiteral("francisco@denmark.lit"), QStringLiteral("princely_musings"), QString(), SubscriptionConfig::Available);
+    ROW("subscribed", PubSubNs, "<subscription jid='francisco@denmark.lit' node='node1' subscription='subscribed'/>", SubscriptionState::Subscribed, u"francisco@denmark.lit"_s, u"node1"_s, QString(), SubscriptionConfig::Unavailable);
+    ROW("unconfigured", PubSubNs, "<subscription jid='francisco@denmark.lit' node='node5' subscription='unconfigured'/>", SubscriptionState::Unconfigured, u"francisco@denmark.lit"_s, u"node5"_s, QString(), SubscriptionConfig::Unavailable);
+    ROW("subscribed-subid", PubSubNs, "<subscription jid='francisco@denmark.lit' node='node6' subscription='subscribed' subid='123-abc'/>", SubscriptionState::Subscribed, u"francisco@denmark.lit"_s, u"node6"_s, u"123-abc"_s, SubscriptionConfig::Unavailable);
+    ROW("pending", PubSubNs, "<subscription jid='francisco@denmark.lit' node='princely_musings' subscription='pending'/>", SubscriptionState::Pending, u"francisco@denmark.lit"_s, u"princely_musings"_s, QString(), SubscriptionConfig::Unavailable);
+    ROW("config-required", PubSubNs, "<subscription jid='francisco@denmark.lit' node='princely_musings' subscription='unconfigured'><subscribe-options><required/></subscribe-options></subscription>", SubscriptionState::Unconfigured, u"francisco@denmark.lit"_s, u"princely_musings"_s, QString(), SubscriptionConfig::Required);
+    ROW("config-available", PubSubNs, "<subscription jid='francisco@denmark.lit' node='princely_musings' subscription='unconfigured'><subscribe-options/></subscription>", SubscriptionState::Unconfigured, u"francisco@denmark.lit"_s, u"princely_musings"_s, QString(), SubscriptionConfig::Available);
 
 #undef ROW
 }
@@ -215,8 +215,8 @@ void tst_QXmppPubSub::testItem()
     QXmppPubSubBaseItem item;
     parsePacket(item, xml);
 
-    QCOMPARE(item.id(), QStringLiteral("abc1337"));
-    QCOMPARE(item.publisher(), QStringLiteral("lnj@qxmpp.org"));
+    QCOMPARE(item.id(), u"abc1337"_s);
+    QCOMPARE(item.publisher(), u"lnj@qxmpp.org"_s);
 
     // test serialization with parsed item
     serializePacket(item, xml);

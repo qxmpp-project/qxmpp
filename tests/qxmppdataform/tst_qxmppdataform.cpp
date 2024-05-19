@@ -48,7 +48,7 @@ void tst_QXmppDataForm::testSimple()
     QCOMPARE(form.fields().size(), 1);
     QCOMPARE(form.fields().at(0).type(), QXmppDataForm::Field::TextSingleField);
     QCOMPARE(form.fields().at(0).isRequired(), true);
-    QCOMPARE(form.fields().at(0).key(), QStringLiteral("search_request"));
+    QCOMPARE(form.fields().at(0).key(), u"search_request"_s);
 
     serializePacket(form, xml);
 }
@@ -99,16 +99,16 @@ void tst_QXmppDataForm::testMedia()
     QCOMPARE(form.fields().at(0).mediaSources().size(), 2);
     QCOMPARE(
         form.fields().at(0).mediaSources().at(0).uri().toString(),
-        QStringLiteral("http://www.victim.com/challenges/ocr.jpeg?F3A6292C"));
+        u"http://www.victim.com/challenges/ocr.jpeg?F3A6292C"_s);
     QCOMPARE(
         form.fields().at(0).mediaSources().at(0).contentType(),
-        QMimeDatabase().mimeTypeForName(QStringLiteral("image/jpeg")));
+        QMimeDatabase().mimeTypeForName(u"image/jpeg"_s));
     QCOMPARE(
         form.fields().at(0).mediaSources().at(1).uri().toString(),
-        QStringLiteral("cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"));
+        u"cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"_s);
     QCOMPARE(
         form.fields().at(0).mediaSources().at(1).contentType(),
-        QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+        QMimeDatabase().mimeTypeForName(u"image/png"_s));
 
     // deprecated
     QCOMPARE(form.fields().at(0).media().isNull(), false);
@@ -117,16 +117,16 @@ void tst_QXmppDataForm::testMedia()
     QCOMPARE(form.fields().at(0).media().uris().size(), 2);
     QCOMPARE(
         form.fields().at(0).media().uris().at(0).first,
-        QStringLiteral("image/jpeg"));
+        u"image/jpeg"_s);
     QCOMPARE(
         form.fields().at(0).media().uris().at(0).second,
-        QStringLiteral("http://www.victim.com/challenges/ocr.jpeg?F3A6292C"));
+        u"http://www.victim.com/challenges/ocr.jpeg?F3A6292C"_s);
     QCOMPARE(
         form.fields().at(0).media().uris().at(1).first,
-        QStringLiteral("image/png"));
+        u"image/png"_s);
     QCOMPARE(
         form.fields().at(0).media().uris().at(1).second,
-        QStringLiteral("cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"));
+        u"cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"_s);
 
     serializePacket(form, xml);
 
@@ -138,11 +138,11 @@ void tst_QXmppDataForm::testMedia()
     mediaField1.mediaSize().setWidth(290);
     mediaField1.mediaSize().setHeight(80);
     mediaField1.mediaSources() << QXmppDataForm::MediaSource(
-        QUrl(QStringLiteral("http://www.victim.com/challenges/ocr.jpeg?F3A6292C")),
-        QMimeDatabase().mimeTypeForName(QStringLiteral("image/jpeg")));
+        QUrl(u"http://www.victim.com/challenges/ocr.jpeg?F3A6292C"_s),
+        QMimeDatabase().mimeTypeForName(u"image/jpeg"_s));
     mediaField1.mediaSources() << QXmppDataForm::MediaSource(
-        QUrl(QStringLiteral("cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org")),
-        QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+        QUrl(u"cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"_s),
+        QMimeDatabase().mimeTypeForName(u"image/png"_s));
 
     QXmppDataForm form2;
     form2.setType(QXmppDataForm::Form);
@@ -157,11 +157,11 @@ void tst_QXmppDataForm::testMedia()
     mediaField2.setMediaSize(QSize(290, 80));
     QVector<QXmppDataForm::MediaSource> sources;
     sources << QXmppDataForm::MediaSource(
-        QUrl(QStringLiteral("http://www.victim.com/challenges/ocr.jpeg?F3A6292C")),
-        QMimeDatabase().mimeTypeForName(QStringLiteral("image/jpeg")));
+        QUrl(u"http://www.victim.com/challenges/ocr.jpeg?F3A6292C"_s),
+        QMimeDatabase().mimeTypeForName(u"image/jpeg"_s));
     sources << QXmppDataForm::MediaSource(
-        QUrl(QStringLiteral("cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org")),
-        QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+        QUrl(u"cid:sha1+f24030b8d91d233bac14777be5ab531ca3b9f102@bob.xmpp.org"_s),
+        QMimeDatabase().mimeTypeForName(u"image/png"_s));
     mediaField2.setMediaSources(sources);
 
     QXmppDataForm form3;
@@ -213,7 +213,7 @@ void tst_QXmppDataForm::testFormType()
     QXmppDataForm form;
     parsePacket(form, xml);
 
-    QCOMPARE(form.formType(), QStringLiteral("http://jabber.org/protocol/pubsub#subscribe_options"));
+    QCOMPARE(form.formType(), u"http://jabber.org/protocol/pubsub#subscribe_options"_s);
 }
 
 QTEST_MAIN(tst_QXmppDataForm)

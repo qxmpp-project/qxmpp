@@ -4,6 +4,8 @@
 
 #include "QXmppFileEncryption.h"
 
+#include "StringLiterals.h"
+
 #include <QByteArray>
 #include <QtCrypto>
 
@@ -21,10 +23,10 @@ static QString cipherName(QXmpp::Cipher cipher)
 {
     switch (cipher) {
     case Aes128GcmNoPad:
-        return QStringLiteral("aes128");
+        return u"aes128"_s;
     case Aes256GcmNoPad:
     case Aes256CbcPkcs7:
-        return QStringLiteral("aes256");
+        return u"aes256"_s;
     }
     Q_UNREACHABLE();
 }

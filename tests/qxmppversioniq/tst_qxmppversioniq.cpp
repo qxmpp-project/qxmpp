@@ -51,9 +51,9 @@ void tst_QXmppVersionIq::testVersionResult()
     QCOMPARE(verIqResult.to(), QLatin1String("romeo@montague.net/orchard"));
     QCOMPARE(verIqResult.from(), QLatin1String("juliet@capulet.com/balcony"));
     QCOMPARE(verIqResult.type(), QXmppIq::Result);
-    QCOMPARE(verIqResult.name(), QStringLiteral("qxmpp"));
-    QCOMPARE(verIqResult.version(), QStringLiteral("0.2.0"));
-    QCOMPARE(verIqResult.os(), QStringLiteral("Windows-XP"));
+    QCOMPARE(verIqResult.name(), u"qxmpp"_s);
+    QCOMPARE(verIqResult.version(), u"0.2.0"_s);
+    QCOMPARE(verIqResult.os(), u"Windows-XP"_s);
 
     serializePacket(verIqResult, xmlResult);
 }

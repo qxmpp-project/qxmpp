@@ -4,6 +4,8 @@
 
 #include "QXmppSocks.h"
 
+#include "StringLiterals.h"
+
 #include <QDataStream>
 #include <QTcpServer>
 #include <QTcpSocket>

@@ -8,6 +8,8 @@
 #include "QXmppElement.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -108,8 +110,8 @@ void QXmppPubSubBaseItem::setPublisher(const QString &publisher)
 /// \cond
 void QXmppPubSubBaseItem::parse(const QDomElement &element)
 {
-    d->id = element.attribute(QStringLiteral("id"));
-    d->publisher = element.attribute(QStringLiteral("publisher"));
+    d->id = element.attribute(u"id"_s);
+    d->publisher = element.attribute(u"publisher"_s);
 
     parsePayload(element.firstChildElement());
 }

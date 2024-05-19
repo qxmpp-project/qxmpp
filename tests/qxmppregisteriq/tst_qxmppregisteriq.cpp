@@ -286,32 +286,32 @@ void tst_QXmppRegisterIq::testSetWithForm()
         QList<QXmppDataForm::Field>()
             << QXmppDataForm::Field(
                    QXmppDataForm::Field::HiddenField,
-                   QStringLiteral("FORM_TYPE"),
-                   QStringLiteral("jabber:iq:register"))
+                   u"FORM_TYPE"_s,
+                   u"jabber:iq:register"_s)
             << QXmppDataForm::Field(
                    QXmppDataForm::Field::TextSingleField,
-                   QStringLiteral("first"),
-                   QStringLiteral("Juliet"),
+                   u"first"_s,
+                   u"Juliet"_s,
                    false,
-                   QStringLiteral("Given Name"))
+                   u"Given Name"_s)
             << QXmppDataForm::Field(
                    QXmppDataForm::Field::TextSingleField,
-                   QStringLiteral("last"),
-                   QStringLiteral("Capulet"),
+                   u"last"_s,
+                   u"Capulet"_s,
                    false,
-                   QStringLiteral("Family Name"))
+                   u"Family Name"_s)
             << QXmppDataForm::Field(
                    QXmppDataForm::Field::TextSingleField,
-                   QStringLiteral("email"),
-                   QStringLiteral("juliet@capulet.com"),
+                   u"email"_s,
+                   u"juliet@capulet.com"_s,
                    false,
-                   QStringLiteral("Email Address"))
+                   u"Email Address"_s)
             << QXmppDataForm::Field(
                    QXmppDataForm::Field::ListSingleField,
-                   QStringLiteral("x-gender"),
-                   QStringLiteral("F"),
+                   u"x-gender"_s,
+                   u"F"_s,
                    false,
-                   QStringLiteral("Gender"))));
+                   u"Gender"_s)));
     serializePacket(sIq, xml);
 }
 
@@ -349,8 +349,8 @@ void tst_QXmppRegisterIq::testBobData()
 
     QXmppBitsOfBinaryData data;
     data.setCid(QXmppBitsOfBinaryContentId::fromContentId(
-        QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org")));
-    data.setContentType(QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+        u"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org"_s));
+    data.setContentType(QMimeDatabase().mimeTypeForName(u"image/png"_s));
     data.setData(QByteArray::fromBase64(QByteArrayLiteral(
         "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
         "/v79/f39fX1+fn58/Pz8fHx/8ACGJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADS0lEQV"
@@ -376,7 +376,7 @@ void tst_QXmppRegisterIq::testBobData()
     QXmppRegisterIq parsedIq;
     parsePacket(parsedIq, xml);
     QCOMPARE(parsedIq.type(), QXmppIq::Result);
-    QCOMPARE(parsedIq.id(), QStringLiteral(""));
+    QCOMPARE(parsedIq.id(), u""_s);
     QCOMPARE(parsedIq.bitsOfBinaryData().size(), 1);
     QCOMPARE(parsedIq.bitsOfBinaryData().first().cid().algorithm(), data.cid().algorithm());
     QCOMPARE(parsedIq.bitsOfBinaryData().first().cid().hash(), data.cid().hash());
@@ -389,7 +389,7 @@ void tst_QXmppRegisterIq::testBobData()
 
     QXmppRegisterIq iq;
     iq.setType(QXmppIq::Result);
-    iq.setId(QStringLiteral(""));
+    iq.setId(u""_s);
     QXmppBitsOfBinaryDataList bobDataList;
     bobDataList << data;
     iq.setBitsOfBinaryData(bobDataList);
@@ -397,7 +397,7 @@ void tst_QXmppRegisterIq::testBobData()
 
     QXmppRegisterIq iq2;
     iq2.setType(QXmppIq::Result);
-    iq2.setId(QStringLiteral(""));
+    iq2.setId(u""_s);
     iq2.bitsOfBinaryData() << data;
     serializePacket(iq2, xml);
 
@@ -419,14 +419,14 @@ void tst_QXmppRegisterIq::testRegistered()
     QXmppRegisterIq iq;
     parsePacket(iq, xml);
     QVERIFY(iq.isRegistered());
-    QCOMPARE(iq.username(), QStringLiteral("juliet"));
+    QCOMPARE(iq.username(), u"juliet"_s);
     serializePacket(iq, xml);
 
     iq = QXmppRegisterIq();
-    iq.setId(QStringLiteral(""));
+    iq.setId(u""_s);
     iq.setType(QXmppIq::Result);
     iq.setIsRegistered(true);
-    iq.setUsername(QStringLiteral("juliet"));
+    iq.setUsername(u"juliet"_s);
     serializePacket(iq, xml);
 }
 
@@ -443,14 +443,14 @@ void tst_QXmppRegisterIq::testRemove()
     QXmppRegisterIq iq;
     parsePacket(iq, xml);
     QVERIFY(iq.isRemove());
-    QCOMPARE(iq.username(), QStringLiteral("juliet"));
+    QCOMPARE(iq.username(), u"juliet"_s);
     serializePacket(iq, xml);
 
     iq = QXmppRegisterIq();
-    iq.setId(QStringLiteral(""));
+    iq.setId(u""_s);
     iq.setType(QXmppIq::Result);
     iq.setIsRemove(true);
-    iq.setUsername(QStringLiteral("juliet"));
+    iq.setUsername(u"juliet"_s);
     serializePacket(iq, xml);
 }
 
@@ -465,10 +465,10 @@ void tst_QXmppRegisterIq::testChangePassword()
         "</iq>");
 
     auto iq = QXmppRegisterIq::createChangePasswordRequest(
-        QStringLiteral("bill"),
-        QStringLiteral("m1cr0$0ft"),
-        QStringLiteral("shakespeare.lit"));
-    iq.setId(QStringLiteral("changePassword1"));
+        u"bill"_s,
+        u"m1cr0$0ft"_s,
+        u"shakespeare.lit"_s);
+    iq.setId(u"changePassword1"_s);
     serializePacket(iq, xml);
 }
 
@@ -481,8 +481,8 @@ void tst_QXmppRegisterIq::testUnregistration()
         "</query>"
         "</iq>");
 
-    auto iq = QXmppRegisterIq::createUnregistrationRequest(QStringLiteral("shakespeare.lit"));
-    iq.setId(QStringLiteral("unreg1"));
+    auto iq = QXmppRegisterIq::createUnregistrationRequest(u"shakespeare.lit"_s);
+    iq.setId(u"unreg1"_s);
     serializePacket(iq, xml);
 }
 

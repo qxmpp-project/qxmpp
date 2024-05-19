@@ -147,45 +147,45 @@ void tst_QXmppUtils::testCalculateHashes_data()
     QTest::addColumn<QXmpp::HashAlgorithm>("algorithm");
 
     QTest::newRow("svg/md5")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("cf7ab33aca717ed632c32296c8426043")
         << HashAlgorithm::Md5;
     QTest::newRow("svg/sha-1")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("89d8cf114e4ec0758638ee8199af85d0974834bb")
         << HashAlgorithm::Sha1;
     QTest::newRow("svg/sha-224")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("f7f29e8e228a0b7529f6a4bc97b0e6bd080a8a91e8386bc1304ececc")
         << HashAlgorithm::Sha224;
     QTest::newRow("svg/sha-256")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("4736d79aa2912a2693cc17c5548612e1474dd1dfca2e8ddff917358482fd309f")
         << HashAlgorithm::Sha256;
     QTest::newRow("svg/sha-384")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("2f2572eac288d92a6f8ba09ae6e91c12f4ebaedc00df8bbbd284c4d60a483cfb21bbae417ec0688d71aa5a940637f11c")
         << HashAlgorithm::Sha384;
     QTest::newRow("svg/sha-512")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("85d34de6e549895d3c62773f589bb93b19c0bae62681f3fd0f3dba7262c96e87f771db4053ff7c9d0305b72222ccfe182596373917c0d109260973c258058196")
         << HashAlgorithm::Sha512;
     QTest::newRow("svg/sha3-256")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("4079f2effb8968e1540ce7c684a01266175c1af8cb15342fa19b7f7926de9f14")
         << HashAlgorithm::Sha3_256;
     QTest::newRow("svg/sha3-512")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("4c374d4c52fb57311761877a31a160703e5b67c0d3838758fa3698ae5bce10438145478116e3885cd9a8c30cf30391e7cd579d1c4c5b9c3ea8dba50930417931")
         << HashAlgorithm::Sha3_512;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     QTest::newRow("svg/blake2b-512")
-        << QStringLiteral(":/test.svg")
+        << u":/test.svg"_s
         << QByteArray::fromHex("a5e86044842e4c8306e9e2ee041fc26d57d172d5cb32346d5ee467c97c5a0b0b2350bc5a4a3dc76b92c48585c2ebbb01cf47fa59a88420fe7bba8f2a18af6f07")
         << HashAlgorithm::Blake2b_512;
 #endif
     QTest::newRow("bmp/sha3-256")
-        << QStringLiteral(":/test.bmp")
+        << u":/test.bmp"_s
         << QByteArray::fromHex("e50ffd13bb279932923ee10ba6847bec7546f77747074d1a7eeeb82228daf257")
         << HashAlgorithm::Sha3_256;
 }
@@ -213,33 +213,33 @@ void tst_QXmppUtils::testParseHostAddress_data()
     QTest::addColumn<int>("resultPort");
 
     QTest::newRow("host-and-port")
-        << QStringLiteral("qxmpp.org:443")
-        << QStringLiteral("qxmpp.org")
+        << u"qxmpp.org:443"_s
+        << u"qxmpp.org"_s
         << 443;
 
     QTest::newRow("no-port")
-        << QStringLiteral("qxmpp.org")
-        << QStringLiteral("qxmpp.org")
+        << u"qxmpp.org"_s
+        << u"qxmpp.org"_s
         << -1;
 
     QTest::newRow("ipv4-with-port")
-        << QStringLiteral("127.0.0.1:443")
-        << QStringLiteral("127.0.0.1")
+        << u"127.0.0.1:443"_s
+        << u"127.0.0.1"_s
         << 443;
 
     QTest::newRow("ipv4-no-port")
-        << QStringLiteral("127.0.0.1")
-        << QStringLiteral("127.0.0.1")
+        << u"127.0.0.1"_s
+        << u"127.0.0.1"_s
         << -1;
 
     QTest::newRow("ipv6-with-port")
-        << QStringLiteral("[2001:41D0:1:A49b::1]:9222")
-        << QStringLiteral("2001:41d0:1:a49b::1")
+        << u"[2001:41D0:1:A49b::1]:9222"_s
+        << u"2001:41d0:1:a49b::1"_s
         << 9222;
 
     QTest::newRow("ipv6-no-port")
-        << QStringLiteral("[2001:41D0:1:A49b::1]")
-        << QStringLiteral("2001:41d0:1:a49b::1")
+        << u"[2001:41D0:1:A49b::1]"_s
+        << u"2001:41d0:1:a49b::1"_s
         << -1;
 }
 

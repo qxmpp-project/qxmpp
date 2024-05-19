@@ -8,6 +8,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QTextStream>
 #include <QXmlStreamWriter>

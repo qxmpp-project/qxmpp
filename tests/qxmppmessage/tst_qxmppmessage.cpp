@@ -131,8 +131,8 @@ void tst_QXmppMessage::testBasic()
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.to(), QStringLiteral("foo@example.com/QXmpp"));
-    QCOMPARE(message.from(), QStringLiteral("bar@example.com/QXmpp"));
+    QCOMPARE(message.to(), u"foo@example.com/QXmpp"_s);
+    QCOMPARE(message.from(), u"bar@example.com/QXmpp"_s);
     QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(int(message.type()), type);
     QCOMPARE(message.body(), body);
@@ -160,8 +160,8 @@ void tst_QXmppMessage::testBasic()
     QT_WARNING_POP
 
     message = QXmppMessage();
-    message.setTo(QStringLiteral("foo@example.com/QXmpp"));
-    message.setFrom(QStringLiteral("bar@example.com/QXmpp"));
+    message.setTo(u"foo@example.com/QXmpp"_s);
+    message.setFrom(u"bar@example.com/QXmpp"_s);
     message.setType(QXmppMessage::Type(type));
     message.setBody(body);
     message.setSubject(subject);
@@ -198,8 +198,8 @@ void tst_QXmppMessage::testMessageAttention()
     QXmppMessage message;
     // parsing
     parsePacket(message, xml);
-    QCOMPARE(message.to(), QStringLiteral("foo@example.com/QXmpp"));
-    QCOMPARE(message.from(), QStringLiteral("bar@example.com/QXmpp"));
+    QCOMPARE(message.to(), u"foo@example.com/QXmpp"_s);
+    QCOMPARE(message.from(), u"bar@example.com/QXmpp"_s);
     QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(message.type(), QXmppMessage::Normal);
     QCOMPARE(message.body(), QString());
@@ -208,7 +208,7 @@ void tst_QXmppMessage::testMessageAttention()
     QCOMPARE(message.receiptId(), QString());
 
     // serialization
-    message = QXmppMessage(QStringLiteral("bar@example.com/QXmpp"), QStringLiteral("foo@example.com/QXmpp"));
+    message = QXmppMessage(u"bar@example.com/QXmpp"_s, u"foo@example.com/QXmpp"_s);
     message.setType(QXmppMessage::Normal);
     message.setAttentionRequested(true);
     serializePacket(message, xml);
@@ -225,23 +225,23 @@ void tst_QXmppMessage::testMessageReceipt()
     QXmppMessage message;
     // parsing
     parsePacket(message, xml);
-    QCOMPARE(message.id(), QStringLiteral("richard2-4.1.247"));
-    QCOMPARE(message.to(), QStringLiteral("kingrichard@royalty.england.lit/throne"));
-    QCOMPARE(message.from(), QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    QCOMPARE(message.id(), u"richard2-4.1.247"_s);
+    QCOMPARE(message.to(), u"kingrichard@royalty.england.lit/throne"_s);
+    QCOMPARE(message.from(), u"northumberland@shakespeare.lit/westminster"_s);
     QVERIFY(message.extendedAddresses().isEmpty());
     QCOMPARE(message.type(), QXmppMessage::Normal);
-    QCOMPARE(message.body(), QStringLiteral("My lord, dispatch; read o'er these articles."));
+    QCOMPARE(message.body(), u"My lord, dispatch; read o'er these articles."_s);
     QCOMPARE(message.isAttentionRequested(), false);
     QCOMPARE(message.isReceiptRequested(), true);
     QCOMPARE(message.receiptId(), QString());
 
     // serialization
     message = QXmppMessage();
-    message.setId(QStringLiteral("richard2-4.1.247"));
-    message.setTo(QStringLiteral("kingrichard@royalty.england.lit/throne"));
-    message.setFrom(QStringLiteral("northumberland@shakespeare.lit/westminster"));
+    message.setId(u"richard2-4.1.247"_s);
+    message.setTo(u"kingrichard@royalty.england.lit/throne"_s);
+    message.setFrom(u"northumberland@shakespeare.lit/westminster"_s);
     message.setType(QXmppMessage::Normal);
-    message.setBody(QStringLiteral("My lord, dispatch; read o'er these articles."));
+    message.setBody(u"My lord, dispatch; read o'er these articles."_s);
     message.setReceiptRequested(true);
     serializePacket(message, xml);
 
@@ -252,22 +252,22 @@ void tst_QXmppMessage::testMessageReceipt()
 
     QXmppMessage receipt;
     parsePacket(receipt, receiptXml);
-    QCOMPARE(receipt.id(), QStringLiteral("bi29sg183b4v"));
-    QCOMPARE(receipt.to(), QStringLiteral("northumberland@shakespeare.lit/westminster"));
-    QCOMPARE(receipt.from(), QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    QCOMPARE(receipt.id(), u"bi29sg183b4v"_s);
+    QCOMPARE(receipt.to(), u"northumberland@shakespeare.lit/westminster"_s);
+    QCOMPARE(receipt.from(), u"kingrichard@royalty.england.lit/throne"_s);
     QVERIFY(receipt.extendedAddresses().isEmpty());
     QCOMPARE(receipt.type(), QXmppMessage::Normal);
     QCOMPARE(receipt.body(), QString());
     QCOMPARE(receipt.isAttentionRequested(), false);
     QCOMPARE(receipt.isReceiptRequested(), false);
-    QCOMPARE(receipt.receiptId(), QStringLiteral("richard2-4.1.247"));
+    QCOMPARE(receipt.receiptId(), u"richard2-4.1.247"_s);
 
     receipt = QXmppMessage();
-    receipt.setId(QStringLiteral("bi29sg183b4v"));
-    receipt.setTo(QStringLiteral("northumberland@shakespeare.lit/westminster"));
-    receipt.setFrom(QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    receipt.setId(u"bi29sg183b4v"_s);
+    receipt.setTo(u"northumberland@shakespeare.lit/westminster"_s);
+    receipt.setFrom(u"kingrichard@royalty.england.lit/throne"_s);
     receipt.setType(QXmppMessage::Normal);
-    receipt.setReceiptId(QStringLiteral("richard2-4.1.247"));
+    receipt.setReceiptId(u"richard2-4.1.247"_s);
     serializePacket(receipt, receiptXml);
 
     const QByteArray oldXml(
@@ -277,15 +277,15 @@ void tst_QXmppMessage::testMessageReceipt()
 
     QXmppMessage old;
     parsePacket(old, oldXml);
-    QCOMPARE(old.id(), QStringLiteral("richard2-4.1.247"));
-    QCOMPARE(old.to(), QStringLiteral("northumberland@shakespeare.lit/westminster"));
-    QCOMPARE(old.from(), QStringLiteral("kingrichard@royalty.england.lit/throne"));
+    QCOMPARE(old.id(), u"richard2-4.1.247"_s);
+    QCOMPARE(old.to(), u"northumberland@shakespeare.lit/westminster"_s);
+    QCOMPARE(old.from(), u"kingrichard@royalty.england.lit/throne"_s);
     QVERIFY(old.extendedAddresses().isEmpty());
     QCOMPARE(old.type(), QXmppMessage::Normal);
     QCOMPARE(old.body(), QString());
     QCOMPARE(old.isAttentionRequested(), false);
     QCOMPARE(old.isReceiptRequested(), false);
-    QCOMPARE(old.receiptId(), QStringLiteral("richard2-4.1.247"));
+    QCOMPARE(old.receiptId(), u"richard2-4.1.247"_s);
 
     // test that an ID is generated
     QXmppMessage message2;
@@ -379,12 +379,12 @@ void tst_QXmppMessage::testMucInvitation()
     QCOMPARE(message.mucInvitationReason(), QLatin1String("Hey Hecate, this is the place for all good witches!"));
 
     message = QXmppMessage();
-    message.setTo(QStringLiteral("hecate@shakespeare.lit"));
-    message.setFrom(QStringLiteral("crone1@shakespeare.lit/desktop"));
+    message.setTo(u"hecate@shakespeare.lit"_s);
+    message.setFrom(u"crone1@shakespeare.lit/desktop"_s);
     message.setType(QXmppMessage::Normal);
-    message.setMucInvitationJid(QStringLiteral("darkcave@macbeth.shakespeare.lit"));
-    message.setMucInvitationPassword(QStringLiteral("cauldronburn"));
-    message.setMucInvitationReason(QStringLiteral("Hey Hecate, this is the place for all good witches!"));
+    message.setMucInvitationJid(u"darkcave@macbeth.shakespeare.lit"_s);
+    message.setMucInvitationPassword(u"cauldronburn"_s);
+    message.setMucInvitationReason(u"Hey Hecate, this is the place for all good witches!"_s);
     serializePacket(message, xml);
 }
 
@@ -449,9 +449,9 @@ void tst_QXmppMessage::testXhtml()
     QCOMPARE(message.xhtml(), QLatin1String("<p style=\"font-weight:bold\">hi!</p>"));
 
     message = QXmppMessage();
-    message.setBody(QStringLiteral("hi!"));
+    message.setBody(u"hi!"_s);
     message.setType(QXmppMessage::Normal);
-    message.setXhtml(QStringLiteral("<p style=\"font-weight:bold\">hi!</p>"));
+    message.setXhtml(u"<p style=\"font-weight:bold\">hi!</p>"_s);
     serializePacket(message, xml);
 }
 
@@ -496,9 +496,9 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(markableMessage, markableXml);
     QCOMPARE(markableMessage.isMarkable(), true);
     QCOMPARE(markableMessage.marker(), QXmppMessage::NoMarker);
-    QCOMPARE(markableMessage.id(), QStringLiteral("message-1"));
+    QCOMPARE(markableMessage.id(), u"message-1"_s);
     QCOMPARE(markableMessage.markedId(), QString());
-    QCOMPARE(markableMessage.thread(), QStringLiteral("sleeping"));
+    QCOMPARE(markableMessage.thread(), u"sleeping"_s);
     QCOMPARE(markableMessage.markedThread(), QString());
 
     const QByteArray receivedXml(
@@ -515,10 +515,10 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(receivedMessage, receivedXml);
     QCOMPARE(receivedMessage.isMarkable(), false);
     QCOMPARE(receivedMessage.marker(), QXmppMessage::Received);
-    QCOMPARE(receivedMessage.id(), QStringLiteral("message-2"));
-    QCOMPARE(receivedMessage.markedId(), QStringLiteral("message-1"));
+    QCOMPARE(receivedMessage.id(), u"message-2"_s);
+    QCOMPARE(receivedMessage.markedId(), u"message-1"_s);
     QCOMPARE(receivedMessage.thread(), QString());
-    QCOMPARE(receivedMessage.markedThread(), QStringLiteral("sleeping"));
+    QCOMPARE(receivedMessage.markedThread(), u"sleeping"_s);
 
     const QByteArray displayedXml(
         "<message "
@@ -534,10 +534,10 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(displayedMessage, displayedXml);
     QCOMPARE(displayedMessage.isMarkable(), false);
     QCOMPARE(displayedMessage.marker(), QXmppMessage::Displayed);
-    QCOMPARE(displayedMessage.id(), QStringLiteral("message-2"));
-    QCOMPARE(displayedMessage.markedId(), QStringLiteral("message-1"));
+    QCOMPARE(displayedMessage.id(), u"message-2"_s);
+    QCOMPARE(displayedMessage.markedId(), u"message-1"_s);
     QCOMPARE(displayedMessage.thread(), QString());
-    QCOMPARE(displayedMessage.markedThread(), QStringLiteral("sleeping"));
+    QCOMPARE(displayedMessage.markedThread(), u"sleeping"_s);
 
     const QByteArray acknowledgedXml(
         "<message "
@@ -553,10 +553,10 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(acknowledgedMessage, acknowledgedXml);
     QCOMPARE(acknowledgedMessage.isMarkable(), false);
     QCOMPARE(acknowledgedMessage.marker(), QXmppMessage::Acknowledged);
-    QCOMPARE(acknowledgedMessage.id(), QStringLiteral("message-2"));
-    QCOMPARE(acknowledgedMessage.markedId(), QStringLiteral("message-1"));
+    QCOMPARE(acknowledgedMessage.id(), u"message-2"_s);
+    QCOMPARE(acknowledgedMessage.markedId(), u"message-1"_s);
     QCOMPARE(acknowledgedMessage.thread(), QString());
-    QCOMPARE(acknowledgedMessage.markedThread(), QStringLiteral("sleeping"));
+    QCOMPARE(acknowledgedMessage.markedThread(), u"sleeping"_s);
 
     const QByteArray emptyThreadXml(
         "<message "
@@ -571,8 +571,8 @@ void tst_QXmppMessage::testChatMarkers()
     parsePacket(emptyThreadMessage, emptyThreadXml);
     QCOMPARE(emptyThreadMessage.isMarkable(), false);
     QCOMPARE(emptyThreadMessage.marker(), QXmppMessage::Received);
-    QCOMPARE(emptyThreadMessage.id(), QStringLiteral("message-2"));
-    QCOMPARE(emptyThreadMessage.markedId(), QStringLiteral("message-1"));
+    QCOMPARE(emptyThreadMessage.id(), u"message-2"_s);
+    QCOMPARE(emptyThreadMessage.markedId(), u"message-1"_s);
     QCOMPARE(emptyThreadMessage.thread(), QString());
     QCOMPARE(emptyThreadMessage.markedThread(), QString());
 
@@ -679,7 +679,7 @@ void tst_QXmppMessage::testPrivateMessage()
     QCOMPARE(message.isPrivate(), true);
 
     message = QXmppMessage();
-    message.setBody(QStringLiteral("My lord, dispatch; read o'er these articles."));
+    message.setBody(u"My lord, dispatch; read o'er these articles."_s);
     message.setPrivate(true);
     serializePacket(message, xml);
 
@@ -713,11 +713,11 @@ void tst_QXmppMessage::testOutOfBandUrl()
 
     QCOMPARE(oobMessage.outOfBandUrls().size(), 2);
 
-    QCOMPARE(oobMessage.outOfBandUrls().front().url(), QStringLiteral("http://www.jabber.org/images/psa-license.jpg"));
+    QCOMPARE(oobMessage.outOfBandUrls().front().url(), u"http://www.jabber.org/images/psa-license.jpg"_s);
     QVERIFY(!oobMessage.outOfBandUrls().front().description().has_value());
 
-    QCOMPARE(oobMessage.outOfBandUrls().at(1).url(), QStringLiteral("https://xmpp.org/images/logos/xmpp-logo.svg"));
-    QCOMPARE(oobMessage.outOfBandUrls().at(1).description().value(), QStringLiteral("XMPP logo"));
+    QCOMPARE(oobMessage.outOfBandUrls().at(1).url(), u"https://xmpp.org/images/logos/xmpp-logo.svg"_s);
+    QCOMPARE(oobMessage.outOfBandUrls().at(1).description().value(), u"XMPP logo"_s);
 
     serializePacket(oobMessage, oobXml);
 
@@ -736,11 +736,11 @@ void tst_QXmppMessage::testMessageCorrect()
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.replaceId(), QStringLiteral("badmessage"));
+    QCOMPARE(message.replaceId(), u"badmessage"_s);
     serializePacket(message, xml);
 
     message.setReplaceId("someotherid");
-    QCOMPARE(message.replaceId(), QStringLiteral("someotherid"));
+    QCOMPARE(message.replaceId(), u"someotherid"_s);
 }
 
 void tst_QXmppMessage::testMessageAttaching()
@@ -753,11 +753,11 @@ void tst_QXmppMessage::testMessageAttaching()
 
     QXmppMessage message;
     parsePacket(message, xml);
-    QCOMPARE(message.attachId(), QStringLiteral("SD24VCzSYQ"));
+    QCOMPARE(message.attachId(), u"SD24VCzSYQ"_s);
     serializePacket(message, xml);
 
     message.setAttachId("someotherid");
-    QCOMPARE(message.attachId(), QStringLiteral("someotherid"));
+    QCOMPARE(message.attachId(), u"someotherid"_s);
 }
 
 void tst_QXmppMessage::testMix()
@@ -782,22 +782,22 @@ void tst_QXmppMessage::testMix()
     parsePacket(message1, xml);
     serializePacket(message1, xml);
 
-    QCOMPARE(message1.mixParticipantId(), QStringLiteral("123456"));
-    QCOMPARE(message1.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(message1.mixUserNick(), QStringLiteral("thirdwitch"));
+    QCOMPARE(message1.mixParticipantId(), u"123456"_s);
+    QCOMPARE(message1.mixUserJid(), u"hag66@shakespeare.example"_s);
+    QCOMPARE(message1.mixUserNick(), u"thirdwitch"_s);
 
     QXmppMessage message2;
 
     message2.setType(QXmppMessage::GroupChat);
-    message2.setFrom(QStringLiteral("coven@mix.shakespeare.example/123456"));
-    message2.setTo(QStringLiteral("hag66@shakespeare.example"));
-    message2.setBody(QStringLiteral("Harpier cries: 'tis time, 'tis time."));
-    message2.setMixUserJid(QStringLiteral("hag66@shakespeare.example"));
-    message2.setMixUserNick(QStringLiteral("thirdwitch"));
+    message2.setFrom(u"coven@mix.shakespeare.example/123456"_s);
+    message2.setTo(u"hag66@shakespeare.example"_s);
+    message2.setBody(u"Harpier cries: 'tis time, 'tis time."_s);
+    message2.setMixUserJid(u"hag66@shakespeare.example"_s);
+    message2.setMixUserNick(u"thirdwitch"_s);
 
-    QCOMPARE(message2.mixParticipantId(), QStringLiteral("123456"));
-    QCOMPARE(message2.mixUserJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(message2.mixUserNick(), QStringLiteral("thirdwitch"));
+    QCOMPARE(message2.mixParticipantId(), u"123456"_s);
+    QCOMPARE(message2.mixUserJid(), u"hag66@shakespeare.example"_s);
+    QCOMPARE(message2.mixUserNick(), u"thirdwitch"_s);
 
     serializePacket(message2, xml);
 }
@@ -813,9 +813,9 @@ void tst_QXmppMessage::testEme()
 
     QXmppMessage messageOmemo;
     parsePacket(messageOmemo, xmlOmemo);
-    QCOMPARE(messageOmemo.encryptionMethodNs(), QStringLiteral("eu.siacs.conversations.axolotl"));
+    QCOMPARE(messageOmemo.encryptionMethodNs(), u"eu.siacs.conversations.axolotl"_s);
     QCOMPARE(messageOmemo.encryptionMethod(), QXmpp::OMEMO);
-    QCOMPARE(messageOmemo.encryptionName(), QStringLiteral("OMEMO"));
+    QCOMPARE(messageOmemo.encryptionName(), u"OMEMO"_s);
     serializePacket(messageOmemo, xmlOmemo);
 
     // test custom encryption
@@ -827,23 +827,23 @@ void tst_QXmppMessage::testEme()
 
     QXmppMessage messageCustom;
     parsePacket(messageCustom, xmlCustom);
-    QCOMPARE(messageCustom.encryptionMethodNs(), QStringLiteral("im:example:customcrypt:1"));
+    QCOMPARE(messageCustom.encryptionMethodNs(), u"im:example:customcrypt:1"_s);
     QCOMPARE(messageCustom.encryptionMethod(), QXmpp::UnknownEncryption);
-    QCOMPARE(messageCustom.encryptionName(), QStringLiteral("CustomCrypt"));
+    QCOMPARE(messageCustom.encryptionName(), u"CustomCrypt"_s);
     serializePacket(messageCustom, xmlCustom);
 
     // test setters/getters
     QXmppMessage message;
     message.setEncryptionMethod(QXmpp::LegacyOpenPGP);
     QCOMPARE(message.encryptionMethod(), QXmpp::LegacyOpenPGP);
-    QCOMPARE(message.encryptionMethodNs(), QStringLiteral("jabber:x:encrypted"));
-    QCOMPARE(message.encryptionName(), QStringLiteral("Legacy OpenPGP"));
+    QCOMPARE(message.encryptionMethodNs(), u"jabber:x:encrypted"_s);
+    QCOMPARE(message.encryptionName(), u"Legacy OpenPGP"_s);
 
     message.setEncryptionMethodNs("fancyorg:encryption:fancycrypt:0");
     message.setEncryptionName("FancyCrypt");
     QCOMPARE(message.encryptionMethod(), QXmpp::UnknownEncryption);
-    QCOMPARE(message.encryptionMethodNs(), QStringLiteral("fancyorg:encryption:fancycrypt:0"));
-    QCOMPARE(message.encryptionName(), QStringLiteral("FancyCrypt"));
+    QCOMPARE(message.encryptionMethodNs(), u"fancyorg:encryption:fancycrypt:0"_s);
+    QCOMPARE(message.encryptionName(), u"FancyCrypt"_s);
 }
 
 void tst_QXmppMessage::testSpoiler()
@@ -858,7 +858,7 @@ void tst_QXmppMessage::testSpoiler()
     QXmppMessage messageWithHint;
     parsePacket(messageWithHint, xmlWithHint);
     QVERIFY(messageWithHint.isSpoiler());
-    QCOMPARE(messageWithHint.spoilerHint(), QStringLiteral("Love story end"));
+    QCOMPARE(messageWithHint.spoilerHint(), u"Love story end"_s);
     serializePacket(messageWithHint, xmlWithHint);
 
     // test parsing without hint
@@ -871,7 +871,7 @@ void tst_QXmppMessage::testSpoiler()
     QXmppMessage messageWithoutHint;
     parsePacket(messageWithoutHint, xmlWithoutHint);
     QVERIFY(messageWithoutHint.isSpoiler());
-    QCOMPARE(messageWithoutHint.spoilerHint(), QStringLiteral(""));
+    QCOMPARE(messageWithoutHint.spoilerHint(), u""_s);
     serializePacket(messageWithoutHint, xmlWithoutHint);
 
     // test setters
@@ -881,7 +881,7 @@ void tst_QXmppMessage::testSpoiler()
 
     message.setIsSpoiler(false);
     message.setSpoilerHint("test hint");
-    QCOMPARE(message.spoilerHint(), QStringLiteral("test hint"));
+    QCOMPARE(message.spoilerHint(), u"test hint"_s);
     QVERIFY(message.isSpoiler());
 }
 
@@ -909,9 +909,9 @@ void tst_QXmppMessage::testProcessingHints()
     // test serialization
     QXmppMessage message2;
     message2.setType(QXmppMessage::Chat);
-    message2.setFrom(QStringLiteral("romeo@montague.lit/laptop"));
-    message2.setTo(QStringLiteral("juliet@capulet.lit/laptop"));
-    message2.setBody(QStringLiteral("V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"));
+    message2.setFrom(u"romeo@montague.lit/laptop"_s);
+    message2.setTo(u"juliet@capulet.lit/laptop"_s);
+    message2.setBody(u"V unir avtug'f pybnx gb uvqr zr sebz gurve fvtug"_s);
     message2.addHint(QXmppMessage::NoPermanentStore);
     message2.addHint(QXmppMessage::NoStore);
     message2.addHint(QXmppMessage::NoCopy);
@@ -963,8 +963,8 @@ void tst_QXmppMessage::testBobData()
 
     QXmppBitsOfBinaryData data;
     data.setCid(QXmppBitsOfBinaryContentId::fromContentId(
-        QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org")));
-    data.setContentType(QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+        u"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org"_s));
+    data.setContentType(QMimeDatabase().mimeTypeForName(u"image/png"_s));
     data.setData(QByteArray::fromBase64(QByteArrayLiteral(
         "iVBORw0KGgoAAAANSUhEUgAAALQAAAA8BAMAAAA9AI20AAAAG1BMVEX///8AAADf39+"
         "/v79/f39fX1+fn58/Pz8fHx/8ACGJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAADS0lEQV"
@@ -991,7 +991,7 @@ void tst_QXmppMessage::testBobData()
     QXmppMessage message;
     parsePacket(message, xml);
     QCOMPARE(message.type(), QXmppMessage::Chat);
-    QCOMPARE(message.id(), QStringLiteral(""));
+    QCOMPARE(message.id(), u""_s);
     QCOMPARE(message.bitsOfBinaryData().size(), 1);
     QCOMPARE(message.bitsOfBinaryData().first().cid().algorithm(), data.cid().algorithm());
     QCOMPARE(message.bitsOfBinaryData().first().cid().hash(), data.cid().hash());
@@ -1004,7 +1004,7 @@ void tst_QXmppMessage::testBobData()
 
     QXmppMessage msg;
     msg.setType(QXmppMessage::Chat);
-    msg.setId(QStringLiteral(""));
+    msg.setId(u""_s);
     QXmppBitsOfBinaryDataList bobDataList;
     bobDataList << data;
     msg.setBitsOfBinaryData(bobDataList);
@@ -1012,7 +1012,7 @@ void tst_QXmppMessage::testBobData()
 
     QXmppMessage msg2;
     msg2.setType(QXmppMessage::Chat);
-    msg2.setId(QStringLiteral(""));
+    msg2.setId(u""_s);
     msg2.bitsOfBinaryData() << data;
     serializePacket(msg2, xml);
 
@@ -1090,15 +1090,15 @@ void tst_QXmppMessage::testStanzaIds()
 
     QXmppMessage msg;
     parsePacket(msg, xml);
-    QCOMPARE(msg.stanzaId(), QStringLiteral("1236"));
-    QCOMPARE(msg.stanzaIdBy(), QStringLiteral("server.tld"));
-    QCOMPARE(msg.originId(), QStringLiteral("5678"));
+    QCOMPARE(msg.stanzaId(), u"1236"_s);
+    QCOMPARE(msg.stanzaIdBy(), u"server.tld"_s);
+    QCOMPARE(msg.originId(), u"5678"_s);
     serializePacket(msg, xml);
 
     QXmppMessage msg2;
-    msg2.setStanzaId(QStringLiteral("1236"));
-    msg2.setStanzaIdBy(QStringLiteral("server.tld"));
-    msg2.setOriginId(QStringLiteral("5678"));
+    msg2.setStanzaId(u"1236"_s);
+    msg2.setStanzaIdBy(u"server.tld"_s);
+    msg2.setOriginId(u"5678"_s);
     serializePacket(msg2, xml);
 }
 
@@ -1258,11 +1258,11 @@ void tst_QXmppMessage::testE2eeFallbackBody()
 
     QXmppMessage message1;
     parsePacket(message1, xml);
-    QCOMPARE(message1.e2eeFallbackBody(), QStringLiteral("This message is encrypted with OMEMO 2 but could not be decrypted"));
+    QCOMPARE(message1.e2eeFallbackBody(), u"This message is encrypted with OMEMO 2 but could not be decrypted"_s);
     serializePacket(message1, xml);
 
     QXmppMessage message2;
-    message2.setE2eeFallbackBody(QStringLiteral("This message is encrypted with OMEMO 2 but could not be decrypted"));
+    message2.setE2eeFallbackBody(u"This message is encrypted with OMEMO 2 but could not be decrypted"_s);
     serializePacket(message2, xml);
 }
 

@@ -112,8 +112,8 @@ void tst_QXmppStreamFeatures::testFull()
     features.setRegisterMode(QXmppStreamFeatures::Enabled);
     features.setPreApprovedSubscriptionsSupported(true);
     features.setRosterVersioningSupported(true);
-    features.setAuthMechanisms(QStringList { QStringLiteral("PLAIN") });
-    features.setCompressionMethods(QStringList { QStringLiteral("zlib") });
+    features.setAuthMechanisms(QStringList { u"PLAIN"_s });
+    features.setCompressionMethods(QStringList { u"zlib"_s });
     serializePacket(features, xml);
 }
 

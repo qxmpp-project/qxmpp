@@ -11,6 +11,8 @@
 #include "QXmppPromise.h"
 #include "QXmppUtils.h"
 
+#include "StringLiterals.h"
+
 #include <QUuid>
 
 using namespace QXmpp;
@@ -101,7 +103,7 @@ QXmppTask<SendResult> QXmppJingleMessageInitiation::reject(std::optional<QXmppJi
     if (!reason) {
         reason = QXmppJingleReason();
         reason->setType(QXmppJingleReason::Busy);
-        reason->setText(QStringLiteral("Busy"));
+        reason->setText(u"Busy"_s);
     }
 
     jmiElement.setReason(reason);
@@ -125,7 +127,7 @@ QXmppTask<SendResult> QXmppJingleMessageInitiation::retract(std::optional<QXmppJ
     if (!reason) {
         reason = QXmppJingleReason();
         reason->setType(QXmppJingleReason::Cancel);
-        reason->setText(QStringLiteral("Retracted"));
+        reason->setText(u"Retracted"_s);
     }
 
     jmiElement.setReason(reason);
@@ -149,7 +151,7 @@ QXmppTask<SendResult> QXmppJingleMessageInitiation::finish(std::optional<QXmppJi
     if (!reason) {
         reason = QXmppJingleReason();
         reason->setType(QXmppJingleReason::Success);
-        reason->setText(QStringLiteral("Success"));
+        reason->setText(u"Success"_s);
     }
 
     jmiElement.setReason(reason);
@@ -474,7 +476,7 @@ bool QXmppJingleMessageInitiationManager::handleExistingSession(const std::share
     // Old session will be finished with reason "Expired".
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Expired);
-    reason.setText(QStringLiteral("Session migrated"));
+    reason.setText(u"Session migrated"_s);
 
     // Tell the old session to be finished.
     Q_EMIT existingJmi->closed(Jmi::Finished { reason, jmiElementId });
@@ -511,7 +513,7 @@ bool QXmppJingleMessageInitiationManager::handleNonExistingSession(const std::sh
 {
     QXmppJingleReason reason;
     reason.setType(QXmppJingleReason::Expired);
-    reason.setText(QStringLiteral("Tie-Break"));
+    reason.setText(u"Tie-Break"_s);
 
     if (QUuid::fromString(existingJmi->id()) < QUuid::fromString(jmiElementId)) {
         // Jingle message initiator with lower ID rejects the other proposal.

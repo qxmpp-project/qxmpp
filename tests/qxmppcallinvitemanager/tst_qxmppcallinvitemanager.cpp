@@ -126,7 +126,7 @@ void tst_QXmppCallInviteManager::testReject()
 
             if (message.to() == callInviteCallPartnerJid) {
                 QVERIFY(message.callInviteElement());
-                QCOMPARE(message.callInviteElement()->id(), QStringLiteral("id1_testReject"));
+                QCOMPARE(message.callInviteElement()->id(), u"id1_testReject"_s);
                 QCOMPARE(message.callInviteElement()->type(), CallInviteType::Reject);
             }
         }
@@ -154,7 +154,7 @@ void tst_QXmppCallInviteManager::testRetract()
 
             if (message.to() == callInviteCallPartnerJid) {
                 QVERIFY(message.callInviteElement());
-                QCOMPARE(message.callInviteElement()->id(), QStringLiteral("id1_testRetract"));
+                QCOMPARE(message.callInviteElement()->id(), u"id1_testRetract"_s);
                 QCOMPARE(message.callInviteElement()->type(), CallInviteType::Retract);
             }
         }
@@ -182,7 +182,7 @@ void tst_QXmppCallInviteManager::testLeft()
 
             if (message.to() == callInviteCallPartnerJid) {
                 QVERIFY(message.callInviteElement());
-                QCOMPARE(message.callInviteElement()->id(), QStringLiteral("id1_testLeft"));
+                QCOMPARE(message.callInviteElement()->id(), u"id1_testLeft"_s);
                 QCOMPARE(message.callInviteElement()->type(), CallInviteType::Left);
             }
         }
@@ -254,7 +254,7 @@ void tst_QXmppCallInviteManager::testSendMessage()
 
     QXmppCallInviteElement callInviteElement;
     callInviteElement.setType(CallInviteType::Invite);
-    callInviteElement.setId(QStringLiteral("id1_testSendMessage"));
+    callInviteElement.setId(u"id1_testSendMessage"_s);
 
     connect(&m_logger, &QXmppLogger::message, this, [jid, callInviteElement](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {

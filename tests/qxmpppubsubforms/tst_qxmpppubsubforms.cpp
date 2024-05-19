@@ -35,9 +35,9 @@ void tst_QXmppPubSubForms::subAuthorization()
 
     auto subAuthForm = QXmppPubSubSubAuthorization::fromDataForm(form);
     QVERIFY(subAuthForm.has_value());
-    QCOMPARE(subAuthForm->subid(), QStringLiteral("123-abc"));
-    QCOMPARE(subAuthForm->node(), QStringLiteral("princely_musings"));
-    QCOMPARE(subAuthForm->subscriberJid(), QStringLiteral("horatio@denmark.lit"));
+    QCOMPARE(subAuthForm->subid(), u"123-abc"_s);
+    QCOMPARE(subAuthForm->node(), u"princely_musings"_s);
+    QCOMPARE(subAuthForm->subscriberJid(), u"horatio@denmark.lit"_s);
     QVERIFY(subAuthForm->allowSubscription().has_value());
     QCOMPARE(subAuthForm->allowSubscription().value(), false);
 

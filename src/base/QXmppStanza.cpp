@@ -14,6 +14,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 #include <QDomElement>
 #include <QXmlStreamWriter>
@@ -30,54 +32,54 @@ QString conditionToString(QXmppStanza::Error::Condition condition)
     case QXmppStanza::Error::NoCondition:
         return {};
     case QXmppStanza::Error::BadRequest:
-        return QStringLiteral("bad-request");
+        return u"bad-request"_s;
     case QXmppStanza::Error::Conflict:
-        return QStringLiteral("conflict");
+        return u"conflict"_s;
     case QXmppStanza::Error::FeatureNotImplemented:
-        return QStringLiteral("feature-not-implemented");
+        return u"feature-not-implemented"_s;
     case QXmppStanza::Error::Forbidden:
-        return QStringLiteral("forbidden");
+        return u"forbidden"_s;
     case QXmppStanza::Error::Gone:
-        return QStringLiteral("gone");
+        return u"gone"_s;
     case QXmppStanza::Error::InternalServerError:
-        return QStringLiteral("internal-server-error");
+        return u"internal-server-error"_s;
     case QXmppStanza::Error::ItemNotFound:
-        return QStringLiteral("item-not-found");
+        return u"item-not-found"_s;
     case QXmppStanza::Error::JidMalformed:
-        return QStringLiteral("jid-malformed");
+        return u"jid-malformed"_s;
     case QXmppStanza::Error::NotAcceptable:
-        return QStringLiteral("not-acceptable");
+        return u"not-acceptable"_s;
     case QXmppStanza::Error::NotAllowed:
-        return QStringLiteral("not-allowed");
+        return u"not-allowed"_s;
     case QXmppStanza::Error::NotAuthorized:
-        return QStringLiteral("not-authorized");
+        return u"not-authorized"_s;
         QT_WARNING_PUSH
         QT_WARNING_DISABLE_DEPRECATED
     case QXmppStanza::Error::PaymentRequired:
         QT_WARNING_POP
-        return QStringLiteral("payment-required");
+        return u"payment-required"_s;
     case QXmppStanza::Error::PolicyViolation:
-        return QStringLiteral("policy-violation");
+        return u"policy-violation"_s;
     case QXmppStanza::Error::RecipientUnavailable:
-        return QStringLiteral("recipient-unavailable");
+        return u"recipient-unavailable"_s;
     case QXmppStanza::Error::Redirect:
-        return QStringLiteral("redirect");
+        return u"redirect"_s;
     case QXmppStanza::Error::RegistrationRequired:
-        return QStringLiteral("registration-required");
+        return u"registration-required"_s;
     case QXmppStanza::Error::RemoteServerNotFound:
-        return QStringLiteral("remote-server-not-found");
+        return u"remote-server-not-found"_s;
     case QXmppStanza::Error::RemoteServerTimeout:
-        return QStringLiteral("remote-server-timeout");
+        return u"remote-server-timeout"_s;
     case QXmppStanza::Error::ResourceConstraint:
-        return QStringLiteral("resource-constraint");
+        return u"resource-constraint"_s;
     case QXmppStanza::Error::ServiceUnavailable:
-        return QStringLiteral("service-unavailable");
+        return u"service-unavailable"_s;
     case QXmppStanza::Error::SubscriptionRequired:
-        return QStringLiteral("subscription-required");
+        return u"subscription-required"_s;
     case QXmppStanza::Error::UndefinedCondition:
-        return QStringLiteral("undefined-condition");
+        return u"undefined-condition"_s;
     case QXmppStanza::Error::UnexpectedRequest:
-        return QStringLiteral("unexpected-request");
+        return u"unexpected-request"_s;
     }
     return {};
 }
@@ -143,15 +145,15 @@ QString typeToString(QXmppStanza::Error::Type type)
     case QXmppStanza::Error::NoType:
         return {};
     case QXmppStanza::Error::Cancel:
-        return QStringLiteral("cancel");
+        return u"cancel"_s;
     case QXmppStanza::Error::Continue:
-        return QStringLiteral("continue");
+        return u"continue"_s;
     case QXmppStanza::Error::Modify:
-        return QStringLiteral("modify");
+        return u"modify"_s;
     case QXmppStanza::Error::Auth:
-        return QStringLiteral("auth");
+        return u"auth"_s;
     case QXmppStanza::Error::Wait:
-        return QStringLiteral("wait");
+        return u"wait"_s;
     }
     return {};
 }
@@ -278,17 +280,17 @@ bool QXmppExtendedAddress::isValid() const
 /// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
-    d->delivered = element.attribute(QStringLiteral("delivered")) == u"true";
-    d->description = element.attribute(QStringLiteral("desc"));
-    d->jid = element.attribute(QStringLiteral("jid"));
-    d->type = element.attribute(QStringLiteral("type"));
+    d->delivered = element.attribute(u"delivered"_s) == u"true";
+    d->description = element.attribute(u"desc"_s);
+    d->jid = element.attribute(u"jid"_s);
+    d->type = element.attribute(u"type"_s);
 }
 
 void QXmppExtendedAddress::toXml(QXmlStreamWriter *xmlWriter) const
 {
     xmlWriter->writeStartElement(QSL65("address"));
     if (d->delivered) {
-        xmlWriter->writeAttribute(QSL65("delivered"), QStringLiteral("true"));
+        xmlWriter->writeAttribute(QSL65("delivered"), u"true"_s);
     }
     if (!d->description.isEmpty()) {
         xmlWriter->writeAttribute(QSL65("desc"), d->description);
@@ -554,9 +556,9 @@ void QXmppStanza::Error::setRetryDate(const QDateTime &retryDate)
 /// \cond
 void QXmppStanza::Error::parse(const QDomElement &errorElement)
 {
-    d->code = errorElement.attribute(QStringLiteral("code")).toInt();
-    d->type = typeFromString(errorElement.attribute(QStringLiteral("type"))).value_or(NoType);
-    d->by = errorElement.attribute(QStringLiteral("by"));
+    d->code = errorElement.attribute(u"code"_s).toInt();
+    d->type = typeFromString(errorElement.attribute(u"type"_s)).value_or(NoType);
+    d->by = errorElement.attribute(u"by"_s);
 
     for (const auto &element : iterChildElements(errorElement)) {
         if (element.namespaceURI() == ns_stanza) {
@@ -580,13 +582,13 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
             // file is too large
             if (element.tagName() == u"file-too-large") {
                 d->fileTooLarge = true;
-                d->maxFileSize = element.firstChildElement(QStringLiteral("max-file-size"))
+                d->maxFileSize = element.firstChildElement(u"max-file-size"_s)
                                      .text()
                                      .toLongLong();
                 // retry later
             } else if (element.tagName() == u"retry") {
                 d->retryDate = QXmppUtils::datetimeFromString(
-                    element.attribute(QStringLiteral("stamp")));
+                    element.attribute(u"stamp"_s));
             }
         }
     }
@@ -621,7 +623,7 @@ void QXmppStanza::Error::toXml(QXmlStreamWriter *writer) const
     }
     if (!d->text.isEmpty()) {
         writer->writeStartElement(QSL65("text"));
-        writer->writeAttribute(QSL65("xml:lang"), QStringLiteral("en"));
+        writer->writeAttribute(QSL65("xml:lang"), u"en"_s);
         writer->writeDefaultNamespace(toString65(ns_stanza));
         writer->writeCharacters(d->text);
         writer->writeEndElement();
@@ -1019,10 +1021,10 @@ void QXmppStanza::generateAndSetNextId()
 
 void QXmppStanza::parse(const QDomElement &element)
 {
-    d->from = element.attribute(QStringLiteral("from"));
-    d->to = element.attribute(QStringLiteral("to"));
-    d->id = element.attribute(QStringLiteral("id"));
-    d->lang = element.attribute(QStringLiteral("lang"));
+    d->from = element.attribute(u"from"_s);
+    d->to = element.attribute(u"to"_s);
+    d->id = element.attribute(u"id"_s);
+    d->lang = element.attribute(u"lang"_s);
 
     QDomElement errorElement = firstChildElement(element, u"error");
     if (!errorElement.isNull()) {

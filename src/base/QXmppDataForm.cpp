@@ -9,6 +9,8 @@
 #include "QXmppDataFormBase.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <optional>
 
 #include <QDebug>
@@ -84,13 +86,13 @@ QString formTypeToString(QXmppDataForm::Type type)
 {
     switch (type) {
     case QXmppDataForm::Form:
-        return QStringLiteral("form");
+        return u"form"_s;
     case QXmppDataForm::Submit:
-        return QStringLiteral("submit");
+        return u"submit"_s;
     case QXmppDataForm::Cancel:
-        return QStringLiteral("cancel");
+        return u"cancel"_s;
     case QXmppDataForm::Result:
-        return QStringLiteral("result");
+        return u"result"_s;
     default:
         return {};
     }
@@ -797,7 +799,7 @@ void QXmppDataForm::parse(const QDomElement &element)
     }
 
     /* form type */
-    const auto typeStr = element.attribute(QStringLiteral("type"));
+    const auto typeStr = element.attribute(u"type"_s);
     if (const auto type = formTypeFromString(typeStr)) {
         d->type = *type;
     } else {
@@ -813,16 +815,16 @@ void QXmppDataForm::parse(const QDomElement &element)
         QXmppDataForm::Field field;
 
         /* field type */
-        field.setType(fieldTypeFromString(fieldElement.attribute(QStringLiteral("type"))).value_or(Field::TextSingleField));
+        field.setType(fieldTypeFromString(fieldElement.attribute(u"type"_s)).value_or(Field::TextSingleField));
 
         /* field attributes */
-        field.setLabel(fieldElement.attribute(QStringLiteral("label")));
-        field.setKey(fieldElement.attribute(QStringLiteral("var")));
+        field.setLabel(fieldElement.attribute(u"label"_s));
+        field.setKey(fieldElement.attribute(u"var"_s));
 
         /* field value(s) */
         switch (field.type()) {
         case Field::BooleanField: {
-            const auto valueStr = fieldElement.firstChildElement(QStringLiteral("value")).text();
+            const auto valueStr = fieldElement.firstChildElement(u"value"_s).text();
             field.setValue(valueStr == u"1" || valueStr == u"true");
             break;
         }
@@ -837,21 +839,21 @@ void QXmppDataForm::parse(const QDomElement &element)
             break;
         }
         default:
-            field.setValue(fieldElement.firstChildElement(QStringLiteral("value")).text());
+            field.setValue(fieldElement.firstChildElement(u"value"_s).text());
         }
 
         /* field media */
         if (const auto mediaElement = firstChildElement(fieldElement, u"media", ns_media_element);
             !mediaElement.isNull()) {
-            field.mediaSize().setHeight(mediaElement.attribute(QStringLiteral("height"), QStringLiteral("-1")).toInt());
-            field.mediaSize().setWidth(mediaElement.attribute(QStringLiteral("width"), QStringLiteral("-1")).toInt());
+            field.mediaSize().setHeight(mediaElement.attribute(u"height"_s, u"-1"_s).toInt());
+            field.mediaSize().setWidth(mediaElement.attribute(u"width"_s, u"-1"_s).toInt());
 
             QMimeDatabase database;
 
             for (const auto &element : iterChildElements(mediaElement, u"uri")) {
                 field.mediaSources() << MediaSource(
                     QUrl(element.text()),
-                    database.mimeTypeForName(element.attribute(QStringLiteral("type"))));
+                    database.mimeTypeForName(element.attribute(u"type"_s)));
             }
         }
 
@@ -861,7 +863,7 @@ void QXmppDataForm::parse(const QDomElement &element)
         case Field::ListSingleField: {
             QList<QPair<QString, QString>> options;
             for (const auto &element : iterChildElements(fieldElement, u"option")) {
-                options << qMakePair(element.attribute(QStringLiteral("label")),
+                options << qMakePair(element.attribute(u"label"_s),
                                      firstChildElement(element, u"value").text());
             }
             field.setOptions(options);
@@ -938,13 +940,13 @@ void QXmppDataForm::toXml(QXmlStreamWriter *writer) const
             if (field.mediaSize().width() > 0) {
                 writeOptionalXmlAttribute(
                     writer,
-                    QStringLiteral("width"),
+                    u"width"_s,
                     QString::number(field.mediaSize().width()));
             }
             if (field.mediaSize().height() > 0) {
                 writeOptionalXmlAttribute(
                     writer,
-                    QStringLiteral("height"),
+                    u"height"_s,
                     QString::number(field.mediaSize().height()));
             }
 

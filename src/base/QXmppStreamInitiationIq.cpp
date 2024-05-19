@@ -6,6 +6,8 @@
 #include "QXmppStreamInitiationIq_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -63,16 +65,16 @@ void QXmppStreamInitiationIq::setSiId(const QString &id)
 
 bool QXmppStreamInitiationIq::isStreamInitiationIq(const QDomElement &element)
 {
-    QDomElement siElement = element.firstChildElement(QStringLiteral("si"));
+    QDomElement siElement = element.firstChildElement(u"si"_s);
     return (siElement.namespaceURI() == ns_stream_initiation);
 }
 
 void QXmppStreamInitiationIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement siElement = element.firstChildElement(QStringLiteral("si"));
-    m_siId = siElement.attribute(QStringLiteral("id"));
-    m_mimeType = siElement.attribute(QStringLiteral("mime-type"));
-    if (siElement.attribute(QStringLiteral("profile")) == ns_stream_initiation_file_transfer) {
+    QDomElement siElement = element.firstChildElement(u"si"_s);
+    m_siId = siElement.attribute(u"id"_s);
+    m_mimeType = siElement.attribute(u"mime-type"_s);
+    if (siElement.attribute(u"profile"_s) == ns_stream_initiation_file_transfer) {
         m_profile = FileTransfer;
     } else {
         m_profile = None;

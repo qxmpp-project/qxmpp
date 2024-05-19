@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -69,8 +71,8 @@ void QXmppOutOfBandUrl::setDescription(const std::optional<QString> &description
 /// \cond
 bool QXmppOutOfBandUrl::parse(const QDomElement &el)
 {
-    d->url = el.firstChildElement(QStringLiteral("url")).text();
-    auto childEl = el.firstChildElement(QStringLiteral("desc"));
+    d->url = el.firstChildElement(u"url"_s).text();
+    auto childEl = el.firstChildElement(u"desc"_s);
     if (!childEl.isNull()) {
         d->description = childEl.text();
     }

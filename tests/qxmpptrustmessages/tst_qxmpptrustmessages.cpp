@@ -60,7 +60,7 @@ void tst_QXmppTrustMessages::testTrustMessageKeyOwner_data()
                "<trust>aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=</trust>"
                "<trust>IhpPjiKLchgrAG5cpSfTvdzPjZ5v6vTOluHEUehkgCA=</trust>"
                "</key-owner>")
-        << QStringLiteral("alice@example.org")
+        << u"alice@example.org"_s
         << QList<QByteArray>({ QByteArray::fromBase64(QByteArrayLiteral("aFABnX7Q/rbTgjBySYzrT2FsYCVYb49mbca5yB734KQ=")),
                                QByteArray::fromBase64(QByteArrayLiteral("IhpPjiKLchgrAG5cpSfTvdzPjZ5v6vTOluHEUehkgCA=")) })
         << QList<QByteArray>();
@@ -70,7 +70,7 @@ void tst_QXmppTrustMessages::testTrustMessageKeyOwner_data()
                "<distrust>tCP1CI3pqSTVGzFYFyPYUMfMZ9Ck/msmfD0wH/VtJBM=</distrust>"
                "<distrust>2fhJtrgoMJxfLI3084/YkYh9paqiSiLFDVL2m0qAgX4=</distrust>"
                "</key-owner>")
-        << QStringLiteral("bob@example.com")
+        << u"bob@example.com"_s
         << QList<QByteArray>()
         << QList<QByteArray>({ QByteArray::fromBase64(QByteArrayLiteral("tCP1CI3pqSTVGzFYFyPYUMfMZ9Ck/msmfD0wH/VtJBM=")),
                                QByteArray::fromBase64(QByteArrayLiteral("2fhJtrgoMJxfLI3084/YkYh9paqiSiLFDVL2m0qAgX4=")) });
@@ -81,7 +81,7 @@ void tst_QXmppTrustMessages::testTrustMessageKeyOwner_data()
                "<distrust>tCP1CI3pqSTVGzFYFyPYUMfMZ9Ck/msmfD0wH/VtJBM=</distrust>"
                "<distrust>2fhJtrgoMJxfLI3084/YkYh9paqiSiLFDVL2m0qAgX4=</distrust>"
                "</key-owner>")
-        << QStringLiteral("bob@example.com")
+        << u"bob@example.com"_s
         << QList<QByteArray>({ QByteArray::fromBase64(QByteArrayLiteral("YjVI04NcbTPvXLaA95RO84HPcSvyOgEZ2r5cTyUs0C8=")) })
         << QList<QByteArray>({ QByteArray::fromBase64(QByteArrayLiteral("tCP1CI3pqSTVGzFYFyPYUMfMZ9Ck/msmfD0wH/VtJBM=")),
                                QByteArray::fromBase64(QByteArrayLiteral("2fhJtrgoMJxfLI3084/YkYh9paqiSiLFDVL2m0qAgX4=")) });
@@ -145,36 +145,36 @@ void tst_QXmppTrustMessages::testTrustMessageElement()
 
     QXmppTrustMessageElement trustMessageElement1;
     parsePacket(trustMessageElement1, xml);
-    QCOMPARE(trustMessageElement1.usage(), QStringLiteral("urn:xmpp:atm:1"));
-    QCOMPARE(trustMessageElement1.encryption(), QStringLiteral("urn:xmpp:omemo:2"));
-    QCOMPARE(trustMessageElement1.keyOwners().at(0).jid(), QStringLiteral("alice@example.org"));
-    QCOMPARE(trustMessageElement1.keyOwners().at(1).jid(), QStringLiteral("bob@example.com"));
+    QCOMPARE(trustMessageElement1.usage(), u"urn:xmpp:atm:1"_s);
+    QCOMPARE(trustMessageElement1.encryption(), u"urn:xmpp:omemo:2"_s);
+    QCOMPARE(trustMessageElement1.keyOwners().at(0).jid(), u"alice@example.org"_s);
+    QCOMPARE(trustMessageElement1.keyOwners().at(1).jid(), u"bob@example.com"_s);
     serializePacket(trustMessageElement1, xml);
 
     QXmppTrustMessageKeyOwner keyOwner1;
-    keyOwner1.setJid(QStringLiteral("alice@example.org"));
+    keyOwner1.setJid(u"alice@example.org"_s);
     QXmppTrustMessageKeyOwner keyOwner2;
-    keyOwner2.setJid(QStringLiteral("bob@example.com"));
+    keyOwner2.setJid(u"bob@example.com"_s);
 
     QXmppTrustMessageElement trustMessageElement2;
-    trustMessageElement2.setUsage(QStringLiteral("urn:xmpp:atm:1"));
-    trustMessageElement2.setEncryption(QStringLiteral("urn:xmpp:omemo:2"));
+    trustMessageElement2.setUsage(u"urn:xmpp:atm:1"_s);
+    trustMessageElement2.setEncryption(u"urn:xmpp:omemo:2"_s);
     trustMessageElement2.setKeyOwners({ keyOwner1, keyOwner2 });
-    QCOMPARE(trustMessageElement2.usage(), QStringLiteral("urn:xmpp:atm:1"));
-    QCOMPARE(trustMessageElement2.encryption(), QStringLiteral("urn:xmpp:omemo:2"));
-    QCOMPARE(trustMessageElement2.keyOwners().at(0).jid(), QStringLiteral("alice@example.org"));
-    QCOMPARE(trustMessageElement2.keyOwners().at(1).jid(), QStringLiteral("bob@example.com"));
+    QCOMPARE(trustMessageElement2.usage(), u"urn:xmpp:atm:1"_s);
+    QCOMPARE(trustMessageElement2.encryption(), u"urn:xmpp:omemo:2"_s);
+    QCOMPARE(trustMessageElement2.keyOwners().at(0).jid(), u"alice@example.org"_s);
+    QCOMPARE(trustMessageElement2.keyOwners().at(1).jid(), u"bob@example.com"_s);
     serializePacket(trustMessageElement2, xml);
 
     QXmppTrustMessageElement trustMessageElement3;
-    trustMessageElement3.setUsage(QStringLiteral("urn:xmpp:atm:1"));
-    trustMessageElement3.setEncryption(QStringLiteral("urn:xmpp:omemo:2"));
+    trustMessageElement3.setUsage(u"urn:xmpp:atm:1"_s);
+    trustMessageElement3.setEncryption(u"urn:xmpp:omemo:2"_s);
     trustMessageElement3.addKeyOwner(keyOwner1);
     trustMessageElement3.addKeyOwner(keyOwner2);
-    QCOMPARE(trustMessageElement3.usage(), QStringLiteral("urn:xmpp:atm:1"));
-    QCOMPARE(trustMessageElement3.encryption(), QStringLiteral("urn:xmpp:omemo:2"));
-    QCOMPARE(trustMessageElement3.keyOwners().at(0).jid(), QStringLiteral("alice@example.org"));
-    QCOMPARE(trustMessageElement3.keyOwners().at(1).jid(), QStringLiteral("bob@example.com"));
+    QCOMPARE(trustMessageElement3.usage(), u"urn:xmpp:atm:1"_s);
+    QCOMPARE(trustMessageElement3.encryption(), u"urn:xmpp:omemo:2"_s);
+    QCOMPARE(trustMessageElement3.keyOwners().at(0).jid(), u"alice@example.org"_s);
+    QCOMPARE(trustMessageElement3.keyOwners().at(1).jid(), u"bob@example.com"_s);
     serializePacket(trustMessageElement3, xml);
 }
 

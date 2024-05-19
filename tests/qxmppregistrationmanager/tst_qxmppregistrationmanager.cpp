@@ -38,7 +38,7 @@ private:
     Q_SLOT void testRegistrationFormReceived();
 
     Q_SLOT void sendStreamFeaturesToManager(bool registrationEnabled = true);
-    Q_SLOT void setManagerConfig(const QString &username, const QString &server = QStringLiteral("example.org"), const QString &password = {});
+    Q_SLOT void setManagerConfig(const QString &username, const QString &server = u"example.org"_s, const QString &password = {});
 
     QXmppClient client;
     QXmppLogger logger;
@@ -79,7 +79,7 @@ void tst_QXmppRegistrationManager::testChangePassword()
     QFETCH(QString, username);
     QFETCH(QString, password);
 
-    setManagerConfig(username, QStringLiteral("example.org"), password);
+    setManagerConfig(username, u"example.org"_s, password);
 
     QObject *context = new QObject(this);
     connect(&logger, &QXmppLogger::message, context, [=](QXmppLogger::MessageType type, const QString &text) {
@@ -101,7 +101,7 @@ void tst_QXmppRegistrationManager::testChangePassword()
 
 void tst_QXmppRegistrationManager::testDeleteAccount()
 {
-    setManagerConfig(QStringLiteral("bob"));
+    setManagerConfig(u"bob"_s);
 
     QObject *context = new QObject(this);
     connect(&logger, &QXmppLogger::message, context, [=](QXmppLogger::MessageType type, const QString &text) {
@@ -139,7 +139,7 @@ void tst_QXmppRegistrationManager::testRequestRegistrationForm()
 {
     QFETCH(bool, triggerManually);
 
-    setManagerConfig(QStringLiteral("bob"));
+    setManagerConfig(u"bob"_s);
 
     manager->setRegistrationFormToSend(QXmppRegisterIq());
     manager->setRegisterOnConnectEnabled(true);
@@ -150,7 +150,7 @@ void tst_QXmppRegistrationManager::testRequestRegistrationForm()
         if (type == QXmppLogger::SentMessage) {
             signalCalled = true;
 
-            QVERIFY(text.contains(QStringLiteral("<query xmlns=\"jabber:iq:register\"/>")));
+            QVERIFY(text.contains(u"<query xmlns=\"jabber:iq:register\"/>"_s));
 
             QXmppRegisterIq iq;
             parsePacket(iq, text.toUtf8());
@@ -182,7 +182,7 @@ void tst_QXmppRegistrationManager::testRegisterOnConnectGetSet()
 
 void tst_QXmppRegistrationManager::testServiceDiscovery()
 {
-    setManagerConfig(QStringLiteral("bob"));
+    setManagerConfig(u"bob"_s);
 
     bool signalEmitted = false;
     QObject *context = new QObject(this);
@@ -193,10 +193,10 @@ void tst_QXmppRegistrationManager::testServiceDiscovery()
 
     QXmppDiscoveryIq iq;
     iq.setType(QXmppIq::Result);
-    iq.setFrom(QStringLiteral("example.org"));
-    iq.setTo(QStringLiteral("bob@example.org"));
+    iq.setFrom(u"example.org"_s);
+    iq.setTo(u"bob@example.org"_s);
     iq.setQueryType(QXmppDiscoveryIq::InfoQuery);
-    iq.setFeatures(QStringList() << QStringLiteral("jabber:iq:register"));
+    iq.setFeatures(QStringList() << u"jabber:iq:register"_s);
 
     client.findExtension<QXmppDiscoveryManager>()->handleStanza(writePacketToDom(iq));
 
@@ -226,12 +226,12 @@ void tst_QXmppRegistrationManager::testSendCachedRegistrationForm()
 {
     QFETCH(bool, triggerSendingManually);
 
-    setManagerConfig(QStringLiteral("bob"));
+    setManagerConfig(u"bob"_s);
 
     QXmppRegisterIq iq;
-    iq.setUsername(QStringLiteral("someone"));
-    iq.setPassword(QStringLiteral("s3cr3t"));
-    iq.setEmail(QStringLiteral("1234@example.org"));
+    iq.setUsername(u"someone"_s);
+    iq.setPassword(u"s3cr3t"_s);
+    iq.setEmail(u"1234@example.org"_s);
 
     bool signalCalled = false;
     QObject *context = new QObject(this);
@@ -244,9 +244,9 @@ void tst_QXmppRegistrationManager::testSendCachedRegistrationForm()
 
             QCOMPARE(parsedIq.id(), iq.id());
             QCOMPARE(parsedIq.type(), QXmppIq::Set);
-            QCOMPARE(parsedIq.username(), QStringLiteral("someone"));
-            QCOMPARE(parsedIq.password(), QStringLiteral("s3cr3t"));
-            QCOMPARE(parsedIq.email(), QStringLiteral("1234@example.org"));
+            QCOMPARE(parsedIq.username(), u"someone"_s);
+            QCOMPARE(parsedIq.password(), u"s3cr3t"_s);
+            QCOMPARE(parsedIq.email(), u"1234@example.org"_s);
         }
     });
 
@@ -312,10 +312,10 @@ void tst_QXmppRegistrationManager::testRegistrationResult()
     QFETCH(bool, isSuccess);
 
     QXmppRegisterIq registrationRequestForm;
-    registrationRequestForm.setUsername(QStringLiteral("someone"));
-    registrationRequestForm.setPassword(QStringLiteral("s3cr3t"));
-    registrationRequestForm.setEmail(QStringLiteral("1234@example.org"));
-    registrationRequestForm.setId(QStringLiteral("register1"));
+    registrationRequestForm.setUsername(u"someone"_s);
+    registrationRequestForm.setPassword(u"s3cr3t"_s);
+    registrationRequestForm.setEmail(u"1234@example.org"_s);
+    registrationRequestForm.setId(u"register1"_s);
 
     bool succeededSignalCalled = false;
     bool failedSignalCalled = false;
@@ -467,8 +467,8 @@ void tst_QXmppRegistrationManager::testRegistrationFormReceived()
     QObject *context = new QObject(this);
     connect(manager, &QXmppRegistrationManager::registrationFormReceived, context, [&](const QXmppRegisterIq &) {
         signalCalled = true;
-        QCOMPARE(iq.username(), QStringLiteral(""));
-        QCOMPARE(iq.password(), QStringLiteral(""));
+        QCOMPARE(iq.username(), u""_s);
+        QCOMPARE(iq.password(), u""_s);
     });
 
     manager->handleStanza(writePacketToDom(iq));

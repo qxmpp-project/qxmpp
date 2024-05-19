@@ -115,20 +115,20 @@ void tst_QXmppOmemoManager::testSecurityPolicies()
 
 void tst_QXmppOmemoManager::testTrustLevels()
 {
-    auto futureTrustLevel = m_alice1.manager->trustLevel(QStringLiteral("alice@example.org"),
+    auto futureTrustLevel = m_alice1.manager->trustLevel(u"alice@example.org"_s,
                                                          QByteArray::fromBase64(QByteArrayLiteral("AZ/cF4OrUOILKO1gQBf62pQevOhBJ2NyHnXLwM4FDZU=")));
     QVERIFY(futureTrustLevel.isFinished());
     auto resultTrustLevel = futureTrustLevel.result();
     QCOMPARE(resultTrustLevel, TrustLevel::Undecided);
 
     m_alice1.manager->setTrustLevel(
-        { { QStringLiteral("alice@example.org"),
+        { { u"alice@example.org"_s,
             QByteArray::fromBase64(QByteArrayLiteral("AZ/cF4OrUOILKO1gQBf62pQevOhBJ2NyHnXLwM4FDZU=")) },
-          { QStringLiteral("bob@example.com"),
+          { u"bob@example.com"_s,
             QByteArray::fromBase64(QByteArrayLiteral("9E51lG3vVmUn8CM7/AIcmIlLP2HPl6Ao0/VSf4VT/oA=")) } },
         TrustLevel::Authenticated);
 
-    futureTrustLevel = m_alice1.manager->trustLevel(QStringLiteral("alice@example.org"),
+    futureTrustLevel = m_alice1.manager->trustLevel(u"alice@example.org"_s,
                                                     QByteArray::fromBase64(QByteArrayLiteral("AZ/cF4OrUOILKO1gQBf62pQevOhBJ2NyHnXLwM4FDZU=")));
     QVERIFY(futureTrustLevel.isFinished());
     resultTrustLevel = futureTrustLevel.result();
@@ -211,7 +211,7 @@ void tst_QXmppOmemoManager::testLoad()
     QVERIFY(!result);
 
     const QXmppOmemoStorage::OwnDevice ownDevice = { 1,
-                                                     QStringLiteral("notebook"),
+                                                     u"notebook"_s,
                                                      QByteArray::fromBase64(QByteArrayLiteral("OU5HM3loYnFjZVVaYmpSbHdab0FPTDhJVHRzUFVUcFMK")),
                                                      QByteArray::fromBase64(QByteArrayLiteral("TkhodEZ6cnFDeGtENWRuT1ZZdUsyaGIwQkRPdHFRSE8K")),
                                                      2,
@@ -251,7 +251,7 @@ void tst_QXmppOmemoManager::testSendMessage()
 
     const auto config1 = IntegrationTests::clientConfiguration();
     auto config2 = config1;
-    config2.setResource(config2.resource() + QStringLiteral("2"));
+    config2.setResource(config2.resource() + u"2"_s);
 
     const QObject context;
     QString recipient = "bob@" + config1.domain();
@@ -373,13 +373,13 @@ void tst_QXmppOmemoManager::testSendIq()
 
     const auto config1 = IntegrationTests::clientConfiguration();
     auto config2 = config1;
-    config2.setResource(config2.resource() + QStringLiteral("2"));
+    config2.setResource(config2.resource() + u"2"_s);
 
     const QObject context;
 
     QXmppBitsOfBinaryIq requestIq;
     requestIq.setTo(config2.jid());
-    requestIq.setCid(QXmppBitsOfBinaryContentId::fromContentId(QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org")));
+    requestIq.setCid(QXmppBitsOfBinaryContentId::fromContentId(u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s));
 
     QXmppBitsOfBinaryIq responseIq;
     responseIq.setType(QXmppIq::Result);

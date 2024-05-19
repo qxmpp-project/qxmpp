@@ -14,6 +14,8 @@
 #include "QXmppUtils_p.h"
 #include "QXmppVCardIq.h"
 
+#include "StringLiterals.h"
+
 using namespace QXmpp::Private;
 
 namespace QXmpp::Private {
@@ -28,7 +30,7 @@ struct VCardData {
 
         auto vCardEl = firstChildElement(el, u"vCard", ns_vcard);
         if (vCardEl.isNull()) {
-            return QXmppError { QStringLiteral("Missing required <vCard/> element."), {} };
+            return QXmppError { u"Missing required <vCard/> element."_s, {} };
         }
 
         VCardData d;

@@ -8,6 +8,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -71,8 +73,8 @@ bool QXmppIbbOpenIq::isIbbOpenIq(const QDomElement &element)
 void QXmppIbbOpenIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement openElement = firstChildElement(element, u"open");
-    m_sid = openElement.attribute(QStringLiteral("sid"));
-    m_block_size = openElement.attribute(QStringLiteral("block-size")).toLong();
+    m_sid = openElement.attribute(u"sid"_s);
+    m_block_size = openElement.attribute(u"block-size"_s).toLong();
 }
 
 void QXmppIbbOpenIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -125,7 +127,7 @@ bool QXmppIbbCloseIq::isIbbCloseIq(const QDomElement &element)
 void QXmppIbbCloseIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement openElement = firstChildElement(element, u"close");
-    m_sid = openElement.attribute(QStringLiteral("sid"));
+    m_sid = openElement.attribute(u"sid"_s);
 }
 
 void QXmppIbbCloseIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -217,8 +219,8 @@ bool QXmppIbbDataIq::isIbbDataIq(const QDomElement &element)
 void QXmppIbbDataIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement dataElement = firstChildElement(element, u"data");
-    m_sid = dataElement.attribute(QStringLiteral("sid"));
-    m_seq = parseInt<uint16_t>(dataElement.attribute(QStringLiteral("seq"))).value_or(0);
+    m_sid = dataElement.attribute(u"sid"_s);
+    m_seq = parseInt<uint16_t>(dataElement.attribute(u"seq"_s)).value_or(0);
     m_payload = QByteArray::fromBase64(dataElement.text().toLatin1());
 }
 

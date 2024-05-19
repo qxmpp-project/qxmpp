@@ -9,6 +9,8 @@
 #include "QXmppIqHandling.h"
 #include "QXmppVersionIq.h"
 
+#include "StringLiterals.h"
+
 #include <QCoreApplication>
 #include <QDomElement>
 #include <QSysInfo>
@@ -28,7 +30,7 @@ QXmppVersionManager::QXmppVersionManager()
 {
     d->clientName = qApp->applicationName();
     if (d->clientName.isEmpty()) {
-        d->clientName = QStringLiteral("Based on QXmpp");
+        d->clientName = u"Based on QXmpp"_s;
     }
 
     d->clientOs = QSysInfo::prettyProductName();

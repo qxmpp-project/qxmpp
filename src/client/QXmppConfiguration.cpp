@@ -8,6 +8,8 @@
 #include "QXmppSasl2UserAgent.h"
 #include "QXmppUtils.h"
 
+#include "StringLiterals.h"
+
 #include <QCoreApplication>
 #include <QNetworkProxy>
 #include <QSslSocket>
@@ -22,7 +24,7 @@ public:
     QString user;
     QString password;
     QString domain;
-    QString resource = QStringLiteral("QXmpp");
+    QString resource = u"QXmpp"_s;
     QString resourcePrefix;
 
     // Facebook
@@ -53,7 +55,7 @@ public:
     QXmppConfiguration::StreamSecurityMode streamSecurityMode = QXmppConfiguration::TLSEnabled;
     QXmppConfiguration::NonSASLAuthMechanism nonSASLAuthMechanism = QXmppConfiguration::NonSASLDigest;
     QString saslAuthMechanism;
-    QList<QString> disabledSaslMechanisms = { QStringLiteral("PLAIN") };
+    QList<QString> disabledSaslMechanisms = { u"PLAIN"_s };
     std::optional<QXmppSasl2UserAgent> sasl2UserAgent;
 
     QNetworkProxy networkProxy;

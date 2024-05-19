@@ -42,8 +42,8 @@ void tst_QXmppBitsOfBinaryContentId::testBasic()
 
     QCOMPARE(cid.algorithm(), QCryptographicHash::Sha1);
     QCOMPARE(cid.hash().toHex(), QByteArrayLiteral("8f35fef110ffc5df08d579a50083ff9308fb6242"));
-    QCOMPARE(cid.toCidUrl(), QStringLiteral("cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
-    QCOMPARE(cid.toContentId(), QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
+    QCOMPARE(cid.toCidUrl(), u"cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
+    QCOMPARE(cid.toContentId(), u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
 
     // test fromContentId()
     cid = QXmppBitsOfBinaryContentId::fromContentId(QStringLiteral(
@@ -51,8 +51,8 @@ void tst_QXmppBitsOfBinaryContentId::testBasic()
 
     QCOMPARE(cid.algorithm(), QCryptographicHash::Sha1);
     QCOMPARE(cid.hash().toHex(), QByteArrayLiteral("8f35fef110ffc5df08d579a50083ff9308fb6242"));
-    QCOMPARE(cid.toCidUrl(), QStringLiteral("cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
-    QCOMPARE(cid.toContentId(), QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
+    QCOMPARE(cid.toCidUrl(), u"cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
+    QCOMPARE(cid.toContentId(), u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
 
     // test setters
     cid = QXmppBitsOfBinaryContentId();
@@ -61,8 +61,8 @@ void tst_QXmppBitsOfBinaryContentId::testBasic()
 
     QCOMPARE(cid.algorithm(), QCryptographicHash::Sha1);
     QCOMPARE(cid.hash().toHex(), QByteArrayLiteral("8f35fef110ffc5df08d579a50083ff9308fb6242"));
-    QCOMPARE(cid.toCidUrl(), QStringLiteral("cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
-    QCOMPARE(cid.toContentId(), QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
+    QCOMPARE(cid.toCidUrl(), u"cid:sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
+    QCOMPARE(cid.toContentId(), u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
 }
 
 void tst_QXmppBitsOfBinaryContentId::testFromContentId_data()
@@ -191,7 +191,7 @@ void tst_QXmppBitsOfBinaryContentId::testUnsupportedAlgorithm()
 {
     QCOMPARE(
         QXmppBitsOfBinaryContentId::fromContentId(
-            QStringLiteral("blake2s160+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org")),
+            u"blake2s160+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s),
         QXmppBitsOfBinaryContentId());
 }
 

@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QSharedData>
 
@@ -134,10 +136,10 @@ void QXmppMixInvitation::setToken(const QString &token)
 /// \cond
 void QXmppMixInvitation::parse(const QDomElement &element)
 {
-    d->inviterJid = element.firstChildElement(QStringLiteral("inviter")).text();
-    d->inviteeJid = element.firstChildElement(QStringLiteral("invitee")).text();
-    d->channelJid = element.firstChildElement(QStringLiteral("channel")).text();
-    d->token = element.firstChildElement(QStringLiteral("token")).text();
+    d->inviterJid = element.firstChildElement(u"inviter"_s).text();
+    d->inviteeJid = element.firstChildElement(u"invitee"_s).text();
+    d->channelJid = element.firstChildElement(u"channel"_s).text();
+    d->token = element.firstChildElement(u"token"_s).text();
 }
 
 void QXmppMixInvitation::toXml(QXmlStreamWriter *writer) const

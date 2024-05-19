@@ -10,6 +10,8 @@
 #include "QXmppUploadRequestManager.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QFile>
 #include <QFileInfo>
 #include <QMimeDatabase>
@@ -274,13 +276,13 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_
 
     auto *uploadRequestManager = client()->findExtension<QXmppUploadRequestManager>();
     if (!uploadRequestManager) {
-        upload->d->reportError({ QStringLiteral("QXmppUploadRequestManager has not been added to the client."), std::any() });
+        upload->d->reportError({ u"QXmppUploadRequestManager has not been added to the client."_s, std::any() });
         upload->d->reportFinished();
         return upload;
     }
 
     if (!data->isOpen()) {
-        upload->d->reportError({ QStringLiteral("Input data device MUST be open."), std::any() });
+        upload->d->reportError({ u"Input data device MUST be open."_s, std::any() });
         upload->d->reportFinished();
         return upload;
     }
@@ -289,8 +291,8 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_
         if (!data->isSequential()) {
             fileSize = data->size();
         } else {
-            warning(QStringLiteral("No fileSize set and cannot determine size from IO device."));
-            upload->d->reportError({ QStringLiteral("File size MUST be set for sequential devices."), std::any() });
+            warning(u"No fileSize set and cannot determine size from IO device."_s);
+            upload->d->reportError({ u"File size MUST be set for sequential devices."_s, std::any() });
             upload->d->reportFinished();
             return upload;
         }
@@ -312,7 +314,7 @@ std::shared_ptr<QXmppHttpUpload> QXmppHttpUploadManager::uploadFile(std::unique_
             auto slot = std::get<QXmppHttpUploadSlotIq>(std::move(result));
 
             if (slot.getUrl().scheme() != u"https" || slot.putUrl().scheme() != u"https") {
-                auto message = QStringLiteral("The server replied with an insecure non-https url. This is forbidden by XEP-0363.");
+                auto message = u"The server replied with an insecure non-https url. This is forbidden by XEP-0363."_s;
                 upload->d->reportError(QXmppError { std::move(message), {} });
                 upload->d->reportFinished();
                 return;

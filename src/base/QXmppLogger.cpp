@@ -5,6 +5,8 @@
 
 #include "QXmppLogger.h"
 
+#include "StringLiterals.h"
+
 #include <iostream>
 
 #include <QChildEvent>
@@ -96,7 +98,7 @@ public:
 QXmppLoggerPrivate::QXmppLoggerPrivate()
     : loggingType(QXmppLogger::NoLogging),
       logFile(nullptr),
-      logFilePath(QStringLiteral("QXmppClientLog.log")),
+      logFilePath(u"QXmppClientLog.log"_s),
       messageTypes(QXmppLogger::AnyMessage)
 {
 }

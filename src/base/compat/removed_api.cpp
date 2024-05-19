@@ -11,6 +11,8 @@
 #include "QXmppStartTlsPacket.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QSharedData>
 #include <QXmlStreamWriter>
@@ -38,15 +40,15 @@ QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 
 static const QStringList PUBSUB_QUERIES = {
-    QStringLiteral("affiliations"),
-    QStringLiteral("default"),
-    QStringLiteral("items"),
-    QStringLiteral("publish"),
-    QStringLiteral("retract"),
-    QStringLiteral("subscribe"),
-    QStringLiteral("subscription"),
-    QStringLiteral("subscriptions"),
-    QStringLiteral("unsubscribe"),
+    u"affiliations"_s,
+    u"default"_s,
+    u"items"_s,
+    u"publish"_s,
+    u"retract"_s,
+    u"subscribe"_s,
+    u"subscription"_s,
+    u"subscriptions"_s,
+    u"unsubscribe"_s,
 };
 
 class QXmppPubSubIqPrivate : public QSharedData
@@ -160,12 +162,12 @@ void QXmppPubSubIq::setItems(const QList<QXmppPubSubItem> &items)
 
 bool QXmppPubSubIq::isPubSubIq(const QDomElement &element)
 {
-    return element.firstChildElement(QStringLiteral("pubsub")).namespaceURI() == ns_pubsub;
+    return element.firstChildElement(u"pubsub"_s).namespaceURI() == ns_pubsub;
 }
 
 void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
 {
-    const QDomElement pubSubElement = element.firstChildElement(QStringLiteral("pubsub"));
+    const QDomElement pubSubElement = element.firstChildElement(u"pubsub"_s);
 
     const QDomElement queryElement = pubSubElement.firstChildElement();
 
@@ -176,8 +178,8 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
         d->queryType = QueryType(queryType);
     }
 
-    d->queryJid = queryElement.attribute(QStringLiteral("jid"));
-    d->queryNode = queryElement.attribute(QStringLiteral("node"));
+    d->queryJid = queryElement.attribute(u"jid"_s);
+    d->queryNode = queryElement.attribute(u"node"_s);
 
     // parse contents
     QDomElement childElement;
@@ -192,8 +194,8 @@ void QXmppPubSubIq::parseElementFromChild(const QDomElement &element)
         }
         break;
     case QXmppPubSubIq::SubscriptionQuery:
-        d->subscriptionId = queryElement.attribute(QStringLiteral("subid"));
-        d->subscriptionType = queryElement.attribute(QStringLiteral("subscription"));
+        d->subscriptionId = queryElement.attribute(u"subid"_s);
+        d->subscriptionType = queryElement.attribute(u"subscription"_s);
         break;
     default:
         break;
@@ -286,7 +288,7 @@ void QXmppPubSubItem::setContents(const QXmppElement &contents)
 
 void QXmppPubSubItem::parse(const QDomElement &element)
 {
-    d->id = element.attribute(QStringLiteral("id"));
+    d->id = element.attribute(u"id"_s);
     d->contents = QXmppElement(element.firstChildElement());
 }
 

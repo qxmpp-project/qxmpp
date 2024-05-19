@@ -12,6 +12,8 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppHttpUploadIq.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QFileInfo>
 #include <QMimeDatabase>
@@ -237,7 +239,7 @@ auto QXmppUploadRequestManager::requestSlot(const QString &fileName,
 {
     if (!serviceFound() && uploadService.isEmpty()) {
         return makeReadyTask(SlotResult(QXmppError {
-            QStringLiteral("Couldn't request upload slot: No service found."), {} }));
+            u"Couldn't request upload slot: No service found."_s, {} }));
     }
 
     QXmppHttpUploadRequestIq iq;

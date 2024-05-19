@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QXmlStreamWriter>
@@ -101,11 +103,11 @@ bool QXmppNonSASLAuthIq::isNonSASLAuthIq(const QDomElement &element)
 
 void QXmppNonSASLAuthIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    m_username = queryElement.firstChildElement(QStringLiteral("username")).text();
-    m_password = queryElement.firstChildElement(QStringLiteral("password")).text();
-    m_digest = QByteArray::fromHex(queryElement.firstChildElement(QStringLiteral("digest")).text().toLatin1());
-    m_resource = queryElement.firstChildElement(QStringLiteral("resource")).text();
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
+    m_username = queryElement.firstChildElement(u"username"_s).text();
+    m_password = queryElement.firstChildElement(u"password"_s).text();
+    m_digest = QByteArray::fromHex(queryElement.firstChildElement(u"digest"_s).text().toLatin1());
+    m_resource = queryElement.firstChildElement(u"resource"_s).text();
 }
 
 void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -119,7 +121,7 @@ void QXmppNonSASLAuthIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeTextElement("digest", m_digest.toHex());
 #else
-        writer->writeTextElement(QStringLiteral("digest"), QString::fromUtf8(m_digest.toHex()));
+        writer->writeTextElement(u"digest"_s, QString::fromUtf8(m_digest.toHex()));
 #endif
     }
     if (!m_password.isEmpty()) {

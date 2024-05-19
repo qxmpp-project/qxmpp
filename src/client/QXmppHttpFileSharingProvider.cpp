@@ -10,6 +10,8 @@
 #include "QXmppHttpUploadManager.h"
 #include "QXmppUtils.h"
 
+#include "StringLiterals.h"
+
 #include <QMimeDatabase>
 #include <QNetworkReply>
 
@@ -147,7 +149,7 @@ auto QXmppHttpFileSharingProvider::uploadFile(std::unique_ptr<QIODevice> data,
     state->upload = d->manager->uploadFile(
         std::move(data),
         info.filename().value_or(QXmppUtils::generateStanzaHash(10)),
-        info.mediaType().value_or(QMimeDatabase().mimeTypeForName(QStringLiteral("application/octet-stream"))),
+        info.mediaType().value_or(QMimeDatabase().mimeTypeForName(u"application/octet-stream"_s)),
         info.size() ? info.size().value() : -1);
 
     QObject::connect(state->upload.get(), &QXmppHttpUpload::finished, [state, reportFinished = std::move(reportFinished)](const QXmppHttpUpload::Result &result) mutable {

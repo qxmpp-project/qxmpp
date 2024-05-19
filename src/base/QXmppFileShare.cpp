@@ -10,6 +10,8 @@
 #include "QXmppHttpFileSource.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <optional>
 
 #include <QDomElement>
@@ -74,9 +76,9 @@ static QString dispositionToString(Disposition value)
 {
     switch (value) {
     case Disposition::Inline:
-        return QStringLiteral("inline");
+        return u"inline"_s;
     case Disposition::Attachment:
-        return QStringLiteral("attachment");
+        return u"attachment"_s;
     }
     Q_UNREACHABLE();
 }
@@ -159,7 +161,7 @@ std::optional<QXmppFileSourcesAttachment> QXmppFileSourcesAttachment::fromDom(co
         return {};
     }
     QXmppFileSourcesAttachment result;
-    result.d->id = el.attribute(QStringLiteral("id"));
+    result.d->id = el.attribute(u"id"_s);
     result.d->sources = FileSources::fromSourcesDom(el);
     return result;
 }
@@ -316,9 +318,9 @@ bool QXmppFileShare::parse(const QDomElement &el)
 {
     if (el.tagName() == u"file-sharing" && el.namespaceURI() == ns_sfs) {
         // disposition
-        d->disposition = dispositionFromString(el.attribute(QStringLiteral("disposition")))
+        d->disposition = dispositionFromString(el.attribute(u"disposition"_s))
                              .value_or(Disposition::Inline);
-        d->id = el.attribute(QStringLiteral("id"));
+        d->id = el.attribute(u"id"_s);
 
         // file metadata
         auto fileEl = firstChildElement(el, u"file");

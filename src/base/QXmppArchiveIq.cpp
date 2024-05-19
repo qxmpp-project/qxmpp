@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -61,11 +63,11 @@ QXmppArchiveChat::QXmppArchiveChat()
 /// \cond
 void QXmppArchiveChat::parse(const QDomElement &element)
 {
-    m_with = element.attribute(QStringLiteral("with"));
-    m_start = QXmppUtils::datetimeFromString(element.attribute(QStringLiteral("start")));
-    m_subject = element.attribute(QStringLiteral("subject"));
-    m_thread = element.attribute(QStringLiteral("thread"));
-    m_version = element.attribute(QStringLiteral("version")).toInt();
+    m_with = element.attribute(u"with"_s);
+    m_start = QXmppUtils::datetimeFromString(element.attribute(u"start"_s));
+    m_subject = element.attribute(u"subject"_s);
+    m_thread = element.attribute(u"thread"_s);
+    m_version = element.attribute(u"version"_s).toInt();
 
     QDateTime timeAccu = m_start;
 
@@ -73,7 +75,7 @@ void QXmppArchiveChat::parse(const QDomElement &element)
         if ((child.tagName() == u"from") || (child.tagName() == u"to")) {
             QXmppArchiveMessage message;
             message.setBody(firstChildElement(child, u"body").text());
-            timeAccu = timeAccu.addSecs(child.attribute(QStringLiteral("secs")).toInt());
+            timeAccu = timeAccu.addSecs(child.attribute(u"secs"_s).toInt());
             message.setDate(timeAccu);
             message.setReceived(child.tagName() == u"from");
             m_messages << message;
@@ -98,7 +100,7 @@ void QXmppArchiveChat::toXml(QXmlStreamWriter *writer, const QXmppResultSetReply
     QDateTime prevTime = m_start;
 
     for (const QXmppArchiveMessage &message : m_messages) {
-        writer->writeStartElement(message.isReceived() ? QStringLiteral("from") : QStringLiteral("to"));
+        writer->writeStartElement(message.isReceived() ? u"from"_s : u"to"_s);
         writeOptionalXmlAttribute(writer, u"secs", QString::number(prevTime.secsTo(message.date())));
         writer->writeTextElement(QSL65("body"), message.body());
         writer->writeEndElement();
@@ -219,7 +221,7 @@ void QXmppArchiveChatIq::setResultSetReply(const QXmppResultSetReply &rsm)
 bool QXmppArchiveChatIq::isArchiveChatIq(const QDomElement &element)
 {
     auto chatEl = firstChildElement(element, u"chat", ns_archive);
-    return !chatEl.isNull() && !chatEl.attribute(QStringLiteral("with")).isEmpty();
+    return !chatEl.isNull() && !chatEl.attribute(u"with"_s).isEmpty();
 }
 
 void QXmppArchiveChatIq::parseElementFromChild(const QDomElement &element)
@@ -338,9 +340,9 @@ bool QXmppArchiveListIq::isArchiveListIq(const QDomElement &element)
 void QXmppArchiveListIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement listElement = firstChildElement(element, u"list");
-    m_with = listElement.attribute(QStringLiteral("with"));
-    m_start = QXmppUtils::datetimeFromString(listElement.attribute(QStringLiteral("start")));
-    m_end = QXmppUtils::datetimeFromString(listElement.attribute(QStringLiteral("end")));
+    m_with = listElement.attribute(u"with"_s);
+    m_start = QXmppUtils::datetimeFromString(listElement.attribute(u"start"_s));
+    m_end = QXmppUtils::datetimeFromString(listElement.attribute(u"end"_s));
 
     m_rsmQuery.parse(listElement);
     m_rsmReply.parse(listElement);
@@ -440,9 +442,9 @@ bool QXmppArchiveRemoveIq::isArchiveRemoveIq(const QDomElement &element)
 void QXmppArchiveRemoveIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement listElement = firstChildElement(element, u"remove");
-    m_with = listElement.attribute(QStringLiteral("with"));
-    m_start = QXmppUtils::datetimeFromString(listElement.attribute(QStringLiteral("start")));
-    m_end = QXmppUtils::datetimeFromString(listElement.attribute(QStringLiteral("end")));
+    m_with = listElement.attribute(u"with"_s);
+    m_start = QXmppUtils::datetimeFromString(listElement.attribute(u"start"_s));
+    m_end = QXmppUtils::datetimeFromString(listElement.attribute(u"end"_s));
 }
 
 void QXmppArchiveRemoveIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -520,8 +522,8 @@ bool QXmppArchiveRetrieveIq::isArchiveRetrieveIq(const QDomElement &element)
 void QXmppArchiveRetrieveIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement retrieveElement = firstChildElement(element, u"retrieve", ns_archive);
-    m_with = retrieveElement.attribute(QStringLiteral("with"));
-    m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute(QStringLiteral("start")));
+    m_with = retrieveElement.attribute(u"with"_s);
+    m_start = QXmppUtils::datetimeFromString(retrieveElement.attribute(u"start"_s));
 
     m_rsmQuery.parse(retrieveElement);
 }

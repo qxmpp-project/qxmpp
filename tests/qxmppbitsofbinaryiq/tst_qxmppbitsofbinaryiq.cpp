@@ -34,22 +34,22 @@ void tst_QXmppBitsOfBinaryIq::testBasic()
 
     QXmppBitsOfBinaryIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.from(), QStringLiteral("doctor@shakespeare.lit/pda"));
-    QCOMPARE(iq.id(), QStringLiteral("get-data-1"));
-    QCOMPARE(iq.to(), QStringLiteral("ladymacbeth@shakespeare.lit/castle"));
+    QCOMPARE(iq.from(), u"doctor@shakespeare.lit/pda"_s);
+    QCOMPARE(iq.id(), u"get-data-1"_s);
+    QCOMPARE(iq.to(), u"ladymacbeth@shakespeare.lit/castle"_s);
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.cid().toContentId(), QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
+    QCOMPARE(iq.cid().toContentId(), u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
     QCOMPARE(iq.contentType(), QMimeType());
     QCOMPARE(iq.data(), QByteArray());
     QCOMPARE(iq.maxAge(), -1);
     serializePacket(iq, xml);
 
     iq = QXmppBitsOfBinaryIq();
-    iq.setFrom(QStringLiteral("doctor@shakespeare.lit/pda"));
-    iq.setId(QStringLiteral("get-data-1"));
-    iq.setTo(QStringLiteral("ladymacbeth@shakespeare.lit/castle"));
+    iq.setFrom(u"doctor@shakespeare.lit/pda"_s);
+    iq.setId(u"get-data-1"_s);
+    iq.setTo(u"ladymacbeth@shakespeare.lit/castle"_s);
     iq.setType(QXmppIq::Get);
-    iq.setCid(QXmppBitsOfBinaryContentId::fromContentId(QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org")));
+    iq.setCid(QXmppBitsOfBinaryContentId::fromContentId(u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s));
     serializePacket(iq, xml);
 }
 
@@ -112,22 +112,22 @@ void tst_QXmppBitsOfBinaryIq::testResult()
     QXmppBitsOfBinaryIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.type(), QXmppIq::Result);
-    QCOMPARE(iq.id(), QStringLiteral("data-result"));
+    QCOMPARE(iq.id(), u"data-result"_s);
     QCOMPARE(iq.cid().algorithm(), QCryptographicHash::Sha1);
     QCOMPARE(iq.cid().hash(), QByteArray::fromHex(QByteArrayLiteral("5a4c38d44fc64805cbb2d92d8b208be13ff40c0f")));
-    QCOMPARE(iq.contentType(), QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+    QCOMPARE(iq.contentType(), QMimeDatabase().mimeTypeForName(u"image/png"_s));
     QCOMPARE(iq.maxAge(), 86400);
     QCOMPARE(iq.data(), data);
     serializePacket(iq, xml);
 
     iq = QXmppBitsOfBinaryIq();
-    iq.setId(QStringLiteral("data-result"));
-    iq.setFrom(QStringLiteral("ladymacbeth@shakespeare.lit/castle"));
-    iq.setTo(QStringLiteral("doctor@shakespeare.lit/pda"));
+    iq.setId(u"data-result"_s);
+    iq.setFrom(u"ladymacbeth@shakespeare.lit/castle"_s);
+    iq.setTo(u"doctor@shakespeare.lit/pda"_s);
     iq.setType(QXmppIq::Result);
     iq.setCid(QXmppBitsOfBinaryContentId::fromContentId(
-        QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org")));
-    iq.setContentType(QMimeDatabase().mimeTypeForName(QStringLiteral("image/png")));
+        u"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org"_s));
+    iq.setContentType(QMimeDatabase().mimeTypeForName(u"image/png"_s));
     iq.setMaxAge(86400);
     iq.setData(data);
     serializePacket(iq, xml);
@@ -146,11 +146,11 @@ void tst_QXmppBitsOfBinaryIq::testOtherSubelement()
 
     QXmppBitsOfBinaryIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.from(), QStringLiteral("doctor@shakespeare.lit/pda"));
-    QCOMPARE(iq.id(), QStringLiteral("get-data-1"));
-    QCOMPARE(iq.to(), QStringLiteral("ladymacbeth@shakespeare.lit/castle"));
+    QCOMPARE(iq.from(), u"doctor@shakespeare.lit/pda"_s);
+    QCOMPARE(iq.id(), u"get-data-1"_s);
+    QCOMPARE(iq.to(), u"ladymacbeth@shakespeare.lit/castle"_s);
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.cid().toContentId(), QStringLiteral("sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"));
+    QCOMPARE(iq.cid().toContentId(), u"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org"_s);
     QCOMPARE(iq.contentType(), QMimeType());
     QCOMPARE(iq.data(), QByteArray());
     QCOMPARE(iq.maxAge(), -1);
@@ -218,7 +218,7 @@ void tst_QXmppBitsOfBinaryIq::fromByteArray()
         "kSuQmCC");
     auto size = data.size();
     auto bobData = QXmppBitsOfBinaryData::fromByteArray(std::move(data));
-    QCOMPARE(bobData.cid().toContentId(), QStringLiteral("sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org"));
+    QCOMPARE(bobData.cid().toContentId(), u"sha1+5a4c38d44fc64805cbb2d92d8b208be13ff40c0f@bob.xmpp.org"_s);
     QCOMPARE(bobData.data().size(), size);
 }
 

@@ -9,6 +9,8 @@
 #include "QXmppHttpFileSource.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <optional>
 
 #include <QDomElement>
@@ -34,11 +36,11 @@ static QString cipherToString(Cipher cipher)
 {
     switch (cipher) {
     case Aes128GcmNoPad:
-        return QStringLiteral("urn:xmpp:ciphers:aes-128-gcm-nopadding:0");
+        return u"urn:xmpp:ciphers:aes-128-gcm-nopadding:0"_s;
     case Aes256GcmNoPad:
-        return QStringLiteral("urn:xmpp:ciphers:aes-256-gcm-nopadding:0");
+        return u"urn:xmpp:ciphers:aes-256-gcm-nopadding:0"_s;
     case Aes256CbcPkcs7:
-        return QStringLiteral("urn:xmpp:ciphers:aes-256-cbc-pkcs7:0");
+        return u"urn:xmpp:ciphers:aes-256-cbc-pkcs7:0"_s;
     }
     Q_UNREACHABLE();
 }
@@ -132,20 +134,20 @@ void QXmppEncryptedFileSource::setHttpSources(const QVector<QXmppHttpFileSource>
 /// \cond
 bool QXmppEncryptedFileSource::parse(const QDomElement &el)
 {
-    QString cipher = el.attribute(QStringLiteral("cipher"));
+    QString cipher = el.attribute(u"cipher"_s);
     if (auto parsedCipher = cipherFromString(cipher)) {
         d->cipher = *parsedCipher;
     } else {
         return false;
     }
 
-    auto keyEl = el.firstChildElement(QStringLiteral("key"));
+    auto keyEl = el.firstChildElement(u"key"_s);
     if (keyEl.isNull()) {
         return false;
     }
     d->key = QByteArray::fromBase64(keyEl.text().toUtf8());
 
-    auto ivEl = el.firstChildElement(QStringLiteral("iv"));
+    auto ivEl = el.firstChildElement(u"iv"_s);
     if (ivEl.isNull()) {
         return false;
     }
@@ -159,7 +161,7 @@ bool QXmppEncryptedFileSource::parse(const QDomElement &el)
         d->hashes.push_back(std::move(hash));
     }
 
-    auto sourcesEl = el.firstChildElement(QStringLiteral("sources"));
+    auto sourcesEl = el.firstChildElement(u"sources"_s);
     if (sourcesEl.isNull()) {
         return false;
     }
@@ -181,8 +183,8 @@ void QXmppEncryptedFileSource::toXml(QXmlStreamWriter *writer) const
     writer->writeTextElement("key", d->key.toBase64());
     writer->writeTextElement("iv", d->iv.toBase64());
 #else
-    writer->writeTextElement(QStringLiteral("key"), QString::fromUtf8(d->key.toBase64()));
-    writer->writeTextElement(QStringLiteral("iv"), QString::fromUtf8(d->iv.toBase64()));
+    writer->writeTextElement(u"key"_s, QString::fromUtf8(d->key.toBase64()));
+    writer->writeTextElement(u"iv"_s, QString::fromUtf8(d->iv.toBase64()));
 #endif
     for (const auto &hash : d->hashes) {
         hash.toXml(writer);

@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -69,7 +71,7 @@ void QXmppDialback::parse(const QDomElement &element)
     } else {
         m_command = Verify;
     }
-    m_type = element.attribute(QStringLiteral("type"));
+    m_type = element.attribute(u"type"_s);
     m_key = element.text();
 }
 

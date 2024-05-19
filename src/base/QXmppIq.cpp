@@ -6,6 +6,8 @@
 
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -81,7 +83,7 @@ void QXmppIq::parse(const QDomElement &element)
 {
     QXmppStanza::parse(element);
 
-    d->type = enumFromString<Type>(IQ_TYPES, element.attribute(QStringLiteral("type")))
+    d->type = enumFromString<Type>(IQ_TYPES, element.attribute(u"type"_s))
                   .value_or(Get);
 
     parseElementFromChild(element);

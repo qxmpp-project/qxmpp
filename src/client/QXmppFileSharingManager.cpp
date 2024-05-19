@@ -16,6 +16,7 @@
 #include "QXmppUtils_p.h"
 
 #include "Algorithms.h"
+#include "StringLiterals.h"
 
 #include <any>
 #include <unordered_map>
@@ -539,7 +540,7 @@ std::shared_ptr<QXmppFileDownload> QXmppFileSharingManager::downloadFile(
 
         // try to do hash verification
         if (filePath.isEmpty()) {
-            warning(QStringLiteral("Can't verify hashes of other io devices than QFile!"));
+            warning(u"Can't verify hashes of other io devices than QFile!"_s);
             download->reportFinished(QXmppFileDownload::Downloaded { QXmppFileDownload::NoStrongHashes });
             return;
         }
@@ -563,7 +564,7 @@ std::shared_ptr<QXmppFileDownload> QXmppFileSharingManager::downloadFile(
                 },
                 [](HashVerificationResult::NotMatching) {
                     return QXmppError {
-                        QStringLiteral("Checksum does not match"),
+                        u"Checksum does not match"_s,
                         {}
                     };
                 },

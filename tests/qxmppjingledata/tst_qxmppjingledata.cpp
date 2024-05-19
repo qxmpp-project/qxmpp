@@ -93,14 +93,14 @@ void tst_QXmppJingleData::testSdpParameter()
     QVERIFY(parameter1.value().isEmpty());
 
     parsePacket(parameter1, xml);
-    QCOMPARE(parameter1.name(), QStringLiteral("test-name"));
-    QCOMPARE(parameter1.value(), QStringLiteral("test-value"));
+    QCOMPARE(parameter1.name(), u"test-name"_s);
+    QCOMPARE(parameter1.value(), u"test-value"_s);
 
     serializePacket(parameter1, xml);
 
     QXmppSdpParameter parameter2;
-    parameter2.setName(QStringLiteral("test-name"));
-    parameter2.setValue(QStringLiteral("test-value"));
+    parameter2.setName(u"test-name"_s);
+    parameter2.setValue(u"test-value"_s);
 
     serializePacket(parameter2, xml);
 }
@@ -112,13 +112,13 @@ void tst_QXmppJingleData::testSdpParameterWithoutValue()
     QXmppSdpParameter parameter1;
 
     parsePacket(parameter1, xml);
-    QCOMPARE(parameter1.name(), QStringLiteral("test-name"));
+    QCOMPARE(parameter1.name(), u"test-name"_s);
     QVERIFY(parameter1.value().isEmpty());
 
     serializePacket(parameter1, xml);
 
     QXmppSdpParameter parameter2;
-    parameter2.setName(QStringLiteral("test-name"));
+    parameter2.setName(u"test-name"_s);
 
     serializePacket(parameter2, xml);
 }
@@ -177,10 +177,10 @@ void tst_QXmppJingleData::testRtpCryptoElement()
     parsePacket(rtpCryptoElement1, xml);
 
     QCOMPARE(rtpCryptoElement1.tag(), uint32_t(1));
-    QCOMPARE(rtpCryptoElement1.cryptoSuite(), QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    QCOMPARE(rtpCryptoElement1.keyParams(), QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    QCOMPARE(rtpCryptoElement1.cryptoSuite(), u"AES_CM_128_HMAC_SHA1_80"_s);
+    QCOMPARE(rtpCryptoElement1.keyParams(), u"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"_s);
     if (hasSessionParams) {
-        QCOMPARE(rtpCryptoElement1.sessionParams(), QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
+        QCOMPARE(rtpCryptoElement1.sessionParams(), u"KDR=1 UNENCRYPTED_SRTCP"_s);
     } else {
         QVERIFY(rtpCryptoElement1.sessionParams().isEmpty());
     }
@@ -189,18 +189,18 @@ void tst_QXmppJingleData::testRtpCryptoElement()
 
     QXmppJingleRtpCryptoElement rtpCryptoElement2;
     rtpCryptoElement2.setTag(1);
-    rtpCryptoElement2.setCryptoSuite(QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    rtpCryptoElement2.setKeyParams(QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    rtpCryptoElement2.setCryptoSuite(u"AES_CM_128_HMAC_SHA1_80"_s);
+    rtpCryptoElement2.setKeyParams(u"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"_s);
 
     if (hasSessionParams) {
-        rtpCryptoElement2.setSessionParams(QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
+        rtpCryptoElement2.setSessionParams(u"KDR=1 UNENCRYPTED_SRTCP"_s);
     }
 
     QCOMPARE(rtpCryptoElement2.tag(), uint32_t(1));
-    QCOMPARE(rtpCryptoElement2.cryptoSuite(), QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    QCOMPARE(rtpCryptoElement2.keyParams(), QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    QCOMPARE(rtpCryptoElement2.cryptoSuite(), u"AES_CM_128_HMAC_SHA1_80"_s);
+    QCOMPARE(rtpCryptoElement2.keyParams(), u"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"_s);
     if (hasSessionParams) {
-        QCOMPARE(rtpCryptoElement2.sessionParams(), QStringLiteral("KDR=1 UNENCRYPTED_SRTCP"));
+        QCOMPARE(rtpCryptoElement2.sessionParams(), u"KDR=1 UNENCRYPTED_SRTCP"_s);
     } else {
         QVERIFY(rtpCryptoElement2.sessionParams().isEmpty());
     }
@@ -290,8 +290,8 @@ void tst_QXmppJingleData::testRtpEncryption()
 
     QXmppJingleRtpCryptoElement rtpCryptoElement2;
     rtpCryptoElement2.setTag(1);
-    rtpCryptoElement2.setCryptoSuite(QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    rtpCryptoElement2.setKeyParams(QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    rtpCryptoElement2.setCryptoSuite(u"AES_CM_128_HMAC_SHA1_80"_s);
+    rtpCryptoElement2.setKeyParams(u"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"_s);
 
     QXmppJingleRtpEncryption rtpEncryption2;
     rtpEncryption2.setRequired(isRequired);
@@ -349,17 +349,17 @@ void tst_QXmppJingleData::testRtpFeedbackProperty()
     QVERIFY(property1.subtype().isEmpty());
 
     parsePacket(property1, xml);
-    QCOMPARE(property1.type(), QStringLiteral("nack"));
-    QCOMPARE(property1.subtype(), QStringLiteral("sli"));
+    QCOMPARE(property1.type(), u"nack"_s);
+    QCOMPARE(property1.subtype(), u"sli"_s);
 
     serializePacket(property1, xml);
 
     QXmppJingleRtpFeedbackProperty property2;
-    property2.setType(QStringLiteral("nack"));
-    property2.setSubtype(QStringLiteral("sli"));
+    property2.setType(u"nack"_s);
+    property2.setSubtype(u"sli"_s);
 
-    QCOMPARE(property1.type(), QStringLiteral("nack"));
-    QCOMPARE(property1.subtype(), QStringLiteral("sli"));
+    QCOMPARE(property1.type(), u"nack"_s);
+    QCOMPARE(property1.subtype(), u"sli"_s);
 
     serializePacket(property2, xml);
 }
@@ -375,28 +375,28 @@ void tst_QXmppJingleData::testRtpFeedbackPropertyWithParameters()
     QXmppJingleRtpFeedbackProperty property1;
 
     parsePacket(property1, xml);
-    QCOMPARE(property1.type(), QStringLiteral("test-type"));
+    QCOMPARE(property1.type(), u"test-type"_s);
     QVERIFY(property1.subtype().isEmpty());
     QCOMPARE(property1.parameters().size(), 2);
-    QCOMPARE(property1.parameters().at(0).name(), QStringLiteral("test-name-1"));
-    QCOMPARE(property1.parameters().at(1).name(), QStringLiteral("test-name-2"));
+    QCOMPARE(property1.parameters().at(0).name(), u"test-name-1"_s);
+    QCOMPARE(property1.parameters().at(1).name(), u"test-name-2"_s);
 
     serializePacket(property1, xml);
 
     QXmppJingleRtpFeedbackProperty property2;
-    property2.setType(QStringLiteral("test-type"));
+    property2.setType(u"test-type"_s);
 
     QXmppSdpParameter parameter1;
-    parameter1.setName(QStringLiteral("test-name-1"));
+    parameter1.setName(u"test-name-1"_s);
 
     QXmppSdpParameter parameter2;
-    parameter2.setName(QStringLiteral("test-name-2"));
+    parameter2.setName(u"test-name-2"_s);
 
     property2.setParameters({ parameter1, parameter2 });
 
     QCOMPARE(property2.parameters().size(), 2);
-    QCOMPARE(property2.parameters().at(0).name(), QStringLiteral("test-name-1"));
-    QCOMPARE(property2.parameters().at(1).name(), QStringLiteral("test-name-2"));
+    QCOMPARE(property2.parameters().at(0).name(), u"test-name-1"_s);
+    QCOMPARE(property2.parameters().at(1).name(), u"test-name-2"_s);
 
     serializePacket(property2, xml);
 }
@@ -479,18 +479,18 @@ void tst_QXmppJingleData::testRtpHeaderExtensionProperty()
 
     parsePacket(property1, xml);
     QCOMPARE(property1.id(), uint32_t(1));
-    QCOMPARE(property1.uri(), QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    QCOMPARE(property1.uri(), u"urn:ietf:params:rtp-hdrext:toffset"_s);
     QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Both);
 
     serializePacket(property1, xml);
 
     QXmppJingleRtpHeaderExtensionProperty property2;
     property2.setId(1);
-    property2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    property2.setUri(u"urn:ietf:params:rtp-hdrext:toffset"_s);
     property2.setSenders(QXmppJingleRtpHeaderExtensionProperty::Both);
 
     QCOMPARE(property1.id(), uint32_t(1));
-    QCOMPARE(property1.uri(), QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    QCOMPARE(property1.uri(), u"urn:ietf:params:rtp-hdrext:toffset"_s);
     QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Both);
 
     serializePacket(property2, xml);
@@ -509,7 +509,7 @@ void tst_QXmppJingleData::testRtpHeaderExtensionPropertyWithSenders()
 
     QXmppJingleRtpHeaderExtensionProperty property2;
     property2.setId(1);
-    property2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    property2.setUri(u"urn:ietf:params:rtp-hdrext:toffset"_s);
     property2.setSenders(QXmppJingleRtpHeaderExtensionProperty::Initiator);
 
     QCOMPARE(property1.senders(), QXmppJingleRtpHeaderExtensionProperty::Initiator);
@@ -529,26 +529,26 @@ void tst_QXmppJingleData::testRtpHeaderExtensionPropertyWithParameters()
 
     parsePacket(property1, xml);
     QCOMPARE(property1.parameters().size(), 2);
-    QCOMPARE(property1.parameters().at(0).name(), QStringLiteral("test-name-1"));
-    QCOMPARE(property1.parameters().at(1).name(), QStringLiteral("test-name-2"));
+    QCOMPARE(property1.parameters().at(0).name(), u"test-name-1"_s);
+    QCOMPARE(property1.parameters().at(1).name(), u"test-name-2"_s);
 
     serializePacket(property1, xml);
 
     QXmppJingleRtpHeaderExtensionProperty property2;
     property2.setId(1);
-    property2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    property2.setUri(u"urn:ietf:params:rtp-hdrext:toffset"_s);
 
     QXmppSdpParameter parameter1;
-    parameter1.setName(QStringLiteral("test-name-1"));
+    parameter1.setName(u"test-name-1"_s);
 
     QXmppSdpParameter parameter2;
-    parameter2.setName(QStringLiteral("test-name-2"));
+    parameter2.setName(u"test-name-2"_s);
 
     property2.setParameters({ parameter1, parameter2 });
 
     QCOMPARE(property2.parameters().size(), 2);
-    QCOMPARE(property2.parameters().at(0).name(), QStringLiteral("test-name-1"));
-    QCOMPARE(property2.parameters().at(1).name(), QStringLiteral("test-name-2"));
+    QCOMPARE(property2.parameters().at(0).name(), u"test-name-1"_s);
+    QCOMPARE(property2.parameters().at(1).name(), u"test-name-2"_s);
 
     serializePacket(property2, xml);
 }
@@ -629,33 +629,33 @@ void tst_QXmppJingleData::testContent()
     QCOMPARE(content1.transportCandidates().size(), 0);
     parsePacket(content1, xml);
 
-    QCOMPARE(content1.creator(), QStringLiteral("initiator"));
-    QCOMPARE(content1.name(), QStringLiteral("voice"));
-    QCOMPARE(content1.description().media(), QStringLiteral("audio"));
+    QCOMPARE(content1.creator(), u"initiator"_s);
+    QCOMPARE(content1.name(), u"voice"_s);
+    QCOMPARE(content1.description().media(), u"audio"_s);
     QCOMPARE(content1.description().ssrc(), quint32(0));
     QVERIFY(content1.isRtpMultiplexingSupported());
     QVERIFY(content1.rtpEncryption());
     QCOMPARE(content1.description().payloadTypes().size(), 2);
     QCOMPARE(content1.description().payloadTypes().at(0).id(), quint8(96));
     QCOMPARE(content1.description().payloadTypes().at(1).id(), quint8(97));
-    QCOMPARE(content1.transportUser(), QStringLiteral("8hhy"));
-    QCOMPARE(content1.transportPassword(), QStringLiteral("asd88fgpdd777uzjYhagZg"));
+    QCOMPARE(content1.transportUser(), u"8hhy"_s);
+    QCOMPARE(content1.transportPassword(), u"asd88fgpdd777uzjYhagZg"_s);
     QCOMPARE(content1.transportCandidates().size(), 2);
-    QCOMPARE(content1.transportCandidates().at(0).id(), QStringLiteral("el0747fg11"));
-    QCOMPARE(content1.transportCandidates().at(1).id(), QStringLiteral("y3s2b30v3r"));
+    QCOMPARE(content1.transportCandidates().at(0).id(), u"el0747fg11"_s);
+    QCOMPARE(content1.transportCandidates().at(1).id(), u"y3s2b30v3r"_s);
     serializePacket(content1, xml);
 
     QXmppJingleIq::Content content2;
-    content2.setCreator(QStringLiteral("initiator"));
-    content2.setName(QStringLiteral("voice"));
+    content2.setCreator(u"initiator"_s);
+    content2.setName(u"voice"_s);
     QXmppJingleDescription content2desc;
-    content2desc.setMedia(QStringLiteral("audio"));
+    content2desc.setMedia(u"audio"_s);
     content2desc.setSsrc(quint32(0));
     content2.setRtpMultiplexingSupported(true);
     QXmppJingleRtpCryptoElement rtpCryptoElement;
     rtpCryptoElement.setTag(1);
-    rtpCryptoElement.setCryptoSuite(QStringLiteral("AES_CM_128_HMAC_SHA1_80"));
-    rtpCryptoElement.setKeyParams(QStringLiteral("inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"));
+    rtpCryptoElement.setCryptoSuite(u"AES_CM_128_HMAC_SHA1_80"_s);
+    rtpCryptoElement.setKeyParams(u"inline:WVNfX19zZW1jdGwgKCkgewkyMjA7fQp9CnVubGVz|2^20|1:32"_s);
     QXmppJingleRtpEncryption rtpEncryption;
     rtpEncryption.setCryptoElements({ rtpCryptoElement });
     content2.setRtpEncryption(rtpEncryption);
@@ -666,29 +666,29 @@ void tst_QXmppJingleData::testContent()
     payloadType2.setId(quint8(97));
     content2desc.addPayloadType(payloadType2);
     content2.setDescription(content2desc);
-    content2.setTransportUser(QStringLiteral("8hhy"));
-    content2.setTransportPassword(QStringLiteral("asd88fgpdd777uzjYhagZg"));
+    content2.setTransportUser(u"8hhy"_s);
+    content2.setTransportPassword(u"asd88fgpdd777uzjYhagZg"_s);
     QXmppJingleCandidate transportCandidate1;
-    transportCandidate1.setId(QStringLiteral("el0747fg11"));
+    transportCandidate1.setId(u"el0747fg11"_s);
     content2.setTransportCandidates({ transportCandidate1 });
     QXmppJingleCandidate transportCandidate2;
-    transportCandidate2.setId(QStringLiteral("y3s2b30v3r"));
+    transportCandidate2.setId(u"y3s2b30v3r"_s);
     content2.addTransportCandidate(transportCandidate2);
 
-    QCOMPARE(content2.creator(), QStringLiteral("initiator"));
-    QCOMPARE(content2.name(), QStringLiteral("voice"));
-    QCOMPARE(content2.description().media(), QStringLiteral("audio"));
+    QCOMPARE(content2.creator(), u"initiator"_s);
+    QCOMPARE(content2.name(), u"voice"_s);
+    QCOMPARE(content2.description().media(), u"audio"_s);
     QCOMPARE(content2.description().ssrc(), quint32(0));
     QVERIFY(content2.isRtpMultiplexingSupported());
     QVERIFY(content2.rtpEncryption());
     QCOMPARE(content2.description().payloadTypes().size(), 2);
     QCOMPARE(content2.description().payloadTypes().at(0).id(), quint8(96));
     QCOMPARE(content2.description().payloadTypes().at(1).id(), quint8(97));
-    QCOMPARE(content2.transportUser(), QStringLiteral("8hhy"));
-    QCOMPARE(content2.transportPassword(), QStringLiteral("asd88fgpdd777uzjYhagZg"));
+    QCOMPARE(content2.transportUser(), u"8hhy"_s);
+    QCOMPARE(content2.transportPassword(), u"asd88fgpdd777uzjYhagZg"_s);
     QCOMPARE(content2.transportCandidates().size(), 2);
-    QCOMPARE(content2.transportCandidates().at(0).id(), QStringLiteral("el0747fg11"));
-    QCOMPARE(content2.transportCandidates().at(1).id(), QStringLiteral("y3s2b30v3r"));
+    QCOMPARE(content2.transportCandidates().at(0).id(), u"el0747fg11"_s);
+    QCOMPARE(content2.transportCandidates().at(1).id(), u"y3s2b30v3r"_s);
     serializePacket(content2, xml);
 }
 
@@ -935,8 +935,8 @@ void tst_QXmppJingleData::testContentRtpFeedbackNegotiation()
 
     const auto rtpFeedbackProperties1 = content1.rtpFeedbackProperties();
     QCOMPARE(rtpFeedbackProperties1.size(), 2);
-    QCOMPARE(rtpFeedbackProperties1[0].subtype(), QStringLiteral("pli"));
-    QCOMPARE(rtpFeedbackProperties1[1].subtype(), QStringLiteral("sli"));
+    QCOMPARE(rtpFeedbackProperties1[0].subtype(), u"pli"_s);
+    QCOMPARE(rtpFeedbackProperties1[1].subtype(), u"sli"_s);
 
     const auto rtpFeedbackIntervals1 = content1.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals1.size(), 2);
@@ -946,12 +946,12 @@ void tst_QXmppJingleData::testContentRtpFeedbackNegotiation()
     serializePacket(content1, xml);
 
     QXmppJingleRtpFeedbackProperty rtpFeedbackProperty1;
-    rtpFeedbackProperty1.setType(QStringLiteral("nack"));
-    rtpFeedbackProperty1.setSubtype(QStringLiteral("pli"));
+    rtpFeedbackProperty1.setType(u"nack"_s);
+    rtpFeedbackProperty1.setSubtype(u"pli"_s);
 
     QXmppJingleRtpFeedbackProperty rtpFeedbackProperty2;
-    rtpFeedbackProperty2.setType(QStringLiteral("nack"));
-    rtpFeedbackProperty2.setSubtype(QStringLiteral("sli"));
+    rtpFeedbackProperty2.setType(u"nack"_s);
+    rtpFeedbackProperty2.setSubtype(u"sli"_s);
 
     QXmppJingleRtpFeedbackInterval rtpFeedbackInterval1;
     rtpFeedbackInterval1.setValue(60);
@@ -961,11 +961,11 @@ void tst_QXmppJingleData::testContentRtpFeedbackNegotiation()
 
     QXmppJinglePayloadType payloadType;
     payloadType.setId(96);
-    payloadType.setName(QStringLiteral("speex"));
+    payloadType.setName(u"speex"_s);
 
     QXmppJingleIq::Content content2;
-    content2.setCreator(QStringLiteral("initiator"));
-    content2.setName(QStringLiteral("voice"));
+    content2.setCreator(u"initiator"_s);
+    content2.setName(u"voice"_s);
     QXmppJingleDescription content2desc;
     content2desc.addPayloadType(payloadType);
     content2.setDescription(content2desc);
@@ -974,8 +974,8 @@ void tst_QXmppJingleData::testContentRtpFeedbackNegotiation()
 
     const auto rtpFeedbackProperties2 = content2.rtpFeedbackProperties();
     QCOMPARE(rtpFeedbackProperties2.size(), 2);
-    QCOMPARE(rtpFeedbackProperties2[0].subtype(), QStringLiteral("pli"));
-    QCOMPARE(rtpFeedbackProperties2[1].subtype(), QStringLiteral("sli"));
+    QCOMPARE(rtpFeedbackProperties2[0].subtype(), u"pli"_s);
+    QCOMPARE(rtpFeedbackProperties2[1].subtype(), u"sli"_s);
 
     const auto rtpFeedbackIntervals2 = content2.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals2.size(), 2);
@@ -1013,19 +1013,19 @@ void tst_QXmppJingleData::testContentRtpHeaderExtensionsNegotiation()
 
     QXmppJingleRtpHeaderExtensionProperty rtpHeaderExtensionProperty1;
     rtpHeaderExtensionProperty1.setId(uint32_t(1));
-    rtpHeaderExtensionProperty1.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:toffset"));
+    rtpHeaderExtensionProperty1.setUri(u"urn:ietf:params:rtp-hdrext:toffset"_s);
 
     QXmppJingleRtpHeaderExtensionProperty rtpHeaderExtensionProperty2;
     rtpHeaderExtensionProperty2.setId(uint32_t(2));
-    rtpHeaderExtensionProperty2.setUri(QStringLiteral("urn:ietf:params:rtp-hdrext:ntp-64"));
+    rtpHeaderExtensionProperty2.setUri(u"urn:ietf:params:rtp-hdrext:ntp-64"_s);
 
     QXmppJinglePayloadType payloadType;
     payloadType.setId(96);
-    payloadType.setName(QStringLiteral("speex"));
+    payloadType.setName(u"speex"_s);
 
     QXmppJingleIq::Content content2;
-    content2.setCreator(QStringLiteral("initiator"));
-    content2.setName(QStringLiteral("voice"));
+    content2.setCreator(u"initiator"_s);
+    content2.setName(u"voice"_s);
     QXmppJingleDescription content2desc;
     content2desc.addPayloadType(payloadType);
     content2.setDescription(content2desc);
@@ -1067,7 +1067,7 @@ void tst_QXmppJingleData::testSession()
     QCOMPARE(session.action(), QXmppJingleIq::SessionInitiate);
     QCOMPARE(session.initiator(), QLatin1String("romeo@montague.lit/orchard"));
     QCOMPARE(session.sid(), QLatin1String("a73sjjvkla37jfea"));
-    QCOMPARE(session.mujiGroupChatJid(), QStringLiteral("darkcave@chat.shakespeare.lit"));
+    QCOMPARE(session.mujiGroupChatJid(), u"darkcave@chat.shakespeare.lit"_s);
     QCOMPARE(session.contents().size(), 1);
     QCOMPARE(session.contents()[0].creator(), QLatin1String("initiator"));
     QCOMPARE(session.contents()[0].name(), QLatin1String("this-is-a-stub"));
@@ -1114,42 +1114,42 @@ void tst_QXmppJingleData::testRtpSessionState_data()
                              "<active xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
                              "</jingle>"
                              "</iq>")
-        << QStringLiteral("active");
+        << u"active"_s;
     QTest::newRow("hold")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-info\">"
                              "<hold xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
                              "</jingle>"
                              "</iq>")
-        << QStringLiteral("hold");
+        << u"hold"_s;
     QTest::newRow("unhold")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-info\">"
                              "<unhold xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
                              "</jingle>"
                              "</iq>")
-        << QStringLiteral("unhold");
+        << u"unhold"_s;
     QTest::newRow("mute")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-info\">"
                              "<mute xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\" creator=\"initiator\" name=\"voice\"/>"
                              "</jingle>"
                              "</iq>")
-        << QStringLiteral("mute");
+        << u"mute"_s;
     QTest::newRow("unmute")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-info\">"
                              "<unmute xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\" creator=\"responder\"/>"
                              "</jingle>"
                              "</iq>")
-        << QStringLiteral("unmute");
+        << u"unmute"_s;
     QTest::newRow("ringing")
         << QByteArrayLiteral("<iq type=\"set\">"
                              "<jingle xmlns=\"urn:xmpp:jingle:1\" action=\"session-info\">"
                              "<ringing xmlns=\"urn:xmpp:jingle:apps:rtp:info:1\"/>"
                              "</jingle>"
                              "</iq>")
-        << QStringLiteral("ringing");
+        << u"ringing"_s;
 }
 
 void tst_QXmppJingleData::testRtpSessionState()
@@ -1176,7 +1176,7 @@ void tst_QXmppJingleData::testRtpSessionState()
 
         if (isMute) {
             QCOMPARE(stateMuting.creator, QXmppJingleIq::Initiator);
-            QCOMPARE(stateMuting.name, QStringLiteral("voice"));
+            QCOMPARE(stateMuting.name, u"voice"_s);
         } else {
             QCOMPARE(stateMuting.creator, QXmppJingleIq::Responder);
             QVERIFY(stateMuting.name.isEmpty());
@@ -1203,7 +1203,7 @@ void tst_QXmppJingleData::testRtpSessionState()
 
         if (isMute) {
             stateMuting.creator = QXmppJingleIq::Initiator;
-            stateMuting.name = QStringLiteral("voice");
+            stateMuting.name = u"voice"_s;
         } else {
             stateMuting.creator = QXmppJingleIq::Responder;
         }
@@ -1228,7 +1228,7 @@ void tst_QXmppJingleData::testRtpSessionState()
 
         if (isMute) {
             QCOMPARE(stateMuting.creator, QXmppJingleIq::Initiator);
-            QCOMPARE(stateMuting.name, QStringLiteral("voice"));
+            QCOMPARE(stateMuting.name, u"voice"_s);
         } else {
             QCOMPARE(stateMuting.creator, QXmppJingleIq::Responder);
             QVERIFY(stateMuting.name.isEmpty());
@@ -1287,8 +1287,8 @@ void tst_QXmppJingleData::testPayloadTypeRtpFeedbackNegotiation()
 
     const auto rtpFeedbackProperties1 = payload1.rtpFeedbackProperties();
     QCOMPARE(rtpFeedbackProperties1.size(), 2);
-    QCOMPARE(rtpFeedbackProperties1[0].subtype(), QStringLiteral("pli"));
-    QCOMPARE(rtpFeedbackProperties1[1].subtype(), QStringLiteral("sli"));
+    QCOMPARE(rtpFeedbackProperties1[0].subtype(), u"pli"_s);
+    QCOMPARE(rtpFeedbackProperties1[1].subtype(), u"sli"_s);
 
     const auto rtpFeedbackIntervals1 = payload1.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals1.size(), 2);
@@ -1298,12 +1298,12 @@ void tst_QXmppJingleData::testPayloadTypeRtpFeedbackNegotiation()
     serializePacket(payload1, xml);
 
     QXmppJingleRtpFeedbackProperty rtpFeedbackProperty1;
-    rtpFeedbackProperty1.setType(QStringLiteral("nack"));
-    rtpFeedbackProperty1.setSubtype(QStringLiteral("pli"));
+    rtpFeedbackProperty1.setType(u"nack"_s);
+    rtpFeedbackProperty1.setSubtype(u"pli"_s);
 
     QXmppJingleRtpFeedbackProperty rtpFeedbackProperty2;
-    rtpFeedbackProperty2.setType(QStringLiteral("nack"));
-    rtpFeedbackProperty2.setSubtype(QStringLiteral("sli"));
+    rtpFeedbackProperty2.setType(u"nack"_s);
+    rtpFeedbackProperty2.setSubtype(u"sli"_s);
 
     QXmppJingleRtpFeedbackInterval rtpFeedbackInterval1;
     rtpFeedbackInterval1.setValue(60);
@@ -1318,8 +1318,8 @@ void tst_QXmppJingleData::testPayloadTypeRtpFeedbackNegotiation()
 
     const auto rtpFeedbackProperties2 = payload2.rtpFeedbackProperties();
     QCOMPARE(rtpFeedbackProperties2.size(), 2);
-    QCOMPARE(rtpFeedbackProperties2[0].subtype(), QStringLiteral("pli"));
-    QCOMPARE(rtpFeedbackProperties2[1].subtype(), QStringLiteral("sli"));
+    QCOMPARE(rtpFeedbackProperties2[0].subtype(), u"pli"_s);
+    QCOMPARE(rtpFeedbackProperties2[1].subtype(), u"sli"_s);
 
     const auto rtpFeedbackIntervals2 = payload2.rtpFeedbackIntervals();
     QCOMPARE(rtpFeedbackIntervals2.size(), 2);
@@ -1587,9 +1587,9 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     proposeElement.setType(JmiType::Propose);
 
     parsePacket(proposeElement, proposeXml);
-    QCOMPARE(proposeElement.id(), QStringLiteral("ca3cf894-5325-482f-a412-a6e9f832298d"));
-    QCOMPARE(proposeElement.description()->type(), QStringLiteral("urn:xmpp:jingle:apps:rtp:1"));
-    QCOMPARE(proposeElement.description()->media(), QStringLiteral("audio"));
+    QCOMPARE(proposeElement.id(), u"ca3cf894-5325-482f-a412-a6e9f832298d"_s);
+    QCOMPARE(proposeElement.description()->type(), u"urn:xmpp:jingle:apps:rtp:1"_s);
+    QCOMPARE(proposeElement.description()->media(), u"audio"_s);
     QCOMPARE(proposeElement.containsTieBreak(), false);  // single check if containsTieBreak is set correctly when unused
     QCOMPARE(proposeElement.reason(), std::nullopt);     // single check if reason is set correctly when unused
     serializePacket(proposeElement, proposeXml);
@@ -1601,7 +1601,7 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     ringingElement.setType(JmiType::Ringing);
 
     parsePacket(ringingElement, ringingXml);
-    QCOMPARE(ringingElement.id(), QStringLiteral("ca3cf894-5325-482f-a412-a6e9f832298d"));
+    QCOMPARE(ringingElement.id(), u"ca3cf894-5325-482f-a412-a6e9f832298d"_s);
     serializePacket(ringingElement, ringingXml);
 
     // --- Proceed ---
@@ -1611,7 +1611,7 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     proceedElement.setType(JmiType::Proceed);
 
     parsePacket(proceedElement, proceedXml);
-    QCOMPARE(proceedElement.id(), QStringLiteral("ca3cf894-5325-482f-a412-a6e9f832298d"));
+    QCOMPARE(proceedElement.id(), u"ca3cf894-5325-482f-a412-a6e9f832298d"_s);
     serializePacket(proceedElement, proceedXml);
 
     // --- Reject ---
@@ -1630,8 +1630,8 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     rejectElement.setType(JmiType::Reject);
 
     parsePacket(rejectElement, rejectXml);
-    QCOMPARE(rejectElement.id(), QStringLiteral("a73sjjvkla37jfea"));
-    QCOMPARE(rejectElement.reason()->text(), QStringLiteral("Busy"));
+    QCOMPARE(rejectElement.id(), u"a73sjjvkla37jfea"_s);
+    QCOMPARE(rejectElement.reason()->text(), u"Busy"_s);
     QCOMPARE(rejectElement.reason()->type(), ReasonType::Busy);
     QCOMPARE(rejectElement.containsTieBreak(), true);
     serializePacket(rejectElement, rejectXml);
@@ -1649,8 +1649,8 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     retractElement.setType(JmiType::Retract);
 
     parsePacket(retractElement, retractXml);
-    QCOMPARE(retractElement.id(), QStringLiteral("a73sjjvkla37jfea"));
-    QCOMPARE(retractElement.reason()->text(), QStringLiteral("Retracted"));
+    QCOMPARE(retractElement.id(), u"a73sjjvkla37jfea"_s);
+    QCOMPARE(retractElement.reason()->text(), u"Retracted"_s);
     QCOMPARE(retractElement.reason()->type(), ReasonType::Cancel);
     serializePacket(retractElement, retractXml);
 
@@ -1668,10 +1668,10 @@ void tst_QXmppJingleData::testJingleMessageInitiationElement()
     finishElement.setType(JmiType::Finish);
 
     parsePacket(finishElement, finishXml);
-    QCOMPARE(finishElement.id(), QStringLiteral("a73sjjvkla37jfea"));
-    QCOMPARE(finishElement.reason()->text(), QStringLiteral("Success"));
+    QCOMPARE(finishElement.id(), u"a73sjjvkla37jfea"_s);
+    QCOMPARE(finishElement.reason()->text(), u"Success"_s);
     QCOMPARE(finishElement.reason()->type(), ReasonType::Success);
-    QCOMPARE(finishElement.migratedTo(), QStringLiteral("989a46a6-f202-4910-a7c3-83c6ba3f3947"));
+    QCOMPARE(finishElement.migratedTo(), u"989a46a6-f202-4910-a7c3-83c6ba3f3947"_s);
     serializePacket(finishElement, finishXml);
 }
 

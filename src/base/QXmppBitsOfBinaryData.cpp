@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QMimeType>
@@ -172,9 +174,9 @@ bool QXmppBitsOfBinaryData::isBitsOfBinaryData(const QDomElement &element)
 /// \cond
 void QXmppBitsOfBinaryData::parseElementFromChild(const QDomElement &dataElement)
 {
-    d->cid = QXmppBitsOfBinaryContentId::fromContentId(dataElement.attribute(QStringLiteral("cid")));
-    d->maxAge = dataElement.attribute(QStringLiteral("max-age"), QStringLiteral("-1")).toInt();
-    d->contentType = QMimeDatabase().mimeTypeForName(dataElement.attribute(QStringLiteral("type")));
+    d->cid = QXmppBitsOfBinaryContentId::fromContentId(dataElement.attribute(u"cid"_s));
+    d->maxAge = dataElement.attribute(u"max-age"_s, u"-1"_s).toInt();
+    d->contentType = QMimeDatabase().mimeTypeForName(dataElement.attribute(u"type"_s));
     d->data = QByteArray::fromBase64(dataElement.text().toUtf8());
 }
 

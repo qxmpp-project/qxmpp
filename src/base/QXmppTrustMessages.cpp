@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -123,8 +125,8 @@ void QXmppTrustMessageElement::addKeyOwner(const QXmppTrustMessageKeyOwner &keyO
 /// \cond
 void QXmppTrustMessageElement::parse(const QDomElement &element)
 {
-    d->usage = element.attribute(QStringLiteral("usage"));
-    d->encryption = element.attribute(QStringLiteral("encryption"));
+    d->usage = element.attribute(u"usage"_s);
+    d->encryption = element.attribute(u"encryption"_s);
 
     for (const auto &keyOwnerElement : iterChildElements(element, u"key-owner")) {
         if (QXmppTrustMessageKeyOwner::isTrustMessageKeyOwner(keyOwnerElement)) {
@@ -263,7 +265,7 @@ void QXmppTrustMessageKeyOwner::setDistrustedKeys(const QList<QByteArray> &keyId
 /// \cond
 void QXmppTrustMessageKeyOwner::parse(const QDomElement &element)
 {
-    d->jid = element.attribute(QStringLiteral("jid"));
+    d->jid = element.attribute(u"jid"_s);
 
     for (const auto &childElement : iterChildElements(element, u"trust")) {
         d->trustedKeys.append(QByteArray::fromBase64(childElement.text().toLatin1()));
@@ -282,7 +284,7 @@ void QXmppTrustMessageKeyOwner::toXml(QXmlStreamWriter *writer) const
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeTextElement("trust", keyIdentifier.toBase64());
 #else
-        writer->writeTextElement(QStringLiteral("trust"), QString::fromUtf8(keyIdentifier.toBase64()));
+        writer->writeTextElement(u"trust"_s, QString::fromUtf8(keyIdentifier.toBase64()));
 #endif
     }
 
@@ -290,7 +292,7 @@ void QXmppTrustMessageKeyOwner::toXml(QXmlStreamWriter *writer) const
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeTextElement("distrust", keyIdentifier.toBase64());
 #else
-        writer->writeTextElement(QStringLiteral("distrust"), QString::fromUtf8(keyIdentifier.toBase64()));
+        writer->writeTextElement(u"distrust"_s, QString::fromUtf8(keyIdentifier.toBase64()));
 #endif
     }
 

@@ -32,7 +32,7 @@ void tst_QXmppStreamInitiationIq::testFileInfo_data()
         << QDateTime().toUTC()
         << QString()
         << QByteArray()
-        << QStringLiteral("test.txt")
+        << u"test.txt"_s
         << qint64(1022);
 
     QTest::newRow("full")
@@ -44,9 +44,9 @@ void tst_QXmppStreamInitiationIq::testFileInfo_data()
                       "<desc>This is a test. If this were a real file...</desc>"
                       "</file>")
         << QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), Qt::UTC)
-        << QStringLiteral("This is a test. If this were a real file...")
+        << u"This is a test. If this were a real file..."_s
         << QByteArray::fromHex("552da749930852c69ae5d2141d3766b1")
-        << QStringLiteral("test.txt")
+        << u"test.txt"_s
         << qint64(1022);
 }
 
@@ -89,7 +89,7 @@ void tst_QXmppStreamInitiationIq::testOffer()
     QXmppStreamInitiationIq iq;
     parsePacket(iq, xml);
     QVERIFY(!iq.fileInfo().isNull());
-    QCOMPARE(iq.fileInfo().name(), QStringLiteral("test.txt"));
+    QCOMPARE(iq.fileInfo().name(), u"test.txt"_s);
     QCOMPARE(iq.fileInfo().size(), qint64(1022));
     serializePacket(iq, xml);
 }

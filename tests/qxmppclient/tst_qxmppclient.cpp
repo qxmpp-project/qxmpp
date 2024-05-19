@@ -56,13 +56,13 @@ void tst_QXmppClient::testSendMessage()
         parsePacket(msg, text.toUtf8());
 
         QCOMPARE(msg.from(), QString());
-        QCOMPARE(msg.to(), QStringLiteral("support@qxmpp.org"));
-        QCOMPARE(msg.body(), QStringLiteral("implement XEP-* plz"));
+        QCOMPARE(msg.to(), u"support@qxmpp.org"_s);
+        QCOMPARE(msg.body(), u"implement XEP-* plz"_s);
     });
 
     client->sendMessage(
-        QStringLiteral("support@qxmpp.org"),
-        QStringLiteral("implement XEP-* plz"));
+        u"support@qxmpp.org"_s,
+        u"implement XEP-* plz"_s);
 
     // see handleMessageSent()
 
@@ -201,7 +201,7 @@ void tst_QXmppClient::testTaskStore()
     task.then(this, [&thenCalled](QXmppIq &&iq) {
         thenCalled = true;
 
-        QCOMPARE(iq.from(), QStringLiteral("juliet"));
+        QCOMPARE(iq.from(), u"juliet"_s);
         // casting not supported
         QVERIFY(!dynamic_cast<QXmppRegisterIq *>(&iq));
     });

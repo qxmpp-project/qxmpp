@@ -4,11 +4,13 @@
 
 #include "QXmppPubSubSubAuthorization.h"
 
-const auto FORM_TYPE_SUBSCRIBE_AUTHORIZATION = QStringLiteral("http://jabber.org/protocol/pubsub#subscribe_authorization");
-const auto ALLOW_SUBSCRIPTION = QStringLiteral("pubsub#allow");
-const auto NODE = QStringLiteral("pubsub#node");
-const auto SUBSCRIBER_JID = QStringLiteral("pubsub#subscriber_jid");
-const auto SUBID = QStringLiteral("pubsub#subid");
+#include "StringLiterals.h"
+
+const auto FORM_TYPE_SUBSCRIBE_AUTHORIZATION = u"http://jabber.org/protocol/pubsub#subscribe_authorization"_s;
+const auto ALLOW_SUBSCRIPTION = u"pubsub#allow"_s;
+const auto NODE = u"pubsub#node"_s;
+const auto SUBSCRIBER_JID = u"pubsub#subscriber_jid"_s;
+const auto SUBID = u"pubsub#subid"_s;
 
 ///
 /// \class QXmppPubSubSubAuthorization

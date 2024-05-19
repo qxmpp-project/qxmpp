@@ -102,8 +102,8 @@ void tst_QXmppPubSubIq::testItemsResponse()
     QVERIFY(iq.itemsContinuation().has_value());
     QCOMPARE(iq.itemsContinuation()->count(), 19);
     QCOMPARE(iq.itemsContinuation()->index(), 0);
-    QCOMPARE(iq.itemsContinuation()->first(), QStringLiteral("current"));
-    QCOMPARE(iq.itemsContinuation()->last(), QStringLiteral("otheritemid"));
+    QCOMPARE(iq.itemsContinuation()->first(), u"current"_s);
+    QCOMPARE(iq.itemsContinuation()->last(), u"otheritemid"_s);
     serializePacket(iq, xml);
 }
 
@@ -118,7 +118,7 @@ void tst_QXmppPubSubIq::testCreateNode()
 
     PubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QStringLiteral("create1"));
+    QCOMPARE(iq.id(), u"create1"_s);
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
@@ -148,7 +148,7 @@ void tst_QXmppPubSubIq::testDeleteNode()
 
     PubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QStringLiteral("delete1"));
+    QCOMPARE(iq.id(), u"delete1"_s);
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
@@ -194,7 +194,7 @@ void tst_QXmppPubSubIq::testPublish()
     serializePacket(iq, xml);
 
     // serialize using setters
-    QXmppPubSubBaseItem item(QStringLiteral("current"));
+    QXmppPubSubBaseItem item(u"current"_s);
 
     iq = PubSubIq();
     iq.setId(QLatin1String("items1"));
@@ -226,7 +226,7 @@ void tst_QXmppPubSubIq::testRetractItem()
 
     PubSubIq<> iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QStringLiteral("retract1"));
+    QCOMPARE(iq.id(), u"retract1"_s);
     QCOMPARE(iq.to(), QLatin1String("pubsub.shakespeare.lit"));
     QCOMPARE(iq.from(), QLatin1String("hamlet@denmark.lit/elsinore"));
     QCOMPARE(iq.type(), QXmppIq::Set);
@@ -234,7 +234,7 @@ void tst_QXmppPubSubIq::testRetractItem()
     QCOMPARE(iq.queryJid(), QString());
     QCOMPARE(iq.queryNode(), QLatin1String("princely_musings"));
     QCOMPARE(iq.items().size(), 1);
-    QCOMPARE(iq.items().first().id(), QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
+    QCOMPARE(iq.items().first().id(), u"ae890ac52d0df67ed7cfdf51b644e901"_s);
     serializePacket(iq, xml);
 
     iq = PubSubIq();
@@ -247,7 +247,7 @@ void tst_QXmppPubSubIq::testRetractItem()
     iq.setQueryNode(QLatin1String("princely_musings"));
 
     QXmppPubSubBaseItem item;
-    item.setId(QStringLiteral("ae890ac52d0df67ed7cfdf51b644e901"));
+    item.setId(u"ae890ac52d0df67ed7cfdf51b644e901"_s);
     iq.setItems({ item });
 
     serializePacket(iq, xml);
@@ -295,14 +295,14 @@ void tst_QXmppPubSubIq::testSubscription()
 
     PubSubIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.id(), QStringLiteral("sub1"));
-    QCOMPARE(iq.to(), QStringLiteral("francisco@denmark.lit/barracks"));
-    QCOMPARE(iq.from(), QStringLiteral("pubsub.shakespeare.lit"));
+    QCOMPARE(iq.id(), u"sub1"_s);
+    QCOMPARE(iq.to(), u"francisco@denmark.lit/barracks"_s);
+    QCOMPARE(iq.from(), u"pubsub.shakespeare.lit"_s);
     QCOMPARE(iq.type(), QXmppIq::Result);
     QCOMPARE(iq.queryType(), PubSubIq<>::Subscription);
-    QCOMPARE(iq.subscription()->jid(), QStringLiteral("francisco@denmark.lit"));
-    QCOMPARE(iq.subscription()->node(), QStringLiteral("princely_musings"));
-    QCOMPARE(iq.subscription()->subId(), QStringLiteral("ba49252aaa4f5d320c24d3766f0bdcade78c78d3"));
+    QCOMPARE(iq.subscription()->jid(), u"francisco@denmark.lit"_s);
+    QCOMPARE(iq.subscription()->node(), u"princely_musings"_s);
+    QCOMPARE(iq.subscription()->subId(), u"ba49252aaa4f5d320c24d3766f0bdcade78c78d3"_s);
     serializePacket(iq, xml);
 
     iq = PubSubIq();
@@ -403,10 +403,10 @@ void tst_QXmppPubSubIq::testCustomItem()
     QCOMPARE(iq.type(), QXmppIq::Result);
     QCOMPARE(iq.queryType(), PubSubIq<>::Items);
     QCOMPARE(iq.queryJid(), QString());
-    QCOMPARE(iq.queryNode(), QStringLiteral("blah"));
+    QCOMPARE(iq.queryNode(), u"blah"_s);
     QCOMPARE(iq.items().size(), 2);
-    QCOMPARE(iq.items().at(0).id(), QStringLiteral("42"));
-    QCOMPARE(iq.items().at(1).id(), QStringLiteral("23"));
+    QCOMPARE(iq.items().at(0).id(), u"42"_s);
+    QCOMPARE(iq.items().at(1).id(), u"23"_s);
     QCOMPARE(iq.items().at(0).publisher(), QString());
     QCOMPARE(iq.items().at(1).publisher(), QString());
 

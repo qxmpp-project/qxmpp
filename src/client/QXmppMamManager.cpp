@@ -16,6 +16,7 @@
 #include "QXmppUtils_p.h"
 
 #include "Algorithms.h"
+#include "StringLiterals.h"
 
 #include <unordered_map>
 
@@ -60,7 +61,7 @@ std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomE
         return {};
     }
 
-    auto queryId = resultElement.attribute(QStringLiteral("queryid"));
+    auto queryId = resultElement.attribute(u"queryid"_s);
 
     auto messageElement = firstChildElement(forwardedElement, u"message", ns_client);
     if (messageElement.isNull()) {
@@ -70,7 +71,7 @@ std::optional<std::tuple<MamMessage, QString>> parseMamMessageResult(const QDomE
     auto parseDelay = [](const auto &forwardedEl) -> std::optional<QDateTime> {
         auto delayEl = firstChildElement(forwardedEl, u"delay", ns_delayed_delivery);
         if (!delayEl.isNull()) {
-            return QXmppUtils::datetimeFromString(delayEl.attribute(QStringLiteral("stamp")));
+            return QXmppUtils::datetimeFromString(delayEl.attribute(u"stamp"_s));
         }
         return {};
     };
@@ -181,27 +182,27 @@ static QXmppMamQueryIq buildRequest(const QString &to,
     QList<QXmppDataForm::Field> fields;
 
     QXmppDataForm::Field hiddenField(QXmppDataForm::Field::HiddenField);
-    hiddenField.setKey(QStringLiteral("FORM_TYPE"));
+    hiddenField.setKey(u"FORM_TYPE"_s);
     hiddenField.setValue(ns_mam.toString());
     fields << hiddenField;
 
     if (!jid.isEmpty()) {
         QXmppDataForm::Field jidField;
-        jidField.setKey(QStringLiteral("with"));
+        jidField.setKey(u"with"_s);
         jidField.setValue(jid);
         fields << jidField;
     }
 
     if (start.isValid()) {
         QXmppDataForm::Field startField;
-        startField.setKey(QStringLiteral("start"));
+        startField.setKey(u"start"_s);
         startField.setValue(QXmppUtils::datetimeToString(start));
         fields << startField;
     }
 
     if (end.isValid()) {
         QXmppDataForm::Field endField;
-        endField.setKey(QStringLiteral("end"));
+        endField.setKey(u"end"_s);
         endField.setValue(QXmppUtils::datetimeToString(end));
         fields << endField;
     }
@@ -339,7 +340,7 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
                     if (std::holds_alternative<QXmppMessage>(result)) {
                         state.processedMessages[i] = std::get<QXmppMessage>(std::move(result));
                     } else {
-                        warning(QStringLiteral("Error decrypting message."));
+                        warning(u"Error decrypting message."_s);
                         state.processedMessages[i] = parseMamMessage(state.messages[i], Unencrypted);
                     }
 

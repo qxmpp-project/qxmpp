@@ -26,6 +26,7 @@
 #include "QXmppVCardManager.h"
 #include "QXmppVersionManager.h"
 
+#include "StringLiterals.h"
 #include "XmppSocket.h"
 
 #include <chrono>
@@ -42,7 +43,7 @@ using IqDecryptResult = QXmppE2eeExtension::IqDecryptResult;
 
 static bool isIqResponse(const QDomElement &el)
 {
-    auto type = el.attribute(QStringLiteral("type"));
+    auto type = el.attribute(u"type"_s);
     return el.tagName() == u"iq" && (type == u"result" || type == u"error");
 }
 
@@ -63,7 +64,7 @@ void QXmppClientPrivate::addProperCapability(QXmppPresence &presence)
 {
     auto *ext = q->findExtension<QXmppDiscoveryManager>();
     if (ext) {
-        presence.setCapabilityHash(QStringLiteral("sha-1"));
+        presence.setCapabilityHash(u"sha-1"_s);
         presence.setCapabilityNode(ext->clientCapabilitiesNode());
         presence.setCapabilityVer(ext->capabilities().verificationString());
     }
@@ -578,13 +579,13 @@ QXmppTask<QXmppClient::IqResult> QXmppClient::sendSensitiveIq(QXmppIq &&iq, cons
                                                   [&](QDomElement &&el) {
                                                       if (!isIqResponse(el)) {
                                                           p.finish(QXmppError {
-                                                              QStringLiteral("Invalid IQ response received."),
+                                                              u"Invalid IQ response received."_s,
                                                               QXmpp::SendError::EncryptionError });
                                                           return;
                                                       }
                                                       if (!d->encryptionExtension) {
                                                           p.finish(QXmppError {
-                                                              QStringLiteral("No decryption extension found."),
+                                                              u"No decryption extension found."_s,
                                                               QXmpp::SendError::EncryptionError });
                                                           return;
                                                       }
@@ -658,7 +659,7 @@ void QXmppClient::disconnectFromServer()
     d->reconnectionTimer->stop();
 
     d->clientPresence.setType(QXmppPresence::Unavailable);
-    d->clientPresence.setStatusText(QStringLiteral("Logged out"));
+    d->clientPresence.setStatusText(u"Logged out"_s);
     if (d->stream->isConnected()) {
         sendPacket(d->clientPresence);
     }
@@ -747,7 +748,7 @@ void QXmppClient::sendMessage(const QString &bareJid, const QString &message)
     if (!resources.isEmpty()) {
         for (const auto &resource : resources) {
             sendPacket(
-                QXmppMessage({}, bareJid + QStringLiteral("/") + resource, message));
+                QXmppMessage({}, bareJid + u"/"_s + resource, message));
         }
     } else {
         sendPacket(QXmppMessage({}, bareJid, message));
@@ -837,17 +838,17 @@ void QXmppClient::injectIq(const QDomElement &element, const std::optional<QXmpp
         return;
     }
     if (!StanzaPipeline::process(d->extensions, element, e2eeMetadata)) {
-        const auto iqType = element.attribute(QStringLiteral("type"));
+        const auto iqType = element.attribute(u"type"_s);
         if (iqType == u"get" || iqType == u"set") {
             // send error IQ
             using Err = QXmppStanza::Error;
 
             QXmppIq iq(QXmppIq::Error);
-            iq.setTo(element.attribute(QStringLiteral("from")));
-            iq.setId(element.attribute(QStringLiteral("id")));
+            iq.setTo(element.attribute(u"from"_s));
+            iq.setId(element.attribute(u"id"_s));
             const auto errMessage = e2eeMetadata.has_value()
-                ? QStringLiteral("Feature not implemented or not supported with end-to-end encryption.")
-                : QStringLiteral("Feature not implemented.");
+                ? u"Feature not implemented or not supported with end-to-end encryption."_s
+                : u"Feature not implemented."_s;
             iq.setError(Err(Err::Cancel, Err::FeatureNotImplemented, errMessage));
             reply(std::move(iq), e2eeMetadata);
         }
@@ -882,7 +883,7 @@ void QXmppClient::_q_elementReceived(const QDomElement &element, bool &handled)
 void QXmppClient::_q_reconnect()
 {
     if (d->stream->configuration().autoReconnectionEnabled()) {
-        debug(QStringLiteral("Reconnecting to server"));
+        debug(u"Reconnecting to server"_s);
         d->stream->connectToHost();
     }
 }

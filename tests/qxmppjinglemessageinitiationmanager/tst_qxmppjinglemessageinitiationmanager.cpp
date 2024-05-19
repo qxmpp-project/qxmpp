@@ -255,7 +255,7 @@ void tst_QXmppJingleMessageInitiationManager::testPropose()
     QString jid { "julietPropose@capulet.example" };
 
     QXmppJingleDescription description;
-    description.setMedia(QStringLiteral("audio"));
+    description.setMedia(u"audio"_s);
     description.setSsrc(123);
     description.setType(ns_jingle_rtp.toString());
 
@@ -299,7 +299,7 @@ void tst_QXmppJingleMessageInitiationManager::testSendMessage()
 
     QXmppJingleMessageInitiationElement jmiElement;
     jmiElement.setType(JmiType::Propose);
-    jmiElement.setId(QStringLiteral("fecbea35-08d3-404f-9ec7-2b57c566fa74"));
+    jmiElement.setId(u"fecbea35-08d3-404f-9ec7-2b57c566fa74"_s);
 
     connect(&m_logger, &QXmppLogger::message, this, [jid, jmiElement](QXmppLogger::MessageType type, const QString &text) {
         if (type == QXmppLogger::SentMessage) {

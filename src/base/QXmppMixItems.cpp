@@ -10,6 +10,8 @@
 #include "QXmppMixParticipantItem.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 using namespace QXmpp::Private;
 
 #include <QDateTime>
@@ -927,8 +929,8 @@ bool QXmppMixConfigItem::isItem(const QDomElement &element)
         for (auto fieldEl = payload.firstChildElement();
              !fieldEl.isNull();
              fieldEl = fieldEl.nextSiblingElement()) {
-            if (fieldEl.attribute(QStringLiteral("var")) == u"FORM_TYPE") {
-                return fieldEl.firstChildElement(QStringLiteral("value")).text() == ns_mix_admin;
+            if (fieldEl.attribute(u"var"_s) == u"FORM_TYPE") {
+                return fieldEl.firstChildElement(u"value"_s).text() == ns_mix_admin;
             }
         }
         return false;
@@ -1110,8 +1112,8 @@ bool QXmppMixInfoItem::isItem(const QDomElement &element)
             return false;
         }
         for (const auto &fieldEl : iterChildElements(payload)) {
-            if (fieldEl.attribute(QStringLiteral("var")) == u"FORM_TYPE") {
-                return fieldEl.firstChildElement(QStringLiteral("value")).text() == ns_mix;
+            if (fieldEl.attribute(u"var"_s) == u"FORM_TYPE") {
+                return fieldEl.firstChildElement(u"value"_s).text() == ns_mix;
             }
         }
         return false;
@@ -1203,8 +1205,8 @@ void QXmppMixParticipantItem::setJid(QString jid)
 /// \cond
 void QXmppMixParticipantItem::parsePayload(const QDomElement &payload)
 {
-    d->nick = payload.firstChildElement(QStringLiteral("nick")).text();
-    d->jid = payload.firstChildElement(QStringLiteral("jid")).text();
+    d->nick = payload.firstChildElement(u"nick"_s).text();
+    d->jid = payload.firstChildElement(u"jid"_s).text();
 }
 
 void QXmppMixParticipantItem::serializePayload(QXmlStreamWriter *writer) const

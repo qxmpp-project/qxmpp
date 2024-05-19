@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -60,10 +62,10 @@ bool QXmppVersionIq::checkIqType(const QString &tagName, const QString &xmlNames
 
 void QXmppVersionIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    m_name = queryElement.firstChildElement(QStringLiteral("name")).text();
-    m_os = queryElement.firstChildElement(QStringLiteral("os")).text();
-    m_version = queryElement.firstChildElement(QStringLiteral("version")).text();
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
+    m_name = queryElement.firstChildElement(u"name"_s).text();
+    m_os = queryElement.firstChildElement(u"os"_s).text();
+    m_version = queryElement.firstChildElement(u"version"_s).text();
 }
 
 void QXmppVersionIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

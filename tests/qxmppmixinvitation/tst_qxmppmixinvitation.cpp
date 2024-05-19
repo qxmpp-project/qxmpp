@@ -37,24 +37,24 @@ void tst_QXmppMixInvitation::testInvitation()
 
     parsePacket(invitation1, xml);
 
-    QCOMPARE(invitation1.inviterJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(invitation1.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
-    QCOMPARE(invitation1.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
-    QCOMPARE(invitation1.token(), QStringLiteral("ABCDEF"));
+    QCOMPARE(invitation1.inviterJid(), u"hag66@shakespeare.example"_s);
+    QCOMPARE(invitation1.inviteeJid(), u"cat@shakespeare.example"_s);
+    QCOMPARE(invitation1.channelJid(), u"coven@mix.shakespeare.example"_s);
+    QCOMPARE(invitation1.token(), u"ABCDEF"_s);
 
     serializePacket(invitation1, xml);
 
     QXmppMixInvitation invitation2;
 
-    invitation2.setInviterJid(QStringLiteral("hag66@shakespeare.example"));
-    invitation2.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
-    invitation2.setChannelJid(QStringLiteral("coven@mix.shakespeare.example"));
-    invitation2.setToken(QStringLiteral("ABCDEF"));
+    invitation2.setInviterJid(u"hag66@shakespeare.example"_s);
+    invitation2.setInviteeJid(u"cat@shakespeare.example"_s);
+    invitation2.setChannelJid(u"coven@mix.shakespeare.example"_s);
+    invitation2.setToken(u"ABCDEF"_s);
 
-    QCOMPARE(invitation2.inviterJid(), QStringLiteral("hag66@shakespeare.example"));
-    QCOMPARE(invitation2.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
-    QCOMPARE(invitation2.channelJid(), QStringLiteral("coven@mix.shakespeare.example"));
-    QCOMPARE(invitation2.token(), QStringLiteral("ABCDEF"));
+    QCOMPARE(invitation2.inviterJid(), u"hag66@shakespeare.example"_s);
+    QCOMPARE(invitation2.inviteeJid(), u"cat@shakespeare.example"_s);
+    QCOMPARE(invitation2.channelJid(), u"coven@mix.shakespeare.example"_s);
+    QCOMPARE(invitation2.token(), u"ABCDEF"_s);
 }
 
 void tst_QXmppMixInvitation::testIsInvitation()

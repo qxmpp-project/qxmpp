@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -30,7 +32,7 @@ QXmppPingIq::QXmppPingIq()
 ///
 bool QXmppPingIq::isPingIq(const QDomElement &element)
 {
-    return isIqType(element, u"ping", ns_ping) && element.attribute(QStringLiteral("type")) == u"get";
+    return isIqType(element, u"ping", ns_ping) && element.attribute(u"type"_s) == u"get";
 }
 
 /// \cond

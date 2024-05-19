@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDebug>
 #include <QDomElement>
 
@@ -106,16 +108,16 @@ bool QXmppResultSetQuery::isNull() const
 /// \cond
 void QXmppResultSetQuery::parse(const QDomElement &element)
 {
-    QDomElement setElement = (element.tagName() == u"set") ? element : element.firstChildElement(QStringLiteral("set"));
+    QDomElement setElement = (element.tagName() == u"set") ? element : element.firstChildElement(u"set"_s);
     if (setElement.namespaceURI() == ns_rsm) {
         bool ok = false;
-        m_max = setElement.firstChildElement(QStringLiteral("max")).text().toInt(&ok);
+        m_max = setElement.firstChildElement(u"max"_s).text().toInt(&ok);
         if (!ok) {
             m_max = -1;
         }
-        m_after = setElement.firstChildElement(QStringLiteral("after")).text();
-        m_before = setElement.firstChildElement(QStringLiteral("before")).text();
-        m_index = setElement.firstChildElement(QStringLiteral("index")).text().toInt(&ok);
+        m_after = setElement.firstChildElement(u"after"_s).text();
+        m_before = setElement.firstChildElement(u"before"_s).text();
+        m_index = setElement.firstChildElement(u"index"_s).text().toInt(&ok);
         if (!ok) {
             m_index = -1;
         }
@@ -233,7 +235,7 @@ void QXmppResultSetReply::parse(const QDomElement &element)
         QDomElement firstElem = firstChildElement(setElement, u"first");
         m_first = firstElem.text();
         bool ok = false;
-        m_index = firstElem.attribute(QStringLiteral("index")).toInt(&ok);
+        m_index = firstElem.attribute(u"index"_s).toInt(&ok);
         if (!ok) {
             m_index = -1;
         }

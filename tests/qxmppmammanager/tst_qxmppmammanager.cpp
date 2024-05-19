@@ -82,7 +82,7 @@ void tst_QXmppMamManager::testHandleStanza_data()
                       "<delay xmlns='urn:xmpp:delay' stamp='2010-07-10T23:08:25Z'/>"
                       "<body>Call me but love, and I'll be new baptized; Henceforth I never will be Romeo.</body>"
                       "</message>")
-        << QStringLiteral("f27");
+        << u"f27"_s;
 
     QTest::newRow("stanza2")
         << QByteArray("<message id='aeb214' to='juliet@capulet.lit/chamber'>"

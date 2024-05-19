@@ -267,12 +267,12 @@ void tst_QXmppSasl::sasl2UserAgent()
         "<software>AwesomeXMPP</software>"
         "<device>Kiva&apos;s Phone</device>"
         "</user-agent>";
-    auto namespaceWrapper = QStringLiteral("<authenticate xmlns='%1'>%2</authenticate>");
+    auto namespaceWrapper = u"<authenticate xmlns='%1'>%2</authenticate>"_s;
 
     auto userAgentDom = xmlToDom(namespaceWrapper.arg(ns_sasl_2, xml)).firstChildElement();
     auto userAgent = Sasl2::UserAgent::fromDom(userAgentDom);
     QVERIFY(userAgent.has_value());
-    QCOMPARE(userAgent->id, QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")));
+    QCOMPARE(userAgent->id, QUuid::fromString(u"d4565fa7-4d72-4749-b3d3-740edbf87770"_s));
     QVERIFY(!userAgent->id.isNull());
     QCOMPARE(userAgent->software, "AwesomeXMPP");
     QCOMPARE(userAgent->device, "Kiva's Phone");
@@ -299,7 +299,7 @@ void tst_QXmppSasl::sasl2Authenticate()
     QCOMPARE(auth->mechanism, "SCRAM-SHA-1-PLUS");
     QCOMPARE(auth->initialResponse, "p=tls-exporter,,n=user,r=12C4CD5C-E38E-4A98-8F6D-15C38F51CCC6");
     QVERIFY(auth->userAgent);
-    QCOMPARE(auth->userAgent->id, QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")));
+    QCOMPARE(auth->userAgent->id, QUuid::fromString(u"d4565fa7-4d72-4749-b3d3-740edbf87770"_s));
     QCOMPARE(auth->userAgent->software, "AwesomeXMPP");
     QCOMPARE(auth->userAgent->device, "Kiva's Phone");
     QVERIFY(auth->bindRequest);
@@ -737,7 +737,7 @@ void tst_QXmppSasl::sasl2ManagerPlain()
     config.setSaslAuthMechanism("PLAIN");
     config.setDisabledSaslMechanisms({});
     config.setSasl2UserAgent(QXmppSasl2UserAgent {
-        QUuid::fromString(QStringLiteral("d4565fa7-4d72-4749-b3d3-740edbf87770")),
+        QUuid::fromString(u"d4565fa7-4d72-4749-b3d3-740edbf87770"_s),
         "QXmpp",
         "HAL 9000",
     });

@@ -10,6 +10,8 @@
 #include "QXmppOutgoingClient.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp;
@@ -38,7 +40,7 @@ public:
 auto parseIq(std::variant<QDomElement, QXmppError> &&sendResult) -> std::optional<QXmppError>
 {
     if (auto el = std::get_if<QDomElement>(&sendResult)) {
-        auto iqType = el->attribute(QStringLiteral("type"));
+        auto iqType = el->attribute(u"type"_s);
         if (iqType == u"result") {
             return {};
         }
@@ -48,7 +50,7 @@ auto parseIq(std::variant<QDomElement, QXmppError> &&sendResult) -> std::optiona
             return QXmppError { error->text(), std::move(*error) };
         }
         // Only happens with IQs with type=error, but no <error/> element
-        return QXmppError { QStringLiteral("Unknown error received."), QXmppStanza::Error() };
+        return QXmppError { u"Unknown error received."_s, QXmppStanza::Error() };
     } else if (auto err = std::get_if<QXmppError>(&sendResult)) {
         return *err;
     }
@@ -100,7 +102,7 @@ bool QXmppCarbonManagerV2::handleStanza(const QDomElement &element, const std::o
     }
 
     // carbon copies must always come from our bare JID
-    auto from = element.attribute(QStringLiteral("from"));
+    auto from = element.attribute(u"from"_s);
     if (from != client()->configuration().jidBare()) {
         info(u"Received carbon copy from attacker or buggy client '" + from + u"' trying to use CVE-2017-5603.");
         return false;
@@ -144,7 +146,7 @@ void QXmppCarbonManagerV2::enableCarbons()
         if (auto err = parseIq(std::move(domResult))) {
             warning(u"Could not enable message carbons: " + err->description);
         } else {
-            info(QStringLiteral("Message Carbons enabled."));
+            info(u"Message Carbons enabled."_s);
         }
     });
 }

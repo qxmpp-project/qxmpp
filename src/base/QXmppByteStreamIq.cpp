@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -186,8 +188,8 @@ bool QXmppByteStreamIq::isByteStreamIq(const QDomElement &element)
 void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 {
     auto queryElement = firstChildElement(element, u"query", ns_bytestreams);
-    m_sid = queryElement.attribute(QStringLiteral("sid"));
-    const auto modeStr = queryElement.attribute(QStringLiteral("mode"));
+    m_sid = queryElement.attribute(u"sid"_s);
+    const auto modeStr = queryElement.attribute(u"mode"_s);
     if (modeStr == u"tcp") {
         m_mode = Tcp;
     } else if (modeStr == u"udp") {
@@ -198,14 +200,14 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
 
     for (const auto &hostElement : iterChildElements(queryElement, u"streamhost")) {
         StreamHost streamHost;
-        streamHost.setHost(hostElement.attribute(QStringLiteral("host")));
-        streamHost.setJid(hostElement.attribute(QStringLiteral("jid")));
-        streamHost.setPort(parseInt<quint16>(hostElement.attribute(QStringLiteral("port"))).value_or(0));
-        streamHost.setZeroconf(hostElement.attribute(QStringLiteral("zeroconf")));
+        streamHost.setHost(hostElement.attribute(u"host"_s));
+        streamHost.setJid(hostElement.attribute(u"jid"_s));
+        streamHost.setPort(parseInt<quint16>(hostElement.attribute(u"port"_s)).value_or(0));
+        streamHost.setZeroconf(hostElement.attribute(u"zeroconf"_s));
         m_streamHosts.append(streamHost);
     }
     m_activate = firstChildElement(queryElement, u"activate").text();
-    m_streamHostUsed = firstChildElement(queryElement, u"streamhost-used").attribute(QStringLiteral("jid"));
+    m_streamHostUsed = firstChildElement(queryElement, u"streamhost-used").attribute(u"jid"_s);
 }
 
 void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
@@ -215,9 +217,9 @@ void QXmppByteStreamIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writeOptionalXmlAttribute(writer, u"sid", m_sid);
     QString modeStr;
     if (m_mode == Tcp) {
-        modeStr = QStringLiteral("tcp");
+        modeStr = u"tcp"_s;
     } else if (m_mode == Udp) {
-        modeStr = QStringLiteral("udp");
+        modeStr = u"udp"_s;
     }
     writeOptionalXmlAttribute(writer, u"mode", modeStr);
     for (const auto &streamHost : m_streamHosts) {

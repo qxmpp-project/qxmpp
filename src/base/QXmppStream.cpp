@@ -13,6 +13,7 @@
 #include "QXmppUtils_p.h"
 
 #include "Stream.h"
+#include "StringLiterals.h"
 #include "XmppSocket.h"
 #include "qxmlstream.h"
 
@@ -210,7 +211,7 @@ QString StreamErrorElement::streamErrorToString(StreamError e)
 std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const QDomElement &el)
 {
     if (el.tagName() != u"error" || el.namespaceURI() != ns_stream) {
-        return QXmppError { QStringLiteral("Invalid dom element."), {} };
+        return QXmppError { u"Invalid dom element."_s, {} };
     }
 
     std::optional<StreamErrorElement::Condition> condition;
@@ -230,7 +231,7 @@ std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const Q
     }
 
     if (!condition) {
-        return QXmppError { QStringLiteral("Stream error is missing valid error condition."), {} };
+        return QXmppError { u"Stream error is missing valid error condition."_s, {} };
     }
 
     return StreamErrorElement {
@@ -253,7 +254,7 @@ void XmppSocket::setSocket(QSslSocket *socket)
     }
 
     QObject::connect(socket, &QAbstractSocket::connected, this, [this]() {
-        info(QStringLiteral("Socket connected to %1 %2")
+        info(u"Socket connected to %1 %2"_s
                  .arg(m_socket->peerAddress().toString(),
                       QString::number(m_socket->peerPort())));
         m_dataBuffer.clear();
@@ -261,13 +262,13 @@ void XmppSocket::setSocket(QSslSocket *socket)
         Q_EMIT started();
     });
     QObject::connect(socket, &QSslSocket::encrypted, this, [this]() {
-        debug(QStringLiteral("Socket encrypted"));
+        debug(u"Socket encrypted"_s);
         m_dataBuffer.clear();
         m_streamOpenElement.clear();
         Q_EMIT started();
     });
     QObject::connect(socket, &QSslSocket::errorOccurred, this, [this](QAbstractSocket::SocketError) {
-        warning(QStringLiteral("Socket error: ") + m_socket->errorString());
+        warning(u"Socket error: "_s + m_socket->errorString());
     });
     QObject::connect(socket, &QSslSocket::readyRead, this, [this]() {
         processData(QString::fromUtf8(m_socket->readAll()));
@@ -330,8 +331,8 @@ void XmppSocket::processData(const QString &data)
     //
     // Check whether we received a stream open or closing tag
     //
-    static const QRegularExpression streamStartRegex(QStringLiteral(R"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)"));
-    static const QRegularExpression streamEndRegex(QStringLiteral("</stream:stream>$"));
+    static const QRegularExpression streamStartRegex(uR"(^(<\?xml.*\?>)?\s*<stream:stream[^>]*>)"_s);
+    static const QRegularExpression streamEndRegex(u"</stream:stream>$"_s);
 
     auto streamOpenMatch = streamStartRegex.match(m_dataBuffer);
     bool hasStreamOpen = streamOpenMatch.hasMatch();
@@ -366,7 +367,7 @@ void XmppSocket::processData(const QString &data)
         wrappedStanzas.prepend(m_streamOpenElement);
     }
     if (!hasStreamClose) {
-        wrappedStanzas.append(QStringLiteral("</stream:stream>"));
+        wrappedStanzas.append(u"</stream:stream>"_s);
     }
 
     //

@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 #include <QDomElement>
 #include <QXmlStreamWriter>
@@ -241,19 +243,19 @@ bool QXmppPubSubSubscription::isSubscription(const QDomElement &element)
         return false;
     }
 
-    if (element.hasAttribute(QStringLiteral("subscription"))) {
-        const auto subStateStr = element.attribute(QStringLiteral("subscription"));
+    if (element.hasAttribute(u"subscription"_s)) {
+        const auto subStateStr = element.attribute(u"subscription"_s);
         if (!enumFromString<State>(SUBSCRIPTION_STATES, subStateStr)) {
             return false;
         }
     }
 
     if (element.namespaceURI() == ns_pubsub || element.namespaceURI() == ns_pubsub_event) {
-        return element.hasAttribute(QStringLiteral("jid"));
+        return element.hasAttribute(u"jid"_s);
     }
     if (element.namespaceURI() == ns_pubsub_owner) {
-        return element.hasAttribute(QStringLiteral("jid")) &&
-            element.hasAttribute(QStringLiteral("subscription"));
+        return element.hasAttribute(u"jid"_s) &&
+            element.hasAttribute(u"subscription"_s);
     }
     return false;
 }
@@ -264,24 +266,24 @@ void QXmppPubSubSubscription::parse(const QDomElement &element)
     bool isPubSub = element.namespaceURI() == ns_pubsub;
     bool isPubSubEvent = !isPubSub && element.namespaceURI() == ns_pubsub_event;
 
-    d->jid = element.attribute(QStringLiteral("jid"));
-    d->state = stateFromString(element.attribute(QStringLiteral("subscription")));
+    d->jid = element.attribute(u"jid"_s);
+    d->state = stateFromString(element.attribute(u"subscription"_s));
 
     if (isPubSub || isPubSubEvent) {
-        d->node = element.attribute(QStringLiteral("node"));
-        d->subId = element.attribute(QStringLiteral("subid"));
+        d->node = element.attribute(u"node"_s);
+        d->subId = element.attribute(u"subid"_s);
 
         if (isPubSubEvent) {
-            if (element.hasAttribute(QStringLiteral("expiry"))) {
+            if (element.hasAttribute(u"expiry"_s)) {
                 d->expiry = QXmppUtils::datetimeFromString(
-                    element.attribute(QStringLiteral("expiry")));
+                    element.attribute(u"expiry"_s));
             }
         } else if (isPubSub) {
-            auto options = element.firstChildElement(QStringLiteral("subscribe-options"));
+            auto options = element.firstChildElement(u"subscribe-options"_s);
             if (options.isNull()) {
                 d->configurationSupport = Unavailable;
             } else {
-                if (!options.firstChildElement(QStringLiteral("required")).isNull()) {
+                if (!options.firstChildElement(u"required"_s).isNull()) {
                     d->configurationSupport = Required;
                 } else {
                     d->configurationSupport = Available;
@@ -308,7 +310,7 @@ void QXmppPubSubSubscription::toXml(QXmlStreamWriter *writer) const
     if (d->configurationSupport > Unavailable) {
         writer->writeStartElement(QSL65("subscribe-options"));
         if (d->configurationSupport == Required) {
-            writer->writeEmptyElement(QStringLiteral("required"));
+            writer->writeEmptyElement(u"required"_s);
         }
         writer->writeEndElement();
     }

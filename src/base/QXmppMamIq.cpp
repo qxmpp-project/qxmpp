@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -127,14 +129,14 @@ bool QXmppMamQueryIq::isMamQueryIq(const QDomElement &element)
 
 void QXmppMamQueryIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    d->node = queryElement.attribute(QStringLiteral("node"));
-    d->queryId = queryElement.attribute(QStringLiteral("queryId"));
-    QDomElement resultSetElement = queryElement.firstChildElement(QStringLiteral("set"));
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
+    d->node = queryElement.attribute(u"node"_s);
+    d->queryId = queryElement.attribute(u"queryId"_s);
+    QDomElement resultSetElement = queryElement.firstChildElement(u"set"_s);
     if (!resultSetElement.isNull()) {
         d->resultSetQuery.parse(resultSetElement);
     }
-    QDomElement formElement = queryElement.firstChildElement(QStringLiteral("x"));
+    QDomElement formElement = queryElement.firstChildElement(u"x"_s);
     if (!formElement.isNull()) {
         d->form.parse(formElement);
     }
@@ -228,7 +230,7 @@ void QXmppMamResultIq::setComplete(bool complete)
 bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 {
     if (element.tagName() == u"iq") {
-        QDomElement finElement = element.firstChildElement(QStringLiteral("fin"));
+        QDomElement finElement = element.firstChildElement(u"fin"_s);
         if (!finElement.isNull() && finElement.namespaceURI() == ns_mam) {
             return true;
         }
@@ -238,9 +240,9 @@ bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 
 void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement finElement = element.firstChildElement(QStringLiteral("fin"));
-    d->complete = finElement.attribute(QStringLiteral("complete")) == u"true";
-    QDomElement resultSetElement = finElement.firstChildElement(QStringLiteral("set"));
+    QDomElement finElement = element.firstChildElement(u"fin"_s);
+    d->complete = finElement.attribute(u"complete"_s) == u"true";
+    QDomElement resultSetElement = finElement.firstChildElement(u"set"_s);
     if (!resultSetElement.isNull()) {
         d->resultSetReply.parse(resultSetElement);
     }
@@ -251,7 +253,7 @@ void QXmppMamResultIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     writer->writeStartElement(QSL65("fin"));
     writer->writeDefaultNamespace(toString65(ns_mam));
     if (d->complete) {
-        writer->writeAttribute(QSL65("complete"), QStringLiteral("true"));
+        writer->writeAttribute(QSL65("complete"), u"true"_s);
     }
     d->resultSetReply.toXml(writer);
     writer->writeEndElement();

@@ -11,6 +11,8 @@
 #include "QXmppIqHandling.h"
 #include "QXmppUtils.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 #include <QDomElement>
 
@@ -90,7 +92,7 @@ std::variant<QXmppEntityTimeIq, QXmppStanza::Error> QXmppEntityTimeManager::hand
 {
     using Err = QXmppStanza::Error;
     if (iq.type() != QXmppIq::Get) {
-        return Err(Err::Cancel, Err::BadRequest, QStringLiteral("Only IQ requests of type 'get' allowed."));
+        return Err(Err::Cancel, Err::BadRequest, u"Only IQ requests of type 'get' allowed."_s);
     }
 
     QXmppEntityTimeIq responseIq;

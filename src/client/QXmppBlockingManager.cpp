@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 constexpr QStringView XMLNS_BLOCKING = u"urn:xmpp:blocking";
@@ -29,7 +31,7 @@ static QVector<QString> parseItems(const QDomElement &el)
 {
     QVector<QString> jids;
     for (const auto &item : iterChildElements(el, u"item")) {
-        jids.append(item.attribute(QStringLiteral("jid")));
+        jids.append(item.attribute(u"jid"_s));
     }
     return jids;
 }
@@ -371,7 +373,7 @@ bool QXmppBlockingManager::handleStanza(const QDomElement &stanza, const std::op
             return StanzaError {
                 StanzaError::Cancel,
                 StanzaError::FeatureNotImplemented,
-                QStringLiteral("Only IQs of type 'set' supported.")
+                u"Only IQs of type 'set' supported."_s
             };
         }
 
@@ -382,7 +384,7 @@ bool QXmppBlockingManager::handleStanza(const QDomElement &stanza, const std::op
             return StanzaError {
                 StanzaError::Cancel,
                 StanzaError::Forbidden,
-                QStringLiteral("Forbidden.")
+                u"Forbidden."_s
             };
         }
 
@@ -390,7 +392,7 @@ bool QXmppBlockingManager::handleStanza(const QDomElement &stanza, const std::op
             return StanzaError {
                 StanzaError::Wait,
                 StanzaError::UnexpectedRequest,
-                QStringLiteral("Client is not subscribed to blocklist.")
+                u"Client is not subscribed to blocklist."_s
             };
         }
 

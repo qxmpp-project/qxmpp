@@ -12,6 +12,8 @@
 #include "QXmppJingleIq.h"
 #include "QXmppUtils.h"
 
+#include "StringLiterals.h"
+
 #include <gst/gst.h>
 
 #include <QDomElement>
@@ -121,17 +123,17 @@ void QXmppCallManager::onUnregistered(QXmppClient *client)
 QXmppCall *QXmppCallManager::call(const QString &jid)
 {
     if (jid.isEmpty()) {
-        warning(QStringLiteral("Refusing to call an empty jid"));
+        warning(u"Refusing to call an empty jid"_s);
         return nullptr;
     }
 
     if (jid == client()->configuration().jid()) {
-        warning(QStringLiteral("Refusing to call self"));
+        warning(u"Refusing to call self"_s);
         return nullptr;
     }
 
     QXmppCall *call = new QXmppCall(jid, QXmppCall::OutgoingDirection, this);
-    QXmppCallStream *stream = call->d->createStream(QStringLiteral("audio"), QStringLiteral("initiator"), QStringLiteral("microphone"));
+    QXmppCallStream *stream = call->d->createStream(u"audio"_s, u"initiator"_s, u"microphone"_s);
     call->d->streams << stream;
     call->d->sid = QXmppUtils::generateStanzaHash();
 
@@ -301,7 +303,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         // for all other requests, require a valid call
         QXmppCall *call = d->findCall(iq.sid());
         if (!call) {
-            warning(QStringLiteral("Remote party %1 sent a request for an unknown call %2").arg(iq.from(), iq.sid()));
+            warning(u"Remote party %1 sent a request for an unknown call %2"_s.arg(iq.from(), iq.sid()));
             return;
         }
         call->d->handleRequest(iq);

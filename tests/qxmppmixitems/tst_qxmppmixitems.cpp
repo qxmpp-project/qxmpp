@@ -115,9 +115,9 @@ void tst_QXmppMixItem::testConfig()
 
     parsePacket(item1, xml);
     QCOMPARE(item1.formType(), QXmppDataForm::Result);
-    QCOMPARE(item1.lastEditorJid(), QStringLiteral("greymalkin@shakespeare.example"));
-    QCOMPARE(item1.ownerJids(), QStringList({ QStringLiteral("hecate@shakespeare.example"), QStringLiteral("greymalkin@shakespeare.example") }));
-    QCOMPARE(item1.administratorJids(), QStringList({ QStringLiteral("juliet@shakespeare.example"), QStringLiteral("romeo@shakespeare.example") }));
+    QCOMPARE(item1.lastEditorJid(), u"greymalkin@shakespeare.example"_s);
+    QCOMPARE(item1.ownerJids(), QStringList({ u"hecate@shakespeare.example"_s, u"greymalkin@shakespeare.example"_s }));
+    QCOMPARE(item1.administratorJids(), QStringList({ u"juliet@shakespeare.example"_s, u"romeo@shakespeare.example"_s }));
     QCOMPARE(item1.channelDeletion(), QDateTime({ { 2023, 12, 31 }, { 12, 30 }, Qt::UTC }));
     QCOMPARE(item1.nodes(), QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Information);
     QCOMPARE(item1.messagesSubscribeRole(), QXmppMixConfigItem::Role::Allowed);
@@ -145,13 +145,13 @@ void tst_QXmppMixItem::testConfig()
     serializePacket(item1, xml);
 
     QXmppMixConfigItem item2;
-    item2.setId(QStringLiteral("2016-05-30T09:00:00"));
+    item2.setId(u"2016-05-30T09:00:00"_s);
     item2.setFormType(QXmppDataForm::Result);
-    item2.setLastEditorJid(QStringLiteral("greymalkin@shakespeare.example"));
-    item2.setOwnerJids(QStringList({ QStringLiteral("hecate@shakespeare.example"),
-                                     QStringLiteral("greymalkin@shakespeare.example") }));
-    item2.setAdministratorJids(QStringList({ QStringLiteral("juliet@shakespeare.example"),
-                                             QStringLiteral("romeo@shakespeare.example") }));
+    item2.setLastEditorJid(u"greymalkin@shakespeare.example"_s);
+    item2.setOwnerJids(QStringList({ u"hecate@shakespeare.example"_s,
+                                     u"greymalkin@shakespeare.example"_s }));
+    item2.setAdministratorJids(QStringList({ u"juliet@shakespeare.example"_s,
+                                             u"romeo@shakespeare.example"_s }));
     item2.setChannelDeletion({ { 2023, 12, 31 }, { 12, 30 }, Qt::UTC });
     item2.setNodes(QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Information);
     item2.setMessagesSubscribeRole(QXmppMixConfigItem::Role::Allowed);
@@ -172,9 +172,9 @@ void tst_QXmppMixItem::testConfig()
     item2.setPrivateMessagesPermitted(false);
 
     QCOMPARE(item2.formType(), QXmppDataForm::Result);
-    QCOMPARE(item2.lastEditorJid(), QStringLiteral("greymalkin@shakespeare.example"));
-    QCOMPARE(item2.ownerJids(), QStringList({ QStringLiteral("hecate@shakespeare.example"), QStringLiteral("greymalkin@shakespeare.example") }));
-    QCOMPARE(item2.administratorJids(), QStringList({ QStringLiteral("juliet@shakespeare.example"), QStringLiteral("romeo@shakespeare.example") }));
+    QCOMPARE(item2.lastEditorJid(), u"greymalkin@shakespeare.example"_s);
+    QCOMPARE(item2.ownerJids(), QStringList({ u"hecate@shakespeare.example"_s, u"greymalkin@shakespeare.example"_s }));
+    QCOMPARE(item2.administratorJids(), QStringList({ u"juliet@shakespeare.example"_s, u"romeo@shakespeare.example"_s }));
     QCOMPARE(item2.channelDeletion(), QDateTime({ { 2023, 12, 31 }, { 12, 30 }, Qt::UTC }));
     QCOMPARE(item2.nodes(), QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Information);
     QCOMPARE(item2.messagesSubscribeRole(), QXmppMixConfigItem::Role::Allowed);
@@ -262,7 +262,7 @@ void tst_QXmppMixItem::testInfo()
 
     parsePacket(item, xml);
     QCOMPARE(item.formType(), QXmppDataForm::Result);
-    QCOMPARE(item.name(), QStringLiteral("Witches Coven"));
+    QCOMPARE(item.name(), u"Witches Coven"_s);
     QCOMPARE(item.description(), QStringLiteral("A location not far from the blasted "
                                                 "heath where the three witches meet"));
     QCOMPARE(item.contactJids(), QStringList() << "greymalkin@shakespeare.example" << "joan@shakespeare.example");
@@ -273,9 +273,9 @@ void tst_QXmppMixItem::testInfo()
     item.setFormType(QXmppDataForm::Submit);
     QCOMPARE(item.formType(), QXmppDataForm::Submit);
     item.setName("Skynet Development");
-    QCOMPARE(item.name(), QStringLiteral("Skynet Development"));
+    QCOMPARE(item.name(), u"Skynet Development"_s);
     item.setDescription("Very cool development group.");
-    QCOMPARE(item.description(), QStringLiteral("Very cool development group."));
+    QCOMPARE(item.description(), u"Very cool development group."_s);
     item.setContactJids(QStringList() << "somebody@example.org");
     QCOMPARE(item.contactJids(), QStringList() << "somebody@example.org");
 }
@@ -325,15 +325,15 @@ void tst_QXmppMixItem::testParticipant()
     QVERIFY(item.jid().isEmpty());
 
     parsePacket(item, xml);
-    QCOMPARE(item.nick(), QStringLiteral("thirdwitch"));
-    QCOMPARE(item.jid(), QStringLiteral("hag66@shakespeare.example"));
+    QCOMPARE(item.nick(), u"thirdwitch"_s);
+    QCOMPARE(item.jid(), u"hag66@shakespeare.example"_s);
     serializePacket(item, xml);
 
     // test setters
     item.setNick("thomasd");
-    QCOMPARE(item.nick(), QStringLiteral("thomasd"));
+    QCOMPARE(item.nick(), u"thomasd"_s);
     item.setJid("thomas@d.example");
-    QCOMPARE(item.jid(), QStringLiteral("thomas@d.example"));
+    QCOMPARE(item.jid(), u"thomas@d.example"_s);
 }
 
 void tst_QXmppMixItem::testIsParticipantItem()

@@ -13,6 +13,7 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
 #include "XmppSocket.h"
 
 #include <QDomElement>
@@ -31,13 +32,13 @@ static std::tuple<QString, QStringList> chooseMechanism(const QXmppConfiguration
         supportedMechanisms.prepend(preferredMechanism);
     }
     if (config.facebookAppId().isEmpty() || config.facebookAccessToken().isEmpty()) {
-        supportedMechanisms.removeAll(QStringLiteral("X-FACEBOOK-PLATFORM"));
+        supportedMechanisms.removeAll(u"X-FACEBOOK-PLATFORM"_s);
     }
     if (config.windowsLiveAccessToken().isEmpty()) {
-        supportedMechanisms.removeAll(QStringLiteral("X-MESSENGER-OAUTH2"));
+        supportedMechanisms.removeAll(u"X-MESSENGER-OAUTH2"_s);
     }
     if (config.googleAccessToken().isEmpty()) {
-        supportedMechanisms.removeAll(QStringLiteral("X-OAUTH2"));
+        supportedMechanisms.removeAll(u"X-OAUTH2"_s);
     }
 
     // determine SASL Authentication mechanism to use
@@ -97,27 +98,27 @@ static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &confi
     auto [mechanism, disabled] = chooseMechanism(config, availableMechanisms);
     if (mechanism.isEmpty()) {
         auto text = disabled.empty()
-            ? QStringLiteral("No supported SASL mechanism available")
-            : QStringLiteral("No supported SASL mechanism available (%1 is disabled)").arg(disabled.join(u", "));
+            ? u"No supported SASL mechanism available"_s
+            : u"No supported SASL mechanism available (%1 is disabled)"_s.arg(disabled.join(u", "));
 
         return error(std::move(text), { AuthenticationError::MechanismMismatch, {}, {} });
     }
 
     auto saslClient = QXmppSaslClient::create(mechanism, parent);
     if (!saslClient) {
-        return error(QStringLiteral("SASL mechanism negotiation failed"),
+        return error(u"SASL mechanism negotiation failed"_s,
                      AuthenticationError { AuthenticationError::ProcessingError, {}, {} });
     }
-    info(QStringLiteral("SASL mechanism '%1' selected").arg(saslClient->mechanism()));
+    info(u"SASL mechanism '%1' selected"_s.arg(saslClient->mechanism()));
     saslClient->setHost(config.domain());
-    saslClient->setServiceType(QStringLiteral("xmpp"));
+    saslClient->setServiceType(u"xmpp"_s);
     setCredentials(saslClient.get(), config);
 
     // send SASL auth request
     if (auto response = saslClient->respond(QByteArray())) {
         return { std::move(saslClient), {}, *response };
     } else {
-        return error(QStringLiteral("SASL initial response failed"),
+        return error(u"SASL initial response failed"_s,
                      AuthenticationError { AuthenticationError::ProcessingError, {}, {} });
     }
 }
@@ -185,7 +186,7 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
             return Accepted;
         } else {
             finish(AuthError {
-                QStringLiteral("Could not respond to SASL challenge"),
+                u"Could not respond to SASL challenge"_s,
                 AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
             });
             return Finished;
@@ -196,7 +197,7 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
             : failure->text;
 
         finish(AuthError {
-            QStringLiteral("Authentication failed: %1").arg(text),
+            u"Authentication failed: %1"_s.arg(text),
             AuthenticationError { mapSaslCondition(failure->condition), failure->text, std::move(*failure) },
         });
         return Finished;
@@ -222,7 +223,7 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(Sasl2::Authentica
         // ID is mandatory
         if (userAgent->deviceId().isNull()) {
             return makeReadyTask<AuthResult>(AuthError {
-                QStringLiteral("Invalid user-agent: device ID must be set."),
+                u"Invalid user-agent: device ID must be set."_s,
                 AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
             });
         }
@@ -258,7 +259,7 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
             return Accepted;
         } else {
             finish(AuthError {
-                QStringLiteral("Could not respond to SASL challenge"),
+                u"Could not respond to SASL challenge"_s,
                 AuthenticationError { AuthenticationError::ProcessingError, {}, {} },
             });
             return Finished;
@@ -273,7 +274,7 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
 
         if (failure->condition == Sasl::ErrorCondition::Aborted && m_state->unsupportedContinue) {
             finish(AuthError {
-                QStringLiteral("Required authentication tasks not supported."),
+                u"Required authentication tasks not supported."_s,
                 AuthenticationError {
                     AuthenticationError::RequiredTasks,
                     m_state->unsupportedContinue->text,
@@ -282,7 +283,7 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
             });
         } else {
             finish(AuthError {
-                QStringLiteral("Authentication failed: %1").arg(text),
+                u"Authentication failed: %1"_s.arg(text),
                 AuthenticationError { mapSaslCondition(failure->condition), failure->text, std::move(*failure) },
             });
         }
@@ -290,7 +291,7 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
     } else if (auto continueElement = Continue::fromDom(el)) {
         // no SASL 2 tasks are currently implemented
         m_state->unsupportedContinue = continueElement;
-        m_socket->sendData(serializeXml(Sasl2::Abort { QStringLiteral("SASL 2 tasks are not supported.") }));
+        m_socket->sendData(serializeXml(Sasl2::Abort { u"SASL 2 tasks are not supported."_s }));
         return Accepted;
     }
     return Rejected;

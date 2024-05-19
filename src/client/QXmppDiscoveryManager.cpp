@@ -12,6 +12,8 @@
 #include "QXmppFutureUtils_p.h"
 #include "QXmppIqHandling.h"
 
+#include "StringLiterals.h"
+
 #include <QCoreApplication>
 #include <QDomElement>
 
@@ -48,17 +50,17 @@ public:
 QXmppDiscoveryManager::QXmppDiscoveryManager()
     : d(new QXmppDiscoveryManagerPrivate)
 {
-    d->clientCapabilitiesNode = QStringLiteral("https://github.com/qxmpp-project/qxmpp");
-    d->clientCategory = QStringLiteral("client");
+    d->clientCapabilitiesNode = u"https://github.com/qxmpp-project/qxmpp"_s;
+    d->clientCategory = u"client"_s;
 #if defined Q_OS_ANDROID || defined Q_OS_BLACKBERRY || defined Q_OS_IOS || defined Q_OS_WP
-    d->clientType = QStringLiteral("phone");
+    d->clientType = u"phone"_s;
 #else
-    d->clientType = QStringLiteral("pc");
+    d->clientType = u"pc"_s;
 #endif
     if (qApp->applicationName().isEmpty() && qApp->applicationVersion().isEmpty()) {
-        d->clientName = QStringLiteral("%1 %2").arg(u"Based on QXmpp", QXmppVersion());
+        d->clientName = u"%1 %2"_s.arg(u"Based on QXmpp", QXmppVersion());
     } else {
-        d->clientName = QStringLiteral("%1 %2").arg(qApp->applicationName(), qApp->applicationVersion());
+        d->clientName = u"%1 %2"_s.arg(qApp->applicationName(), qApp->applicationVersion());
     }
 }
 
@@ -346,7 +348,7 @@ std::variant<QXmppDiscoveryIq, QXmppStanza::Error> QXmppDiscoveryManager::handle
     using Error = QXmppStanza::Error;
 
     if (!iq.queryNode().isEmpty() && !iq.queryNode().startsWith(d->clientCapabilitiesNode)) {
-        return Error(Error::Cancel, Error::ItemNotFound, QStringLiteral("Unknown node."));
+        return Error(Error::Cancel, Error::ItemNotFound, u"Unknown node."_s);
     }
 
     switch (iq.queryType()) {

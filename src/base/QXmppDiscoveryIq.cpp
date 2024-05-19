@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QCryptographicHash>
 #include <QDomElement>
 #include <QSharedData>
@@ -401,8 +403,8 @@ QByteArray QXmppDiscoveryIq::verificationString() const
             fieldMap.insert(field.key(), field);
         }
 
-        if (fieldMap.contains(QStringLiteral("FORM_TYPE"))) {
-            const QXmppDataForm::Field field = fieldMap.take(QStringLiteral("FORM_TYPE"));
+        if (fieldMap.contains(u"FORM_TYPE"_s)) {
+            const QXmppDataForm::Field field = fieldMap.take(u"FORM_TYPE"_s);
             S += field.value().toString() + u"<";
 
             QStringList keys = fieldMap.keys();
@@ -448,7 +450,7 @@ bool QXmppDiscoveryIq::checkIqType(const QString &tagName, const QString &xmlNam
 void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement queryElement = firstChildElement(element, u"query");
-    d->queryNode = queryElement.attribute(QStringLiteral("node"));
+    d->queryNode = queryElement.attribute(u"node"_s);
     if (queryElement.namespaceURI() == ns_disco_items) {
         d->queryType = ItemsQuery;
     } else {
@@ -457,13 +459,13 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
 
     for (const auto &itemElement : iterChildElements(queryElement)) {
         if (itemElement.tagName() == u"feature") {
-            d->features.append(itemElement.attribute(QStringLiteral("var")));
+            d->features.append(itemElement.attribute(u"var"_s));
         } else if (itemElement.tagName() == u"identity") {
             QXmppDiscoveryIq::Identity identity;
-            identity.setLanguage(itemElement.attribute(QStringLiteral("xml:lang")));
-            identity.setCategory(itemElement.attribute(QStringLiteral("category")));
-            identity.setName(itemElement.attribute(QStringLiteral("name")));
-            identity.setType(itemElement.attribute(QStringLiteral("type")));
+            identity.setLanguage(itemElement.attribute(u"xml:lang"_s));
+            identity.setCategory(itemElement.attribute(u"category"_s));
+            identity.setName(itemElement.attribute(u"name"_s));
+            identity.setType(itemElement.attribute(u"type"_s));
 
             // FIXME: for some reason the language does not found,
             // so we are forced to use QDomNamedNodeMap
@@ -478,9 +480,9 @@ void QXmppDiscoveryIq::parseElementFromChild(const QDomElement &element)
             d->identities.append(identity);
         } else if (itemElement.tagName() == u"item") {
             QXmppDiscoveryIq::Item item;
-            item.setJid(itemElement.attribute(QStringLiteral("jid")));
-            item.setName(itemElement.attribute(QStringLiteral("name")));
-            item.setNode(itemElement.attribute(QStringLiteral("node")));
+            item.setJid(itemElement.attribute(u"jid"_s));
+            item.setName(itemElement.attribute(u"name"_s));
+            item.setNode(itemElement.attribute(u"node"_s));
             d->items.append(item);
         } else if (itemElement.tagName() == u"x" &&
                    itemElement.namespaceURI() == ns_data) {

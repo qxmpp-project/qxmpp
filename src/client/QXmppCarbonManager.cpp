@@ -10,6 +10,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -52,8 +54,8 @@ void QXmppCarbonManager::setCarbonsEnabled(bool enabled)
     if (client()) {
         QXmppIq iq(QXmppIq::Set);
         QXmppElement carbonselement;
-        carbonselement.setTagName(m_carbonsEnabled ? QStringLiteral("enable") : QStringLiteral("disable"));
-        carbonselement.setAttribute(QStringLiteral("xmlns"), ns_carbons.toString());
+        carbonselement.setTagName(m_carbonsEnabled ? u"enable"_s : u"disable"_s);
+        carbonselement.setAttribute(u"xmlns"_s, ns_carbons.toString());
 
         iq.setExtensions(QXmppElementList() << carbonselement);
         client()->sendPacket(iq);
@@ -84,8 +86,8 @@ bool QXmppCarbonManager::handleStanza(const QDomElement &element)
     }
 
     // carbon copies must always come from our bare JID
-    if (element.attribute(QStringLiteral("from")) != client()->configuration().jidBare()) {
-        info(QStringLiteral("Received carbon copy from possible attacker trying to use CVE-2017-5603."));
+    if (element.attribute(u"from"_s) != client()->configuration().jidBare()) {
+        info(u"Received carbon copy from possible attacker trying to use CVE-2017-5603."_s);
         return false;
     }
 

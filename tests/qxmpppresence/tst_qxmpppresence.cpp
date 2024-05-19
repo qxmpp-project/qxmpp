@@ -128,37 +128,37 @@ void tst_QXmppPresence::testPresenceWithCapability()
     // test parsing and serialization after parsing
     QXmppPresence presence;
     parsePacket(presence, xml);
-    QCOMPARE(presence.to(), QStringLiteral("foo@example.com/QXmpp"));
-    QCOMPARE(presence.from(), QStringLiteral("bar@example.com/QXmpp"));
+    QCOMPARE(presence.to(), u"foo@example.com/QXmpp"_s);
+    QCOMPARE(presence.from(), u"bar@example.com/QXmpp"_s);
     QCOMPARE(presence.availableStatusType(), QXmppPresence::Away);
-    QCOMPARE(presence.statusText(), QStringLiteral("In a meeting"));
+    QCOMPARE(presence.statusText(), u"In a meeting"_s);
     QCOMPARE(presence.priority(), 5);
     QCOMPARE(presence.photoHash(), QByteArray::fromHex("73b908bc"));
     QCOMPARE(presence.vCardUpdateType(), QXmppPresence::VCardUpdateValidPhoto);
-    QCOMPARE(presence.capabilityHash(), QStringLiteral("sha-1"));
-    QCOMPARE(presence.capabilityNode(), QStringLiteral("https://github.com/qxmpp-project/qxmpp"));
+    QCOMPARE(presence.capabilityHash(), u"sha-1"_s);
+    QCOMPARE(presence.capabilityNode(), u"https://github.com/qxmpp-project/qxmpp"_s);
     QCOMPARE(presence.capabilityVer(), QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
-    QCOMPARE(presence.extensions().first().tagName(), QStringLiteral("x"));
-    QCOMPARE(presence.extensions().first().attribute(QStringLiteral("xmlns")), QStringLiteral("urn:other:namespace"));
+    QCOMPARE(presence.extensions().first().tagName(), u"x"_s);
+    QCOMPARE(presence.extensions().first().attribute(u"xmlns"_s), u"urn:other:namespace");
 
     serializePacket(presence, xml);
 
     // test serialization from setters
     QXmppPresence presence2;
-    presence2.setTo(QStringLiteral("foo@example.com/QXmpp"));
-    presence2.setFrom(QStringLiteral("bar@example.com/QXmpp"));
+    presence2.setTo(u"foo@example.com/QXmpp"_s);
+    presence2.setFrom(u"bar@example.com/QXmpp"_s);
     presence2.setAvailableStatusType(QXmppPresence::Away);
-    presence2.setStatusText(QStringLiteral("In a meeting"));
+    presence2.setStatusText(u"In a meeting"_s);
     presence2.setPriority(5);
     presence2.setPhotoHash(QByteArray::fromHex("73b908bc"));
     presence2.setVCardUpdateType(QXmppPresence::VCardUpdateValidPhoto);
-    presence2.setCapabilityHash(QStringLiteral("sha-1"));
-    presence2.setCapabilityNode(QStringLiteral("https://github.com/qxmpp-project/qxmpp"));
+    presence2.setCapabilityHash(u"sha-1"_s);
+    presence2.setCapabilityNode(u"https://github.com/qxmpp-project/qxmpp"_s);
     presence2.setCapabilityVer(QByteArray::fromBase64("QgayPKawpkPSDYmwT/WM94uAlu0="));
 
     QXmppElement unknownExtension;
-    unknownExtension.setTagName(QStringLiteral("x"));
-    unknownExtension.setAttribute(QStringLiteral("xmlns"), QStringLiteral("urn:other:namespace"));
+    unknownExtension.setTagName(u"x"_s);
+    unknownExtension.setAttribute(u"xmlns"_s, u"urn:other:namespace"_s);
     presence2.setExtensions(QXmppElementList() << unknownExtension);
 
     serializePacket(presence2, xml);
@@ -271,24 +271,24 @@ void tst_QXmppPresence::testPresenceWithMuji()
 
     QVERIFY(presence1.isPreparingMujiSession());
     QCOMPARE(presence1.mujiContents().size(), 2);
-    QCOMPARE(presence1.mujiContents().at(0).name(), QStringLiteral("video"));
-    QCOMPARE(presence1.mujiContents().at(1).name(), QStringLiteral("voice"));
+    QCOMPARE(presence1.mujiContents().at(0).name(), u"video"_s);
+    QCOMPARE(presence1.mujiContents().at(1).name(), u"voice"_s);
     serializePacket(presence1, xml);
 
     QXmppPresence presence2;
     presence2.setIsPreparingMujiSession(true);
     QXmppJingleIq::Content mujiContent1;
-    mujiContent1.setCreator(QStringLiteral("initiator"));
-    mujiContent1.setName(QStringLiteral("video"));
+    mujiContent1.setCreator(u"initiator"_s);
+    mujiContent1.setName(u"video"_s);
     QXmppJingleIq::Content mujiContent2;
-    mujiContent2.setCreator(QStringLiteral("initiator"));
-    mujiContent2.setName(QStringLiteral("voice"));
+    mujiContent2.setCreator(u"initiator"_s);
+    mujiContent2.setName(u"voice"_s);
     presence2.setMujiContents({ mujiContent1, mujiContent2 });
 
     QVERIFY(presence2.isPreparingMujiSession());
     QCOMPARE(presence2.mujiContents().size(), 2);
-    QCOMPARE(presence2.mujiContents().at(0).name(), QStringLiteral("video"));
-    QCOMPARE(presence2.mujiContents().at(1).name(), QStringLiteral("voice"));
+    QCOMPARE(presence2.mujiContents().at(0).name(), u"video"_s);
+    QCOMPARE(presence2.mujiContents().at(1).name(), u"voice"_s);
     serializePacket(presence2, xml);
 }
 
@@ -328,14 +328,14 @@ void tst_QXmppPresence::testPresenceWithMix()
     QXmppPresence presence;
     parsePacket(presence, xml);
 
-    QCOMPARE(presence.mixUserJid(), QStringLiteral("hecate@shakespeare.example/UUID-x4r/2491"));
-    QCOMPARE(presence.mixUserNick(), QStringLiteral("thirdwitch"));
+    QCOMPARE(presence.mixUserJid(), u"hecate@shakespeare.example/UUID-x4r/2491"_s);
+    QCOMPARE(presence.mixUserNick(), u"thirdwitch"_s);
     serializePacket(presence, xml);
 
     presence.setMixUserJid("alexander@example.org");
-    QCOMPARE(presence.mixUserJid(), QStringLiteral("alexander@example.org"));
+    QCOMPARE(presence.mixUserJid(), u"alexander@example.org"_s);
     presence.setMixUserNick("erik");
-    QCOMPARE(presence.mixUserNick(), QStringLiteral("erik"));
+    QCOMPARE(presence.mixUserNick(), u"erik"_s);
 }
 
 void tst_QXmppPresence::testPresenceWithVCard()

@@ -6,6 +6,8 @@
 #include "QXmppGlobal_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <array>
 
 using namespace QXmpp::Private;

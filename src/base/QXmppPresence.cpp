@@ -10,6 +10,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 #include <QDomElement>
 
@@ -414,7 +416,7 @@ void QXmppPresence::parse(const QDomElement &element)
     QXmppStanza::parse(element);
 
     // attributes
-    d->type = enumFromString<Type>(PRESENCE_TYPES, element.attribute(QStringLiteral("type")))
+    d->type = enumFromString<Type>(PRESENCE_TYPES, element.attribute(u"type"_s))
                   .value_or(Available);
 
     QXmppElementList unknownElements;
@@ -442,23 +444,23 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
     // XEP-0045: Multi-User Chat
     if (element.tagName() == u"x" && element.namespaceURI() == ns_muc) {
         d->mucSupported = true;
-        d->mucPassword = element.firstChildElement(QStringLiteral("password")).text();
+        d->mucPassword = element.firstChildElement(u"password"_s).text();
     } else if (element.tagName() == u"x" && element.namespaceURI() == ns_muc_user) {
         d->mucItem.parse(firstChildElement(element, u"item"));
 
         d->mucStatusCodes.clear();
         for (const auto &statusElement : iterChildElements(element, u"status")) {
-            d->mucStatusCodes << statusElement.attribute(QStringLiteral("code")).toInt();
+            d->mucStatusCodes << statusElement.attribute(u"code"_s).toInt();
         }
         // XEP-0115: Entity Capabilities
     } else if (element.tagName() == u"c" && element.namespaceURI() == ns_capabilities) {
-        d->capabilityNode = element.attribute(QStringLiteral("node"));
-        d->capabilityVer = QByteArray::fromBase64(element.attribute(QStringLiteral("ver")).toLatin1());
-        d->capabilityHash = element.attribute(QStringLiteral("hash"));
-        d->capabilityExt = element.attribute(QStringLiteral("ext")).split(u' ', Qt::SkipEmptyParts);
+        d->capabilityNode = element.attribute(u"node"_s);
+        d->capabilityVer = QByteArray::fromBase64(element.attribute(u"ver"_s).toLatin1());
+        d->capabilityHash = element.attribute(u"hash"_s);
+        d->capabilityExt = element.attribute(u"ext"_s).split(u' ', Qt::SkipEmptyParts);
         // XEP-0153: vCard-Based Avatars
     } else if (element.namespaceURI() == ns_vcard_update) {
-        QDomElement photoElement = element.firstChildElement(QStringLiteral("photo"));
+        QDomElement photoElement = element.firstChildElement(u"photo"_s);
         if (photoElement.isNull()) {
             d->photoHash = {};
             d->vCardUpdateType = VCardUpdateNotReady;
@@ -472,7 +474,7 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
         }
         // XEP-0272: Multiparty Jingle (Muji)
     } else if (element.tagName() == u"muji" && element.namespaceURI() == ns_muji) {
-        if (!element.firstChildElement(QStringLiteral("preparing")).isNull()) {
+        if (!element.firstChildElement(u"preparing"_s).isNull()) {
             d->isPreparingMujiSession = true;
         }
 
@@ -483,14 +485,14 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
         }
         // XEP-0319: Last User Interaction in Presence
     } else if (element.tagName() == u"idle" && element.namespaceURI() == ns_idle) {
-        if (element.hasAttribute(QStringLiteral("since"))) {
-            const QString since = element.attribute(QStringLiteral("since"));
+        if (element.hasAttribute(u"since"_s)) {
+            const QString since = element.attribute(u"since"_s);
             d->lastUserInteraction = QXmppUtils::datetimeFromString(since);
         }
         // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     } else if (element.tagName() == u"mix" && element.namespaceURI() == ns_mix_presence) {
-        d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
-        d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
+        d->mixUserJid = element.firstChildElement(u"jid"_s).text();
+        d->mixUserNick = element.firstChildElement(u"nick"_s).text();
     } else {
         unknownElements << element;
     }
@@ -555,7 +557,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeDefaultNamespace(toString65(ns_vcard_update));
         switch (d->vCardUpdateType) {
         case VCardUpdateNoPhoto:
-            xmlWriter->writeEmptyElement(QStringLiteral("photo"));
+            xmlWriter->writeEmptyElement(u"photo"_s);
             break;
         case VCardUpdateValidPhoto:
             writeXmlTextElement(xmlWriter, u"photo", QString::fromUtf8(d->photoHash.toHex()));
@@ -572,7 +574,7 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         xmlWriter->writeDefaultNamespace(toString65(ns_muji));
 
         if (d->isPreparingMujiSession) {
-            xmlWriter->writeEmptyElement(QStringLiteral("preparing"));
+            xmlWriter->writeEmptyElement(u"preparing"_s);
         }
 
         for (const auto &mujiContent : d->mujiContents) {

@@ -506,7 +506,7 @@ void tst_QXmppMixIq::testSetters()
     QT_WARNING_PUSH
     QT_WARNING_DISABLE_DEPRECATED
     iq.setJid("coven@mix.example.com");
-    QCOMPARE(iq.jid(), QStringLiteral("coven@mix.example.com"));
+    QCOMPARE(iq.jid(), u"coven@mix.example.com"_s);
     QT_WARNING_POP
 
     iq.setParticipantId("123456");
@@ -515,7 +515,7 @@ void tst_QXmppMixIq::testSetters()
     QT_WARNING_PUSH
     QT_WARNING_DISABLE_DEPRECATED
     iq.setChannelName("coven");
-    QCOMPARE(iq.channelName(), QStringLiteral("coven"));
+    QCOMPARE(iq.channelName(), u"coven"_s);
     QT_WARNING_POP
 
     iq.setChannelId("coven");
@@ -534,13 +534,13 @@ void tst_QXmppMixIq::testSetters()
     QCOMPARE(iq.subscriptions(), QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids);
 
     iq.setNick("third witch");
-    QCOMPARE(iq.nick(), QStringLiteral("third witch"));
+    QCOMPARE(iq.nick(), u"third witch"_s);
 
     QXmppMixInvitation invitation;
-    invitation.setToken(QStringLiteral("ABCDEF"));
+    invitation.setToken(u"ABCDEF"_s);
 
     iq.setInvitation(invitation);
-    QCOMPARE(iq.invitation()->token(), QStringLiteral("ABCDEF"));
+    QCOMPARE(iq.invitation()->token(), u"ABCDEF"_s);
 }
 
 void tst_QXmppMixIq::testInvalidActionType()
@@ -599,7 +599,7 @@ void tst_QXmppMixIq::testListToMixNodes()
 {
     QVERIFY(!listToMixNodes({}));
     const QXmppMixConfigItem::Nodes nodes = { QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids };
-    const QVector<QString> nodeList = { QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("urn:xmpp:mix:nodes:banned") };
+    const QVector<QString> nodeList = { u"urn:xmpp:mix:nodes:allowed"_s, u"urn:xmpp:mix:nodes:banned"_s };
     QCOMPARE(listToMixNodes(nodeList), nodes);
 }
 
@@ -607,7 +607,7 @@ void tst_QXmppMixIq::testMixNodesToList()
 {
     QVERIFY(mixNodesToList({}).isEmpty());
     const QXmppMixConfigItem::Nodes nodes = { QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids };
-    const QVector<QString> nodeList = { QStringLiteral("urn:xmpp:mix:nodes:allowed"), QStringLiteral("urn:xmpp:mix:nodes:banned") };
+    const QVector<QString> nodeList = { u"urn:xmpp:mix:nodes:allowed"_s, u"urn:xmpp:mix:nodes:banned"_s };
     QCOMPARE(mixNodesToList(nodes), nodeList);
 }
 
@@ -663,20 +663,20 @@ void tst_QXmppMixIq::testMixInvitationResponseIq()
     QVERIFY(iq1.invitation().token().isEmpty());
 
     parsePacket(iq1, xml);
-    QCOMPARE(iq1.invitation().token(), QStringLiteral("ABCDEF"));
+    QCOMPARE(iq1.invitation().token(), u"ABCDEF"_s);
     serializePacket(iq1, xml);
 
     QXmppMixInvitation invitation;
-    invitation.setToken(QStringLiteral("ABCDEF"));
+    invitation.setToken(u"ABCDEF"_s);
 
     QXmppMixInvitationResponseIq iq2;
     iq2.setType(QXmppIq::Result);
-    iq2.setId(QStringLiteral("kl2fax27"));
-    iq2.setFrom(QStringLiteral("coven@mix.shakespeare.example"));
-    iq2.setTo(QStringLiteral("hag66@shakespeare.example/UUID-h5z/0253"));
+    iq2.setId(u"kl2fax27"_s);
+    iq2.setFrom(u"coven@mix.shakespeare.example"_s);
+    iq2.setTo(u"hag66@shakespeare.example/UUID-h5z/0253"_s);
     iq2.setInvitation(invitation);
 
-    QCOMPARE(iq2.invitation().token(), QStringLiteral("ABCDEF"));
+    QCOMPARE(iq2.invitation().token(), u"ABCDEF"_s);
     serializePacket(iq2, xml);
 }
 
@@ -730,17 +730,17 @@ void tst_QXmppMixIq::testMixInvitationRequestIq()
     QVERIFY(iq1.inviteeJid().isEmpty());
 
     parsePacket(iq1, xml);
-    QCOMPARE(iq1.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
+    QCOMPARE(iq1.inviteeJid(), u"cat@shakespeare.example"_s);
     serializePacket(iq1, xml);
 
     QXmppMixInvitationRequestIq iq2;
     iq2.setType(QXmppIq::Get);
-    iq2.setId(QStringLiteral("kl2fax27"));
-    iq2.setFrom(QStringLiteral("hag66@shakespeare.example/UUID-h5z/0253"));
-    iq2.setTo(QStringLiteral("coven@mix.shakespeare.example"));
-    iq2.setInviteeJid(QStringLiteral("cat@shakespeare.example"));
+    iq2.setId(u"kl2fax27"_s);
+    iq2.setFrom(u"hag66@shakespeare.example/UUID-h5z/0253"_s);
+    iq2.setTo(u"coven@mix.shakespeare.example"_s);
+    iq2.setInviteeJid(u"cat@shakespeare.example"_s);
 
-    QCOMPARE(iq2.inviteeJid(), QStringLiteral("cat@shakespeare.example"));
+    QCOMPARE(iq2.inviteeJid(), u"cat@shakespeare.example"_s);
     serializePacket(iq2, xml);
 }
 
@@ -807,9 +807,9 @@ void tst_QXmppMixIq::testMixSubscriptionUpdateIq()
 
     QXmppMixSubscriptionUpdateIq iq2;
     iq2.setType(QXmppIq::Set);
-    iq2.setId(QStringLiteral("E6E10350-76CF-40C6-B91B-1EA08C332FC7"));
-    iq2.setFrom(QStringLiteral("hag66@shakespeare.example/UUID-a1j/7533"));
-    iq2.setTo(QStringLiteral("coven@mix.shakespeare.example"));
+    iq2.setId(u"E6E10350-76CF-40C6-B91B-1EA08C332FC7"_s);
+    iq2.setFrom(u"hag66@shakespeare.example/UUID-a1j/7533"_s);
+    iq2.setTo(u"coven@mix.shakespeare.example"_s);
     iq2.setAdditions(additions);
     iq2.setRemovals(removals);
 

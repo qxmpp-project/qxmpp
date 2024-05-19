@@ -37,19 +37,19 @@ void tst_QXmppResultSet::testQuery_data()
                                              "<max>10</max>"
                                              "<after>peterpan@neverland.lit</after>"
                                              "</set>")
-                               << 10 << -1 << QString() << QStringLiteral("peterpan@neverland.lit");
+                               << 10 << -1 << QString() << u"peterpan@neverland.lit"_s;
 
     QTest::newRow("Example 5") << QByteArray("<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                              "<max>10</max>"
                                              "<before>peter@pixyland.org</before>"
                                              "</set>")
-                               << 10 << -1 << QStringLiteral("peter@pixyland.org") << QString();
+                               << 10 << -1 << u"peter@pixyland.org"_s << QString();
 
     QTest::newRow("Example 11") << QByteArray("<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                               "<max>10</max>"
                                               "<before/>"
                                               "</set>")
-                                << 10 << -1 << QStringLiteral("") << QString();
+                                << 10 << -1 << u""_s << QString();
 
     QTest::newRow("Example 12") << QByteArray("<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                               "<max>10</max>"
@@ -95,20 +95,20 @@ void tst_QXmppResultSet::testReply_data()
                                              "<last>peterpan@neverland.lit</last>"
                                              "<count>800</count>"
                                              "</set>")
-                               << 800 << 0 << QStringLiteral("stpeter@jabber.org") << QStringLiteral("peterpan@neverland.lit");
+                               << 800 << 0 << u"stpeter@jabber.org"_s << u"peterpan@neverland.lit"_s;
 
     QTest::newRow("Example 6") << QByteArray("<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                              "<first index=\"0\">stpeter@jabber.org</first>"
                                              "<last>peterpan@neverland.lit</last>"
                                              "<count>800</count>"
                                              "</set>")
-                               << 800 << 0 << QStringLiteral("stpeter@jabber.org") << QStringLiteral("peterpan@neverland.lit");
+                               << 800 << 0 << u"stpeter@jabber.org"_s << u"peterpan@neverland.lit"_s;
     QTest::newRow("Example 4") << QByteArray("<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                              "<first index=\"10\">peter@pixyland.org</first>"
                                              "<last>peter@rabbit.lit</last>"
                                              "<count>800</count>"
                                              "</set>")
-                               << 800 << 10 << QStringLiteral("peter@pixyland.org") << QStringLiteral("peter@rabbit.lit");
+                               << 800 << 10 << u"peter@pixyland.org"_s << u"peter@rabbit.lit"_s;
 
     QTest::newRow("Example 7") << QByteArray("<set xmlns=\"http://jabber.org/protocol/rsm\">"
                                              "<count>790</count>"

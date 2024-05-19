@@ -8,6 +8,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 #include <QDomElement>
 
@@ -20,11 +22,11 @@ QString actionToString(Action action)
 {
     switch (action) {
     case Action::Add:
-        return QStringLiteral("add");
+        return u"add"_s;
     case Action::Delete:
-        return QStringLiteral("delete");
+        return u"delete"_s;
     case Action::Modify:
-        return QStringLiteral("modify");
+        return u"modify"_s;
     }
     return {};
 }
@@ -46,9 +48,9 @@ QString transportToString(Transport transport)
 {
     switch (transport) {
     case Transport::Tcp:
-        return QStringLiteral("tcp");
+        return u"tcp"_s;
     case Transport::Udp:
-        return QStringLiteral("udp");
+        return u"udp"_s;
     }
 
     return {};
@@ -270,8 +272,8 @@ bool QXmppExternalService::isExternalService(const QDomElement &element)
         return false;
     }
 
-    return !element.attribute(QStringLiteral("host")).isEmpty() &&
-        !element.attribute(QStringLiteral("type")).isEmpty();
+    return !element.attribute(u"host"_s).isEmpty() &&
+        !element.attribute(u"type"_s).isEmpty();
 }
 
 ///
@@ -281,36 +283,36 @@ void QXmppExternalService::parse(const QDomElement &el)
 {
     QDomNamedNodeMap attributes = el.attributes();
 
-    setHost(el.attribute(QStringLiteral("host")));
-    setType(el.attribute(QStringLiteral("type")));
+    setHost(el.attribute(u"host"_s));
+    setType(el.attribute(u"type"_s));
 
-    d->action = actionFromString(el.attribute(QStringLiteral("action")));
+    d->action = actionFromString(el.attribute(u"action"_s));
 
-    if (attributes.contains(QStringLiteral("expires"))) {
-        setExpires(QXmppUtils::datetimeFromString(el.attribute(QStringLiteral("expires"))));
+    if (attributes.contains(u"expires"_s)) {
+        setExpires(QXmppUtils::datetimeFromString(el.attribute(u"expires"_s)));
     }
 
-    if (attributes.contains(QStringLiteral("name"))) {
-        setName(el.attribute(QStringLiteral("name")));
+    if (attributes.contains(u"name"_s)) {
+        setName(el.attribute(u"name"_s));
     }
 
-    if (attributes.contains(QStringLiteral("password"))) {
-        setPassword(el.attribute(QStringLiteral("password")));
+    if (attributes.contains(u"password"_s)) {
+        setPassword(el.attribute(u"password"_s));
     }
 
-    if (attributes.contains(QStringLiteral("port"))) {
-        setPort(el.attribute(QStringLiteral("port")).toInt());
+    if (attributes.contains(u"port"_s)) {
+        setPort(el.attribute(u"port"_s).toInt());
     }
 
-    if (attributes.contains(QStringLiteral("restricted"))) {
-        auto restrictedStr = el.attribute(QStringLiteral("restricted"));
+    if (attributes.contains(u"restricted"_s)) {
+        auto restrictedStr = el.attribute(u"restricted"_s);
         setRestricted(restrictedStr == u"true" || restrictedStr == u"1");
     }
 
-    d->transport = transportFromString(el.attribute(QStringLiteral("transport")));
+    d->transport = transportFromString(el.attribute(u"transport"_s));
 
-    if (attributes.contains(QStringLiteral("username"))) {
-        setUsername(el.attribute(QStringLiteral("username")));
+    if (attributes.contains(u"username"_s)) {
+        setUsername(el.attribute(u"username"_s));
     }
 }
 

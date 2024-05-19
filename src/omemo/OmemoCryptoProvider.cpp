@@ -8,6 +8,8 @@
 #include "QXmppOmemoManager_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QtCrypto>
 
 using namespace QXmpp::Private;
@@ -51,7 +53,7 @@ int hmac_sha256_final_func(void *hmac_context, signal_buffer **output, void *use
 
     auto messageAuthenticationCode = messageAuthenticationCodeGenerator->final();
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(messageAuthenticationCode.constData()), messageAuthenticationCode.size()))) {
-        d->warning(QStringLiteral("Message authentication code could not be loaded"));
+        d->warning(u"Message authentication code could not be loaded"_s);
         return -1;
     }
 
@@ -84,7 +86,7 @@ int sha512_digest_final_func(void *digest_context, signal_buffer **output, void 
 
     auto hash = hashGenerator->result();
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(hash.constData()), hash.size()))) {
-        d->warning(QStringLiteral("Hash could not be loaded"));
+        d->warning(u"Hash could not be loaded"_s);
         return -1;
     }
 
@@ -110,13 +112,13 @@ int encrypt_func(signal_buffer **output,
 
     switch (key_len) {
     case 128 / 8:
-        cipherName = QStringLiteral("aes128");
+        cipherName = u"aes128"_s;
         break;
     case 192 / 8:
-        cipherName = QStringLiteral("aes192");
+        cipherName = u"aes192"_s;
         break;
     case 256 / 8:
-        cipherName = QStringLiteral("aes256");
+        cipherName = u"aes256"_s;
         break;
     default:
         return -1;
@@ -149,7 +151,7 @@ int encrypt_func(signal_buffer **output,
     }
 
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(encryptedData.constData()), encryptedData.size()))) {
-        d->warning(QStringLiteral("Encrypted data could not be loaded"));
+        d->warning(u"Encrypted data could not be loaded"_s);
         return -4;
     }
 
@@ -169,13 +171,13 @@ int decrypt_func(signal_buffer **output,
 
     switch (key_len) {
     case 128 / 8:
-        cipherName = QStringLiteral("aes128");
+        cipherName = u"aes128"_s;
         break;
     case 192 / 8:
-        cipherName = QStringLiteral("aes192");
+        cipherName = u"aes192"_s;
         break;
     case 256 / 8:
-        cipherName = QStringLiteral("aes256");
+        cipherName = u"aes256"_s;
         break;
     default:
         return -1;
@@ -208,7 +210,7 @@ int decrypt_func(signal_buffer **output,
     }
 
     if (!(*output = signal_buffer_create(reinterpret_cast<const uint8_t *>(decryptedData.constData()), decryptedData.size()))) {
-        d->warning(QStringLiteral("Decrypted data could not be loaded"));
+        d->warning(u"Decrypted data could not be loaded"_s);
         return -4;
     }
 

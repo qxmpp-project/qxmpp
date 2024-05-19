@@ -7,6 +7,7 @@
 #include "QXmppHashing_p.h"
 
 #include "Algorithms.h"
+#include "StringLiterals.h"
 
 #include <QCryptographicHash>
 #include <QFuture>
@@ -264,7 +265,7 @@ public:
         // check for readability
         if (!data->isOpen() || !data->isReadable()) {
             reportResult({ QXmppError {
-                               QStringLiteral("Input data is not opened for reading."),
+                               u"Input data is not opened for reading."_s,
                                std::any() },
                            std::move(data) });
             return;

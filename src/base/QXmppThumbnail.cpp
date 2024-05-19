@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QMimeType>
@@ -99,24 +101,24 @@ void QXmppThumbnail::setHeight(std::optional<uint32_t> newHeight)
 bool QXmppThumbnail::parse(const QDomElement &el)
 {
     if (el.tagName() == u"thumbnail" && el.namespaceURI() == ns_thumbs) {
-        if (!el.hasAttribute(QStringLiteral("uri"))) {
+        if (!el.hasAttribute(u"uri"_s)) {
             return false;
         }
 
-        d->uri = el.attribute(QStringLiteral("uri"));
-        if (el.hasAttribute(QStringLiteral("media-type"))) {
-            d->mediaType = QMimeDatabase().mimeTypeForName(el.attribute(QStringLiteral("media-type")));
+        d->uri = el.attribute(u"uri"_s);
+        if (el.hasAttribute(u"media-type"_s)) {
+            d->mediaType = QMimeDatabase().mimeTypeForName(el.attribute(u"media-type"_s));
         }
 
         bool success = false;
-        if (auto string = el.attribute(QStringLiteral("width")); !string.isEmpty()) {
+        if (auto string = el.attribute(u"width"_s); !string.isEmpty()) {
             if (auto parsedInt = string.toUInt(&success); success) {
                 d->width = parsedInt;
             } else {
                 return false;
             }
         }
-        if (auto string = el.attribute(QStringLiteral("height")); !string.isEmpty()) {
+        if (auto string = el.attribute(u"height"_s); !string.isEmpty()) {
             if (auto parsedInt = string.toUInt(&success); success) {
                 d->height = parsedInt;
             } else {

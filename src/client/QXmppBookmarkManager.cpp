@@ -11,6 +11,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -137,7 +139,7 @@ bool QXmppBookmarkManager::handleStanza(const QDomElement &stanza)
                 Q_EMIT bookmarksReceived(d->bookmarks);
             }
             return true;
-        } else if (!d->pendingId.isEmpty() && stanza.attribute(QStringLiteral("id")) == d->pendingId) {
+        } else if (!d->pendingId.isEmpty() && stanza.attribute(u"id"_s) == d->pendingId) {
             QXmppIq iq;
             iq.parse(stanza);
             if (iq.type() == QXmppIq::Result) {

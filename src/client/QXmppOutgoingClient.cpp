@@ -20,6 +20,7 @@
 
 #include "Algorithms.h"
 #include "Stream.h"
+#include "StringLiterals.h"
 
 #include <unordered_map>
 
@@ -69,7 +70,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
 
 void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port)
 {
-    q->info(QStringLiteral("Connecting to %1:%2").arg(host, QString::number(port)));
+    q->info(u"Connecting to %1:%2"_s.arg(host, QString::number(port)));
 
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
@@ -88,7 +89,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
     if (localSecurity == QXmppConfiguration::LegacySSL) {
         if (!q->socket()->supportsSsl()) {
-            q->warning(QStringLiteral("Not connecting as legacy SSL was requested, but SSL support is not available"));
+            q->warning(u"Not connecting as legacy SSL was requested, but SSL support is not available"_s);
             return;
         }
         q->socket()->connectToHostEncrypted(host, port);
@@ -191,10 +192,10 @@ void QXmppOutgoingClient::connectToHost()
 
     // otherwise, lookup server
     const auto domain = configuration().domain();
-    debug(QStringLiteral("Looking up service records for domain %1").arg(domain));
+    debug(u"Looking up service records for domain %1"_s.arg(domain));
     lookupXmppClientRecords(domain, this).then(this, [this, domain](auto result) {
         if (auto error = std::get_if<QXmppError>(&result)) {
-            warning(QStringLiteral("Lookup for domain %1 failed: %2")
+            warning(u"Lookup for domain %1 failed: %2"_s
                         .arg(domain, error->description));
 
             // as a fallback, use domain as the host name
@@ -206,7 +207,7 @@ void QXmppOutgoingClient::connectToHost()
         d->nextSrvRecordIdx = 0;
 
         if (d->srvRecords.isEmpty()) {
-            warning(QStringLiteral("'%1' has no xmpp-client service records.").arg(domain));
+            warning(u"'%1' has no xmpp-client service records."_s.arg(domain));
 
             // as a fallback, use domain as the host name
             d->connectToHost(d->config.domain(), d->config.port());
@@ -262,7 +263,7 @@ QSslSocket *QXmppOutgoingClient::socket() const
 
 void QXmppOutgoingClient::_q_socketDisconnected()
 {
-    debug(QStringLiteral("Socket disconnected"));
+    debug(u"Socket disconnected"_s);
     d->isAuthenticated = false;
     if (d->redirect) {
         d->connectToHost(d->redirect->host, d->redirect->port);
@@ -275,7 +276,7 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 void QXmppOutgoingClient::socketSslErrors(const QList<QSslError> &errors)
 {
     // log errors
-    warning(QStringLiteral("SSL errors"));
+    warning(u"SSL errors"_s);
     for (int i = 0; i < errors.count(); ++i) {
         warning(errors.at(i).errorString());
     }
@@ -314,7 +315,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
     // start authentication
     d->setListener<Sasl2Manager>(&d->socket).authenticate(std::move(sasl2Request), d->config, sasl2Feature, this).then(this, [this](auto result) {
         if (auto success = std::get_if<Sasl2::Success>(&result)) {
-            debug(QStringLiteral("Authenticated"));
+            debug(u"Authenticated"_s);
             d->isAuthenticated = true;
             d->config.setJid(success->authorizationIdentifier);
             d->bind2Bound = std::move(success->bound);
@@ -354,7 +355,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
                 plainText = false;
             } else {
                 // TODO: errors: should trigger error signal
-                warning(QStringLiteral("No supported Non-SASL Authentication mechanism available"));
+                warning(u"No supported Non-SASL Authentication mechanism available"_s);
                 disconnectFromHost();
                 return;
             }
@@ -363,7 +364,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
             task.then(this, [this](auto result) {
                 if (std::holds_alternative<Success>(result)) {
                     // successful Non-SASL Authentication
-                    debug(QStringLiteral("Authenticated (Non-SASL)"));
+                    debug(u"Authenticated (Non-SASL)"_s);
                     d->isAuthenticated = true;
 
                     // xmpp connection made
@@ -371,7 +372,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
                 } else {
                     // TODO: errors: should trigger error signal
                     auto &error = std::get<QXmppError>(result);
-                    warning(QStringLiteral("Could not authenticate using Non-SASL Authentication: ") + error.description);
+                    warning(u"Could not authenticate using Non-SASL Authentication: "_s + error.description);
                     disconnectFromHost();
                     return;
                 }
@@ -379,7 +380,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
         } else {
             // TODO: errors: should trigger error signal
             auto &error = std::get<QXmppError>(result);
-            warning(QStringLiteral("Couldn't list Non-SASL Authentication mechanisms: ") + error.description);
+            warning(u"Couldn't list Non-SASL Authentication mechanisms: "_s + error.description);
             disconnectFromHost();
         }
     });
@@ -429,11 +430,11 @@ void QXmppOutgoingClient::startResourceBinding()
                 openSession();
             }
         } else if (auto *protocolError = std::get_if<ProtocolError>(&r)) {
-            setError(QStringLiteral("Resource binding failed: ") + protocolError->text,
+            setError(u"Resource binding failed: "_s + protocolError->text,
                      StreamError::UndefinedCondition);
             disconnectFromHost();
         } else if (auto *stanzaError = std::get_if<QXmppStanza::Error>(&r)) {
-            QString text = QStringLiteral("Resource binding failed: ") + stanzaError->text();
+            QString text = u"Resource binding failed: "_s + stanzaError->text();
             setError(text, BindError { *stanzaError });
             disconnectFromHost();
         }
@@ -442,7 +443,7 @@ void QXmppOutgoingClient::startResourceBinding()
 
 void QXmppOutgoingClient::openSession()
 {
-    info(QStringLiteral("Session established"));
+    info(u"Session established"_s);
     Q_ASSERT(!d->sessionStarted);
     d->sessionStarted = true;
 
@@ -543,13 +544,13 @@ void QXmppOutgoingClient::handleStart()
 void QXmppOutgoingClient::handleStream(const QDomElement &streamElement)
 {
     if (d->streamId.isEmpty()) {
-        d->streamId = streamElement.attribute(QStringLiteral("id"));
+        d->streamId = streamElement.attribute(u"id"_s);
     }
     if (d->streamFrom.isEmpty()) {
-        d->streamFrom = streamElement.attribute(QStringLiteral("from"));
+        d->streamFrom = streamElement.attribute(u"from"_s);
     }
     if (d->streamVersion.isEmpty()) {
-        d->streamVersion = streamElement.attribute(QStringLiteral("version"));
+        d->streamVersion = streamElement.attribute(u"version"_s);
 
         // no version specified, signals XMPP Version < 1.0.
         // switch to old auth mechanism if enabled
@@ -574,7 +575,7 @@ void QXmppOutgoingClient::handlePacketReceived(const QDomElement &nodeRecv)
     case Accepted:
         return;
     case Rejected:
-        setError(QStringLiteral("Unexpected element received."), StreamError::UndefinedCondition);
+        setError(u"Unexpected element received."_s, StreamError::UndefinedCondition);
         disconnectFromHost();
         return;
     case Finished:
@@ -639,7 +640,7 @@ void QXmppOutgoingClient::handleStreamFeatures(const QXmppStreamFeatures &featur
     if (saslAvailable && configuration().useSASLAuthentication()) {
         d->setListener<SaslManager>(&d->socket).authenticate(d->config, features.authMechanisms(), this).then(this, [this](auto result) {
             if (std::holds_alternative<Success>(result)) {
-                debug(QStringLiteral("Authenticated"));
+                debug(u"Authenticated"_s);
                 d->isAuthenticated = true;
                 handleStart();
             } else {
@@ -690,11 +691,11 @@ void QXmppOutgoingClient::handleStreamError(const QXmpp::Private::StreamErrorEle
 
         // only disconnect socket (so stream mangement can resume state is not reset)
         d->socket.disconnectFromHost();
-        debug(QStringLiteral("Received redirect to '%1:%2'")
+        debug(u"Received redirect to '%1:%2'"_s
                   .arg(redirect->host, redirect->port));
     } else {
         auto condition = std::get<StreamError>(streamError.condition);
-        auto text = QStringLiteral("Received stream error (%1): %2")
+        auto text = u"Received stream error (%1): %2"_s
                         .arg(StreamErrorElement::streamErrorToString(condition), streamError.text);
 
         setError(text, condition);
@@ -706,7 +707,7 @@ bool QXmppOutgoingClient::handleStanza(const QDomElement &stanza)
     Q_ASSERT(stanza.namespaceURI() == ns_client);
 
     if (stanza.tagName() == u"iq") {
-        const auto type = stanza.attribute(QStringLiteral("type"));
+        const auto type = stanza.attribute(u"type"_s);
 
         if (type == u"result" || type == u"error") {
             // emit iq responses
@@ -717,8 +718,8 @@ bool QXmppOutgoingClient::handleStanza(const QDomElement &stanza)
         } else if (type == u"get" || type == u"set") {
             // respond with error if we didn't understand the iq request
             QXmppIq iq(QXmppIq::Error);
-            iq.setId(stanza.attribute(QStringLiteral("id")));
-            iq.setTo(stanza.attribute(QStringLiteral("from")));
+            iq.setId(stanza.attribute(u"id"_s));
+            iq.setTo(stanza.attribute(u"from"_s));
             iq.setError(QXmppStanza::Error {
                 QXmppStanza::Error::Cancel,
                 QXmppStanza::Error::FeatureNotImplemented,
@@ -754,7 +755,7 @@ bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
 
         // TLS required by config but not offered by server
         if (localSecurity == QXmppConfiguration::TLSRequired && remoteSecurity == QXmppStreamFeatures::Disabled) {
-            warning(QStringLiteral("Server does not support TLS"));
+            warning(u"Server does not support TLS"_s);
             disconnectFromHost();
             return true;
         }
@@ -762,7 +763,7 @@ bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
         // TLS not available locally, but required by server/config
         if (!socket()->supportsSsl() &&
             (localSecurity == QXmppConfiguration::TLSRequired || remoteSecurity == QXmppStreamFeatures::Required)) {
-            warning(QStringLiteral("TLS is required to connect but not available locally"));
+            warning(u"TLS is required to connect but not available locally"_s);
             disconnectFromHost();
             return true;
         }
@@ -783,7 +784,7 @@ bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
 
 void QXmppOutgoingClient::throwKeepAliveError()
 {
-    setError(QStringLiteral("Ping timeout"), TimeoutError());
+    setError(u"Ping timeout"_s, TimeoutError());
     disconnectFromHost();
 }
 
@@ -838,10 +839,10 @@ HandleElementResult BindManager::handleElement(const QDomElement &el)
     auto process = [](QXmppBindIq &&iq) -> Result {
         if (iq.type() == QXmppIq::Result) {
             if (iq.jid().isEmpty()) {
-                return ProtocolError { QStringLiteral("Server did not return JID upon resource binding.") };
+                return ProtocolError { u"Server did not return JID upon resource binding."_s };
             }
 
-            static const QRegularExpression jidRegex(QStringLiteral("^([^@/]+)@([^@/]+)/(.+)$"));
+            static const QRegularExpression jidRegex(u"^([^@/]+)@([^@/]+)/(.+)$"_s);
             if (const auto match = jidRegex.match(iq.jid()); match.hasMatch()) {
                 return BoundAddress {
                     match.captured(1),
@@ -850,13 +851,13 @@ HandleElementResult BindManager::handleElement(const QDomElement &el)
                 };
             }
 
-            return ProtocolError { QStringLiteral("Bind IQ received with invalid JID") };
+            return ProtocolError { u"Bind IQ received with invalid JID"_s };
         }
 
         return iq.error();
     };
 
-    if (QXmppBindIq::isBindIq(el) && el.attribute(QStringLiteral("id")) == m_iqId) {
+    if (QXmppBindIq::isBindIq(el) && el.attribute(u"id"_s) == m_iqId) {
         Q_ASSERT(m_promise.has_value());
 
         auto p = std::move(*m_promise);
@@ -928,7 +929,7 @@ HandleElementResult NonSaslAuthManager::handleElement(const QDomElement &el)
         auto query = std::get<OptionsQuery>(std::move(m_query));
         m_query = {};
 
-        auto iqType = el.attribute(QStringLiteral("type"));
+        auto iqType = el.attribute(u"type"_s);
         if (QXmppNonSASLAuthIq::isNonSASLAuthIq(el) && iqType == u"result") {
             auto queryEl = firstChildElement(el, u"query");
 
@@ -949,8 +950,8 @@ HandleElementResult NonSaslAuthManager::handleElement(const QDomElement &el)
         auto query = std::get<AuthQuery>(std::move(m_query));
         m_query = {};
 
-        const auto id = el.attribute(QStringLiteral("id"));
-        const auto type = el.attribute(QStringLiteral("type"));
+        const auto id = el.attribute(u"id"_s);
+        const auto type = el.attribute(u"type"_s);
 
         if (id == query.id) {
             if (type == u"result") {
@@ -961,10 +962,10 @@ HandleElementResult NonSaslAuthManager::handleElement(const QDomElement &el)
 
                 query.p.finish(QXmppError { iq.error().text(), iq.error() });
             } else {
-                query.p.finish(QXmppError { QStringLiteral("Received unexpected IQ response."), {} });
+                query.p.finish(QXmppError { u"Received unexpected IQ response."_s, {} });
             }
         } else {
-            query.p.finish(QXmppError { QStringLiteral("Received IQ response with wrong ID."), {} });
+            query.p.finish(QXmppError { u"Received IQ response with wrong ID."_s, {} });
         }
         return Finished;
     }
@@ -1037,12 +1038,12 @@ OutgoingIqManager::~OutgoingIqManager() = default;
 QXmppTask<IqResult> OutgoingIqManager::sendIq(QXmppIq &&iq, const QString &to)
 {
     if (iq.id().isEmpty()) {
-        warning(QStringLiteral("QXmppStream::sendIq() error: ID is empty. Using random ID."));
+        warning(u"QXmppStream::sendIq() error: ID is empty. Using random ID."_s);
         iq.setId(QXmppUtils::generateStanzaUuid());
     }
     if (hasId(iq.id())) {
-        warning(QStringLiteral("QXmppStream::sendIq() error:"
-                               "The IQ's ID (\"%1\") is already in use. Using random ID.")
+        warning(u"QXmppStream::sendIq() error:"
+                "The IQ's ID (\"%1\") is already in use. Using random ID."_s
                     .arg(iq.id()));
         iq.setId(QXmppUtils::generateStanzaUuid());
     }
@@ -1083,13 +1084,13 @@ QXmppTask<IqResult> OutgoingIqManager::start(const QString &id, const QString &t
 {
     if (!isIdValid(id)) {
         return makeReadyTask<IqResult>(
-            QXmppError { QStringLiteral("Invalid IQ id: empty or in use."),
+            QXmppError { u"Invalid IQ id: empty or in use."_s,
                          SendError::Disconnected });
     }
 
     if (to.isEmpty()) {
         return makeReadyTask<IqResult>(
-            QXmppError { QStringLiteral("The 'to' address must be set so the stream can match the response."),
+            QXmppError { u"The 'to' address must be set so the stream can match the response."_s,
                          SendError::Disconnected });
     }
 
@@ -1109,7 +1110,7 @@ void OutgoingIqManager::cancelAll()
 {
     for (auto &[id, state] : m_requests) {
         state.interface.finish(QXmppError {
-            QStringLiteral("IQ has been cancelled."),
+            u"IQ has been cancelled."_s,
             QXmpp::SendError::Disconnected });
     }
     m_requests.clear();
@@ -1138,12 +1139,12 @@ bool OutgoingIqManager::handleStanza(const QDomElement &stanza)
     }
 
     // only accept "result" and "error" types
-    const auto iqType = stanza.attribute(QStringLiteral("type"));
+    const auto iqType = stanza.attribute(u"type"_s);
     if (iqType != u"result" && iqType != u"error") {
         return false;
     }
 
-    const auto id = stanza.attribute(QStringLiteral("id"));
+    const auto id = stanza.attribute(u"id"_s);
     auto itr = m_requests.find(id);
     if (itr == m_requests.end()) {
         return false;
@@ -1157,8 +1158,8 @@ bool OutgoingIqManager::handleStanza(const QDomElement &stanza)
     // attribute or have it set to the user's bare JID.
     // If 'from' is empty, the IQ has been sent by the server. In this case we don't need to
     // do the check as we trust the server anyways.
-    if (auto from = stanza.attribute(QStringLiteral("from")); !from.isEmpty() && from != expectedFrom) {
-        warning(QStringLiteral("Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'")
+    if (auto from = stanza.attribute(u"from"_s); !from.isEmpty() && from != expectedFrom) {
+        warning(u"Ignored received IQ response to request '%1' because of wrong sender '%2' instead of expected sender '%3'"_s
                     .arg(id, from, expectedFrom));
         return false;
     }
@@ -1174,7 +1175,7 @@ bool OutgoingIqManager::handleStanza(const QDomElement &stanza)
         } else {
             // this shouldn't happen (no <error/> element in IQ of type error)
             using Err = QXmppStanza::Error;
-            promise.finish(QXmppError { QStringLiteral("IQ error"), Err(Err::Cancel, Err::UndefinedCondition) });
+            promise.finish(QXmppError { u"IQ error"_s, Err(Err::Cancel, Err::UndefinedCondition) });
         }
     } else {
         // report stanza element for parsing
@@ -1311,7 +1312,7 @@ QXmppTask<void> C2sStreamManager::requestEnable()
 void C2sStreamManager::onEnabled(const SmEnabled &enabled)
 {
     // Called whenever stream management is enabled, either by requestEnable() or by onBind2Bound()
-    q->debug(QStringLiteral("Stream management enabled"));
+    q->debug(u"Stream management enabled"_s);
     m_smId = enabled.id;
     m_canResume = enabled.resume;
     if (enabled.resume && !enabled.location.isEmpty()) {
@@ -1324,12 +1325,12 @@ void C2sStreamManager::onEnabled(const SmEnabled &enabled)
 
 void C2sStreamManager::onEnableFailed(const SmFailed &)
 {
-    q->warning(QStringLiteral("Failed to enable stream management"));
+    q->warning(u"Failed to enable stream management"_s);
 }
 
 void C2sStreamManager::onResumed(const SmResumed &resumed)
 {
-    q->debug(QStringLiteral("Stream resumed"));
+    q->debug(u"Stream resumed"_s);
     q->streamAckManager().setAcknowledgedSequenceNumber(resumed.h);
     m_streamResumed = true;
     m_enabled = true;
@@ -1338,7 +1339,7 @@ void C2sStreamManager::onResumed(const SmResumed &resumed)
 
 void C2sStreamManager::onResumeFailed(const SmFailed &)
 {
-    q->debug(QStringLiteral("Stream resumption failed"));
+    q->debug(u"Stream resumption failed"_s);
 }
 
 bool C2sStreamManager::setResumeAddress(const QString &address)

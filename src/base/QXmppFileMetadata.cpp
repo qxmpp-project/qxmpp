@@ -11,6 +11,7 @@
 #include "QXmppUtils_p.h"
 
 #include "Algorithms.h"
+#include "StringLiterals.h"
 
 #include <utility>
 

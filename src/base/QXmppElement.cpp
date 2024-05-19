@@ -6,6 +6,8 @@
 
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QTextStream>
 
@@ -39,7 +41,7 @@ QXmppElementPrivate::QXmppElementPrivate(const QDomElement &element)
     QString xmlns = element.namespaceURI();
     QString parentns = element.parentNode().namespaceURI();
     if (!xmlns.isEmpty() && xmlns != parentns) {
-        attributes.insert(QStringLiteral("xmlns"), xmlns);
+        attributes.insert(u"xmlns"_s, xmlns);
     }
     QDomNamedNodeMap attrs = element.attributes();
     for (int i = 0; i < attrs.size(); i++) {
@@ -291,8 +293,8 @@ void QXmppElement::toXml(QXmlStreamWriter *writer) const
     }
 
     writer->writeStartElement(d->name);
-    if (d->attributes.contains(QStringLiteral("xmlns"))) {
-        writer->writeDefaultNamespace(d->attributes.value(QStringLiteral("xmlns")));
+    if (d->attributes.contains(u"xmlns"_s)) {
+        writer->writeDefaultNamespace(d->attributes.value(u"xmlns"_s));
     }
     std::for_each(d->attributes.keyBegin(), d->attributes.keyEnd(), [this, writer](const QString &key) {
         if (key != u"xmlns") {

@@ -9,6 +9,7 @@
 #include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
 
+#include "StringLiterals.h"
 #include "TestClient.h"
 #include "util.h"
 
@@ -51,14 +52,14 @@ static QXmppRosterIq newRoster(TestClient *client, int version, const std::optio
     if (roster.type() == QXmppIq::Result || roster.type() == QXmppIq::Set) {
         switch (version) {
         case 0:
-            roster.addItem(newRosterItem(QStringLiteral("1@bare.com"), QStringLiteral("1 Bare"), { QStringLiteral("all") }));
-            roster.addItem(newRosterItem(QStringLiteral("2@bare.com"), QStringLiteral("2 Bare"), { QStringLiteral("all") }));
-            roster.addItem(newRosterItem(QStringLiteral("3@bare.com"), QStringLiteral("3 Bare"), { QStringLiteral("all") }));
+            roster.addItem(newRosterItem(u"1@bare.com"_s, u"1 Bare"_s, { u"all"_s }));
+            roster.addItem(newRosterItem(u"2@bare.com"_s, u"2 Bare"_s, { u"all"_s }));
+            roster.addItem(newRosterItem(u"3@bare.com"_s, u"3 Bare"_s, { u"all"_s }));
             break;
         case 1:
-            roster.addItem(newRosterItem(QStringLiteral("4@gamer.com"), QStringLiteral("4 Gamer"), { QStringLiteral("gamers") }));
-            roster.addItem(newRosterItem(QStringLiteral("5@gamer.com"), QStringLiteral("5 Gamer"), { QStringLiteral("gamers") }));
-            roster.addItem(newRosterItem(QStringLiteral("6@gamer.com"), QStringLiteral("6 Gamer"), { QStringLiteral("gamers") }));
+            roster.addItem(newRosterItem(u"4@gamer.com"_s, u"4 Gamer"_s, { u"gamers"_s }));
+            roster.addItem(newRosterItem(u"5@gamer.com"_s, u"5 Gamer"_s, { u"gamers"_s }));
+            roster.addItem(newRosterItem(u"6@gamer.com"_s, u"6 Gamer"_s, { u"gamers"_s }));
             break;
         default:
             Q_UNREACHABLE();
@@ -82,14 +83,14 @@ static QXmppVCardIq newClientVCard(TestClient *client, int version, const std::o
     if (vcard.type() == QXmppIq::Result || vcard.type() == QXmppIq::Set) {
         switch (version) {
         case 0:
-            vcard.setFirstName(QStringLiteral("Nox"));
-            vcard.setLastName(QStringLiteral("PasNox"));
-            vcard.setNickName(QStringLiteral("It is me PasNox"));
+            vcard.setFirstName(u"Nox"_s);
+            vcard.setLastName(u"PasNox"_s);
+            vcard.setNickName(u"It is me PasNox"_s);
             break;
         case 1:
-            vcard.setFirstName(QStringLiteral("Nox"));
-            vcard.setLastName(QStringLiteral("Bookri"));
-            vcard.setNickName(QStringLiteral("It is me Bookri"));
+            vcard.setFirstName(u"Nox"_s);
+            vcard.setLastName(u"Bookri"_s);
+            vcard.setNickName(u"It is me Bookri"_s);
             break;
         default:
             Q_UNREACHABLE();
@@ -205,17 +206,17 @@ void tst_QXmppAccountMigrationManager::realImportExport()
     auto exportTask = manager->exportData();
     QVERIFY(!exportTask.isFinished());
 
-    client->expect(QStringLiteral("<iq id='qxmpp2' from='pasnox@xmpp.example/QXmpp' type='get'>"
-                                  "<query xmlns='jabber:iq:roster'>"
-                                  "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
-                                  "</query>"
-                                  "</iq>"));
-    client->expect(QStringLiteral("<iq id='qxmpp3' to='pasnox@xmpp.example' type='get'>"
-                                  "<vCard xmlns='vcard-temp'>"
-                                  "<TITLE/>"
-                                  "<ROLE/>"
-                                  "</vCard>"
-                                  "</iq>"));
+    client->expect(u"<iq id='qxmpp2' from='pasnox@xmpp.example/QXmpp' type='get'>"
+                   "<query xmlns='jabber:iq:roster'>"
+                   "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
+                   "</query>"
+                   "</iq>"_s);
+    client->expect(u"<iq id='qxmpp3' to='pasnox@xmpp.example' type='get'>"
+                   "<vCard xmlns='vcard-temp'>"
+                   "<TITLE/>"
+                   "<ROLE/>"
+                   "</vCard>"
+                   "</iq>"_s);
 
     client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result)));
     client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp3", QXmppIq::Result)));

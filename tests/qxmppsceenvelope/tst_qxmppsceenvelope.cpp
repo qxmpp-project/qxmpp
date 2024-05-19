@@ -29,10 +29,10 @@ void tst_QXmppSceEnvelope::testReader()
         "</envelope>");
 
     QXmppSceEnvelopeReader reader(xmlToDom(xml));
-    QCOMPARE(reader.from(), QStringLiteral("opportunity@mars.planet"));
-    QCOMPARE(reader.to(), QStringLiteral("missioncontrol@houston.nasa.gov"));
+    QCOMPARE(reader.from(), u"opportunity@mars.planet"_s);
+    QCOMPARE(reader.to(), u"missioncontrol@houston.nasa.gov"_s);
     QCOMPARE(reader.timestamp(), QDateTime({ 2004, 01, 25 }, { 05, 05, 00 }, Qt::UTC));
-    QCOMPARE(reader.contentElement().firstChildElement().tagName(), QStringLiteral("body"));
+    QCOMPARE(reader.contentElement().firstChildElement().tagName(), u"body"_s);
 }
 
 void tst_QXmppSceEnvelope::testWriter()

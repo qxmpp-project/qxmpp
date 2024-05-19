@@ -4,6 +4,8 @@
 
 #include "QXmppOmemoMemoryStorage.h"
 
+#include "StringLiterals.h"
+
 #include <QtTest>
 
 class tst_QXmppOmemoMemoryStorage : public QObject
@@ -45,7 +47,7 @@ void tst_QXmppOmemoMemoryStorage::testOwnDevice()
     QCOMPARE(result.latestPreKeyId, 1);
 
     ownDevice.id = 1;
-    ownDevice.label = QStringLiteral("Notebook");
+    ownDevice.label = u"Notebook"_s;
     ownDevice.privateIdentityKey = QByteArray::fromBase64(QByteArrayLiteral("ZDVNZFdJeFFUa3N6ZWdSUG9scUdoQXFpWERGbHRsZTIK"));
     ownDevice.publicIdentityKey = QByteArray::fromBase64(QByteArrayLiteral("dUsxSTJyM2tKVHE1TzNXbk1Xd0tpMGY0TnFleDRYUGkK"));
     ownDevice.latestSignedPreKeyId = 2;
@@ -60,7 +62,7 @@ void tst_QXmppOmemoMemoryStorage::testOwnDevice()
     QVERIFY(optionalResult);
     result = optionalResult.value();
     QCOMPARE(result.id, 1);
-    QCOMPARE(result.label, QStringLiteral("Notebook"));
+    QCOMPARE(result.label, u"Notebook"_s);
     QCOMPARE(result.privateIdentityKey, QByteArray::fromBase64(QByteArrayLiteral("ZDVNZFdJeFFUa3N6ZWdSUG9scUdoQXFpWERGbHRsZTIK")));
     QCOMPARE(result.publicIdentityKey, QByteArray::fromBase64(QByteArrayLiteral("dUsxSTJyM2tKVHE1TzNXbk1Xd0tpMGY0TnFleDRYUGkK")));
     QCOMPARE(result.latestSignedPreKeyId, 2);
@@ -149,7 +151,7 @@ void tst_QXmppOmemoMemoryStorage::testDevices()
     QVERIFY(result.isEmpty());
 
     QXmppOmemoStorage::Device deviceAlice;
-    deviceAlice.label = QStringLiteral("Desktop");
+    deviceAlice.label = u"Desktop"_s;
     deviceAlice.keyId = QByteArray::fromBase64(QByteArrayLiteral("bEFLaDRQRkFlYXdyakE2aURoN0wyMzk2NTJEM2hRMgo="));
     deviceAlice.session = QByteArray::fromBase64(QByteArrayLiteral("Cs8CCAQSIQWIhBRMdJ80tLVT7ius0H1LutRLeXBid68NH90M/kwhGxohBT+2kM/wVQ2UrZZPJBRmGZP0ZoCCWiET7KxA3ieAa888IiBSTWnp4qrTeo7z9kfKRaAFy+fYwPBI2HCSOxfC0anyPigAMmsKIQXZ95Xs7I+tOsg76eLtp266XTuCF8STa+VZkXPPJ00WSRIgmJ73wjhXPZqIt9ofB0NVwbWOKnYzQ90SHJEd/hyBHkUaJAgAEiDxXDT00+zpJd+TKJrD6nWQxQZhB8I7vCRdD/Oxw61MYjpJCiEFmTV1l+cOLEytoTp17VOEunYlCZmDqn/qoUYI/8P9ZQsaJAgBEiB/QP+9Lb0YOhSQmIr/X75Vs1FME1qzmohSzqBVTzbfZFCnf1jsR2AAaiEFPxj3VK+knGrndOjcgMXI4wEfH/0VrbgJqobGWbewYyA="));
     deviceAlice.unrespondedSentStanzasCount = 10;
@@ -157,7 +159,7 @@ void tst_QXmppOmemoMemoryStorage::testDevices()
     deviceAlice.removalFromDeviceListDate = QDateTime(QDate(2022, 01, 01), QTime());
 
     QXmppOmemoStorage::Device deviceBob1;
-    deviceBob1.label = QStringLiteral("Phone");
+    deviceBob1.label = u"Phone"_s;
     deviceBob1.keyId = QByteArray::fromBase64(QByteArrayLiteral("WTV6c3B2UFhYbE9OQ1d0N0ZScUhLWXpmYnY2emJoego="));
     deviceBob1.session = QByteArray::fromBase64(QByteArrayLiteral("CvgCCAQSIQXZwE+G9R6ECMxKWPMidwcx3lPboUT2KEoea3B2T3vjUBohBQ7qW+Fb9Gi/SLsuQTv2TRixF0zLx2/mw0V4arjYSmgHIiCwuvEP2eyFU7FsbtSZBWKt+hH/DwBF7C0WrfxDrSu1bSgAMmsKIQXm5tRa73ZcUWn7fQa2YlDv+yLw1copPjdRZCrGcK7cNRIg0OXBvqBTAfyiUlLKW3LDIiSMHkRYYWDyknSJz3s+81oaJAgAEiAQlSKV+70EMYAjjW88dO52dp9e/aDhT8YUDHNFaCFUxTpJCiEF2OE4fb7Quwg0PMeJfT1uXmq/YXVaos9A7bn37TySiWkaJAgAEiDJlr5w0mBHBHZzttfVyvd2y2IzBV7bGdoX+lKHaEGIoUonCAwSIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECRgCUMgnWMgnYABqIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECQ=="));
     deviceBob1.unrespondedSentStanzasCount = 20;
@@ -165,38 +167,38 @@ void tst_QXmppOmemoMemoryStorage::testDevices()
     deviceBob1.removalFromDeviceListDate = QDateTime(QDate(2022, 01, 02), QTime());
 
     QXmppOmemoStorage::Device deviceBob2;
-    deviceBob2.label = QStringLiteral("Tablet");
+    deviceBob2.label = u"Tablet"_s;
     deviceBob2.keyId = QByteArray::fromBase64(QByteArrayLiteral("U0tXcUlSVHVISzZLYUdGcW53czBtdXYxTEt2blVsbQo="));
     deviceBob2.session = QByteArray::fromBase64(QByteArrayLiteral("CvgCCAQSIQU/tpDP8FUNlK2WTyQUZhmT9GaAglohE+ysQN4ngGvPPBohBdnAT4b1HoQIzEpY8yJ3BzHeU9uhRPYoSh5rcHZPe+NQIiBNmwyjLm5xdbf5f9ab9AASopfdiSybMFMdS4SQR5pSTygAMmsKIQW5FhVKpKUzKlhUCfoCmMwoo5jUFn7+NrcOQl6CQYraZRIgkNHGSWgeoLUvYMM8wsgqU4RUv8ymv/Kv4LLJb8q4vlEaJAgAEiA/GmWir7/6tWyOTrGXsehUnnPZhFs6zGvTDNe1LZaIeTpJCiEFa7t/sVQV2uofS36GbijY63d2B4yJKFGDu6K96cU5PFsaJAgAEiA6kX2jqwfZkN0AmNOZGLPg9J8ryrSSpo74DxU85z0q/konCE4SIQWZRzzFf3M1/gzbg9/xUsNcyiUnr5jAjLpSPOj7BOW6BBgCUKd/WKd/YABqIQWZRzzFf3M1/gzbg9/xUsNcyiUnr5jAjLpSPOj7BOW6BA=="));
     deviceBob2.unrespondedSentStanzasCount = 30;
     deviceBob2.unrespondedReceivedStanzasCount = 31;
     deviceBob2.removalFromDeviceListDate = QDateTime(QDate(2022, 01, 03), QTime());
 
-    m_omemoStorage.addDevice(QStringLiteral("alice@example.org"), 1, deviceAlice);
-    m_omemoStorage.addDevice(QStringLiteral("bob@example.com"), 1, deviceBob1);
-    m_omemoStorage.addDevice(QStringLiteral("bob@example.com"), 2, deviceBob2);
+    m_omemoStorage.addDevice(u"alice@example.org"_s, 1, deviceAlice);
+    m_omemoStorage.addDevice(u"bob@example.com"_s, 1, deviceBob1);
+    m_omemoStorage.addDevice(u"bob@example.com"_s, 2, deviceBob2);
 
     future = m_omemoStorage.allData();
     QVERIFY(future.isFinished());
     result = future.result().devices;
     QCOMPARE(result.size(), 2);
 
-    auto resultDevicesAlice = result.value(QStringLiteral("alice@example.org"));
+    auto resultDevicesAlice = result.value(u"alice@example.org"_s);
     QCOMPARE(resultDevicesAlice.size(), 1);
 
     auto resultDeviceAlice = resultDevicesAlice.value(1);
-    QCOMPARE(resultDeviceAlice.label, QStringLiteral("Desktop"));
+    QCOMPARE(resultDeviceAlice.label, u"Desktop"_s);
     QCOMPARE(resultDeviceAlice.keyId, QByteArray::fromBase64(QByteArrayLiteral("bEFLaDRQRkFlYXdyakE2aURoN0wyMzk2NTJEM2hRMgo=")));
     QCOMPARE(resultDeviceAlice.session, QByteArray::fromBase64(QByteArrayLiteral("Cs8CCAQSIQWIhBRMdJ80tLVT7ius0H1LutRLeXBid68NH90M/kwhGxohBT+2kM/wVQ2UrZZPJBRmGZP0ZoCCWiET7KxA3ieAa888IiBSTWnp4qrTeo7z9kfKRaAFy+fYwPBI2HCSOxfC0anyPigAMmsKIQXZ95Xs7I+tOsg76eLtp266XTuCF8STa+VZkXPPJ00WSRIgmJ73wjhXPZqIt9ofB0NVwbWOKnYzQ90SHJEd/hyBHkUaJAgAEiDxXDT00+zpJd+TKJrD6nWQxQZhB8I7vCRdD/Oxw61MYjpJCiEFmTV1l+cOLEytoTp17VOEunYlCZmDqn/qoUYI/8P9ZQsaJAgBEiB/QP+9Lb0YOhSQmIr/X75Vs1FME1qzmohSzqBVTzbfZFCnf1jsR2AAaiEFPxj3VK+knGrndOjcgMXI4wEfH/0VrbgJqobGWbewYyA=")));
     QCOMPARE(resultDeviceAlice.unrespondedSentStanzasCount, 10);
     QCOMPARE(resultDeviceAlice.unrespondedReceivedStanzasCount, 11);
     QCOMPARE(resultDeviceAlice.removalFromDeviceListDate, QDateTime(QDate(2022, 01, 01), QTime()));
 
-    auto resultDevicesBob = result.value(QStringLiteral("bob@example.com"));
+    auto resultDevicesBob = result.value(u"bob@example.com"_s);
     QCOMPARE(resultDevicesBob.size(), 2);
 
     auto resultDeviceBob1 = resultDevicesBob.value(1);
-    QCOMPARE(resultDeviceBob1.label, QStringLiteral("Phone"));
+    QCOMPARE(resultDeviceBob1.label, u"Phone"_s);
     QCOMPARE(resultDeviceBob1.keyId, QByteArray::fromBase64(QByteArrayLiteral("WTV6c3B2UFhYbE9OQ1d0N0ZScUhLWXpmYnY2emJoego=")));
     QCOMPARE(resultDeviceBob1.session, QByteArray::fromBase64(QByteArrayLiteral("CvgCCAQSIQXZwE+G9R6ECMxKWPMidwcx3lPboUT2KEoea3B2T3vjUBohBQ7qW+Fb9Gi/SLsuQTv2TRixF0zLx2/mw0V4arjYSmgHIiCwuvEP2eyFU7FsbtSZBWKt+hH/DwBF7C0WrfxDrSu1bSgAMmsKIQXm5tRa73ZcUWn7fQa2YlDv+yLw1copPjdRZCrGcK7cNRIg0OXBvqBTAfyiUlLKW3LDIiSMHkRYYWDyknSJz3s+81oaJAgAEiAQlSKV+70EMYAjjW88dO52dp9e/aDhT8YUDHNFaCFUxTpJCiEF2OE4fb7Quwg0PMeJfT1uXmq/YXVaos9A7bn37TySiWkaJAgAEiDJlr5w0mBHBHZzttfVyvd2y2IzBV7bGdoX+lKHaEGIoUonCAwSIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECRgCUMgnWMgnYABqIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECQ==")));
     QCOMPARE(resultDeviceBob1.unrespondedSentStanzasCount, 20);
@@ -204,74 +206,74 @@ void tst_QXmppOmemoMemoryStorage::testDevices()
     QCOMPARE(resultDeviceBob1.removalFromDeviceListDate, QDateTime(QDate(2022, 01, 02), QTime()));
 
     auto resultDeviceBob2 = resultDevicesBob.value(2);
-    QCOMPARE(resultDeviceBob2.label, QStringLiteral("Tablet"));
+    QCOMPARE(resultDeviceBob2.label, u"Tablet"_s);
     QCOMPARE(resultDeviceBob2.keyId, QByteArray::fromBase64(QByteArrayLiteral("U0tXcUlSVHVISzZLYUdGcW53czBtdXYxTEt2blVsbQo=")));
     QCOMPARE(resultDeviceBob2.session, QByteArray::fromBase64(QByteArrayLiteral("CvgCCAQSIQU/tpDP8FUNlK2WTyQUZhmT9GaAglohE+ysQN4ngGvPPBohBdnAT4b1HoQIzEpY8yJ3BzHeU9uhRPYoSh5rcHZPe+NQIiBNmwyjLm5xdbf5f9ab9AASopfdiSybMFMdS4SQR5pSTygAMmsKIQW5FhVKpKUzKlhUCfoCmMwoo5jUFn7+NrcOQl6CQYraZRIgkNHGSWgeoLUvYMM8wsgqU4RUv8ymv/Kv4LLJb8q4vlEaJAgAEiA/GmWir7/6tWyOTrGXsehUnnPZhFs6zGvTDNe1LZaIeTpJCiEFa7t/sVQV2uofS36GbijY63d2B4yJKFGDu6K96cU5PFsaJAgAEiA6kX2jqwfZkN0AmNOZGLPg9J8ryrSSpo74DxU85z0q/konCE4SIQWZRzzFf3M1/gzbg9/xUsNcyiUnr5jAjLpSPOj7BOW6BBgCUKd/WKd/YABqIQWZRzzFf3M1/gzbg9/xUsNcyiUnr5jAjLpSPOj7BOW6BA==")));
     QCOMPARE(resultDeviceBob2.unrespondedSentStanzasCount, 30);
     QCOMPARE(resultDeviceBob2.unrespondedReceivedStanzasCount, 31);
     QCOMPARE(resultDeviceBob2.removalFromDeviceListDate, QDateTime(QDate(2022, 01, 03), QTime()));
 
-    m_omemoStorage.removeDevice(QStringLiteral("bob@example.com"), 2);
+    m_omemoStorage.removeDevice(u"bob@example.com"_s, 2);
 
     future = m_omemoStorage.allData();
     QVERIFY(future.isFinished());
     result = future.result().devices;
     QCOMPARE(result.size(), 2);
 
-    resultDevicesAlice = result.value(QStringLiteral("alice@example.org"));
+    resultDevicesAlice = result.value(u"alice@example.org"_s);
     QCOMPARE(resultDevicesAlice.size(), 1);
 
     resultDeviceAlice = resultDevicesAlice.value(1);
-    QCOMPARE(resultDeviceAlice.label, QStringLiteral("Desktop"));
+    QCOMPARE(resultDeviceAlice.label, u"Desktop"_s);
     QCOMPARE(resultDeviceAlice.keyId, QByteArray::fromBase64(QByteArrayLiteral("bEFLaDRQRkFlYXdyakE2aURoN0wyMzk2NTJEM2hRMgo=")));
     QCOMPARE(resultDeviceAlice.session, QByteArray::fromBase64(QByteArrayLiteral("Cs8CCAQSIQWIhBRMdJ80tLVT7ius0H1LutRLeXBid68NH90M/kwhGxohBT+2kM/wVQ2UrZZPJBRmGZP0ZoCCWiET7KxA3ieAa888IiBSTWnp4qrTeo7z9kfKRaAFy+fYwPBI2HCSOxfC0anyPigAMmsKIQXZ95Xs7I+tOsg76eLtp266XTuCF8STa+VZkXPPJ00WSRIgmJ73wjhXPZqIt9ofB0NVwbWOKnYzQ90SHJEd/hyBHkUaJAgAEiDxXDT00+zpJd+TKJrD6nWQxQZhB8I7vCRdD/Oxw61MYjpJCiEFmTV1l+cOLEytoTp17VOEunYlCZmDqn/qoUYI/8P9ZQsaJAgBEiB/QP+9Lb0YOhSQmIr/X75Vs1FME1qzmohSzqBVTzbfZFCnf1jsR2AAaiEFPxj3VK+knGrndOjcgMXI4wEfH/0VrbgJqobGWbewYyA=")));
     QCOMPARE(resultDeviceAlice.unrespondedSentStanzasCount, 10);
     QCOMPARE(resultDeviceAlice.unrespondedReceivedStanzasCount, 11);
     QCOMPARE(resultDeviceAlice.removalFromDeviceListDate, QDateTime(QDate(2022, 01, 01), QTime()));
 
-    resultDevicesBob = result.value(QStringLiteral("bob@example.com"));
+    resultDevicesBob = result.value(u"bob@example.com"_s);
     QCOMPARE(resultDevicesBob.size(), 1);
 
     resultDeviceBob1 = resultDevicesBob.value(1);
-    QCOMPARE(resultDeviceBob1.label, QStringLiteral("Phone"));
+    QCOMPARE(resultDeviceBob1.label, u"Phone"_s);
     QCOMPARE(resultDeviceBob1.keyId, QByteArray::fromBase64(QByteArrayLiteral("WTV6c3B2UFhYbE9OQ1d0N0ZScUhLWXpmYnY2emJoego=")));
     QCOMPARE(resultDeviceBob1.session, QByteArray::fromBase64(QByteArrayLiteral("CvgCCAQSIQXZwE+G9R6ECMxKWPMidwcx3lPboUT2KEoea3B2T3vjUBohBQ7qW+Fb9Gi/SLsuQTv2TRixF0zLx2/mw0V4arjYSmgHIiCwuvEP2eyFU7FsbtSZBWKt+hH/DwBF7C0WrfxDrSu1bSgAMmsKIQXm5tRa73ZcUWn7fQa2YlDv+yLw1copPjdRZCrGcK7cNRIg0OXBvqBTAfyiUlLKW3LDIiSMHkRYYWDyknSJz3s+81oaJAgAEiAQlSKV+70EMYAjjW88dO52dp9e/aDhT8YUDHNFaCFUxTpJCiEF2OE4fb7Quwg0PMeJfT1uXmq/YXVaos9A7bn37TySiWkaJAgAEiDJlr5w0mBHBHZzttfVyvd2y2IzBV7bGdoX+lKHaEGIoUonCAwSIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECRgCUMgnWMgnYABqIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECQ==")));
     QCOMPARE(resultDeviceBob1.unrespondedSentStanzasCount, 20);
     QCOMPARE(resultDeviceBob1.unrespondedReceivedStanzasCount, 21);
     QCOMPARE(resultDeviceBob1.removalFromDeviceListDate, QDateTime(QDate(2022, 01, 02), QTime()));
 
-    m_omemoStorage.removeDevice(QStringLiteral("alice@example.org"), 1);
+    m_omemoStorage.removeDevice(u"alice@example.org"_s, 1);
 
     future = m_omemoStorage.allData();
     QVERIFY(future.isFinished());
     result = future.result().devices;
     QCOMPARE(result.size(), 1);
 
-    resultDevicesBob = result.value(QStringLiteral("bob@example.com"));
+    resultDevicesBob = result.value(u"bob@example.com"_s);
     QCOMPARE(resultDevicesBob.size(), 1);
 
     resultDeviceBob1 = resultDevicesBob.value(1);
-    QCOMPARE(resultDeviceBob1.label, QStringLiteral("Phone"));
+    QCOMPARE(resultDeviceBob1.label, u"Phone"_s);
     QCOMPARE(resultDeviceBob1.keyId, QByteArray::fromBase64(QByteArrayLiteral("WTV6c3B2UFhYbE9OQ1d0N0ZScUhLWXpmYnY2emJoego=")));
     QCOMPARE(resultDeviceBob1.session, QByteArray::fromBase64(QByteArrayLiteral("CvgCCAQSIQXZwE+G9R6ECMxKWPMidwcx3lPboUT2KEoea3B2T3vjUBohBQ7qW+Fb9Gi/SLsuQTv2TRixF0zLx2/mw0V4arjYSmgHIiCwuvEP2eyFU7FsbtSZBWKt+hH/DwBF7C0WrfxDrSu1bSgAMmsKIQXm5tRa73ZcUWn7fQa2YlDv+yLw1copPjdRZCrGcK7cNRIg0OXBvqBTAfyiUlLKW3LDIiSMHkRYYWDyknSJz3s+81oaJAgAEiAQlSKV+70EMYAjjW88dO52dp9e/aDhT8YUDHNFaCFUxTpJCiEF2OE4fb7Quwg0PMeJfT1uXmq/YXVaos9A7bn37TySiWkaJAgAEiDJlr5w0mBHBHZzttfVyvd2y2IzBV7bGdoX+lKHaEGIoUonCAwSIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECRgCUMgnWMgnYABqIQXN7Y76Vwcsaubw8EHYaIPnBB11WjEEYcEPalwlgEUECQ==")));
     QCOMPARE(resultDeviceBob1.unrespondedSentStanzasCount, 20);
     QCOMPARE(resultDeviceBob1.unrespondedReceivedStanzasCount, 21);
     QCOMPARE(resultDeviceBob1.removalFromDeviceListDate, QDateTime(QDate(2022, 01, 02), QTime()));
 
-    m_omemoStorage.addDevice(QStringLiteral("alice@example.org"), 1, deviceAlice);
-    m_omemoStorage.addDevice(QStringLiteral("bob@example.com"), 2, deviceBob2);
-    m_omemoStorage.removeDevices(QStringLiteral("bob@example.com"));
+    m_omemoStorage.addDevice(u"alice@example.org"_s, 1, deviceAlice);
+    m_omemoStorage.addDevice(u"bob@example.com"_s, 2, deviceBob2);
+    m_omemoStorage.removeDevices(u"bob@example.com"_s);
 
     future = m_omemoStorage.allData();
     QVERIFY(future.isFinished());
     result = future.result().devices;
     QCOMPARE(result.size(), 1);
 
-    resultDevicesAlice = result.value(QStringLiteral("alice@example.org"));
+    resultDevicesAlice = result.value(u"alice@example.org"_s);
     QCOMPARE(resultDevicesAlice.size(), 1);
 
     resultDeviceAlice = resultDevicesAlice.value(1);
-    QCOMPARE(resultDeviceAlice.label, QStringLiteral("Desktop"));
+    QCOMPARE(resultDeviceAlice.label, u"Desktop"_s);
     QCOMPARE(resultDeviceAlice.keyId, QByteArray::fromBase64(QByteArrayLiteral("bEFLaDRQRkFlYXdyakE2aURoN0wyMzk2NTJEM2hRMgo=")));
     QCOMPARE(resultDeviceAlice.session, QByteArray::fromBase64(QByteArrayLiteral("Cs8CCAQSIQWIhBRMdJ80tLVT7ius0H1LutRLeXBid68NH90M/kwhGxohBT+2kM/wVQ2UrZZPJBRmGZP0ZoCCWiET7KxA3ieAa888IiBSTWnp4qrTeo7z9kfKRaAFy+fYwPBI2HCSOxfC0anyPigAMmsKIQXZ95Xs7I+tOsg76eLtp266XTuCF8STa+VZkXPPJ00WSRIgmJ73wjhXPZqIt9ofB0NVwbWOKnYzQ90SHJEd/hyBHkUaJAgAEiDxXDT00+zpJd+TKJrD6nWQxQZhB8I7vCRdD/Oxw61MYjpJCiEFmTV1l+cOLEytoTp17VOEunYlCZmDqn/qoUYI/8P9ZQsaJAgBEiB/QP+9Lb0YOhSQmIr/X75Vs1FME1qzmohSzqBVTzbfZFCnf1jsR2AAaiEFPxj3VK+knGrndOjcgMXI4wEfH/0VrbgJqobGWbewYyA=")));
     QCOMPARE(resultDeviceAlice.unrespondedSentStanzasCount, 10);
@@ -290,7 +292,7 @@ void tst_QXmppOmemoMemoryStorage::testResetAll()
 
     m_omemoStorage.addPreKeyPairs({ { 1, QByteArrayLiteral("RZLgD0lmL2WpJbskbGKFRMZL4zqSSvU0rElmO7UwGSVt") },
                                     { 2, QByteArrayLiteral("3PGPNsf9P7pPitp9dt2uvZYT4HkxdHJAbWqLvOPXUeca") } });
-    m_omemoStorage.addDevice(QStringLiteral("alice@example.org"),
+    m_omemoStorage.addDevice(u"alice@example.org"_s,
                              123,
                              QXmppOmemoStorage::Device());
 

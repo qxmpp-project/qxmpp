@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -195,11 +197,11 @@ void QXmppGeolocItem::serializePayload(QXmlStreamWriter *writer) const
     writer->writeStartElement(QSL65("geoloc"));
     writer->writeDefaultNamespace(toString65(ns_geoloc));
 
-    writeTextEl(writer, QStringLiteral("accuracy"), d->accuracy);
-    writeTextEl(writer, QStringLiteral("country"), d->country);
-    writeTextEl(writer, QStringLiteral("lat"), d->latitude);
-    writeTextEl(writer, QStringLiteral("locality"), d->locality);
-    writeTextEl(writer, QStringLiteral("lon"), d->longitude);
+    writeTextEl(writer, u"accuracy"_s, d->accuracy);
+    writeTextEl(writer, u"country"_s, d->country);
+    writeTextEl(writer, u"lat"_s, d->latitude);
+    writeTextEl(writer, u"locality"_s, d->locality);
+    writeTextEl(writer, u"lon"_s, d->longitude);
 
     writer->writeEndElement();
 }

@@ -4,18 +4,20 @@
 
 #include "QXmppPubSubSubscribeOptions.h"
 
+#include "StringLiterals.h"
+
 #include <QDateTime>
 
-const auto SUBSCRIBE_OPTIONS_FORM_TYPE = QStringLiteral("http://jabber.org/protocol/pubsub#subscribe_options");
+const auto SUBSCRIBE_OPTIONS_FORM_TYPE = u"http://jabber.org/protocol/pubsub#subscribe_options"_s;
 
-const auto NOTIFICATIONS_ENABLED = QStringLiteral("pubsub#deliver");
-const auto DIGESTS_ENABLED = QStringLiteral("pubsub#digest");
-const auto DIGEST_FREQUENCY_MS = QStringLiteral("pubsub#digest_frequency");
-const auto BODY_INCLUDED = QStringLiteral("pubsub#include_body");
-const auto EXPIRE = QStringLiteral("pubsub#expire");
-const auto NOTIFICATION_RULES = QStringLiteral("pubsub#show-values");
-const auto SUBSCRIPTION_TYPE = QStringLiteral("pubsub#subscription_type");
-const auto SUBSCRIPTION_DEPTH = QStringLiteral("pubsub#subscription_depth");
+const auto NOTIFICATIONS_ENABLED = u"pubsub#deliver"_s;
+const auto DIGESTS_ENABLED = u"pubsub#digest"_s;
+const auto DIGEST_FREQUENCY_MS = u"pubsub#digest_frequency"_s;
+const auto BODY_INCLUDED = u"pubsub#include_body"_s;
+const auto EXPIRE = u"pubsub#expire"_s;
+const auto NOTIFICATION_RULES = u"pubsub#show-values"_s;
+const auto SUBSCRIPTION_TYPE = u"pubsub#subscription_type"_s;
+const auto SUBSCRIPTION_DEPTH = u"pubsub#subscription_depth"_s;
 
 class QXmppPubSubSubscribeOptionsPrivate : public QSharedData
 {
@@ -33,19 +35,19 @@ public:
 QXmppPubSubSubscribeOptions::PresenceStates QXmppPubSubSubscribeOptions::presenceStatesFromStringList(const QStringList &values)
 {
     PresenceStates states;
-    if (values.contains(QStringLiteral("away"))) {
+    if (values.contains(u"away"_s)) {
         states |= Away;
     }
-    if (values.contains(QStringLiteral("chat"))) {
+    if (values.contains(u"chat"_s)) {
         states |= Chat;
     }
-    if (values.contains(QStringLiteral("dnd"))) {
+    if (values.contains(u"dnd"_s)) {
         states |= DoNotDisturb;
     }
-    if (values.contains(QStringLiteral("online"))) {
+    if (values.contains(u"online"_s)) {
         states |= Online;
     }
-    if (values.contains(QStringLiteral("xa"))) {
+    if (values.contains(u"xa"_s)) {
         states |= ExtendedAway;
     }
     return states;
@@ -55,19 +57,19 @@ QStringList QXmppPubSubSubscribeOptions::presenceStatesToStringList(PresenceStat
 {
     QStringList output;
     if (states & Away) {
-        output << QStringLiteral("away");
+        output << u"away"_s;
     }
     if (states & Chat) {
-        output << QStringLiteral("chat");
+        output << u"chat"_s;
     }
     if (states & DoNotDisturb) {
-        output << QStringLiteral("dnd");
+        output << u"dnd"_s;
     }
     if (states & Online) {
-        output << QStringLiteral("online");
+        output << u"online"_s;
     }
     if (states & ExtendedAway) {
-        output << QStringLiteral("xa");
+        output << u"xa"_s;
     }
     return output;
 }
@@ -241,9 +243,9 @@ void QXmppPubSubSubscribeOptions::serializeForm(QXmppDataForm &form) const
     const auto subscriptionTypeToString = [](SubscriptionType type) -> QString {
         switch (type) {
         case Items:
-            return QStringLiteral("items");
+            return u"items"_s;
         case Nodes:
-            return QStringLiteral("nodes");
+            return u"nodes"_s;
         }
         return {};
     };
@@ -251,9 +253,9 @@ void QXmppPubSubSubscribeOptions::serializeForm(QXmppDataForm &form) const
     const auto subscriptionDepthToString = [](SubscriptionDepth depth) -> QString {
         switch (depth) {
         case TopLevelOnly:
-            return QStringLiteral("1");
+            return u"1"_s;
         case Recursive:
-            return QStringLiteral("all");
+            return u"all"_s;
         }
         return {};
     };

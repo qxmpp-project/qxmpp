@@ -107,7 +107,7 @@ void tst_QXmppOmemoData::testOmemoDeviceElement_data()
     QTest::newRow("idAndLabel")
         << QByteArrayLiteral("<device id=\"4223\" label=\"Gajim on Ubuntu Linux\"/>")
         << uint32_t(4223)
-        << QStringLiteral("Gajim on Ubuntu Linux");
+        << u"Gajim on Ubuntu Linux"_s;
 }
 
 void tst_QXmppOmemoData::testOmemoDeviceElement()
@@ -170,7 +170,7 @@ void tst_QXmppOmemoData::testOmemoDeviceList()
 
     QXmppOmemoDeviceElement deviceElement2;
     deviceElement2.setId(4223);
-    deviceElement2.setLabel(QStringLiteral("Gajim on Ubuntu Linux"));
+    deviceElement2.setLabel(u"Gajim on Ubuntu Linux"_s);
 
     QXmppOmemoDeviceList deviceList1;
     parsePacket(deviceList1, xml);
@@ -451,13 +451,13 @@ void tst_QXmppOmemoData::testOmemoElement()
     QVERIFY(!omemoEnvelope1->isUsedForKeyExchange());
     QCOMPARE(omemoEnvelope1->data().toBase64(), QByteArrayLiteral("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
 
-    const auto omemoEnvelope2 = omemoElement1.searchEnvelope(QStringLiteral("romeo@montague.lit"), 12321);
+    const auto omemoEnvelope2 = omemoElement1.searchEnvelope(u"romeo@montague.lit"_s, 12321);
     QVERIFY(omemoEnvelope2);
     QCOMPARE(omemoEnvelope2->recipientDeviceId(), uint32_t(12321));
     QVERIFY(omemoEnvelope2->isUsedForKeyExchange());
     QCOMPARE(omemoEnvelope2->data().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
 
-    const auto omemoEnvelope3 = omemoElement1.searchEnvelope(QStringLiteral("romeo@montague.lit"), 1337);
+    const auto omemoEnvelope3 = omemoElement1.searchEnvelope(u"romeo@montague.lit"_s, 1337);
     QVERIFY(omemoEnvelope3);
     QCOMPARE(omemoEnvelope3->recipientDeviceId(), uint32_t(1337));
     QVERIFY(!omemoEnvelope3->isUsedForKeyExchange());
@@ -497,28 +497,28 @@ void tst_QXmppOmemoData::testOmemoElement()
     QXmppOmemoEnvelope omemoEnvelope4;
     omemoEnvelope4.setRecipientDeviceId(31415);
     omemoEnvelope4.setData(QByteArray::fromBase64("Oy5TSG9vVVV4Wz9wUkUvI1lUXiVLIU5bbGIsUV0wRngK"));
-    omemoElement2.addEnvelope(QStringLiteral("juliet@capulet.lit"), omemoEnvelope4);
+    omemoElement2.addEnvelope(u"juliet@capulet.lit"_s, omemoEnvelope4);
 
     QXmppOmemoEnvelope omemoEnvelope5;
     omemoEnvelope5.setRecipientDeviceId(12321);
     omemoEnvelope5.setIsUsedForKeyExchange(true);
     omemoEnvelope5.setData(QByteArray::fromBase64("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
-    omemoElement2.addEnvelope(QStringLiteral("romeo@montague.lit"), omemoEnvelope5);
+    omemoElement2.addEnvelope(u"romeo@montague.lit"_s, omemoEnvelope5);
 
     QXmppOmemoEnvelope omemoEnvelope6;
     omemoEnvelope6.setRecipientDeviceId(1337);
     omemoEnvelope6.setData(QByteArray::fromBase64("PTEoSk91VnRZSXBzcFlPXy4jZ3NKcGVZZ2d3YVJbVj8K"));
-    omemoElement2.addEnvelope(QStringLiteral("romeo@montague.lit"), omemoEnvelope6);
+    omemoElement2.addEnvelope(u"romeo@montague.lit"_s, omemoEnvelope6);
 
     QCOMPARE(omemoElement2.senderDeviceId(), uint32_t(27183));
 
-    const auto omemoEnvelope7 = omemoElement2.searchEnvelope(QStringLiteral("romeo@montague.lit"), 12321);
+    const auto omemoEnvelope7 = omemoElement2.searchEnvelope(u"romeo@montague.lit"_s, 12321);
     QVERIFY(omemoEnvelope7);
     QCOMPARE(omemoEnvelope7->recipientDeviceId(), uint32_t(12321));
     QVERIFY(omemoEnvelope7->isUsedForKeyExchange());
     QCOMPARE(omemoEnvelope7->data().toBase64(), QByteArrayLiteral("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
 
-    const auto omemoEnvelope8 = omemoElement2.searchEnvelope(QStringLiteral("juliet@capulet.lit"), 31415);
+    const auto omemoEnvelope8 = omemoElement2.searchEnvelope(u"juliet@capulet.lit"_s, 31415);
     QVERIFY(omemoEnvelope8);
     QVERIFY(!omemoEnvelope8->isUsedForKeyExchange());
 

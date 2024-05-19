@@ -10,6 +10,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -96,9 +98,9 @@ void QXmppOmemoEnvelope::setData(const QByteArray &data)
 
 void QXmppOmemoEnvelope::parse(const QDomElement &element)
 {
-    m_recipientDeviceId = element.attribute(QStringLiteral("rid")).toUInt();
+    m_recipientDeviceId = element.attribute(u"rid"_s).toUInt();
 
-    const auto isUsedForKeyExchange = element.attribute(QStringLiteral("kex"));
+    const auto isUsedForKeyExchange = element.attribute(u"kex"_s);
     if (isUsedForKeyExchange == u"true" || isUsedForKeyExchange == u"1") {
         m_isUsedForKeyExchange = true;
     }
@@ -112,7 +114,7 @@ void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
     writer->writeAttribute(QSL65("rid"), QString::number(m_recipientDeviceId));
 
     if (m_isUsedForKeyExchange) {
-        writeOptionalXmlAttribute(writer, u"kex", QStringLiteral("true"));
+        writeOptionalXmlAttribute(writer, u"kex", u"true"_s);
     }
 
     writer->writeCharacters(QString::fromUtf8(m_data.toBase64()));
@@ -222,12 +224,12 @@ void QXmppOmemoElement::addEnvelope(const QString &recipientJid, const QXmppOmem
 
 void QXmppOmemoElement::parse(const QDomElement &element)
 {
-    const auto header = element.firstChildElement(QStringLiteral("header"));
+    const auto header = element.firstChildElement(u"header"_s);
 
-    m_senderDeviceId = header.attribute(QStringLiteral("sid")).toUInt();
+    m_senderDeviceId = header.attribute(u"sid"_s).toUInt();
 
     for (const auto &recipient : iterChildElements(header, u"keys")) {
-        const auto recipientJid = recipient.attribute(QStringLiteral("jid"));
+        const auto recipientJid = recipient.attribute(u"jid"_s);
 
         for (const auto &envelope : iterChildElements(recipient, u"key")) {
             QXmppOmemoEnvelope omemoEnvelope;
@@ -236,7 +238,7 @@ void QXmppOmemoElement::parse(const QDomElement &element)
         }
     }
 
-    m_payload = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("payload")).text().toLatin1());
+    m_payload = QByteArray::fromBase64(element.firstChildElement(u"payload"_s).text().toLatin1());
 }
 
 void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const

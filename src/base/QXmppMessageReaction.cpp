@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -95,7 +97,7 @@ void QXmppMessageReaction::setEmojis(const QVector<QString> &emojis)
 /// \cond
 void QXmppMessageReaction::parse(const QDomElement &element)
 {
-    d->messageId = element.attribute(QStringLiteral("id"));
+    d->messageId = element.attribute(u"id"_s);
 
     for (const auto &childElement : iterChildElements(element)) {
         d->emojis.append(childElement.text());

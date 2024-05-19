@@ -4,14 +4,16 @@
 
 #include "QXmppBitsOfBinaryContentId.h"
 
+#include "StringLiterals.h"
+
 #include <QMap>
 #include <QSharedData>
 
-#define CONTENTID_URL QStringLiteral("cid:")
+#define CONTENTID_URL u"cid:"_s
 #define CONTENTID_URL_LENGTH 4
-#define CONTENTID_POSTFIX QStringLiteral("@bob.xmpp.org")
+#define CONTENTID_POSTFIX u"@bob.xmpp.org"_s
 #define CONTENTID_POSTFIX_LENGTH 13
-#define CONTENTID_HASH_SEPARATOR QStringLiteral("+")
+#define CONTENTID_HASH_SEPARATOR u"+"_s
 
 static const QMap<QCryptographicHash::Algorithm, QStringView> HASH_ALGORITHMS = {
     { QCryptographicHash::Sha1, u"sha1" },

@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -70,15 +72,15 @@ QString QXmppMucItem::affiliationToString(Affiliation affiliation)
 {
     switch (affiliation) {
     case QXmppMucItem::OwnerAffiliation:
-        return QStringLiteral("owner");
+        return u"owner"_s;
     case QXmppMucItem::AdminAffiliation:
-        return QStringLiteral("admin");
+        return u"admin"_s;
     case QXmppMucItem::MemberAffiliation:
-        return QStringLiteral("member");
+        return u"member"_s;
     case QXmppMucItem::OutcastAffiliation:
-        return QStringLiteral("outcast");
+        return u"outcast"_s;
     case QXmppMucItem::NoAffiliation:
-        return QStringLiteral("none");
+        return u"none"_s;
     default:
         return QString();
     }
@@ -155,13 +157,13 @@ QString QXmppMucItem::roleToString(Role role)
 {
     switch (role) {
     case QXmppMucItem::ModeratorRole:
-        return QStringLiteral("moderator");
+        return u"moderator"_s;
     case QXmppMucItem::ParticipantRole:
-        return QStringLiteral("participant");
+        return u"participant"_s;
     case QXmppMucItem::VisitorRole:
-        return QStringLiteral("visitor");
+        return u"visitor"_s;
     case QXmppMucItem::NoRole:
-        return QStringLiteral("none");
+        return u"none"_s;
     default:
         return QString();
     }
@@ -177,12 +179,12 @@ void QXmppMucItem::setRole(Role role)
 /// \cond
 void QXmppMucItem::parse(const QDomElement &element)
 {
-    m_affiliation = QXmppMucItem::affiliationFromString(element.attribute(QStringLiteral("affiliation")).toLower());
-    m_jid = element.attribute(QStringLiteral("jid"));
-    m_nick = element.attribute(QStringLiteral("nick"));
-    m_role = QXmppMucItem::roleFromString(element.attribute(QStringLiteral("role")).toLower());
-    m_actor = element.firstChildElement(QStringLiteral("actor")).attribute(QStringLiteral("jid"));
-    m_reason = element.firstChildElement(QStringLiteral("reason")).text();
+    m_affiliation = QXmppMucItem::affiliationFromString(element.attribute(u"affiliation"_s).toLower());
+    m_jid = element.attribute(u"jid"_s);
+    m_nick = element.attribute(u"nick"_s);
+    m_role = QXmppMucItem::roleFromString(element.attribute(u"role"_s).toLower());
+    m_actor = element.firstChildElement(u"actor"_s).attribute(u"jid"_s);
+    m_reason = element.firstChildElement(u"reason"_s).text();
 }
 
 void QXmppMucItem::toXml(QXmlStreamWriter *writer) const
@@ -219,13 +221,13 @@ void QXmppMucAdminIq::setItems(const QList<QXmppMucItem> &items)
 /// \cond
 bool QXmppMucAdminIq::isMucAdminIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
     return (queryElement.namespaceURI() == ns_muc_admin);
 }
 
 void QXmppMucAdminIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
     for (const auto &child : iterChildElements(queryElement, u"item")) {
         QXmppMucItem item;
         item.parse(child);
@@ -259,14 +261,14 @@ void QXmppMucOwnerIq::setForm(const QXmppDataForm &form)
 /// \cond
 bool QXmppMucOwnerIq::isMucOwnerIq(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
     return (queryElement.namespaceURI() == ns_muc_owner);
 }
 
 void QXmppMucOwnerIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    m_form.parse(queryElement.firstChildElement(QStringLiteral("x")));
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
+    m_form.parse(queryElement.firstChildElement(u"x"_s));
 }
 
 void QXmppMucOwnerIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

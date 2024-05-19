@@ -8,6 +8,8 @@
 #include "QXmppDataForm.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -222,7 +224,7 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     }
 
     // find correct "event" element
-    auto event = firstChildElement(stanza, QStringLiteral("event"), ns_pubsub_event);
+    auto event = firstChildElement(stanza, u"event"_s, ns_pubsub_event);
     auto eventTypeElement = event.firstChildElement();
 
     // check for validity of the event type
@@ -237,7 +239,7 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     case Items:
     case Retract:
     case Purge:
-        if (!eventTypeElement.hasAttribute(QStringLiteral("node"))) {
+        if (!eventTypeElement.hasAttribute(u"node"_s)) {
             return false;
         }
         break;
@@ -249,8 +251,8 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
     // check individual content
     switch (*eventType) {
     case Delete: {
-        if (const auto redirect = eventTypeElement.firstChildElement(QStringLiteral("redirect"));
-            !redirect.isNull() && !redirect.hasAttribute(QStringLiteral("uri"))) {
+        if (const auto redirect = eventTypeElement.firstChildElement(u"redirect"_s);
+            !redirect.isNull() && !redirect.hasAttribute(u"uri"_s)) {
             return false;
         }
         break;
@@ -309,7 +311,7 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
         case Items:
         case Retract:
         case Purge:
-            d->node = eventTypeElement.attribute(QStringLiteral("node"));
+            d->node = eventTypeElement.attribute(u"node"_s);
             break;
         case Subscription:
             break;
@@ -318,9 +320,9 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
         // check the items using isItemValid()
         switch (d->eventType) {
         case Delete:
-            if (auto redirect = eventTypeElement.firstChildElement(QStringLiteral("redirect"));
+            if (auto redirect = eventTypeElement.firstChildElement(u"redirect"_s);
                 !redirect.isNull()) {
-                d->redirectUri = redirect.attribute(QStringLiteral("uri"));
+                d->redirectUri = redirect.attribute(u"uri"_s);
             }
             break;
         case Items:
@@ -330,7 +332,7 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
         case Retract:
             // parse retract ids
             for (const auto &retract : iterChildElements(eventTypeElement, u"retract")) {
-                d->retractIds << retract.attribute(QStringLiteral("id"));
+                d->retractIds << retract.attribute(u"id"_s);
             }
             break;
         case Subscription: {
@@ -340,7 +342,7 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
             break;
         }
         case Configuration:
-            if (auto formElement = firstChildElement(eventTypeElement, QStringLiteral("x"), ns_data);
+            if (auto formElement = firstChildElement(eventTypeElement, u"x"_s, ns_data);
                 !formElement.isNull()) {
                 QXmppDataForm form;
                 form.parse(formElement);

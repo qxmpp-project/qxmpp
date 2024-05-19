@@ -92,13 +92,13 @@ void tst_QXmppRpcIq::testNil()
 
 void tst_QXmppRpcIq::testString()
 {
-    checkVariant(QStringLiteral("hello world"),
+    checkVariant(u"hello world"_s,
                  QByteArray("<value><string>hello world</string></value>"));
 }
 
 void tst_QXmppRpcIq::testArray()
 {
-    checkVariant(QVariantList() << QStringLiteral("hello world") << double(-12.214),
+    checkVariant(QVariantList() << u"hello world"_s << double(-12.214),
                  QByteArray("<value><array><data>"
                             "<value><string>hello world</string></value>"
                             "<value><double>-12.214</double></value>"
@@ -108,7 +108,7 @@ void tst_QXmppRpcIq::testArray()
 void tst_QXmppRpcIq::testStruct()
 {
     QMap<QString, QVariant> map;
-    map["bar"] = QStringLiteral("hello world");
+    map["bar"] = u"hello world"_s;
     map["foo"] = double(-12.214);
     checkVariant(map,
                  QByteArray("<value><struct>"
@@ -173,7 +173,7 @@ void tst_QXmppRpcIq::testResponse()
     parsePacket(iq, xml);
     QCOMPARE(iq.faultCode(), 0);
     QCOMPARE(iq.faultString(), QString());
-    QCOMPARE(iq.values(), QVariantList() << QStringLiteral("Colorado"));
+    QCOMPARE(iq.values(), QVariantList() << u"Colorado"_s);
     serializePacket(iq, xml);
 }
 

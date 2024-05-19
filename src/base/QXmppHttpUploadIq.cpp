@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QMimeDatabase>
 #include <QSharedData>
@@ -100,11 +102,11 @@ bool QXmppHttpUploadRequestIq::isHttpUploadRequestIq(const QDomElement &element)
 void QXmppHttpUploadRequestIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement request = firstChildElement(element, u"request");
-    d->fileName = request.attribute(QStringLiteral("filename"));
-    d->size = request.attribute(QStringLiteral("size")).toLongLong();
-    if (request.hasAttribute(QStringLiteral("content-type"))) {
+    d->fileName = request.attribute(u"filename"_s);
+    d->size = request.attribute(u"size"_s).toLongLong();
+    if (request.hasAttribute(u"content-type"_s)) {
         QMimeDatabase mimeDb;
-        QMimeType type = mimeDb.mimeTypeForName(request.attribute(QStringLiteral("content-type")));
+        QMimeType type = mimeDb.mimeTypeForName(request.attribute(u"content-type"_s));
         if (!type.isDefault() && type.isValid()) {
             d->contentType = type;
         }
@@ -220,12 +222,12 @@ void QXmppHttpUploadSlotIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement slot = firstChildElement(element, u"slot");
     QDomElement put = firstChildElement(slot, u"put");
-    d->getUrl = QUrl::fromEncoded(firstChildElement(slot, u"get").attribute(QStringLiteral("url")).toUtf8());
-    d->putUrl = QUrl::fromEncoded(put.attribute(QStringLiteral("url")).toUtf8());
+    d->getUrl = QUrl::fromEncoded(firstChildElement(slot, u"get").attribute(u"url"_s).toUtf8());
+    d->putUrl = QUrl::fromEncoded(put.attribute(u"url"_s).toUtf8());
     if (put.hasChildNodes()) {
         QMap<QString, QString> headers;
         for (const auto &header : iterChildElements(put, u"header")) {
-            headers[header.attribute(QStringLiteral("name"))] = header.text();
+            headers[header.attribute(u"name"_s)] = header.text();
         }
 
         setPutHeaders(headers);
@@ -241,7 +243,7 @@ void QXmppHttpUploadSlotIq::toXmlElementFromChild(QXmlStreamWriter *writer) cons
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     writer->writeAttribute("url", d->putUrl.toEncoded());
 #else
-    writer->writeAttribute(QStringLiteral("url"), QString::fromUtf8(d->putUrl.toEncoded()));
+    writer->writeAttribute(u"url"_s, QString::fromUtf8(d->putUrl.toEncoded()));
 #endif
     std::for_each(d->putHeaders.keyBegin(), d->putHeaders.keyEnd(), [&](const QString &name) {
         writer->writeStartElement(QSL65("header"));
@@ -255,7 +257,7 @@ void QXmppHttpUploadSlotIq::toXmlElementFromChild(QXmlStreamWriter *writer) cons
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     writer->writeAttribute("url", d->getUrl.toEncoded());
 #else
-    writer->writeAttribute(QStringLiteral("url"), QString::fromUtf8(d->getUrl.toEncoded()));
+    writer->writeAttribute(u"url"_s, QString::fromUtf8(d->getUrl.toEncoded()));
 #endif
     writer->writeEndElement();
 

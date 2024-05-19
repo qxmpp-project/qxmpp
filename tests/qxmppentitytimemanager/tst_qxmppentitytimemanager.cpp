@@ -60,7 +60,7 @@ void tst_QXmppEntityTimeManager::testHandleRequest()
     QXmppEntityTimeIq resp;
     resp.parse(packet);
 
-    QCOMPARE(resp.id(), QStringLiteral("time_1"));
+    QCOMPARE(resp.id(), u"time_1"_s);
     QCOMPARE(resp.type(), QXmppIq::Result);
 }
 

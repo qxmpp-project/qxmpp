@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -51,7 +53,7 @@ void QXmppHttpFileSource::setUrl(QUrl url)
 bool QXmppHttpFileSource::parse(const QDomElement &el)
 {
     if (el.tagName() == u"url-data" && el.namespaceURI() == ns_url_data) {
-        m_url = QUrl(el.attribute(QStringLiteral("target")));
+        m_url = QUrl(el.attribute(u"target"_s));
         return true;
     }
     return false;

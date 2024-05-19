@@ -10,6 +10,8 @@
 #include "QXmppDataForm.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -134,8 +136,8 @@ void QXmppPushEnableIq::parseElementFromChild(const QDomElement &element)
         } else {
             d->mode = Disable;
         }
-        d->jid = childElement.attribute(QStringLiteral("jid"));
-        d->node = childElement.attribute(QStringLiteral("node"));
+        d->jid = childElement.attribute(u"jid"_s);
+        d->node = childElement.attribute(u"node"_s);
     }
 }
 

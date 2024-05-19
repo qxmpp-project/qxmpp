@@ -209,9 +209,9 @@ void tst_QXmppVCardManager::testSetClientVCard()
 
     // set a new vcard
     QXmppVCardIq newVCard;
-    newVCard.setFirstName(QStringLiteral("Bob"));
+    newVCard.setFirstName(u"Bob"_s);
     newVCard.setBirthday(QDate(1, 2, 2000));
-    newVCard.setEmail(QStringLiteral("bob@qxmpp.org"));
+    newVCard.setEmail(u"bob@qxmpp.org"_s);
     vCardManager->setClientVCard(newVCard);
 
     // there's currently no signal to see whether the change was successful...
@@ -231,9 +231,9 @@ void tst_QXmppVCardManager::testSetClientVCard()
 
     // check our vcard has been changed successfully
     QCOMPARE(vCardManager->clientVCard().from(), client->configuration().jidBare());
-    QCOMPARE(vCardManager->clientVCard().firstName(), QStringLiteral("Bob"));
+    QCOMPARE(vCardManager->clientVCard().firstName(), u"Bob"_s);
     QCOMPARE(vCardManager->clientVCard().birthday(), QDate(01, 02, 2000));
-    QCOMPARE(vCardManager->clientVCard().email(), QStringLiteral("bob@qxmpp.org"));
+    QCOMPARE(vCardManager->clientVCard().email(), u"bob@qxmpp.org"_s);
 
     // reset the vcard for future tests
     vCardManager->setClientVCard(QXmppVCardIq());

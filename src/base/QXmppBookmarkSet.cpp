@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp::Private;
@@ -126,18 +128,18 @@ void QXmppBookmarkSet::parse(const QDomElement &element)
 {
     for (const auto &childElement : iterChildElements(element, u"conference")) {
         QXmppBookmarkConference conference;
-        auto autojoinAttribute = childElement.attribute(QStringLiteral("autojoin"));
+        auto autojoinAttribute = childElement.attribute(u"autojoin"_s);
         conference.setAutoJoin(autojoinAttribute == u"true" || autojoinAttribute == u"1");
-        conference.setJid(childElement.attribute(QStringLiteral("jid")));
-        conference.setName(childElement.attribute(QStringLiteral("name")));
+        conference.setJid(childElement.attribute(u"jid"_s));
+        conference.setName(childElement.attribute(u"name"_s));
         conference.setNickName(firstChildElement(childElement, u"nick").text());
         m_conferences << conference;
     }
 
     for (const auto &childElement : iterChildElements(element, u"url")) {
         QXmppBookmarkUrl url;
-        url.setName(childElement.attribute(QStringLiteral("name")));
-        url.setUrl(QUrl(childElement.attribute(QStringLiteral("url"))));
+        url.setName(childElement.attribute(u"name"_s));
+        url.setUrl(QUrl(childElement.attribute(u"url"_s)));
         m_urls << url;
     }
 }
@@ -149,7 +151,7 @@ void QXmppBookmarkSet::toXml(QXmlStreamWriter *writer) const
     for (const auto &conference : m_conferences) {
         writer->writeStartElement(QSL65("conference"));
         if (conference.autoJoin()) {
-            writeOptionalXmlAttribute(writer, u"autojoin", QStringLiteral("true"));
+            writeOptionalXmlAttribute(writer, u"autojoin", u"true"_s);
         }
         writeOptionalXmlAttribute(writer, u"jid", conference.jid());
         writeOptionalXmlAttribute(writer, u"name", conference.name());

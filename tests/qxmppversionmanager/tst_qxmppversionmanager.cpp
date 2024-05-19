@@ -41,9 +41,9 @@ void tst_QXmppVersionManager::testSendRequest()
 
     QCOMPARE(spy.size(), 1);
     auto version = spy.at(0).at(0).value<QXmppVersionIq>();
-    QCOMPARE(version.name(), QStringLiteral("Exodus"));
-    QCOMPARE(version.version(), QStringLiteral("0.7.0.4"));
-    QCOMPARE(version.os(), QStringLiteral("Windows-XP 5.01.2600"));
+    QCOMPARE(version.name(), u"Exodus"_s);
+    QCOMPARE(version.version(), u"0.7.0.4"_s);
+    QCOMPARE(version.os(), u"Windows-XP 5.01.2600"_s);
 }
 
 void tst_QXmppVersionManager::testHandleRequest()

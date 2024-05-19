@@ -31,8 +31,8 @@ void tst_QXmppPushEnableIq::testPushEnable()
     QXmppPushEnableIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.mode(), QXmppPushEnableIq::Enable);
-    QCOMPARE(iq.jid(), QStringLiteral("push-5.client.example"));
-    QCOMPARE(iq.node(), QStringLiteral("yxs32uqsflafdk3iuqo"));
+    QCOMPARE(iq.jid(), u"push-5.client.example"_s);
+    QCOMPARE(iq.node(), u"yxs32uqsflafdk3iuqo"_s);
 
     serializePacket(iq, xml);
 
@@ -56,7 +56,7 @@ void tst_QXmppPushEnableIq::testPushDisable()
     QXmppPushEnableIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.mode(), QXmppPushEnableIq::Disable);
-    QCOMPARE(iq.jid(), QStringLiteral("push-5.client.example"));
+    QCOMPARE(iq.jid(), u"push-5.client.example"_s);
 
     serializePacket(iq, xml);
 

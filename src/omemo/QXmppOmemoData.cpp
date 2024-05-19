@@ -12,6 +12,8 @@
 #include "QXmppOmemoItems_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QHash>
 
@@ -88,8 +90,8 @@ void QXmppOmemoDeviceElement::setLabel(const QString &label)
 
 void QXmppOmemoDeviceElement::parse(const QDomElement &element)
 {
-    m_id = element.attribute(QStringLiteral("id")).toInt();
-    m_label = element.attribute(QStringLiteral("label"));
+    m_id = element.attribute(u"id"_s).toInt();
+    m_label = element.attribute(u"label"_s);
 }
 
 void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
@@ -294,21 +296,21 @@ void QXmppOmemoDeviceBundle::removePublicPreKey(uint32_t id)
 
 void QXmppOmemoDeviceBundle::parse(const QDomElement &element)
 {
-    m_publicIdentityKey = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("ik")).text().toLatin1());
+    m_publicIdentityKey = QByteArray::fromBase64(element.firstChildElement(u"ik"_s).text().toLatin1());
 
-    const auto signedPublicPreKeyElement = element.firstChildElement(QStringLiteral("spk"));
+    const auto signedPublicPreKeyElement = element.firstChildElement(u"spk"_s);
     if (!signedPublicPreKeyElement.isNull()) {
-        m_signedPublicPreKeyId = signedPublicPreKeyElement.attribute(QStringLiteral("id")).toInt();
+        m_signedPublicPreKeyId = signedPublicPreKeyElement.attribute(u"id"_s).toInt();
         m_signedPublicPreKey = QByteArray::fromBase64(signedPublicPreKeyElement.text().toLatin1());
     }
-    m_signedPublicPreKeySignature = QByteArray::fromBase64(element.firstChildElement(QStringLiteral("spks")).text().toLatin1());
+    m_signedPublicPreKeySignature = QByteArray::fromBase64(element.firstChildElement(u"spks"_s).text().toLatin1());
 
-    const auto publicPreKeysElement = element.firstChildElement(QStringLiteral("prekeys"));
+    const auto publicPreKeysElement = element.firstChildElement(u"prekeys"_s);
     if (!publicPreKeysElement.isNull()) {
-        for (QDomElement publicPreKeyElement = publicPreKeysElement.firstChildElement(QStringLiteral("pk"));
+        for (QDomElement publicPreKeyElement = publicPreKeysElement.firstChildElement(u"pk"_s);
              !publicPreKeyElement.isNull();
-             publicPreKeyElement = publicPreKeyElement.nextSiblingElement(QStringLiteral("pk"))) {
-            m_publicPreKeys.insert(publicPreKeyElement.attribute(QStringLiteral("id")).toInt(), QByteArray::fromBase64(publicPreKeyElement.text().toLatin1()));
+             publicPreKeyElement = publicPreKeyElement.nextSiblingElement(u"pk"_s)) {
+            m_publicPreKeys.insert(publicPreKeyElement.attribute(u"id"_s).toInt(), QByteArray::fromBase64(publicPreKeyElement.text().toLatin1()));
         }
     }
 }

@@ -15,6 +15,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 
 using namespace QXmpp;
@@ -28,7 +30,7 @@ struct RosterData {
     static std::variant<RosterData, QXmppError> fromDom(const QDomElement &el)
     {
         if (el.tagName() != u"roster" && el.namespaceURI() != ns_qxmpp_export) {
-            return QXmppError { QStringLiteral("Invalid element."), {} };
+            return QXmppError { u"Invalid element."_s, {} };
         }
 
         RosterData d;
@@ -192,7 +194,7 @@ bool QXmppRosterManager::handleStanza(const QDomElement &element)
 
     // Security check: only server should send this iq
     // from() should be either empty or bareJid of the user
-    const auto fromJid = element.attribute(QStringLiteral("from"));
+    const auto fromJid = element.attribute(u"from"_s);
     if (!fromJid.isEmpty() && QXmppUtils::jidToBareJid(fromJid) != client()->configuration().jidBare()) {
         return false;
     }
@@ -349,7 +351,7 @@ QXmppTask<QXmppRosterManager::Result> QXmppRosterManager::renameRosterItem(const
 {
     if (!d->entries.contains(bareJid)) {
         return makeReadyTask<Result>(
-            QXmppError { QStringLiteral("The roster doesn't contain this user."), {} });
+            QXmppError { u"The roster doesn't contain this user."_s, {} });
     }
 
     auto item = d->entries.value(bareJid);

@@ -9,13 +9,15 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QSharedData>
 
 using namespace QXmpp::Private;
 
-#define ELEMENT_REGISTERED QStringLiteral("registered")
-#define ELEMENT_REMOVE QStringLiteral("remove")
+#define ELEMENT_REGISTERED u"registered"_s
+#define ELEMENT_REMOVE u"remove"_s
 
 class QXmppRegisterIqPrivate : public QSharedData
 {
@@ -264,17 +266,17 @@ bool QXmppRegisterIq::isRegisterIq(const QDomElement &element)
 
 void QXmppRegisterIq::parseElementFromChild(const QDomElement &element)
 {
-    QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    d->instructions = queryElement.firstChildElement(QStringLiteral("instructions")).text();
-    d->username = queryElement.firstChildElement(QStringLiteral("username")).text();
-    d->password = queryElement.firstChildElement(QStringLiteral("password")).text();
-    d->email = queryElement.firstChildElement(QStringLiteral("email")).text();
+    QDomElement queryElement = element.firstChildElement(u"query"_s);
+    d->instructions = queryElement.firstChildElement(u"instructions"_s).text();
+    d->username = queryElement.firstChildElement(u"username"_s).text();
+    d->password = queryElement.firstChildElement(u"password"_s).text();
+    d->email = queryElement.firstChildElement(u"email"_s).text();
 
     if (auto formEl = firstChildElement(queryElement, u"x", ns_data); !formEl.isNull()) {
         d->form.parse(formEl);
     }
     if (auto oobEl = firstChildElement(queryElement, u"x", ns_oob); !oobEl.isNull()) {
-        d->outOfBandUrl = oobEl.firstChildElement(QStringLiteral("url")).text();
+        d->outOfBandUrl = oobEl.firstChildElement(u"url"_s).text();
     }
 
     d->isRegistered = !queryElement.firstChildElement(ELEMENT_REGISTERED).isNull();
@@ -301,19 +303,19 @@ void QXmppRegisterIq::toXmlElementFromChild(QXmlStreamWriter *writer) const
     if (!d->username.isEmpty()) {
         writer->writeTextElement(QSL65("username"), d->username);
     } else if (!d->username.isNull()) {
-        writer->writeEmptyElement(QStringLiteral("username"));
+        writer->writeEmptyElement(u"username"_s);
     }
 
     if (!d->password.isEmpty()) {
         writer->writeTextElement(QSL65("password"), d->password);
     } else if (!d->password.isNull()) {
-        writer->writeEmptyElement(QStringLiteral("password"));
+        writer->writeEmptyElement(u"password"_s);
     }
 
     if (!d->email.isEmpty()) {
         writer->writeTextElement(QSL65("email"), d->email);
     } else if (!d->email.isNull()) {
-        writer->writeEmptyElement(QStringLiteral("email"));
+        writer->writeEmptyElement(u"email"_s);
     }
 
     d->form.toXml(writer);

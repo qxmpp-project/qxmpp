@@ -8,6 +8,8 @@
 #include "QXmppNonza.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QBuffer>
 #include <QByteArray>
 #include <QCryptographicHash>
@@ -118,7 +120,7 @@ QString QXmppUtils::datetimeToString(const QDateTime &dt)
 ///
 int QXmppUtils::timezoneOffsetFromString(const QString &str)
 {
-    static const QRegularExpression timezoneRegex(QStringLiteral("(Z|([+-])([0-9]{2}):([0-9]{2}))"));
+    static const QRegularExpression timezoneRegex(u"(Z|([+-])([0-9]{2}):([0-9]{2}))"_s);
 
     const auto match = timezoneRegex.match(str);
     if (!match.hasMatch()) {
@@ -147,17 +149,17 @@ int QXmppUtils::timezoneOffsetFromString(const QString &str)
 QString QXmppUtils::timezoneOffsetToString(int secs)
 {
     if (!secs) {
-        return QStringLiteral("Z");
+        return u"Z"_s;
     }
 
     const QTime tzoTime = QTime(0, 0, 0).addSecs(qAbs(secs));
-    return (secs < 0 ? QStringLiteral("-") : QStringLiteral("+")) + tzoTime.toString(QStringLiteral("hh:mm"));
+    return (secs < 0 ? u"-"_s : u"+"_s) + tzoTime.toString(u"hh:mm"_s);
 }
 
 /// Returns the domain for the given \a jid.
 QString QXmppUtils::jidToDomain(const QString &jid)
 {
-    return jidToBareJid(jid).split(QStringLiteral("@")).last();
+    return jidToBareJid(jid).split(u"@"_s).last();
 }
 
 /// Returns the resource for the given \a jid.
@@ -296,7 +298,7 @@ QString QXmppUtils::generateStanzaHash(int length)
         return QXmppUtils::generateStanzaUuid();
     }
 
-    const QString somechars = QStringLiteral("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    const QString somechars = u"1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"_s;
     const int N = somechars.size();
     QString hashResult;
     for (int idx = 0; idx < length; ++idx) {

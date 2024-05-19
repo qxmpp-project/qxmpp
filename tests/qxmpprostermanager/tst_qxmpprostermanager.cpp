@@ -68,7 +68,7 @@ void tst_QXmppRosterManager::testRenameItem()
     bobAsk.addItem(createItem("bob@qxmpp.org", "subscribe"));
 
     QVERIFY(manager->handleStanza(writePacketToDom(bobAsk)));
-    QCOMPARE(manager->getRosterEntry("bob@qxmpp.org").subscriptionStatus(), QStringLiteral("subscribe"));
+    QCOMPARE(manager->getRosterEntry("bob@qxmpp.org").subscriptionStatus(), u"subscribe"_s);
 
     // rename bob
     bool requestSent = false;
@@ -79,8 +79,8 @@ void tst_QXmppRosterManager::testRenameItem()
             QXmppRosterIq renameRequest;
             parsePacket(renameRequest, text.toUtf8());
             QCOMPARE(renameRequest.items().size(), 1);
-            QCOMPARE(renameRequest.items().first().bareJid(), QStringLiteral("bob@qxmpp.org"));
-            QCOMPARE(renameRequest.items().first().name(), QStringLiteral("Bob"));
+            QCOMPARE(renameRequest.items().first().bareJid(), u"bob@qxmpp.org"_s);
+            QCOMPARE(renameRequest.items().first().name(), u"Bob"_s);
             // check that subscription state ('ask') for bob is not included
             QVERIFY(renameRequest.items().first().subscriptionStatus().isNull());
         }
@@ -94,16 +94,16 @@ void tst_QXmppRosterManager::subscriptionRequestReceived()
 {
     QXmppPresence presence;
     presence.setType(QXmppPresence::Subscribe);
-    presence.setFrom(QStringLiteral("alice@example.org/notebook"));
-    presence.setStatusText(QStringLiteral("Hi, I'm Alice."));
+    presence.setFrom(u"alice@example.org/notebook"_s);
+    presence.setStatusText(u"Hi, I'm Alice."_s);
 
     bool subscriptionRequestReceived = false;
 
     connect(manager, &QXmppRosterManager::subscriptionRequestReceived, this, [&](const QString &subscriberBareJid, const QXmppPresence &presence) {
         subscriptionRequestReceived = true;
 
-        QCOMPARE(subscriberBareJid, QStringLiteral("alice@example.org"));
-        QCOMPARE(presence.statusText(), QStringLiteral("Hi, I'm Alice."));
+        QCOMPARE(subscriberBareJid, u"alice@example.org"_s);
+        QCOMPARE(presence.statusText(), u"Hi, I'm Alice."_s);
     });
 
     Q_EMIT client.presenceReceived(presence);
@@ -113,7 +113,7 @@ void tst_QXmppRosterManager::subscriptionRequestReceived()
 void tst_QXmppRosterManager::testAddItem()
 {
     TestClient test;
-    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
+    test.configuration().setJid(u"juliet@capulet.lit"_s);
     auto *rosterManager = test.addNewExtension<QXmppRosterManager>(&test);
 
     auto future = rosterManager->addRosterItem("contact@example.org");
@@ -133,13 +133,13 @@ void tst_QXmppRosterManager::testAddItem()
     auto err = expectFutureVariant<QXmppError>(future);
     auto error = err.value<QXmppStanza::Error>().value();
     QCOMPARE(error.type(), QXmppStanza::Error::Modify);
-    QCOMPARE(error.text(), QStringLiteral("This is not allowed"));
+    QCOMPARE(error.text(), u"This is not allowed"_s);
 }
 
 void tst_QXmppRosterManager::testRemoveItem()
 {
     TestClient test;
-    test.configuration().setJid(QStringLiteral("juliet@capulet.lit"));
+    test.configuration().setJid(u"juliet@capulet.lit"_s);
     auto *rosterManager = test.addNewExtension<QXmppRosterManager>(&test);
 
     auto future = rosterManager->removeRosterItem("contact@example.org");
@@ -159,7 +159,7 @@ void tst_QXmppRosterManager::testRemoveItem()
     auto err = expectFutureVariant<QXmppError>(future);
     auto error = err.value<QXmppStanza::Error>().value();
     QCOMPARE(error.type(), QXmppStanza::Error::Cancel);
-    QCOMPARE(error.text(), QStringLiteral("Not found"));
+    QCOMPARE(error.text(), u"Not found"_s);
 }
 
 QTEST_MAIN(tst_QXmppRosterManager)

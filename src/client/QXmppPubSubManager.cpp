@@ -18,6 +18,7 @@
 #include "QXmppUtils_p.h"
 
 #include "Algorithms.h"
+#include "StringLiterals.h"
 
 #include <QDomElement>
 
@@ -599,7 +600,7 @@ QXmppTask<QXmppPubSubManager::OptionsResult> QXmppPubSubManager::requestSubscrib
                                return *options;
                            }
                        }
-                       return QXmppError { QStringLiteral("Server returned invalid data form."), {} };
+                       return QXmppError { u"Server returned invalid data form."_s, {} };
                    });
 }
 
@@ -665,9 +666,9 @@ QXmppTask<QXmppPubSubManager::NodeConfigResult> QXmppPubSubManager::requestNodeC
                            if (const auto config = QXmppPubSubNodeConfig::fromDataForm(*dataForm)) {
                                return *config;
                            }
-                           return QXmppError { QStringLiteral("Server returned invalid data form."), {} };
+                           return QXmppError { u"Server returned invalid data form."_s, {} };
                        }
-                       return QXmppError { QStringLiteral("Server returned no data form."), {} };
+                       return QXmppError { u"Server returned no data form."_s, {} };
                    });
 }
 
@@ -962,7 +963,7 @@ QString QXmppPubSubManager::standardItemIdToString(StandardItemId itemId)
 {
     switch (itemId) {
     case Current:
-        return QStringLiteral("current");
+        return u"current"_s;
     }
     return {};
 }
@@ -983,8 +984,8 @@ bool QXmppPubSubManager::handleStanza(const QDomElement &element)
 
     auto event = firstChildElement(element, u"event", ns_pubsub_event);
     if (!event.isNull()) {
-        const auto service = element.attribute(QStringLiteral("from"));
-        const auto node = event.firstChildElement().attribute(QStringLiteral("node"));
+        const auto service = element.attribute(u"from"_s);
+        const auto node = event.firstChildElement().attribute(u"node"_s);
 
         const auto extensions = client()->extensions();
         for (auto *extension : extensions) {

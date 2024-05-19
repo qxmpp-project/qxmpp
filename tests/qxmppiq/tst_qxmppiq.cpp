@@ -46,8 +46,8 @@ void tst_QXmppIq::testBasic()
 
     QXmppIq iq;
     parsePacket(iq, xml);
-    QCOMPARE(iq.to(), QStringLiteral("foo@example.com/QXmpp"));
-    QCOMPARE(iq.from(), QStringLiteral("bar@example.com/QXmpp"));
+    QCOMPARE(iq.to(), u"foo@example.com/QXmpp"_s);
+    QCOMPARE(iq.from(), u"bar@example.com/QXmpp"_s);
     QCOMPARE(int(iq.type()), type);
     serializePacket(iq, xml);
 }

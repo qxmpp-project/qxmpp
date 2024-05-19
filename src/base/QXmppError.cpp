@@ -6,6 +6,8 @@
 
 #include "QXmppStanza.h"
 
+#include "StringLiterals.h"
+
 #include <QFileDevice>
 #include <QNetworkReply>
 

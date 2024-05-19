@@ -7,6 +7,8 @@
 #include "QXmppConstants_p.h"
 #include "QXmppUtils_p.h"
 
+#include "StringLiterals.h"
+
 #include <QDomElement>
 #include <QXmlStreamWriter>
 
@@ -128,15 +130,15 @@ void QXmppPubSubAffiliation::setJid(const QString &jid)
 bool QXmppPubSubAffiliation::isAffiliation(const QDomElement &element)
 {
     if (element.tagName() != u"affiliation" ||
-        !enumFromString<Affiliation>(PUBSUB_AFFILIATIONS, element.attribute(QStringLiteral("affiliation")))) {
+        !enumFromString<Affiliation>(PUBSUB_AFFILIATIONS, element.attribute(u"affiliation"_s))) {
         return false;
     }
 
     if (element.namespaceURI() == ns_pubsub) {
-        return element.hasAttribute(QStringLiteral("node"));
+        return element.hasAttribute(u"node"_s);
     }
     if (element.namespaceURI() == ns_pubsub_owner) {
-        return element.hasAttribute(QStringLiteral("jid"));
+        return element.hasAttribute(u"jid"_s);
     }
     return false;
 }
@@ -144,10 +146,10 @@ bool QXmppPubSubAffiliation::isAffiliation(const QDomElement &element)
 /// \cond
 void QXmppPubSubAffiliation::parse(const QDomElement &element)
 {
-    d->type = enumFromString<Affiliation>(PUBSUB_AFFILIATIONS, element.attribute(QStringLiteral("affiliation"))).value_or(None);
+    d->type = enumFromString<Affiliation>(PUBSUB_AFFILIATIONS, element.attribute(u"affiliation"_s)).value_or(None);
 
-    d->node = element.attribute(QStringLiteral("node"));
-    d->jid = element.attribute(QStringLiteral("jid"));
+    d->node = element.attribute(u"node"_s);
+    d->jid = element.attribute(u"jid"_s);
 }
 
 void QXmppPubSubAffiliation::toXml(QXmlStreamWriter *writer) const
