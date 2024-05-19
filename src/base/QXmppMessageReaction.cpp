@@ -128,6 +128,6 @@ void QXmppMessageReaction::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppMessageReaction::isMessageReaction(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("reactions") &&
+    return element.tagName() == u"reactions" &&
         element.namespaceURI() == ns_reactions;
 }

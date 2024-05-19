@@ -163,6 +163,6 @@ void QXmppMixInvitation::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppMixInvitation::isMixInvitation(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("invitation") &&
+    return element.tagName() == u"invitation" &&
         element.namespaceURI() == ns_mix_misc;
 }

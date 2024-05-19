@@ -131,7 +131,7 @@ void QXmppPubSubBaseItem::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppPubSubBaseItem::isItem(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("item");
+    return element.tagName() == u"item";
 }
 
 ///

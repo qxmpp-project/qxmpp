@@ -232,7 +232,7 @@ bool QXmppPubSubMetadata::parseField(const QXmppDataForm::Field &field)
         d->type = value.toString();
     } else if (key == MAX_ITEMS) {
         const auto string = value.toString();
-        if (string == QStringLiteral("max")) {
+        if (string == u"max") {
             d->maxItems = Max();
         } else {
             bool ok;

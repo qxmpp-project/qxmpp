@@ -127,7 +127,7 @@ void QXmppPubSubAffiliation::setJid(const QString &jid)
 ///
 bool QXmppPubSubAffiliation::isAffiliation(const QDomElement &element)
 {
-    if (element.tagName() != QStringLiteral("affiliation") ||
+    if (element.tagName() != u"affiliation" ||
         !enumFromString<Affiliation>(PUBSUB_AFFILIATIONS, element.attribute(QStringLiteral("affiliation")))) {
         return false;
     }

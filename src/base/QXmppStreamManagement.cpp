@@ -48,7 +48,7 @@ std::optional<SmEnabled> SmEnabled::fromDom(const QDomElement &el)
 
     const auto resume = el.attribute(QStringLiteral("resume"));
     return SmEnabled {
-        .resume = (resume == QStringLiteral("true") || resume == QStringLiteral("1")),
+        .resume = (resume == u"true" || resume == u"1"),
         .id = el.attribute(QStringLiteral("id")),
         .max = el.attribute(QStringLiteral("max")).toULongLong(),
         .location = el.attribute(QStringLiteral("location")),

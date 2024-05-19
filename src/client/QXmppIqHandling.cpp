@@ -28,7 +28,7 @@ void QXmpp::Private::sendIqReply(QXmppClient *client,
 
 std::tuple<bool, QString, QString> QXmpp::Private::checkIsIqRequest(const QDomElement &el)
 {
-    if (el.tagName() != QStringLiteral("iq")) {
+    if (el.tagName() != u"iq") {
         return { false, {}, {} };
     }
     auto queryElement = el.firstChildElement();

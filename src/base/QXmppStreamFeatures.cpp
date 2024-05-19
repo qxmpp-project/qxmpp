@@ -283,7 +283,7 @@ void QXmppStreamFeatures::setRosterVersioningSupported(bool supported)
 bool QXmppStreamFeatures::isStreamFeatures(const QDomElement &element)
 {
     return element.namespaceURI() == ns_stream &&
-        element.tagName() == QStringLiteral("features");
+        element.tagName() == u"features";
 }
 
 static QXmppStreamFeatures::Mode readFeature(const QDomElement &element, QStringView tagName, QStringView tagNs)

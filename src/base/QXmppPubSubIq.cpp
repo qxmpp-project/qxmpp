@@ -322,7 +322,7 @@ bool PubSubIqBase::isPubSubIq(const QDomElement &element, bool (*isItemValid)(co
 {
     // IQs must have only one direct child element.
     const auto pubSubElement = element.firstChildElement();
-    if (pubSubElement.tagName() != QStringLiteral("pubsub")) {
+    if (pubSubElement.tagName() != u"pubsub") {
         return false;
     }
 

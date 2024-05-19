@@ -440,10 +440,10 @@ void QXmppPresence::parse(const QDomElement &element)
 void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList &unknownElements)
 {
     // XEP-0045: Multi-User Chat
-    if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc) {
+    if (element.tagName() == u"x" && element.namespaceURI() == ns_muc) {
         d->mucSupported = true;
         d->mucPassword = element.firstChildElement(QStringLiteral("password")).text();
-    } else if (element.tagName() == QStringLiteral("x") && element.namespaceURI() == ns_muc_user) {
+    } else if (element.tagName() == u"x" && element.namespaceURI() == ns_muc_user) {
         d->mucItem.parse(firstChildElement(element, u"item"));
 
         d->mucStatusCodes.clear();
@@ -451,7 +451,7 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             d->mucStatusCodes << statusElement.attribute(QStringLiteral("code")).toInt();
         }
         // XEP-0115: Entity Capabilities
-    } else if (element.tagName() == QStringLiteral("c") && element.namespaceURI() == ns_capabilities) {
+    } else if (element.tagName() == u"c" && element.namespaceURI() == ns_capabilities) {
         d->capabilityNode = element.attribute(QStringLiteral("node"));
         d->capabilityVer = QByteArray::fromBase64(element.attribute(QStringLiteral("ver")).toLatin1());
         d->capabilityHash = element.attribute(QStringLiteral("hash"));
@@ -471,7 +471,7 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             }
         }
         // XEP-0272: Multiparty Jingle (Muji)
-    } else if (element.tagName() == QStringLiteral("muji") && element.namespaceURI() == ns_muji) {
+    } else if (element.tagName() == u"muji" && element.namespaceURI() == ns_muji) {
         if (!element.firstChildElement(QStringLiteral("preparing")).isNull()) {
             d->isPreparingMujiSession = true;
         }
@@ -482,13 +482,13 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             d->mujiContents.append(content);
         }
         // XEP-0319: Last User Interaction in Presence
-    } else if (element.tagName() == QStringLiteral("idle") && element.namespaceURI() == ns_idle) {
+    } else if (element.tagName() == u"idle" && element.namespaceURI() == ns_idle) {
         if (element.hasAttribute(QStringLiteral("since"))) {
             const QString since = element.attribute(QStringLiteral("since"));
             d->lastUserInteraction = QXmppUtils::datetimeFromString(since);
         }
         // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
-    } else if (element.tagName() == QStringLiteral("mix") && element.namespaceURI() == ns_mix_presence) {
+    } else if (element.tagName() == u"mix" && element.namespaceURI() == ns_mix_presence) {
         d->mixUserJid = element.firstChildElement(QStringLiteral("jid")).text();
         d->mixUserNick = element.firstChildElement(QStringLiteral("nick")).text();
     } else {

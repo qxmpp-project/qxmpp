@@ -1443,7 +1443,7 @@ void QXmppMessage::parseExtensions(const QDomElement &element, const QXmpp::SceM
 bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sceMode)
 {
     if (sceMode & QXmpp::ScePublic) {
-        if (sceMode == QXmpp::ScePublic && element.tagName() == QStringLiteral("body")) {
+        if (sceMode == QXmpp::ScePublic && element.tagName() == u"body") {
             d->e2eeFallbackBody = element.text();
             return true;
         }
@@ -1515,20 +1515,20 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         }
     }
     if (sceMode & QXmpp::SceSensitive) {
-        if (element.tagName() == QStringLiteral("body")) {
+        if (element.tagName() == u"body") {
             d->body = element.text();
             return true;
         }
-        if (element.tagName() == QStringLiteral("subject")) {
+        if (element.tagName() == u"subject") {
             d->subject = element.text();
             return true;
         }
-        if (element.tagName() == QStringLiteral("thread")) {
+        if (element.tagName() == u"thread") {
             d->thread = element.text();
             d->parentThread = element.attribute(QStringLiteral("parent"));
             return true;
         }
-        if (element.tagName() == QStringLiteral("x")) {
+        if (element.tagName() == u"x") {
             if (element.namespaceURI() == ns_legacy_delayed_delivery) {
                 // if XEP-0203 exists, XEP-0091 has no need to parse because XEP-0091
                 // is no more standard protocol)

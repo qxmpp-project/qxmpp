@@ -217,7 +217,7 @@ void QXmppPubSubEventBase::setConfigurationForm(const std::optional<QXmppDataFor
 /// \cond
 bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::function<bool(const QDomElement &)> isItemValid)
 {
-    if (stanza.tagName() != QStringLiteral("message")) {
+    if (stanza.tagName() != u"message") {
         return false;
     }
 
@@ -281,7 +281,7 @@ bool QXmppPubSubEventBase::isPubSubEvent(const QDomElement &stanza, std::functio
 bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp::SceMode sceMode)
 {
     if (sceMode & QXmpp::SceSensitive &&
-        eventElement.tagName() == QStringLiteral("event") &&
+        eventElement.tagName() == u"event" &&
         eventElement.namespaceURI() == ns_pubsub_event) {
         // check that the query type is valid
         const auto eventTypeElement = eventElement.firstChildElement();
@@ -295,7 +295,7 @@ bool QXmppPubSubEventBase::parseExtension(const QDomElement &eventElement, QXmpp
         if (d->eventType == Items) {
             auto child = eventTypeElement.firstChildElement();
             if (!child.isNull()) {
-                if (child.tagName() == QStringLiteral("retract")) {
+                if (child.tagName() == u"retract") {
                     d->eventType = Retract;
                 }
             }

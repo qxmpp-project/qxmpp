@@ -51,15 +51,15 @@ QXmppMucItem::Affiliation QXmppMucItem::affiliation() const
 /// \cond
 QXmppMucItem::Affiliation QXmppMucItem::affiliationFromString(const QString &affiliationStr)
 {
-    if (affiliationStr == QStringLiteral("owner")) {
+    if (affiliationStr == u"owner") {
         return QXmppMucItem::OwnerAffiliation;
-    } else if (affiliationStr == QStringLiteral("admin")) {
+    } else if (affiliationStr == u"admin") {
         return QXmppMucItem::AdminAffiliation;
-    } else if (affiliationStr == QStringLiteral("member")) {
+    } else if (affiliationStr == u"member") {
         return QXmppMucItem::MemberAffiliation;
-    } else if (affiliationStr == QStringLiteral("outcast")) {
+    } else if (affiliationStr == u"outcast") {
         return QXmppMucItem::OutcastAffiliation;
-    } else if (affiliationStr == QStringLiteral("none")) {
+    } else if (affiliationStr == u"none") {
         return QXmppMucItem::NoAffiliation;
     } else {
         return QXmppMucItem::UnspecifiedAffiliation;
@@ -138,13 +138,13 @@ QXmppMucItem::Role QXmppMucItem::role() const
 /// \cond
 QXmppMucItem::Role QXmppMucItem::roleFromString(const QString &roleStr)
 {
-    if (roleStr == QStringLiteral("moderator")) {
+    if (roleStr == u"moderator") {
         return QXmppMucItem::ModeratorRole;
-    } else if (roleStr == QStringLiteral("participant")) {
+    } else if (roleStr == u"participant") {
         return QXmppMucItem::ParticipantRole;
-    } else if (roleStr == QStringLiteral("visitor")) {
+    } else if (roleStr == u"visitor") {
         return QXmppMucItem::VisitorRole;
-    } else if (roleStr == QStringLiteral("none")) {
+    } else if (roleStr == u"none") {
         return QXmppMucItem::NoRole;
     } else {
         return QXmppMucItem::UnspecifiedRole;

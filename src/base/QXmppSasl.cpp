@@ -1073,11 +1073,11 @@ QXmppSaslServer::~QXmppSaslServer() = default;
 /// Creates an SASL server for the given mechanism.
 std::unique_ptr<QXmppSaslServer> QXmppSaslServer::create(const QString &mechanism, QObject *parent)
 {
-    if (mechanism == QStringLiteral("PLAIN")) {
+    if (mechanism == u"PLAIN") {
         return std::make_unique<QXmppSaslServerPlain>(parent);
-    } else if (mechanism == QStringLiteral("DIGEST-MD5")) {
+    } else if (mechanism == u"DIGEST-MD5") {
         return std::make_unique<QXmppSaslServerDigestMd5>(parent);
-    } else if (mechanism == QStringLiteral("ANONYMOUS")) {
+    } else if (mechanism == u"ANONYMOUS") {
         return std::make_unique<QXmppSaslServerAnonymous>(parent);
     } else {
         return {};

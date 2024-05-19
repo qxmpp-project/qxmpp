@@ -414,7 +414,7 @@ void QXmppRosterIq::Item::parse(const QDomElement &element)
 
     // pre-approved
     const QString approved = element.attribute(QStringLiteral("approved"));
-    d->approved = (approved == QStringLiteral("1") || approved == QStringLiteral("true"));
+    d->approved = (approved == u"1" || approved == u"true");
 
     // groups
     for (const auto &groupElement : iterChildElements(element, u"group")) {

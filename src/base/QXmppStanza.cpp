@@ -158,15 +158,15 @@ QString typeToString(QXmppStanza::Error::Type type)
 
 std::optional<QXmppStanza::Error::Type> typeFromString(const QString &string)
 {
-    if (string == QStringLiteral("cancel")) {
+    if (string == u"cancel") {
         return QXmppStanza::Error::Cancel;
-    } else if (string == QStringLiteral("continue")) {
+    } else if (string == u"continue") {
         return QXmppStanza::Error::Continue;
-    } else if (string == QStringLiteral("modify")) {
+    } else if (string == u"modify") {
         return QXmppStanza::Error::Modify;
-    } else if (string == QStringLiteral("auth")) {
+    } else if (string == u"auth") {
         return QXmppStanza::Error::Auth;
-    } else if (string == QStringLiteral("wait")) {
+    } else if (string == u"wait") {
         return QXmppStanza::Error::Wait;
     }
     return std::nullopt;
@@ -278,7 +278,7 @@ bool QXmppExtendedAddress::isValid() const
 /// \cond
 void QXmppExtendedAddress::parse(const QDomElement &element)
 {
-    d->delivered = element.attribute(QStringLiteral("delivered")) == QStringLiteral("true");
+    d->delivered = element.attribute(QStringLiteral("delivered")) == u"true";
     d->description = element.attribute(QStringLiteral("desc"));
     d->jid = element.attribute(QStringLiteral("jid"));
     d->type = element.attribute(QStringLiteral("type"));
@@ -560,7 +560,7 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
 
     for (const auto &element : iterChildElements(errorElement)) {
         if (element.namespaceURI() == ns_stanza) {
-            if (element.tagName() == QStringLiteral("text")) {
+            if (element.tagName() == u"text") {
                 d->text = element.text();
             } else {
                 d->condition = conditionFromString(element.tagName()).value_or(NoCondition);
@@ -578,13 +578,13 @@ void QXmppStanza::Error::parse(const QDomElement &errorElement)
         } else if (element.namespaceURI() == ns_http_upload) {
             // XEP-0363: HTTP File Upload
             // file is too large
-            if (element.tagName() == QStringLiteral("file-too-large")) {
+            if (element.tagName() == u"file-too-large") {
                 d->fileTooLarge = true;
                 d->maxFileSize = element.firstChildElement(QStringLiteral("max-file-size"))
                                      .text()
                                      .toLongLong();
                 // retry later
-            } else if (element.tagName() == QStringLiteral("retry")) {
+            } else if (element.tagName() == u"retry") {
                 d->retryDate = QXmppUtils::datetimeFromString(
                     element.attribute(QStringLiteral("stamp")));
             }

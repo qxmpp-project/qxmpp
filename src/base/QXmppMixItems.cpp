@@ -927,7 +927,7 @@ bool QXmppMixConfigItem::isItem(const QDomElement &element)
         for (auto fieldEl = payload.firstChildElement();
              !fieldEl.isNull();
              fieldEl = fieldEl.nextSiblingElement()) {
-            if (fieldEl.attribute(QStringLiteral("var")) == QStringLiteral(u"FORM_TYPE")) {
+            if (fieldEl.attribute(QStringLiteral("var")) == u"FORM_TYPE") {
                 return fieldEl.firstChildElement(QStringLiteral("value")).text() == ns_mix_admin;
             }
         }
@@ -1110,7 +1110,7 @@ bool QXmppMixInfoItem::isItem(const QDomElement &element)
             return false;
         }
         for (const auto &fieldEl : iterChildElements(payload)) {
-            if (fieldEl.attribute(QStringLiteral("var")) == QStringLiteral(u"FORM_TYPE")) {
+            if (fieldEl.attribute(QStringLiteral("var")) == u"FORM_TYPE") {
                 return fieldEl.firstChildElement(QStringLiteral("value")).text() == ns_mix;
             }
         }
@@ -1227,7 +1227,7 @@ void QXmppMixParticipantItem::serializePayload(QXmlStreamWriter *writer) const
 bool QXmppMixParticipantItem::isItem(const QDomElement &element)
 {
     return QXmppPubSubBaseItem::isItem(element, [](const QDomElement &payload) {
-        return payload.tagName() == QStringLiteral("participant") &&
+        return payload.tagName() == u"participant" &&
             payload.namespaceURI() == ns_mix;
     });
 }

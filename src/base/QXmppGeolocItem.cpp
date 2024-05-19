@@ -144,7 +144,7 @@ void QXmppGeolocItem::setLongitude(std::optional<double> lon)
 bool QXmppGeolocItem::isItem(const QDomElement &itemElement)
 {
     auto isPayloadValid = [](const QDomElement &payload) -> bool {
-        return payload.tagName() == QStringLiteral("geoloc") &&
+        return payload.tagName() == u"geoloc" &&
             payload.namespaceURI() == ns_geoloc;
     };
 

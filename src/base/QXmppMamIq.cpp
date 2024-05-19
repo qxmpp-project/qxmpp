@@ -227,7 +227,7 @@ void QXmppMamResultIq::setComplete(bool complete)
 /// \cond
 bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 {
-    if (element.tagName() == QStringLiteral("iq")) {
+    if (element.tagName() == u"iq") {
         QDomElement finElement = element.firstChildElement(QStringLiteral("fin"));
         if (!finElement.isNull() && finElement.namespaceURI() == ns_mam) {
             return true;
@@ -239,7 +239,7 @@ bool QXmppMamResultIq::isMamResultIq(const QDomElement &element)
 void QXmppMamResultIq::parseElementFromChild(const QDomElement &element)
 {
     QDomElement finElement = element.firstChildElement(QStringLiteral("fin"));
-    d->complete = finElement.attribute(QStringLiteral("complete")) == QStringLiteral("true");
+    d->complete = finElement.attribute(QStringLiteral("complete")) == u"true";
     QDomElement resultSetElement = finElement.firstChildElement(QStringLiteral("set"));
     if (!resultSetElement.isNull()) {
         d->resultSetReply.parse(resultSetElement);

@@ -188,9 +188,9 @@ void QXmppByteStreamIq::parseElementFromChild(const QDomElement &element)
     auto queryElement = firstChildElement(element, u"query", ns_bytestreams);
     m_sid = queryElement.attribute(QStringLiteral("sid"));
     const auto modeStr = queryElement.attribute(QStringLiteral("mode"));
-    if (modeStr == QStringLiteral("tcp")) {
+    if (modeStr == u"tcp") {
         m_mode = Tcp;
-    } else if (modeStr == QStringLiteral("udp")) {
+    } else if (modeStr == u"udp") {
         m_mode = Udp;
     } else {
         m_mode = None;

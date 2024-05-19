@@ -1162,13 +1162,13 @@ void tst_QXmppJingleData::testRtpSessionState()
     parsePacket(iq1, xml);
 
     const auto rtpSessionState1 = *iq1.rtpSessionState();
-    if (state == QStringLiteral("active")) {
+    if (state == u"active") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateActive>(rtpSessionState1));
-    } else if (state == QStringLiteral("hold")) {
+    } else if (state == u"hold") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateHold>(rtpSessionState1));
-    } else if (state == QStringLiteral("unhold")) {
+    } else if (state == u"unhold") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateUnhold>(rtpSessionState1));
-    } else if (const auto isMute = state == QStringLiteral("mute"); isMute || state == QStringLiteral("unmute")) {
+    } else if (auto isMute = state == u"mute"; isMute || state == u"unmute") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateMuting>(rtpSessionState1));
 
         const auto stateMuting = std::get<QXmppJingleIq::RtpSessionStateMuting>(rtpSessionState1);
@@ -1181,7 +1181,7 @@ void tst_QXmppJingleData::testRtpSessionState()
             QCOMPARE(stateMuting.creator, QXmppJingleIq::Responder);
             QVERIFY(stateMuting.name.isEmpty());
         }
-    } else if (state == QStringLiteral("ringing")) {
+    } else if (state == u"ringing") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateRinging>(rtpSessionState1));
     }
 
@@ -1191,13 +1191,13 @@ void tst_QXmppJingleData::testRtpSessionState()
     iq2.setType(QXmppIq::Set);
     iq2.setId({});
 
-    if (state == QStringLiteral("active")) {
+    if (state == u"active") {
         iq2.setRtpSessionState(QXmppJingleIq::RtpSessionStateActive());
-    } else if (state == QStringLiteral("hold")) {
+    } else if (state == u"hold") {
         iq2.setRtpSessionState(QXmppJingleIq::RtpSessionStateHold());
-    } else if (state == QStringLiteral("unhold")) {
+    } else if (state == u"unhold") {
         iq2.setRtpSessionState(QXmppJingleIq::RtpSessionStateUnhold());
-    } else if (const auto isMute = state == QStringLiteral("mute"); isMute || state == QStringLiteral("unmute")) {
+    } else if (const auto isMute = state == u"mute"; isMute || state == u"unmute") {
         QXmppJingleIq::RtpSessionStateMuting stateMuting;
         stateMuting.isMute = isMute;
 
@@ -1209,18 +1209,18 @@ void tst_QXmppJingleData::testRtpSessionState()
         }
 
         iq2.setRtpSessionState(stateMuting);
-    } else if (state == QStringLiteral("ringing")) {
+    } else if (state == u"ringing") {
         iq2.setRtpSessionState(QXmppJingleIq::RtpSessionStateRinging());
     }
 
     const auto rtpSessionState2 = *iq2.rtpSessionState();
-    if (state == QStringLiteral("active")) {
+    if (state == u"active") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateActive>(rtpSessionState2));
-    } else if (state == QStringLiteral("hold")) {
+    } else if (state == u"hold") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateHold>(rtpSessionState2));
-    } else if (state == QStringLiteral("unhold")) {
+    } else if (state == u"unhold") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateUnhold>(rtpSessionState2));
-    } else if (const auto isMute = state == QStringLiteral("mute"); isMute || state == QStringLiteral("unmute")) {
+    } else if (const auto isMute = state == u"mute"; isMute || state == u"unmute") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateMuting>(rtpSessionState2));
 
         const auto stateMuting = std::get<QXmppJingleIq::RtpSessionStateMuting>(rtpSessionState2);
@@ -1233,7 +1233,7 @@ void tst_QXmppJingleData::testRtpSessionState()
             QCOMPARE(stateMuting.creator, QXmppJingleIq::Responder);
             QVERIFY(stateMuting.name.isEmpty());
         }
-    } else if (state == QStringLiteral("ringing")) {
+    } else if (state == u"ringing") {
         QVERIFY(std::holds_alternative<QXmppJingleIq::RtpSessionStateRinging>(rtpSessionState2));
     }
 

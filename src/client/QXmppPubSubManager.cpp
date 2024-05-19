@@ -224,16 +224,16 @@ QXmppTask<QXmppPubSubManager::FeaturesResult> QXmppPubSubManager::requestFeature
         const auto identities = iq.identities();
 
         const auto isPubSubServiceFound = std::any_of(identities.cbegin(), identities.cend(), [=](const QXmppDiscoveryIq::Identity &identity) {
-            if (identity.category() == QStringLiteral("pubsub")) {
+            if (identity.category() == u"pubsub") {
                 const auto identityType = identity.type();
 
                 switch (serviceType) {
                 case PubSubOrPep:
-                    return identityType == QStringLiteral("service") || identityType == QStringLiteral("pep");
+                    return identityType == u"service" || identityType == u"pep";
                 case PubSub:
-                    return identityType == QStringLiteral("service");
+                    return identityType == u"service";
                 case Pep:
-                    return identityType == QStringLiteral("pep");
+                    return identityType == u"pep";
                 }
             }
             return false;

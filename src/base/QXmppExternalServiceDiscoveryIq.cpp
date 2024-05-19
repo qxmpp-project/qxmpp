@@ -31,11 +31,11 @@ QString actionToString(Action action)
 
 std::optional<Action> actionFromString(const QString &string)
 {
-    if (string == QStringLiteral("add")) {
+    if (string == u"add") {
         return Action::Add;
-    } else if (string == QStringLiteral("delete")) {
+    } else if (string == u"delete") {
         return Action::Delete;
-    } else if (string == QStringLiteral("modify")) {
+    } else if (string == u"modify") {
         return Action::Modify;
     }
 
@@ -56,9 +56,9 @@ QString transportToString(Transport transport)
 
 std::optional<Transport> transportFromString(const QString &string)
 {
-    if (string == QStringLiteral("tcp")) {
+    if (string == u"tcp") {
         return Transport::Tcp;
-    } else if (string == QStringLiteral("udp")) {
+    } else if (string == u"udp") {
         return Transport::Udp;
     }
 
@@ -419,7 +419,7 @@ bool QXmppExternalServiceDiscoveryIq::isExternalServiceDiscoveryIq(const QDomEle
 ///
 bool QXmppExternalServiceDiscoveryIq::checkIqType(const QString &tagName, const QString &xmlNamespace)
 {
-    return tagName == QStringLiteral("services") && (xmlNamespace == ns_external_service_discovery);
+    return tagName == u"services" && (xmlNamespace == ns_external_service_discovery);
 }
 
 /// \cond

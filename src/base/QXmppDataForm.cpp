@@ -772,7 +772,7 @@ QString QXmppDataForm::formType() const
 {
     const auto formTypeItr = std::find_if(d->fields.begin(), d->fields.end(), [](const QXmppDataForm::Field &field) {
         return field.type() == QXmppDataForm::Field::HiddenField &&
-            field.key() == QStringLiteral("FORM_TYPE");
+            field.key() == u"FORM_TYPE";
     });
 
     if (formTypeItr != d->fields.end()) {

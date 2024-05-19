@@ -118,7 +118,7 @@ void QXmppBookmarkSet::setUrls(const QList<QXmppBookmarkUrl> &urls)
 /// \cond
 bool QXmppBookmarkSet::isBookmarkSet(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("storage") &&
+    return element.tagName() == u"storage" &&
         element.namespaceURI() == ns_bookmarks;
 }
 

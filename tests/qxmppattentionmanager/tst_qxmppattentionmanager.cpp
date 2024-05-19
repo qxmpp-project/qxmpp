@@ -91,7 +91,7 @@ void tst_QXmppAttentionManager::testReceived()
 
     connect(manager, &QXmppAttentionManager::attentionRequested, &context, [&](const QXmppMessage &receivedMsg, bool isTrusted) {
         signalCalled = true;
-        QCOMPARE(isTrusted, QXmppUtils::jidToBareJid(receivedMsg.from()) == QStringLiteral("contact@qxmpp.org"));
+        QCOMPARE(isTrusted, QXmppUtils::jidToBareJid(receivedMsg.from()) == u"contact@qxmpp.org");
         QCOMPARE(receivedMsg.body(), msg.body());
     });
 

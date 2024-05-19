@@ -237,7 +237,7 @@ bool QXmppPubSubSubscription::isConfigurationRequired() const
 ///
 bool QXmppPubSubSubscription::isSubscription(const QDomElement &element)
 {
-    if (element.tagName() != QStringLiteral("subscription")) {
+    if (element.tagName() != u"subscription") {
         return false;
     }
 

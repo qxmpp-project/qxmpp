@@ -99,8 +99,7 @@ void QXmppOmemoEnvelope::parse(const QDomElement &element)
     m_recipientDeviceId = element.attribute(QStringLiteral("rid")).toUInt();
 
     const auto isUsedForKeyExchange = element.attribute(QStringLiteral("kex"));
-    if (isUsedForKeyExchange == QStringLiteral("true") ||
-        isUsedForKeyExchange == QStringLiteral("1")) {
+    if (isUsedForKeyExchange == u"true" || isUsedForKeyExchange == u"1") {
         m_isUsedForKeyExchange = true;
     }
 
@@ -129,8 +128,7 @@ void QXmppOmemoEnvelope::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppOmemoEnvelope::isOmemoEnvelope(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("key") &&
-        element.namespaceURI() == ns_omemo_2;
+    return element.tagName() == u"key" && element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -284,7 +282,6 @@ void QXmppOmemoElement::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppOmemoElement::isOmemoElement(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("encrypted") &&
-        element.namespaceURI() == ns_omemo_2;
+    return element.tagName() == u"encrypted" && element.namespaceURI() == ns_omemo_2;
 }
 /// \endcond

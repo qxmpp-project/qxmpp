@@ -181,10 +181,10 @@ QString QXmppPubSubSubscribeOptions::formType() const
 bool QXmppPubSubSubscribeOptions::parseField(const QXmppDataForm::Field &field)
 {
     const auto subscriptionTypeFromString = [](const QString &value) -> std::optional<SubscriptionType> {
-        if (value == QStringLiteral("items")) {
+        if (value == u"items") {
             return Items;
         }
-        if (value == QStringLiteral("nodes")) {
+        if (value == u"nodes") {
             return Nodes;
         }
         return {};
@@ -194,7 +194,7 @@ bool QXmppPubSubSubscribeOptions::parseField(const QXmppDataForm::Field &field)
         if (value == QChar(u'1')) {
             return TopLevelOnly;
         }
-        if (value == QStringLiteral("all")) {
+        if (value == u"all") {
             return Recursive;
         }
         return {};

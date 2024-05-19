@@ -222,7 +222,7 @@ void QXmppTuneItem::setUri(QUrl uri)
 bool QXmppTuneItem::isItem(const QDomElement &itemElement)
 {
     auto isPayloadValid = [](const QDomElement &payload) -> bool {
-        return payload.tagName() == QStringLiteral("tune") &&
+        return payload.tagName() == u"tune" &&
             payload.namespaceURI() == ns_tune;
     };
 

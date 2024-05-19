@@ -193,7 +193,7 @@ void QXmppExtensibleDataFormBase::parseForm(const QXmppDataForm &form)
         // FORM_TYPE fields are not saved (override this function to save them)
         if (!parseField(field) &&
             !(field.type() == QXmppDataForm::Field::HiddenField &&
-              field.key() == QStringLiteral("FORM_TYPE"))) {
+              field.key() == u"FORM_TYPE")) {
             d->unknownFields << field;
         }
     }

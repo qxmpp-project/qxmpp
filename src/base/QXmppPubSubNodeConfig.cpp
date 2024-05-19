@@ -90,19 +90,19 @@ public:
 
 std::optional<QXmppPubSubNodeConfig::AccessModel> QXmppPubSubNodeConfig::accessModelFromString(const QString &string)
 {
-    if (string == QStringLiteral("open")) {
+    if (string == u"open") {
         return Open;
     }
-    if (string == QStringLiteral("presence")) {
+    if (string == u"presence") {
         return Presence;
     }
-    if (string == QStringLiteral("roster")) {
+    if (string == u"roster") {
         return Roster;
     }
-    if (string == QStringLiteral("authorize")) {
+    if (string == u"authorize") {
         return Authorize;
     }
-    if (string == QStringLiteral("whitelist")) {
+    if (string == u"whitelist") {
         return Allowlist;
     }
     return std::nullopt;
@@ -127,13 +127,13 @@ QString QXmppPubSubNodeConfig::accessModelToString(AccessModel model)
 
 std::optional<QXmppPubSubNodeConfig::PublishModel> QXmppPubSubNodeConfig::publishModelFromString(const QString &string)
 {
-    if (string == QStringLiteral("publishers")) {
+    if (string == u"publishers") {
         return Publishers;
     }
-    if (string == QStringLiteral("subscribers")) {
+    if (string == u"subscribers") {
         return Subscribers;
     }
-    if (string == QStringLiteral("open")) {
+    if (string == u"open") {
         return Anyone;
     }
     return std::nullopt;
@@ -154,13 +154,13 @@ QString QXmppPubSubNodeConfig::publishModelToString(QXmppPubSubNodeConfig::Publi
 
 std::optional<QXmppPubSubNodeConfig::ChildAssociationPolicy> QXmppPubSubNodeConfig::childAssociatationPolicyFromString(const QString &string)
 {
-    if (string == QStringLiteral("all")) {
+    if (string == u"all") {
         return ChildAssociationPolicy::All;
     }
-    if (string == QStringLiteral("owners")) {
+    if (string == u"owners") {
         return ChildAssociationPolicy::Owners;
     }
-    if (string == QStringLiteral("whitelist")) {
+    if (string == u"whitelist") {
         return ChildAssociationPolicy::Whitelist;
     }
     return std::nullopt;
@@ -181,10 +181,10 @@ QString QXmppPubSubNodeConfig::childAssociationPolicyToString(QXmppPubSubNodeCon
 
 std::optional<QXmppPubSubNodeConfig::ItemPublisher> QXmppPubSubNodeConfig::itemPublisherFromString(const QString &string)
 {
-    if (string == QStringLiteral("owner")) {
+    if (string == u"owner") {
         return NodeOwner;
     }
-    if (string == QStringLiteral("publisher")) {
+    if (string == u"publisher") {
         return Publisher;
     }
     return std::nullopt;
@@ -203,10 +203,10 @@ QString QXmppPubSubNodeConfig::itemPublisherToString(ItemPublisher publisher)
 
 std::optional<QXmppPubSubNodeConfig::NodeType> QXmppPubSubNodeConfig::nodeTypeFromString(const QString &string)
 {
-    if (string == QStringLiteral("leaf")) {
+    if (string == u"leaf") {
         return Leaf;
     }
-    if (string == QStringLiteral("collection")) {
+    if (string == u"collection") {
         return Collection;
     }
     return std::nullopt;
@@ -225,10 +225,10 @@ QString QXmppPubSubNodeConfig::nodeTypeToString(NodeType type)
 
 std::optional<QXmppPubSubNodeConfig::NotificationType> QXmppPubSubNodeConfig::notificationTypeFromString(const QString &string)
 {
-    if (string == QStringLiteral("normal")) {
+    if (string == u"normal") {
         return Normal;
     }
-    if (string == QStringLiteral("headline")) {
+    if (string == u"headline") {
         return Headline;
     }
     return std::nullopt;
@@ -247,13 +247,13 @@ QString QXmppPubSubNodeConfig::notificationTypeToString(NotificationType type)
 
 std::optional<QXmppPubSubNodeConfig::SendLastItemType> QXmppPubSubNodeConfig::sendLastItemTypeFromString(const QString &string)
 {
-    if (string == QStringLiteral("never")) {
+    if (string == u"never") {
         return Never;
     }
-    if (string == QStringLiteral("on_sub")) {
+    if (string == u"on_sub") {
         return OnSubscription;
     }
-    if (string == QStringLiteral("on_sub_and_presence")) {
+    if (string == u"on_sub_and_presence") {
         return OnSubscriptionAndPresence;
     }
     return std::nullopt;
@@ -676,7 +676,7 @@ bool QXmppPubSubNodeConfig::parseField(const QXmppDataForm::Field &field)
         bool ok = false;
         if (const auto maxItems = value.toULongLong(&ok); ok) {
             d->maxItems = maxItems;
-        } else if (value.type() == QVariant::String && value.toString() == QStringLiteral("max")) {
+        } else if (value.type() == QVariant::String && value.toString() == u"max") {
             d->maxItems = Max();
         } else {
             d->maxItems = Unset();

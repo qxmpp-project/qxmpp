@@ -115,7 +115,7 @@ QVariant QXmppRpcMarshaller::demarshall(const QDomElement &elem, QStringList &er
         }
         errors << QStringLiteral("I was looking for an integer but data was courupt");
         return QVariant();
-    } else if (typeName == QStringLiteral("double")) {
+    } else if (typeName == u"double") {
         bool ok = false;
         QVariant val(typeData.text().toDouble(&ok));
         if (ok) {
@@ -173,7 +173,7 @@ bool QXmppRpcErrorIq::isRpcErrorIq(const QDomElement &element)
     QString type = element.attribute(QStringLiteral("type"));
     QDomElement errorElement = element.firstChildElement(QStringLiteral("error"));
     QDomElement queryElement = element.firstChildElement(QStringLiteral("query"));
-    return (type == QStringLiteral("error")) &&
+    return type == u"error" &&
         !errorElement.isNull() &&
         queryElement.namespaceURI() == ns_rpc;
 }
@@ -237,7 +237,7 @@ bool QXmppRpcResponseIq::isRpcResponseIq(const QDomElement &element)
     QString type = element.attribute(QStringLiteral("type"));
     QDomElement dataElement = element.firstChildElement(QStringLiteral("query"));
     return dataElement.namespaceURI() == ns_rpc &&
-        type == QStringLiteral("result");
+        type == u"result";
 }
 
 void QXmppRpcResponseIq::parseElementFromChild(const QDomElement &element)
@@ -332,7 +332,7 @@ bool QXmppRpcInvokeIq::isRpcInvokeIq(const QDomElement &element)
     QString type = element.attribute(QStringLiteral("type"));
     QDomElement dataElement = element.firstChildElement(QStringLiteral("query"));
     return dataElement.namespaceURI() == ns_rpc &&
-        type == QStringLiteral("set");
+        type == u"set";
 }
 
 void QXmppRpcInvokeIq::parseElementFromChild(const QDomElement &element)

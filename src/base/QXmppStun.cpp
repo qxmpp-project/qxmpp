@@ -1856,7 +1856,7 @@ bool QXmppIceComponentPrivate::addRemoteCandidate(const QXmppJingleCandidate &ca
         (candidate.type() != QXmppJingleCandidate::HostType &&
          candidate.type() != QXmppJingleCandidate::RelayedType &&
          candidate.type() != QXmppJingleCandidate::ServerReflexiveType) ||
-        candidate.protocol() != QStringLiteral("udp") ||
+        candidate.protocol() != u"udp" ||
         (candidate.host().protocol() != QAbstractSocket::IPv4Protocol &&
          candidate.host().protocol() != QAbstractSocket::IPv6Protocol)) {
         return false;

@@ -112,7 +112,7 @@ void tst_QXmppRegistrationManager::testDeleteAccount()
 
         QVERIFY(!iq.id().isEmpty());
         // to address must be the server or empty
-        QVERIFY(iq.to() == QStringLiteral("example.org") || iq.to().isEmpty());
+        QVERIFY(iq.to() == u"example.org" || iq.to().isEmpty());
         QCOMPARE(iq.type(), QXmppIq::Set);
         QVERIFY(iq.isRemove());
 

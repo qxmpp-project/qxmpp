@@ -1103,7 +1103,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeys()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("bob@example.com")) {
+            if (message.to() == u"bob@example.com") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1132,7 +1132,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeys()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("carol@example.net")) {
+            if (message.to() == u"carol@example.net") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1161,7 +1161,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeys()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1176,18 +1176,18 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeys()
                 for (const auto &keyOwner : keyOwners) {
                     const auto keyOwnerJid = keyOwner.jid();
 
-                    if (keyOwnerJid == QStringLiteral("alice@example.org")) {
+                    if (keyOwnerJid == u"alice@example.org") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("RwyI/3m9l4wgju9JduFxb5MEJvBNRDfPfo1Ewhl1DEI=")),
                                          QByteArray::fromBase64(QByteArrayLiteral("tfskruc1xcfC+VKzuqvLZUJVZccZX/Pg5j88ukpuY2M=")) }));
                         QCOMPARE(keyOwner.distrustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) }));
-                    } else if (keyOwnerJid == QStringLiteral("bob@example.com")) {
+                    } else if (keyOwnerJid == u"bob@example.com") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) }));
                         QCOMPARE(keyOwner.distrustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("8gBTC1fspYkO4akS6QKN+XFA9Nmf9NEIg7hjtlpTjII=")) }));
-                    } else if (keyOwnerJid == QStringLiteral("carol@example.net")) {
+                    } else if (keyOwnerJid == u"carol@example.net") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) }));
                         QVERIFY(keyOwner.distrustedKeys().isEmpty());
@@ -1242,7 +1242,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpoints()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("bob@example.com")) {
+            if (message.to() == u"bob@example.com") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1271,7 +1271,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpoints()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("carol@example.net")) {
+            if (message.to() == u"carol@example.net") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1300,7 +1300,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpoints()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1315,11 +1315,11 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpoints()
                 for (const auto &keyOwner : keyOwners) {
                     const auto keyOwnerJid = keyOwner.jid();
 
-                    if (keyOwnerJid == QStringLiteral("bob@example.com")) {
+                    if (keyOwnerJid == u"bob@example.com") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) }));
                         QVERIFY(keyOwner.distrustedKeys().isEmpty());
-                    } else if (keyOwnerJid == QStringLiteral("carol@example.net")) {
+                    } else if (keyOwnerJid == u"carol@example.net") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) }));
                         QVERIFY(keyOwner.distrustedKeys().isEmpty());
@@ -1379,7 +1379,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthent
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("bob@example.com")) {
+            if (message.to() == u"bob@example.com") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1408,7 +1408,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthent
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("carol@example.net")) {
+            if (message.to() == u"carol@example.net") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1437,7 +1437,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthent
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1452,15 +1452,15 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoOwnEndpointsWithAuthent
                 for (const auto &keyOwner : keyOwners) {
                     const auto keyOwnerJid = keyOwner.jid();
 
-                    if (keyOwnerJid == QStringLiteral("alice@example.org")) {
+                    if (keyOwnerJid == u"alice@example.org") {
                         QVERIFY(keyOwner.trustedKeys().isEmpty());
                         QCOMPARE(keyOwner.distrustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("GaHysNhcfDSzG2q6OAThRGUpuFB9E7iCRR/1mK1TL+Q=")) }));
-                    } else if (keyOwnerJid == QStringLiteral("bob@example.com")) {
+                    } else if (keyOwnerJid == u"bob@example.com") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("+1VJvMLCGvkDquZ6mQZ+SS+gTbQ436BJUwFOoW0Ma1g=")) }));
                         QVERIFY(keyOwner.distrustedKeys().isEmpty());
-                    } else if (keyOwnerJid == QStringLiteral("carol@example.net")) {
+                    } else if (keyOwnerJid == u"carol@example.net") {
                         QCOMPARE(keyOwner.trustedKeys(),
                                  QList({ QByteArray::fromBase64(QByteArrayLiteral("tVy3ygBnW4q6V2TYe8p4i904zD+x4rNMRegxPnPI7fw=")) }));
                         QVERIFY(keyOwner.distrustedKeys().isEmpty());
@@ -1514,7 +1514,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoContactsWithAuthenticat
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 const auto trustMessageElement = message.trustMessageElement();
 
                 QVERIFY(trustMessageElement);
@@ -1541,7 +1541,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsOwnKeysNoContactsWithAuthenticat
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 const auto trustMessageElement = message.trustMessageElement();
 
                 QVERIFY(trustMessageElement);
@@ -1614,7 +1614,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("bob@example.com")) {
+            if (message.to() == u"bob@example.com") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1641,7 +1641,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("carol@example.net")) {
+            if (message.to() == u"carol@example.net") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1668,7 +1668,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleOwnKeyDistrusted()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 Q_EMIT unexpectedTrustMessageSent();
             }
         }
@@ -1741,7 +1741,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeys()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1770,7 +1770,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeys()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("bob@example.com")) {
+            if (message.to() == u"bob@example.com") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1799,7 +1799,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeys()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("carol@example.net")) {
+            if (message.to() == u"carol@example.net") {
                 Q_EMIT unexpectedTrustMessageSent();
             }
         }
@@ -1901,7 +1901,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAut
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("bob@example.com")) {
+            if (message.to() == u"bob@example.com") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -1928,7 +1928,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsContactKeysNoOwnEndpointsWithAut
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() != QStringLiteral("bob@example.com")) {
+            if (message.to() != u"bob@example.com") {
                 Q_EMIT unexpectedTrustMessageSent();
             }
         }
@@ -1985,7 +1985,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() == QStringLiteral("alice@example.org")) {
+            if (message.to() == u"alice@example.org") {
                 sentMessagesCount++;
 
                 const auto trustMessageElement = message.trustMessageElement();
@@ -2012,7 +2012,7 @@ void tst_QXmppAtmManager::testMakeTrustDecisionsSoleContactKeyDistrusted()
             QXmppMessage message;
             parsePacket(message, text.toUtf8());
 
-            if (message.to() != QStringLiteral("alice@example.org")) {
+            if (message.to() != u"alice@example.org") {
                 Q_EMIT unexpectedTrustMessageSent();
             }
         }

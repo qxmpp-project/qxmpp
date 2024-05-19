@@ -113,8 +113,7 @@ void QXmppOmemoDeviceElement::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppOmemoDeviceElement::isOmemoDeviceElement(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("device") &&
-        element.namespaceURI() == ns_omemo_2;
+    return element.tagName() == u"device" && element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -154,8 +153,7 @@ void QXmppOmemoDeviceList::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppOmemoDeviceList::isOmemoDeviceList(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("devices") &&
-        element.namespaceURI() == ns_omemo_2;
+    return element.tagName() == u"devices" && element.namespaceURI() == ns_omemo_2;
 }
 
 ///
@@ -370,8 +368,7 @@ void QXmppOmemoDeviceBundle::toXml(QXmlStreamWriter *writer) const
 ///
 bool QXmppOmemoDeviceBundle::isOmemoDeviceBundle(const QDomElement &element)
 {
-    return element.tagName() == QStringLiteral("bundle") &&
-        element.namespaceURI() == ns_omemo_2;
+    return element.tagName() == u"bundle" && element.namespaceURI() == ns_omemo_2;
 }
 
 ///
