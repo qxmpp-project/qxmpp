@@ -37,8 +37,8 @@ class tst_QXmppMixManager : public QObject
 
 private:
     Q_SLOT void testDiscoveryFeatures();
-    Q_SLOT void testSupportedByServer();
-    Q_SLOT void testArchivingSupportedByServer();
+    Q_SLOT void testParticipantSupport();
+    Q_SLOT void testMessageArchivingSupport();
     Q_SLOT void testService();
     Q_SLOT void testServices();
     Q_SLOT void testResetCachedData();
@@ -93,25 +93,25 @@ void tst_QXmppMixManager::testDiscoveryFeatures()
     QCOMPARE(manager.discoveryFeatures(), QStringList { "urn:xmpp:mix:core:1" });
 }
 
-void tst_QXmppMixManager::testSupportedByServer()
+void tst_QXmppMixManager::testParticipantSupport()
 {
     QXmppMixManager manager;
-    QSignalSpy spy(&manager, &QXmppMixManager::supportedByServerChanged);
+    QSignalSpy spy(&manager, &QXmppMixManager::participantSupportChanged);
 
-    QVERIFY(!manager.supportedByServer());
-    manager.setSupportedByServer(true);
-    QVERIFY(manager.supportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Unknown);
+    manager.setParticipantSupport(QXmppMixManager::Support::Supported);
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Supported);
     QCOMPARE(spy.size(), 1);
 }
 
-void tst_QXmppMixManager::testArchivingSupportedByServer()
+void tst_QXmppMixManager::testMessageArchivingSupport()
 {
     QXmppMixManager manager;
-    QSignalSpy spy(&manager, &QXmppMixManager::archivingSupportedByServerChanged);
+    QSignalSpy spy(&manager, &QXmppMixManager::messageArchivingSupportChanged);
 
-    QVERIFY(!manager.archivingSupportedByServer());
-    manager.setArchivingSupportedByServer(true);
-    QVERIFY(manager.archivingSupportedByServer());
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Unknown);
+    manager.setMessageArchivingSupport(QXmppMixManager::Support::Supported);
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Supported);
     QCOMPARE(spy.size(), 1);
 }
 
@@ -188,14 +188,14 @@ void tst_QXmppMixManager::testResetCachedData()
     QXmppMixManager::Service service;
     service.jid = u"mix.shakespeare.example"_s;
 
-    manager.setSupportedByServer(true);
-    manager.setArchivingSupportedByServer(true);
+    manager.setParticipantSupport(QXmppMixManager::Support::Supported);
+    manager.setMessageArchivingSupport(QXmppMixManager::Support::Supported);
     manager.addService(service);
 
     manager.resetCachedData();
 
-    QVERIFY(!manager.supportedByServer());
-    QVERIFY(!manager.archivingSupportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Unknown);
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Unknown);
     QVERIFY(manager.services().isEmpty());
 }
 
@@ -217,8 +217,8 @@ void tst_QXmppMixManager::testHandleDiscoInfo()
 
     manager->handleDiscoInfo(iq);
 
-    QVERIFY(manager->supportedByServer());
-    QVERIFY(manager->archivingSupportedByServer());
+    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Supported);
+    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Supported);
     QCOMPARE(manager->services().at(0).jid, u"shakespeare.example"_s);
     QVERIFY(manager->services().at(0).channelsSearchable);
     QVERIFY(manager->services().at(0).channelCreationAllowed);
@@ -228,8 +228,8 @@ void tst_QXmppMixManager::testHandleDiscoInfo()
 
     manager->handleDiscoInfo(iq);
 
-    QVERIFY(!manager->supportedByServer());
-    QVERIFY(!manager->archivingSupportedByServer());
+    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Unsupported);
+    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Unsupported);
     QVERIFY(manager->services().isEmpty());
 }
 
@@ -508,20 +508,20 @@ void tst_QXmppMixManager::testOnRegistered()
     QXmppMixManager::Service service;
     service.jid = u"mix.shakespeare.example"_s;
 
-    manager.setSupportedByServer(true);
-    manager.setArchivingSupportedByServer(true);
+    manager.setParticipantSupport(QXmppMixManager::Support::Supported);
+    manager.setMessageArchivingSupport(QXmppMixManager::Support::Supported);
     manager.addService(service);
 
     client.setStreamManagementState(QXmppClient::NewStream);
     Q_EMIT client.connected();
-    QVERIFY(!manager.supportedByServer());
-    QVERIFY(!manager.archivingSupportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Unknown);
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Unknown);
     QVERIFY(manager.services().isEmpty());
 
     QXmppDiscoveryIq iq;
     iq.setFeatures({ u"urn:xmpp:mix:pam:2"_s });
     Q_EMIT manager.client()->findExtension<QXmppDiscoveryManager>()->infoReceived(iq);
-    QVERIFY(manager.supportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Supported);
 }
 
 void tst_QXmppMixManager::testOnUnregistered()
@@ -538,14 +538,14 @@ void tst_QXmppMixManager::testOnUnregistered()
     QXmppMixManager::Service service;
     service.jid = u"mix.shakespeare.example"_s;
 
-    manager.setSupportedByServer(true);
-    manager.setArchivingSupportedByServer(true);
+    manager.setParticipantSupport(QXmppMixManager::Support::Supported);
+    manager.setMessageArchivingSupport(QXmppMixManager::Support::Supported);
     manager.addService(service);
 
     manager.onUnregistered(&client);
 
-    QVERIFY(!manager.supportedByServer());
-    QVERIFY(!manager.archivingSupportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Unknown);
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Unknown);
     QVERIFY(manager.services().isEmpty());
 
     QXmppDiscoveryIq::Identity identity;
@@ -561,17 +561,17 @@ void tst_QXmppMixManager::testOnUnregistered()
     iq.setIdentities({ identity });
 
     Q_EMIT manager.client()->findExtension<QXmppDiscoveryManager>()->infoReceived(iq);
-    QVERIFY(!manager.supportedByServer());
-    QVERIFY(!manager.archivingSupportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Unknown);
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Unknown);
     QVERIFY(manager.services().isEmpty());
 
-    manager.setSupportedByServer(true);
-    manager.setArchivingSupportedByServer(true);
+    manager.setParticipantSupport(QXmppMixManager::Support::Supported);
+    manager.setMessageArchivingSupport(QXmppMixManager::Support::Supported);
     manager.addService(service);
 
     Q_EMIT client.connected();
-    QVERIFY(manager.supportedByServer());
-    QVERIFY(manager.archivingSupportedByServer());
+    QCOMPARE(manager.participantSupport(), QXmppMixManager::Support::Supported);
+    QCOMPARE(manager.messageArchivingSupport(), QXmppMixManager::Support::Supported);
     QVERIFY(!manager.services().isEmpty());
 }
 

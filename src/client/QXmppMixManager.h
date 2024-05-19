@@ -19,11 +19,17 @@ class QXmppMixManagerPrivate;
 class QXMPP_EXPORT QXmppMixManager : public QXmppClientExtension, public QXmppPubSubEventHandler
 {
     Q_OBJECT
-    Q_PROPERTY(bool supportedByServer READ supportedByServer NOTIFY supportedByServerChanged)
-    Q_PROPERTY(bool archivingSupportedByServer READ archivingSupportedByServer NOTIFY archivingSupportedByServerChanged)
+    Q_PROPERTY(Support participantSupport READ participantSupport NOTIFY participantSupportChanged)
+    Q_PROPERTY(Support messageArchivingSupport READ messageArchivingSupport NOTIFY messageArchivingSupportChanged)
     Q_PROPERTY(QList<Service> services READ services NOTIFY servicesChanged)
 
 public:
+    enum class Support {
+        Unknown,
+        Unsupported,
+        Supported,
+    };
+
     struct QXMPP_EXPORT Service {
         QString jid;
         bool channelsSearchable = false;
@@ -66,11 +72,11 @@ public:
 
     QStringList discoveryFeatures() const override;
 
-    bool supportedByServer() const;
-    Q_SIGNAL void supportedByServerChanged();
+    Support participantSupport() const;
+    Q_SIGNAL void participantSupportChanged();
 
-    bool archivingSupportedByServer() const;
-    Q_SIGNAL void archivingSupportedByServerChanged();
+    Support messageArchivingSupport() const;
+    Q_SIGNAL void messageArchivingSupportChanged();
 
     QList<Service> services() const;
     Q_SIGNAL void servicesChanged();
@@ -139,8 +145,8 @@ private:
 
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);
 
-    void setSupportedByServer(bool supportedByServer);
-    void setArchivingSupportedByServer(bool archivingSupportedByServer);
+    void setParticipantSupport(Support participantSupport);
+    void setMessageArchivingSupport(Support messageArchivingSupport);
     void addService(const Service &service);
     void removeService(const QString &jid);
     void removeServices();

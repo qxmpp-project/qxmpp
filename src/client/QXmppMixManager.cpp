@@ -29,8 +29,8 @@ class QXmppMixManagerPrivate
 public:
     QXmppPubSubManager *pubSubManager = nullptr;
     QXmppDiscoveryManager *discoveryManager = nullptr;
-    bool supportedByServer = false;
-    bool archivingSupportedByServer = false;
+    QXmppMixManager::Support participantSupport;
+    QXmppMixManager::Support messageArchivingSupport;
     QList<QXmppMixManager::Service> services;
 };
 
@@ -148,21 +148,43 @@ public:
 ///
 
 ///
-/// \property QXmppMixManager::supportedByServer
+/// \property QXmppMixManager::participantSupport
 ///
-/// \see QXmppMixManager::supportedByServer()
+/// \see QXmppMixManager::participantSupport()
 ///
 
 ///
-/// \property QXmppMixManager::archivingSupportedByServer
+/// \property QXmppMixManager::messageArchivingSupport
 ///
-/// \see QXmppMixManager::archivingSupportedByServer()
+/// \see QXmppMixManager::messageArchivingSupport()
 ///
 
 ///
 /// \property QXmppMixManager::services
 ///
 /// \see QXmppMixManager::services()
+///
+
+///
+/// \enum QXmppMixManager::Support
+///
+/// Server support for a feature.
+///
+/// \var QXmppMixManager::Support::Unknown
+///
+/// Whether the server supports the feature is not known.
+///
+/// That means, there is no corresponding information from the server (yet).
+/// That is, for example, the case if the client is not connected or connected but has not received
+/// the information yet.
+///
+/// \var QXmppMixManager::Unsupported
+///
+/// The server does not support the feature.
+///
+/// \var QXmppMixManager::Support::Supported
+///
+/// The server supports the feature.
 ///
 
 ///
@@ -336,40 +358,42 @@ QStringList QXmppMixManager::discoveryFeatures() const
 }
 
 ///
-/// Returns whether the own server supports MIX clients.
+/// Returns the server's support for MIX channel participants as specified in
+/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements}.
 ///
-/// In that case, the server interacts between a client and a MIX service.
-/// E.g., the server adds a MIX service to the client's roster after joining it and archives the
-/// messages sent through the channel while the client is offline.
+/// If the server supports it, the server interacts between a client and a MIX channel that the user
+/// participates in.
+/// E.g., the server adds the MIX channel to the user's roster after joining it.
 ///
-/// \return whether MIX clients are supported
+/// \return the server support for MIX channel participants
 ///
-bool QXmppMixManager::supportedByServer() const
+QXmppMixManager::Support QXmppMixManager::participantSupport() const
 {
-    return d->supportedByServer;
+    return d->participantSupport;
 }
 
 ///
-/// \fn QXmppMixManager::supportedByServerChanged()
+/// \fn QXmppMixManager::participantSupportChanged()
 ///
-/// Emitted when the server enabled or disabled supporting MIX clients.
+/// Emitted when the server's support for MIX channel participants changed.
 ///
 
 ///
-/// Returns whether the own server supports archiving messages via
-/// \xep{0313, Message Archive Management} of MIX channels the user participates in.
+/// Returns the server's support for archiving messages via \xep{0313, Message Archive Management}
+/// of MIX channels the user participates in as specified in
+/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements}.
 ///
-/// \return whether MIX messages are archived
+/// \return the server support for archiving MIX messages
 ///
-bool QXmppMixManager::archivingSupportedByServer() const
+QXmppMixManager::Support QXmppMixManager::messageArchivingSupport() const
 {
-    return d->archivingSupportedByServer;
+    return d->messageArchivingSupport;
 }
 
 ///
-/// \fn QXmppMixManager::archivingSupportedByServerChanged()
+/// \fn QXmppMixManager::messageArchivingSupportChanged()
 ///
-/// Emitted when the server enabled or disabled supporting archiving for MIX.
+/// Emitted when the server's support for archiving MIX messages changed.
 ///
 
 ///
@@ -1195,15 +1219,15 @@ void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
     if (iq.from().isEmpty() || iq.from() == client()->configuration().domain()) {
         // Check whether MIX is supported.
         if (iq.features().contains(ns_mix_pam)) {
-            setSupportedByServer(true);
+            setParticipantSupport(QXmppMixManager::Support::Supported);
 
             // Check whether MIX archiving is supported.
             if (iq.features().contains(ns_mix_pam_archiving)) {
-                setArchivingSupportedByServer(true);
+                setMessageArchivingSupport(QXmppMixManager::Support::Supported);
             }
         } else {
-            setSupportedByServer(false);
-            setArchivingSupportedByServer(false);
+            setParticipantSupport(QXmppMixManager::Support::Unsupported);
+            setMessageArchivingSupport(QXmppMixManager::Support::Unsupported);
         }
     }
 
@@ -1235,29 +1259,31 @@ void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 }
 
 ///
-/// Sets whether the own server supports MIX.
+/// Sets the server's support for MIX channel participants as specified in
+/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements}.
 ///
-/// \param supportedByServer whether MIX is supported by the own server
+/// \param participantSupport server support for MIX channel participants
 ///
-void QXmppMixManager::setSupportedByServer(bool supportedByServer)
+void QXmppMixManager::setParticipantSupport(Support participantSupport)
 {
-    if (d->supportedByServer != supportedByServer) {
-        d->supportedByServer = supportedByServer;
-        Q_EMIT supportedByServerChanged();
+    if (d->participantSupport != participantSupport) {
+        d->participantSupport = participantSupport;
+        Q_EMIT participantSupportChanged();
     }
 }
 
 ///
-/// Sets whether the own server supports archiving messages via
-/// \xep{0313, Message Archive Management} of MIX channels the user participates in.
+/// Sets the server's support for archiving messages via \xep{0313, Message Archive Management} of
+/// MIX channels the user participates in as specified in
+/// \xep{0405, Mediated Information eXchange (MIX): Participant Server Requirements}.
 ///
-/// \param archivingSupportedByServer whether MIX messages are archived by the own server
+/// \param messageArchivingSupport server support for archiving MIX messages
 ///
-void QXmppMixManager::setArchivingSupportedByServer(bool archivingSupportedByServer)
+void QXmppMixManager::setMessageArchivingSupport(Support messageArchivingSupport)
 {
-    if (d->archivingSupportedByServer != archivingSupportedByServer) {
-        d->archivingSupportedByServer = archivingSupportedByServer;
-        Q_EMIT archivingSupportedByServerChanged();
+    if (d->messageArchivingSupport != messageArchivingSupport) {
+        d->messageArchivingSupport = messageArchivingSupport;
+        Q_EMIT messageArchivingSupportChanged();
     }
 }
 
@@ -1325,7 +1351,7 @@ void QXmppMixManager::removeServices()
 ///
 void QXmppMixManager::resetCachedData()
 {
-    setSupportedByServer(false);
-    setArchivingSupportedByServer(false);
+    setParticipantSupport(QXmppMixManager::Support::Unknown);
+    setMessageArchivingSupport(QXmppMixManager::Support::Unknown);
     removeServices();
 }

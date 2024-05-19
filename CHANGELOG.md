@@ -4,10 +4,27 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-QXmpp 1.7.0 (UNRELEASED)
-------------------------
+QXmpp 1.7.0 (May 19, 2024)
+--------------------------
 
-*under development*
+ - Complete support of MIX groupchats and add new QXmppMixManager (@melvo, #589)
+ - Support of new SASL 2 authentication from XEP-0388: Extensible SASL Profile (@lnjX, #607)
+ - Update support of XEP-0428: Fallback Indication to v0.2 (@lnjX, #608)
+ - Update support of XEP-0447: Stateless file sharing to v0.3.1 (@lnjX, #613)
+ - ClientExtension: New onRegistered() and onUnregistered() virtual functions, called when the
+   extension is added to or removed from a client. (@lnjX, #599)
+ - Client: New error handling: New errorOccurred() signal with QXmppError based API (@lnjX)
+ - New StreamError, AuthenticationError and BindError offering more details about connection
+   errors (@lnjX)
+ - The 'from' attribute of the &lt;stream:stream&gt; open is set if a JID is configured (@lnjX)
+ - Security improvements in the internals of QXmppClient by terminating the connection when
+   unexpected packets are received (@lnjX)
+
+**Breaking** changes:
+ - Drop support for RFC3920 servers requiring a &lt;session/&gt; IQ to be sent. (@lnjX)
+   Feel free to open an issue if this is a problem to you.
+ - PLAIN authentication is disabled by default, but can be enabled in QXmppConfiguration again.
+   (@lnjX, #607)
 
 QXmpp 1.6.1 (May 16, 2024)
 --------------------------
