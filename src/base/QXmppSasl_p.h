@@ -245,6 +245,23 @@ struct Abort {
 
 }  // namespace Sasl2
 
+enum class IanaHashAlgorithm {
+    Sha256,
+    Sha384,
+    Sha512,
+    Sha3_224,
+    Sha3_256,
+    Sha3_384,
+    Sha3_512,
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    Blake2s_256,
+    Blake2b_256,
+    Blake2b_512,
+#endif
+};
+
+QCryptographicHash::Algorithm ianaHashAlgorithmToQt(IanaHashAlgorithm alg);
+
 //
 // SASL mechanisms
 //
@@ -263,6 +280,23 @@ struct SaslScramMechanism {
         Sha512,
         Sha3_512,
     } algorithm;
+};
+
+struct SaslHtMechanism {
+    static std::optional<SaslHtMechanism> fromString(QStringView);
+    QString toString() const;
+
+    auto operator<=>(const SaslHtMechanism &) const = default;
+
+    enum ChannelBindingType {
+        TlsServerEndpoint,
+        TlsUnique,
+        TlsExporter,
+        None,
+    };
+
+    IanaHashAlgorithm hashAlgorithm;
+    ChannelBindingType channelBindingType;
 };
 
 struct SaslDigestMd5Mechanism {
@@ -292,7 +326,8 @@ struct SaslMechanism
                    SaslAnonymousMechanism,
                    SaslPlainMechanism,
                    SaslDigestMd5Mechanism,
-                   SaslScramMechanism> {
+                   SaslScramMechanism,
+                   SaslHtMechanism> {
     static std::optional<SaslMechanism> fromString(QStringView str);
     QString toString() const;
 };

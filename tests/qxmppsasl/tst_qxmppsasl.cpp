@@ -8,6 +8,7 @@
 #include "QXmppSasl2UserAgent.h"
 #include "QXmppSaslManager_p.h"
 #include "QXmppSasl_p.h"
+#include "QXmppUtils_p.h"
 
 #include "XmppSocket.h"
 #include "util.h"
@@ -63,6 +64,8 @@ private:
     Q_SLOT void sasl2Failure();
     Q_SLOT void sasl2ContinueElement();
     Q_SLOT void sasl2Abort();
+
+    Q_SLOT void htAlgorithmParsing();
 
     // client
     Q_SLOT void testClientAvailableMechanisms();
@@ -397,6 +400,27 @@ void tst_QXmppSasl::sasl2Abort()
     QVERIFY(abort);
     QCOMPARE(abort->text, "I changed my mind.");
     serializePacket(*abort, xml);
+}
+
+void tst_QXmppSasl::htAlgorithmParsing()
+{
+    constexpr auto testValues = to_array<std::tuple<QStringView, SaslHtMechanism>>({
+        { u"HT-SHA-256-ENDP", { IanaHashAlgorithm::Sha256, SaslHtMechanism::TlsServerEndpoint } },
+        { u"HT-SHA-256-EXPR", { IanaHashAlgorithm::Sha256, SaslHtMechanism::TlsExporter } },
+        { u"HT-SHA-256-UNIQ", { IanaHashAlgorithm::Sha256, SaslHtMechanism::TlsUnique } },
+        { u"HT-SHA-256-NONE", { IanaHashAlgorithm::Sha256, SaslHtMechanism::None } },
+        { u"HT-SHA3-256-ENDP", { IanaHashAlgorithm::Sha3_256, SaslHtMechanism::TlsServerEndpoint } },
+        { u"HT-SHA3-512-EXPR", { IanaHashAlgorithm::Sha3_512, SaslHtMechanism::TlsExporter } },
+        { u"HT-SHA-512-UNIQ", { IanaHashAlgorithm::Sha512, SaslHtMechanism::TlsUnique } },
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        { u"HT-BLAKE2B-256-NONE", { IanaHashAlgorithm::Blake2b_256, SaslHtMechanism::None } },
+#endif
+    });
+
+    for (const auto &[string, htAlg] : testValues) {
+        QCOMPARE(htAlg.toString(), string);
+        QCOMPARE(unwrap(SaslHtMechanism::fromString(string)), htAlg);
+    }
 }
 
 void tst_QXmppSasl::testClientAvailableMechanisms()

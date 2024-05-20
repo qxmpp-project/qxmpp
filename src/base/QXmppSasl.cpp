@@ -45,6 +45,22 @@ constexpr auto SASL_ERROR_CONDITIONS = to_array<QStringView>({
     u"temporary-auth-failure",
 });
 
+// https://www.iana.org/assignments/named-information/named-information.xhtml#hash-alg
+constexpr auto ianaHashAlgorithms = to_array<QStringView>({
+    u"SHA-256",
+    u"SHA-384",
+    u"SHA-512",
+    u"SHA3-224",
+    u"SHA3-256",
+    u"SHA3-384",
+    u"SHA3-512",
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    u"BLAKE2S-256",
+    u"BLAKE2B-256",
+    u"BLAKE2B-512",
+#endif
+});
+
 namespace QXmpp::Private {
 
 namespace Sasl {
@@ -628,6 +644,30 @@ void Abort::toXml(QXmlStreamWriter *writer) const
 
 }  // namespace Sasl2
 
+QCryptographicHash::Algorithm ianaHashAlgorithmToQt(IanaHashAlgorithm alg)
+{
+#define CASE(_algorithm)                \
+    case IanaHashAlgorithm::_algorithm: \
+        return QCryptographicHash::_algorithm;
+
+    switch (alg) {
+        CASE(Sha256)
+        CASE(Sha384)
+        CASE(Sha512)
+        CASE(Sha3_224)
+        CASE(Sha3_256)
+        CASE(Sha3_384)
+        CASE(Sha3_512)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        CASE(Blake2s_256)
+        CASE(Blake2b_256)
+        CASE(Blake2b_512)
+#endif
+    }
+    Q_UNREACHABLE();
+#undef CASE
+}
+
 std::optional<SaslScramMechanism> SaslScramMechanism::fromString(QStringView str)
 {
     if (str == u"SCRAM-SHA-1") {
@@ -675,10 +715,71 @@ QCryptographicHash::Algorithm SaslScramMechanism::qtAlgorithm() const
     Q_UNREACHABLE();
 }
 
+std::optional<SaslHtMechanism> SaslHtMechanism::fromString(QStringView string)
+{
+    // prefix
+    static constexpr QStringView prefix = u"HT-";
+    if (!string.startsWith(prefix)) {
+        return {};
+    }
+    string = string.mid(prefix.size());
+
+    // hash algorithm
+    // C++23: use enumerate view
+    std::optional<IanaHashAlgorithm> algorithm;
+    for (size_t i = 0; i < ianaHashAlgorithms.size(); ++i) {
+        if (string.startsWith(ianaHashAlgorithms.at(i))) {
+            algorithm = IanaHashAlgorithm(i);
+            string = string.mid(ianaHashAlgorithms.at(i).size());
+        }
+    }
+    if (!algorithm) {
+        return {};
+    }
+
+    // channel-binding type
+    if (string == u"-ENDP") {
+        return SaslHtMechanism { *algorithm, TlsServerEndpoint };
+    }
+    if (string == u"-UNIQ") {
+        return SaslHtMechanism { *algorithm, TlsUnique };
+    }
+    if (string == u"-EXPR") {
+        return SaslHtMechanism { *algorithm, TlsExporter };
+    }
+    if (string == u"-NONE") {
+        return SaslHtMechanism { *algorithm, None };
+    }
+    return {};
+}
+
+static QStringView channelBindingTypeToString(SaslHtMechanism::ChannelBindingType t)
+{
+    switch (t) {
+    case SaslHtMechanism::TlsServerEndpoint:
+        return u"ENDP";
+    case SaslHtMechanism::TlsUnique:
+        return u"UNIQ";
+    case SaslHtMechanism::TlsExporter:
+        return u"EXPR";
+    case SaslHtMechanism::None:
+        return u"NONE";
+    }
+    Q_UNREACHABLE();
+}
+
+QString SaslHtMechanism::toString() const
+{
+    return u"HT-" + ianaHashAlgorithms.at(size_t(hashAlgorithm)) + u'-' + channelBindingTypeToString(channelBindingType);
+}
+
 std::optional<SaslMechanism> SaslMechanism::fromString(QStringView str)
 {
     if (str.startsWith(u"SCRAM-")) {
         return into<SaslMechanism>(SaslScramMechanism::fromString(str));
+    }
+    if (str.startsWith(u"HT-")) {
+        return into<SaslMechanism>(SaslHtMechanism::fromString(str));
     }
     if (str == u"DIGEST-MD5") {
         return { { SaslDigestMd5Mechanism() } };
@@ -706,6 +807,7 @@ QString SaslMechanism::toString() const
     return visit(
         overloaded {
             [](SaslScramMechanism scram) { return scram.toString(); },
+            [](SaslHtMechanism ht) { return ht.toString(); },
             [](SaslDigestMd5Mechanism) { return u"DIGEST-MD5"_s; },
             [](SaslPlainMechanism) { return u"PLAIN"_s; },
             [](SaslAnonymousMechanism) { return u"ANONYMOUS"_s; },
@@ -837,6 +939,9 @@ bool QXmppSaslClient::isMechanismAvailable(SaslMechanism mechanism, const Creden
 {
     return visit(
         overloaded {
+            [&](SaslHtMechanism) {
+                return false;
+            },
             [&](std::variant<SaslScramMechanism, SaslDigestMd5Mechanism, SaslPlainMechanism>) {
                 return !credentials.password.isEmpty();
             },
@@ -872,6 +977,9 @@ std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(SaslMechanism mechanism
         overloaded {
             [&](SaslScramMechanism scram) {
                 return std::make_unique<QXmppSaslClientScram>(scram, parent);
+            },
+            [&](SaslHtMechanism) {
+                return nullptr;
             },
             [&](SaslPlainMechanism) {
                 return std::make_unique<QXmppSaslClientPlain>(parent);
