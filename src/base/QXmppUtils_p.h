@@ -80,6 +80,13 @@ void writeXmlTextElement(QXmlStreamWriter *stream, QStringView name, QStringView
 void writeXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns, QStringView value);
 void writeOptionalXmlTextElement(QXmlStreamWriter *writer, QStringView name, QStringView value);
 void writeEmptyElement(QXmlStreamWriter *writer, QStringView name, QStringView xmlns);
+template<typename T>
+inline void writeOptional(QXmlStreamWriter *writer, const std::optional<T> &value)
+{
+    if (value) {
+        value->toXml(writer);
+    }
+}
 
 // Base64
 std::optional<QByteArray> parseBase64(const QString &);
