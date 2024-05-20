@@ -8,6 +8,11 @@
 #include <algorithm>
 #include <functional>
 
+namespace std {
+template<typename T>
+class optional;
+}
+
 namespace QXmpp::Private {
 
 template<typename OutputVector, typename InputVector, typename Converter>
@@ -27,6 +32,24 @@ template<typename Vec, typename T>
 auto contains(const Vec &vec, const T &value)
 {
     return std::find(std::begin(vec), std::end(vec), value) != std::end(vec);
+}
+
+template<typename T, typename Function>
+auto map(Function mapValue, std::optional<T> &&optValue) -> std::optional<std::invoke_result_t<Function, T &&>>
+{
+    if (optValue) {
+        return mapValue(std::move(*optValue));
+    }
+    return {};
+}
+
+template<typename To, typename From>
+auto into(std::optional<From> &&value) -> std::optional<To>
+{
+    if (value) {
+        return To { *value };
+    }
+    return {};
 }
 
 }  // namespace QXmpp::Private
