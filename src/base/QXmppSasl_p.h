@@ -165,6 +165,7 @@ struct StreamFeature {
 
     QList<QString> mechanisms;
     std::optional<Bind2Feature> bind2Feature;
+    std::optional<FastFeature> fast;
     bool streamResumptionAvailable = false;
 };
 
@@ -186,6 +187,8 @@ struct Authenticate {
     std::optional<UserAgent> userAgent;
     std::optional<Bind2Request> bindRequest;
     std::optional<SmResume> smResume;
+    std::optional<FastTokenRequest> tokenRequest;
+    std::optional<FastRequest> fast;
 };
 
 struct Challenge {
@@ -212,6 +215,7 @@ struct Success {
     std::optional<Bind2Bound> bound;
     std::optional<SmResumed> smResumed;
     std::optional<SmFailed> smFailed;
+    std::optional<FastToken> token;
 };
 
 struct Failure {
