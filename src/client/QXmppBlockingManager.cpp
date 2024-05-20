@@ -4,6 +4,7 @@
 
 #include "QXmppBlockingManager.h"
 
+#include "QXmppConstants_p.h"
 #include "QXmppIqHandling.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
@@ -11,8 +12,6 @@
 #include "StringLiterals.h"
 
 #include <QDomElement>
-
-constexpr QStringView XMLNS_BLOCKING = u"urn:xmpp:blocking";
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
@@ -58,13 +57,13 @@ public:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
         writer->writeStartElement(QSL65("blocklist"));
-        writer->writeDefaultNamespace(XMLNS_BLOCKING.toString());
+        writer->writeDefaultNamespace(toString65(ns_blocking));
         serializeItems(writer, jids);
         writer->writeEndElement();
     }
     static bool checkIqType(const QString &tagName, const QString &xmlns)
     {
-        return tagName == u"blocklist" && xmlns == XMLNS_BLOCKING;
+        return tagName == u"blocklist" && xmlns == ns_blocking;
     }
 };
 
@@ -85,13 +84,13 @@ public:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
         writer->writeStartElement(QSL65("block"));
-        writer->writeDefaultNamespace(XMLNS_BLOCKING.toString());
+        writer->writeDefaultNamespace(toString65(ns_blocking));
         serializeItems(writer, jids);
         writer->writeEndElement();
     }
     static bool checkIqType(const QString &tagName, const QString &xmlns)
     {
-        return tagName == u"block" && xmlns == XMLNS_BLOCKING;
+        return tagName == u"block" && xmlns == ns_blocking;
     }
 };
 
@@ -113,14 +112,14 @@ public:
     void toXmlElementFromChild(QXmlStreamWriter *writer) const override
     {
         writer->writeStartElement(QSL65("unblock"));
-        writer->writeDefaultNamespace(XMLNS_BLOCKING.toString());
+        writer->writeDefaultNamespace(toString65(ns_blocking));
         serializeItems(writer, jids);
         writer->writeEndElement();
     }
 
     static bool checkIqType(const QString &tagName, const QString &xmlns)
     {
-        return tagName == u"unblock" && xmlns == XMLNS_BLOCKING;
+        return tagName == u"unblock" && xmlns == ns_blocking;
     }
 };
 
@@ -352,7 +351,7 @@ QXmppTask<QXmppBlockingManager::Result> QXmppBlockingManager::unblock(QVector<QS
 /// \cond
 QStringList QXmppBlockingManager::discoveryFeatures() const
 {
-    return { XMLNS_BLOCKING.toString() };
+    return { ns_blocking.toString() };
 }
 
 void QXmppBlockingManager::onRegistered(QXmppClient *client)

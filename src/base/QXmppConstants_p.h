@@ -141,6 +141,8 @@ inline constexpr QStringView ns_jingle_rtp_info = u"urn:xmpp:jingle:apps:rtp:inf
 inline constexpr QStringView ns_jingle_rtp_errors = u"urn:xmpp:jingle:apps:rtp:errors:1";
 // XEP-0184: Message Receipts
 inline constexpr QStringView ns_message_receipts = u"urn:xmpp:receipts";
+// XEP-0191 Blocking Command
+inline constexpr QStringView ns_blocking = u"urn:xmpp:blocking";
 // XEP-0198: Stream Management
 inline constexpr QStringView ns_stream_management = u"urn:xmpp:sm:3";
 // XEP-0199: XMPP Ping
