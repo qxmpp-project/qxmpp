@@ -217,6 +217,7 @@ void QXmppIncomingClient::sendStreamFeatures()
         features.setSasl2Feature(Sasl2::StreamFeature {
             mechanisms,
             d->resource.isEmpty() ? Bind2Feature {} : std::optional<Bind2Feature>(),
+            {},
             false,
         });
     }

@@ -371,6 +371,7 @@ std::optional<StreamFeature> StreamFeature::fromDom(const QDomElement &el)
 
     if (auto inlineEl = firstChildElement(el, u"inline", ns_sasl_2); !inlineEl.isNull()) {
         feature.bind2Feature = Bind2Feature::fromDom(firstChildElement(inlineEl, u"bind", ns_bind2));
+        feature.fast = FastFeature::fromDom(firstChildElement(inlineEl, u"fast", ns_fast));
         feature.streamResumptionAvailable = !firstChildElement(inlineEl, u"sm", ns_stream_management).isNull();
     }
     return feature;
@@ -383,11 +384,12 @@ void StreamFeature::toXml(QXmlStreamWriter *writer) const
     for (const auto &mechanism : mechanisms) {
         writeXmlTextElement(writer, u"mechanism", mechanism);
     }
-    if (bind2Feature || streamResumptionAvailable) {
+    if (bind2Feature || fast || streamResumptionAvailable) {
         writer->writeStartElement(QSL65("inline"));
         if (bind2Feature) {
             bind2Feature->toXml(writer);
         }
+        writeOptional(writer, fast);
         if (streamResumptionAvailable) {
             writeEmptyElement(writer, u"sm", ns_stream_management);
         }
@@ -431,6 +433,8 @@ std::optional<Authenticate> Authenticate::fromDom(const QDomElement &el)
         UserAgent::fromDom(firstChildElement(el, u"user-agent", ns_sasl_2)),
         Bind2Request::fromDom(firstChildElement(el, u"bind", ns_bind2)),
         SmResume::fromDom(firstChildElement(el, u"resume", ns_stream_management)),
+        FastTokenRequest::fromDom(firstChildElement(el, u"request-token", ns_fast)),
+        FastRequest::fromDom(firstChildElement(el, u"fast", ns_fast)),
     };
 }
 
@@ -449,6 +453,8 @@ void Authenticate::toXml(QXmlStreamWriter *writer) const
     if (smResume) {
         smResume->toXml(writer);
     }
+    writeOptional(writer, tokenRequest);
+    writeOptional(writer, fast);
     writer->writeEndElement();
 }
 
@@ -507,6 +513,7 @@ std::optional<Success> Success::fromDom(const QDomElement &el)
     output.bound = Bind2Bound::fromDom(firstChildElement(el, u"bound", ns_bind2));
     output.smResumed = SmResumed::fromDom(firstChildElement(el, u"resumed", ns_stream_management));
     output.smFailed = SmFailed::fromDom(firstChildElement(el, u"failed", ns_stream_management));
+    output.token = FastToken::fromDom(firstChildElement(el, u"token", ns_fast));
 
     return output;
 }
@@ -528,6 +535,7 @@ void Success::toXml(QXmlStreamWriter *writer) const
     if (smFailed) {
         smFailed->toXml(writer);
     }
+    writeOptional(writer, token);
     writer->writeEndElement();
 }
 
