@@ -62,6 +62,22 @@ private:
     std::optional<State> m_state;
 };
 
+// Authentication token management
+class FastTokenManager
+{
+public:
+    explicit FastTokenManager(QXmppConfiguration &config);
+
+    static bool isFastEnabled(const QXmppConfiguration &);
+    bool hasToken() const;
+    void onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl2::StreamFeature &feature);
+    void onSasl2Success(const Sasl2::Success &success);
+
+private:
+    QXmppConfiguration &config;
+    std::optional<SaslHtMechanism> requestedMechanism;
+};
+
 }  // namespace QXmpp::Private
 
 #endif  // QXMPPSASLMANAGER_P_H

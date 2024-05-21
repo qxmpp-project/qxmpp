@@ -194,6 +194,7 @@ public:
     std::optional<Bind2Bound> bind2Bound;
 
     std::variant<QXmppOutgoingClient *, StarttlsManager, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> listener;
+    FastTokenManager fastTokenManager;
     C2sStreamManager c2sStreamManager;
     CarbonManager carbonManager;
     CsiManager csiManager;

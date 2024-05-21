@@ -61,6 +61,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
       streamAckManager(socket),
       iqManager(qq, streamAckManager),
       listener(qq),
+      fastTokenManager(config),
       c2sStreamManager(qq),
       csiManager(qq),
       pingManager(qq),
@@ -310,6 +311,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
         sasl2Request.bindRequest = createBind2Request(sasl2Feature.bind2Feature->features);
     }
     // other extensions
+    d->fastTokenManager.onSasl2Authenticate(sasl2Request, sasl2Feature);
     d->c2sStreamManager.onSasl2Authenticate(sasl2Request, sasl2Feature);
 
     // start authentication
@@ -321,6 +323,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
             d->bind2Bound = std::move(success->bound);
 
             // extensions
+            d->fastTokenManager.onSasl2Success(*success);
             d->c2sStreamManager.onSasl2Success(*success);
             if (d->bind2Bound) {
                 d->c2sStreamManager.onBind2Bound(*d->bind2Bound);

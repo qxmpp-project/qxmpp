@@ -5,6 +5,7 @@
 
 #include "QXmppConfiguration.h"
 #include "QXmppConstants_p.h"
+#include "QXmppCredentials.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppSasl2UserAgent.h"
 #include "QXmppSaslManager_p.h"
@@ -23,6 +24,7 @@
 
 using namespace std::placeholders;
 namespace views = std::views;
+using std::ranges::empty;
 using std::ranges::max;
 
 namespace QXmpp::Private {
@@ -290,6 +292,57 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
         return Accepted;
     }
     return Rejected;
+}
+
+FastTokenManager::FastTokenManager(QXmppConfiguration &config)
+    : config(config)
+{
+}
+
+bool FastTokenManager::isFastEnabled(const QXmppConfiguration &config)
+{
+    return config.sasl2UserAgent().has_value();
+}
+
+bool FastTokenManager::hasToken() const
+{
+    return config.credentialData().htToken.has_value();
+}
+
+void FastTokenManager::onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl2::StreamFeature &feature)
+{
+    auto selectMechanism = [](const auto &availableMechanisms) {
+        // find mechanisms supported by us
+        auto mechanisms = availableMechanisms |
+            views::transform(&SaslHtMechanism::fromString) |
+            views::filter([](const auto &v) { return v.has_value(); }) |
+            views::transform([](const auto &v) { return *v; }) |
+            views::filter([](const auto &m) { return m.channelBindingType == SaslHtMechanism::None; });
+
+        return empty(mechanisms) ? std::optional<SaslHtMechanism>() : max(mechanisms);
+    };
+
+    requestedMechanism.reset();
+
+    if (feature.fast && isFastEnabled(config) && !hasToken()) {
+        // request token
+        if (auto mechanism = selectMechanism(feature.fast->mechanisms)) {
+            requestedMechanism = mechanism;
+            auth.tokenRequest = FastTokenRequest { mechanism->toString() };
+        }
+    }
+}
+
+void FastTokenManager::onSasl2Success(const Sasl2::Success &success)
+{
+    if (success.token && (requestedMechanism || config.credentialData().htToken)) {
+        // use requested mechanism (new) or the one from the old token (token rotation)
+        config.credentialData().htToken = HtToken {
+            requestedMechanism ? *requestedMechanism : config.credentialData().htToken->mechanism,
+            success.token->token,
+            success.token->expiry,
+        };
+    }
 }
 
 }  // namespace QXmpp::Private
