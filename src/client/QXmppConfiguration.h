@@ -15,7 +15,12 @@
 class QNetworkProxy;
 class QSslCertificate;
 class QXmppConfigurationPrivate;
+class QXmppCredentials;
 class QXmppSasl2UserAgent;
+
+namespace QXmpp::Private {
+struct Credentials;
+}
 
 ///
 /// \brief The QXmppConfiguration class holds configuration options.
@@ -81,6 +86,9 @@ public:
 
     QString jidBare() const;
 
+    QXmppCredentials credentials() const;
+    void setCredentials(const QXmppCredentials &);
+
     QString facebookAccessToken() const;
     void setFacebookAccessToken(const QString &);
 
@@ -138,6 +146,11 @@ public:
 
     QList<QSslCertificate> caCertificates() const;
     void setCaCertificates(const QList<QSslCertificate> &);
+
+    /// \cond
+    const QXmpp::Private::Credentials &credentialData() const;
+    QXmpp::Private::Credentials &credentialData();
+    /// \endcond
 
 private:
     QSharedDataPointer<QXmppConfigurationPrivate> d;
