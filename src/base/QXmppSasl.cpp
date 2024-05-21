@@ -1005,8 +1005,8 @@ std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(SaslMechanism mechanism
             [&](SaslScramMechanism scram) {
                 return std::make_unique<QXmppSaslClientScram>(scram, parent);
             },
-            [&](SaslHtMechanism) {
-                return nullptr;
+            [&](SaslHtMechanism ht) {
+                return std::make_unique<QXmppSaslClientHt>(ht, parent);
             },
             [&](SaslPlainMechanism) {
                 return std::make_unique<QXmppSaslClientPlain>(parent);
@@ -1574,4 +1574,24 @@ QByteArray QXmppSaslDigestMd5::serializeMessage(const QMap<QByteArray, QByteArra
         }
     }
     return ba;
+}
+
+std::optional<QByteArray> QXmppSaslClientHt::respond(const QByteArray &challenge)
+{
+    // TODO: verify <additional-data/> provided by SASL 2 (hmac of 'Responder' + cb data).
+
+    Q_ASSERT(m_mechanism.channelBindingType == QXmpp::Private::SaslHtMechanism::None);
+
+    if (m_done || !challenge.isEmpty() || !m_token || m_mechanism != m_token->mechanism) {
+        return {};
+    }
+
+    // calculate token hash
+    QMessageAuthenticationCode hmac(
+        ianaHashAlgorithmToQt(m_mechanism.hashAlgorithm),
+        m_token->secret.toUtf8());
+    hmac.addData("Initiator");
+
+    m_done = true;
+    return username().toUtf8() + char(0) + hmac.result();
 }
