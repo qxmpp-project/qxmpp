@@ -533,6 +533,27 @@ private:
     QByteArray m_nonce;
 };
 
+class QXmppSaslClientHt : public QXmppSaslClient
+{
+    Q_OBJECT
+    using HtMechanism = QXmpp::Private::SaslHtMechanism;
+
+public:
+    QXmppSaslClientHt(HtMechanism mechanism, QObject *parent)
+        : QXmppSaslClient(parent), m_mechanism(mechanism)
+    {
+    }
+
+    void setCredentials(const QXmpp::Private::Credentials &credentials) override { m_token = credentials.htToken; }
+    QXmpp::Private::SaslMechanism mechanism() const override { return { m_mechanism }; }
+    std::optional<QByteArray> respond(const QByteArray &challenge) override;
+
+private:
+    std::optional<QXmpp::Private::HtToken> m_token;
+    HtMechanism m_mechanism;
+    bool m_done = false;
+};
+
 class QXmppSaslClientWindowsLive : public QXmppSaslClient
 {
     Q_OBJECT
