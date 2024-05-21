@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppClient.h"
+#include "QXmppCredentials.h"
 #include "QXmppE2eeExtension.h"
 #include "QXmppFutureUtils_p.h"
 #include "QXmppLogger.h"
@@ -39,6 +40,8 @@ private:
 #if BUILD_INTERNAL_TESTS
     Q_SLOT void csiManager();
 #endif
+
+    Q_SLOT void credentialsSerialization();
 };
 
 void tst_QXmppClient::testSendMessage()
@@ -265,6 +268,19 @@ void tst_QXmppClient::csiManager()
     client.expectNoPacket();
 }
 #endif
+
+void tst_QXmppClient::credentialsSerialization()
+{
+    auto xml = "<credentials xmlns=\"org.qxmpp.credentials\"/>";
+    QXmlStreamReader r(xml);
+    r.readNextStartElement();
+    auto credentials = unwrap(QXmppCredentials::fromXml(r));
+
+    QString output;
+    QXmlStreamWriter w(&output);
+    credentials.toXml(w);
+    QCOMPARE(output, xml);
+}
 
 QTEST_MAIN(tst_QXmppClient)
 #include "tst_qxmppclient.moc"

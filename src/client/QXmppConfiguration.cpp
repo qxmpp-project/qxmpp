@@ -5,8 +5,11 @@
 #include "QXmppConfiguration.h"
 
 #include "QXmppConstants_p.h"
+#include "QXmppCredentials.h"
 #include "QXmppSasl2UserAgent.h"
+#include "QXmppSasl_p.h"
 #include "QXmppUtils.h"
+#include "QXmppUtils_p.h"
 
 #include "StringLiterals.h"
 
@@ -16,26 +19,56 @@
 
 using namespace QXmpp::Private;
 
+struct QXmppCredentialsPrivate : QSharedData, Credentials { };
+
+///
+/// \class QXmppCredentials
+///
+/// \brief Stores different kinds of credentials used for authentication.
+///
+/// \since QXmpp 1.8
+///
+
+/// Default constructor.
+QXmppCredentials::QXmppCredentials()
+    : d(new QXmppCredentialsPrivate)
+{
+}
+
+QXMPP_PRIVATE_DEFINE_RULE_OF_SIX(QXmppCredentials)
+
+///
+/// Tries to parse XML-serialized credentials.
+///
+std::optional<QXmppCredentials> QXmppCredentials::fromXml(QXmlStreamReader &r)
+{
+    if (!r.isStartElement() || r.name() != u"credentials" || r.namespaceUri() != ns_qxmpp_credentials) {
+        return {};
+    }
+    r.skipCurrentElement();
+    return QXmppCredentials {};
+}
+
+///
+/// Serializes the credentials to XML.
+///
+void QXmppCredentials::toXml(QXmlStreamWriter &writer) const
+{
+    writer.writeStartElement(QSL65("credentials"));
+    writer.writeDefaultNamespace(toString65(ns_qxmpp_credentials));
+    writer.writeEndElement();
+}
+
 class QXmppConfigurationPrivate : public QSharedData
 {
 public:
     QString host;
     int port = XMPP_DEFAULT_PORT;
     QString user;
-    QString password;
     QString domain;
     QString resource = u"QXmpp"_s;
     QString resourcePrefix;
-
-    // Facebook
-    QString facebookAccessToken;
-    QString facebookAppId;
-
-    // Google
-    QString googleAccessToken;
-
-    // Windows Live
-    QString windowsLiveAccessToken;
+    QXmppCredentials credentials;
 
     bool autoAcceptSubscriptions = false;
     bool sendIntialPresence = true;
@@ -131,7 +164,7 @@ void QXmppConfiguration::setUser(const QString &user)
 ///
 void QXmppConfiguration::setPassword(const QString &password)
 {
-    d->password = password;
+    credentialData().password = password;
 }
 
 ///
@@ -213,7 +246,7 @@ QString QXmppConfiguration::user() const
 /// Returns the password.
 QString QXmppConfiguration::password() const
 {
-    return d->password;
+    return credentialData().password;
 }
 
 /// Returns the resource identifier.
@@ -252,10 +285,30 @@ QString QXmppConfiguration::jidBare() const
     }
 }
 
+///
+/// Returns the credentials of this configuration.
+///
+/// \since QXmpp 1.8
+///
+QXmppCredentials QXmppConfiguration::credentials() const
+{
+    return d->credentials;
+}
+
+///
+/// Sets the credentials for this configuration.
+///
+/// \since QXmpp 1.8
+///
+void QXmppConfiguration::setCredentials(const QXmppCredentials &credentials)
+{
+    d->credentials = credentials;
+}
+
 /// Returns the access token used for X-FACEBOOK-PLATFORM authentication.
 QString QXmppConfiguration::facebookAccessToken() const
 {
-    return d->facebookAccessToken;
+    return credentialData().facebookAccessToken;
 }
 
 ///
@@ -266,25 +319,25 @@ QString QXmppConfiguration::facebookAccessToken() const
 ///
 void QXmppConfiguration::setFacebookAccessToken(const QString &accessToken)
 {
-    d->facebookAccessToken = accessToken;
+    credentialData().facebookAccessToken = accessToken;
 }
 
 /// Returns the application ID used for X-FACEBOOK-PLATFORM authentication.
 QString QXmppConfiguration::facebookAppId() const
 {
-    return d->facebookAppId;
+    return credentialData().facebookAppId;
 }
 
 /// Sets the application ID used for X-FACEBOOK-PLATFORM authentication.
 void QXmppConfiguration::setFacebookAppId(const QString &appId)
 {
-    d->facebookAppId = appId;
+    credentialData().facebookAppId = appId;
 }
 
 /// Returns the access token used for X-OAUTH2 authentication.
 QString QXmppConfiguration::googleAccessToken() const
 {
-    return d->googleAccessToken;
+    return credentialData().googleAccessToken;
 }
 
 ///
@@ -295,13 +348,13 @@ QString QXmppConfiguration::googleAccessToken() const
 ///
 void QXmppConfiguration::setGoogleAccessToken(const QString &accessToken)
 {
-    d->googleAccessToken = accessToken;
+    credentialData().googleAccessToken = accessToken;
 }
 
 /// Returns the access token used for X-MESSENGER-OAUTH2 authentication.
 QString QXmppConfiguration::windowsLiveAccessToken() const
 {
-    return d->windowsLiveAccessToken;
+    return credentialData().windowsLiveAccessToken;
 }
 
 ///
@@ -312,7 +365,7 @@ QString QXmppConfiguration::windowsLiveAccessToken() const
 ///
 void QXmppConfiguration::setWindowsLiveAccessToken(const QString &accessToken)
 {
-    d->windowsLiveAccessToken = accessToken;
+    credentialData().windowsLiveAccessToken = accessToken;
 }
 
 ///
@@ -603,3 +656,15 @@ QList<QSslCertificate> QXmppConfiguration::caCertificates() const
 {
     return d->caCertificates;
 }
+
+/// \cond
+const Credentials &QXmppConfiguration::credentialData() const
+{
+    return *(d->credentials.d);
+}
+
+Credentials &QXmppConfiguration::credentialData()
+{
+    return *(d->credentials.d);
+}
+/// \endcond

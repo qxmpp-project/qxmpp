@@ -25,6 +25,7 @@ constexpr int XMPP_DEFAULT_PORT = 5222;
 }
 
 // QXmpp
+inline constexpr QStringView ns_qxmpp_credentials = u"org.qxmpp.credentials";
 inline constexpr QStringView ns_qxmpp_export = u"org.qxmpp.export";
 // XMPP
 inline constexpr QStringView ns_stream = u"http://etherx.jabber.org/streams";

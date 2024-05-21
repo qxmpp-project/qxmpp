@@ -209,6 +209,22 @@ struct Abort {
 
 }  // namespace Sasl2
 
+//
+// Credentials
+//
+
+struct Credentials {
+    QString password;
+
+    // Facebook
+    QString facebookAccessToken;
+    QString facebookAppId;
+    // Google
+    QString googleAccessToken;
+    // Windows Live
+    QString windowsLiveAccessToken;
+};
+
 }  // namespace QXmpp::Private
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
