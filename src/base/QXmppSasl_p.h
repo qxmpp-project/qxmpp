@@ -41,7 +41,9 @@ class SaslManager;
 // We mean it.
 //
 
-namespace QXmpp::Private::Sasl {
+namespace QXmpp::Private {
+
+namespace Sasl {
 
 enum class ErrorCondition {
     Aborted,
@@ -95,9 +97,7 @@ struct Success {
     void toXml(QXmlStreamWriter *writer) const;
 };
 
-}  // namespace QXmpp::Private::Sasl
-
-namespace QXmpp::Private {
+}  // namespace Sasl
 
 struct Bind2Feature {
     static std::optional<Bind2Feature> fromDom(const QDomElement &);
@@ -126,9 +126,7 @@ struct Bind2Bound {
     std::optional<SmEnabled> smEnabled;
 };
 
-}  // namespace QXmpp::Private
-
-namespace QXmpp::Private::Sasl2 {
+namespace Sasl2 {
 
 struct StreamFeature {
     static std::optional<StreamFeature> fromDom(const QDomElement &);
@@ -210,7 +208,9 @@ struct Abort {
     QString text;
 };
 
-}  // namespace QXmpp::Private::Sasl2
+}  // namespace Sasl2
+
+}  // namespace QXmpp::Private
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
