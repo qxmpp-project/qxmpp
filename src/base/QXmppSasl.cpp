@@ -11,6 +11,7 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
 #include "StringLiterals.h"
 
 #include <QDomElement>
@@ -19,7 +20,13 @@
 #include <QXmlStreamWriter>
 #include <QtEndian>
 
+using std::visit;
 using namespace QXmpp::Private;
+
+template<class... Ts>
+struct overloaded : Ts... {
+    using Ts::operator()...;
+};
 
 static QByteArray forcedNonce;
 
@@ -527,6 +534,94 @@ void Abort::toXml(QXmlStreamWriter *writer) const
 
 }  // namespace Sasl2
 
+std::optional<SaslScramMechanism> SaslScramMechanism::fromString(QStringView str)
+{
+    if (str == u"SCRAM-SHA-1") {
+        return { { Sha1 } };
+    }
+    if (str == u"SCRAM-SHA-256") {
+        return { { Sha256 } };
+    }
+    if (str == u"SCRAM-SHA-512") {
+        return { { Sha512 } };
+    }
+    if (str == u"SCRAM-SHA3-512") {
+        return { { Sha3_512 } };
+    }
+    return {};
+}
+
+QString SaslScramMechanism::toString() const
+{
+    switch (algorithm) {
+    case Sha1:
+        return u"SCRAM-SHA-1"_s;
+    case Sha256:
+        return u"SCRAM-SHA-256"_s;
+    case Sha512:
+        return u"SCRAM-SHA-512"_s;
+    case Sha3_512:
+        return u"SCRAM-SHA3-512"_s;
+    }
+    Q_UNREACHABLE();
+}
+
+QCryptographicHash::Algorithm SaslScramMechanism::qtAlgorithm() const
+{
+    switch (algorithm) {
+    case Sha1:
+        return QCryptographicHash::Sha1;
+    case Sha256:
+        return QCryptographicHash::Sha256;
+    case Sha512:
+        return QCryptographicHash::Sha512;
+    case Sha3_512:
+        return QCryptographicHash::Sha3_512;
+    }
+    Q_UNREACHABLE();
+}
+
+std::optional<SaslMechanism> SaslMechanism::fromString(QStringView str)
+{
+    if (str.startsWith(u"SCRAM-")) {
+        return into<SaslMechanism>(SaslScramMechanism::fromString(str));
+    }
+    if (str == u"DIGEST-MD5") {
+        return { { SaslDigestMd5Mechanism() } };
+    }
+    if (str == u"PLAIN") {
+        return { { SaslPlainMechanism() } };
+    }
+    if (str == u"ANONYMOUS") {
+        return { { SaslAnonymousMechanism() } };
+    }
+    if (str == u"X-FACEBOOK-PLATFORM") {
+        return { { SaslXFacebookMechanism() } };
+    }
+    if (str == u"X-MESSENGER-OAUTH2") {
+        return { { SaslXWindowsLiveMechanism() } };
+    }
+    if (str == u"X-OAUTH2") {
+        return { { SaslXGoogleMechanism() } };
+    }
+    return {};
+}
+
+QString SaslMechanism::toString() const
+{
+    return visit(
+        overloaded {
+            [](SaslScramMechanism scram) { return scram.toString(); },
+            [](SaslDigestMd5Mechanism) { return u"DIGEST-MD5"_s; },
+            [](SaslPlainMechanism) { return u"PLAIN"_s; },
+            [](SaslAnonymousMechanism) { return u"ANONYMOUS"_s; },
+            [](SaslXFacebookMechanism) { return u"X-FACEBOOK-PLATFORM"_s; },
+            [](SaslXWindowsLiveMechanism) { return u"X-MESSENGER-OAUTH2"_s; },
+            [](SaslXGoogleMechanism) { return u"X-OAUTH2"_s; },
+        },
+        *this);
+}
+
 }  // namespace QXmpp::Private
 
 ///
@@ -606,14 +701,6 @@ void QXmppSasl2UserAgent::setDeviceName(const QString &device)
     d->device = device;
 }
 
-// When adding new algorithms, also add them to QXmppSaslClient::availableMechanisms().
-static const QMap<QStringView, QCryptographicHash::Algorithm> SCRAM_ALGORITHMS = {
-    { u"SCRAM-SHA-1", QCryptographicHash::Sha1 },
-    { u"SCRAM-SHA-256", QCryptographicHash::Sha256 },
-    { u"SCRAM-SHA-512", QCryptographicHash::Sha512 },
-    { u"SCRAM-SHA3-512", QCryptographicHash::RealSha3_512 },
-};
-
 // Calculate digest response for use with XMPP/SASL.
 
 static QByteArray calculateDigest(const QByteArray &method, const QByteArray &digestUri, const QByteArray &secret, const QByteArray &nonce, const QByteArray &cnonce, const QByteArray &nc)
@@ -688,41 +775,57 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
 QStringList QXmppSaslClient::availableMechanisms()
 {
     return {
-        u"SCRAM-SHA3-512"_s,
-        u"SCRAM-SHA-512"_s,
-        u"SCRAM-SHA-256"_s,
-        u"SCRAM-SHA-1"_s,
-        u"DIGEST-MD5"_s,
-        u"PLAIN"_s,
-        u"ANONYMOUS"_s,
-        u"X-FACEBOOK-PLATFORM"_s,
-        u"X-MESSENGER-OAUTH2"_s,
-        u"X-OAUTH2"_s,
+        SaslScramMechanism(SaslScramMechanism::Sha3_512).toString(),
+        SaslScramMechanism(SaslScramMechanism::Sha512).toString(),
+        SaslScramMechanism(SaslScramMechanism::Sha256).toString(),
+        SaslScramMechanism(SaslScramMechanism::Sha1).toString(),
+        SaslMechanism(SaslDigestMd5Mechanism()).toString(),
+        SaslMechanism(SaslPlainMechanism()).toString(),
+        SaslMechanism(SaslAnonymousMechanism()).toString(),
+        SaslMechanism(SaslXFacebookMechanism()).toString(),
+        SaslMechanism(SaslXWindowsLiveMechanism()).toString(),
+        SaslMechanism(SaslXGoogleMechanism()).toString(),
     };
 }
 
 ///
 /// Creates an SASL client for the given mechanism.
 ///
-std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(const QString &mechanism, QObject *parent)
+std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(const QString &string, QObject *parent)
 {
-    if (mechanism == u"PLAIN") {
-        return std::make_unique<QXmppSaslClientPlain>(parent);
-    } else if (mechanism == u"DIGEST-MD5") {
-        return std::make_unique<QXmppSaslClientDigestMd5>(parent);
-    } else if (mechanism == u"ANONYMOUS") {
-        return std::make_unique<QXmppSaslClientAnonymous>(parent);
-    } else if (SCRAM_ALGORITHMS.contains(mechanism)) {
-        return std::make_unique<QXmppSaslClientScram>(SCRAM_ALGORITHMS.value(mechanism), parent);
-    } else if (mechanism == u"X-FACEBOOK-PLATFORM") {
-        return std::make_unique<QXmppSaslClientFacebook>(parent);
-    } else if (mechanism == u"X-MESSENGER-OAUTH2") {
-        return std::make_unique<QXmppSaslClientWindowsLive>(parent);
-    } else if (mechanism == u"X-OAUTH2") {
-        return std::make_unique<QXmppSaslClientGoogle>(parent);
-    } else {
-        return nullptr;
+    if (auto mechanism = SaslMechanism::fromString(string)) {
+        return create(*mechanism, parent);
     }
+    return nullptr;
+}
+
+std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(SaslMechanism mechanism, QObject *parent)
+{
+    return visit<std::unique_ptr<QXmppSaslClient>>(
+        overloaded {
+            [&](SaslScramMechanism scram) {
+                return std::make_unique<QXmppSaslClientScram>(scram, parent);
+            },
+            [&](SaslPlainMechanism) {
+                return std::make_unique<QXmppSaslClientPlain>(parent);
+            },
+            [&](SaslDigestMd5Mechanism) {
+                return std::make_unique<QXmppSaslClientDigestMd5>(parent);
+            },
+            [&](SaslAnonymousMechanism) {
+                return std::make_unique<QXmppSaslClientAnonymous>(parent);
+            },
+            [&](SaslXFacebookMechanism) {
+                return std::make_unique<QXmppSaslClientFacebook>(parent);
+            },
+            [&](SaslXWindowsLiveMechanism) {
+                return std::make_unique<QXmppSaslClientWindowsLive>(parent);
+            },
+            [&](SaslXGoogleMechanism) {
+                return std::make_unique<QXmppSaslClientGoogle>(parent);
+            },
+        },
+        mechanism);
 }
 
 QXmppSaslClientAnonymous::QXmppSaslClientAnonymous(QObject *parent)
@@ -925,26 +1028,18 @@ std::optional<QByteArray> QXmppSaslClientPlain::respond(const QByteArray &)
     }
 }
 
-QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent)
+QXmppSaslClientScram::QXmppSaslClientScram(SaslScramMechanism mechanism, QObject *parent)
     : QXmppSaslClient(parent),
-      m_algorithm(algorithm),
+      m_mechanism(mechanism),
       m_step(0),
-      m_dklen(QCryptographicHash::hashLength(algorithm))
+      m_dklen(QCryptographicHash::hashLength(m_mechanism.qtAlgorithm()))
 {
-    const auto itr = std::find(SCRAM_ALGORITHMS.cbegin(), SCRAM_ALGORITHMS.cend(), algorithm);
-    Q_ASSERT(itr != SCRAM_ALGORITHMS.cend());
-
     m_nonce = generateNonce();
 }
 
 void QXmppSaslClientScram::setCredentials(const QXmpp::Private::Credentials &credentials)
 {
     m_password = credentials.password;
-}
-
-QString QXmppSaslClientScram::mechanism() const
-{
-    return SCRAM_ALGORITHMS.key(m_algorithm).toString();
 }
 
 std::optional<QByteArray> QXmppSaslClientScram::respond(const QByteArray &challenge)
@@ -967,17 +1062,17 @@ std::optional<QByteArray> QXmppSaslClientScram::respond(const QByteArray &challe
 
         // calculate proofs
         const QByteArray clientFinalMessageBare = QByteArrayLiteral("c=") + m_gs2Header.toBase64() + QByteArrayLiteral(",r=") + nonce;
-        const QByteArray saltedPassword = deriveKeyPbkdf2(m_algorithm, m_password.toUtf8(), salt,
+        const QByteArray saltedPassword = deriveKeyPbkdf2(m_mechanism.qtAlgorithm(), m_password.toUtf8(), salt,
                                                           iterations, m_dklen);
-        const QByteArray clientKey = QMessageAuthenticationCode::hash(QByteArrayLiteral("Client Key"), saltedPassword, m_algorithm);
-        const QByteArray storedKey = QCryptographicHash::hash(clientKey, m_algorithm);
+        const QByteArray clientKey = QMessageAuthenticationCode::hash(QByteArrayLiteral("Client Key"), saltedPassword, m_mechanism.qtAlgorithm());
+        const QByteArray storedKey = QCryptographicHash::hash(clientKey, m_mechanism.qtAlgorithm());
         const QByteArray authMessage = m_clientFirstMessageBare + QByteArrayLiteral(",") + challenge + QByteArrayLiteral(",") + clientFinalMessageBare;
-        QByteArray clientProof = QMessageAuthenticationCode::hash(authMessage, storedKey, m_algorithm);
+        QByteArray clientProof = QMessageAuthenticationCode::hash(authMessage, storedKey, m_mechanism.qtAlgorithm());
         std::transform(clientProof.cbegin(), clientProof.cend(), clientKey.cbegin(),
                        clientProof.begin(), std::bit_xor<char>());
 
-        const QByteArray serverKey = QMessageAuthenticationCode::hash(QByteArrayLiteral("Server Key"), saltedPassword, m_algorithm);
-        m_serverSignature = QMessageAuthenticationCode::hash(authMessage, serverKey, m_algorithm);
+        const QByteArray serverKey = QMessageAuthenticationCode::hash(QByteArrayLiteral("Server Key"), saltedPassword, m_mechanism.qtAlgorithm());
+        m_serverSignature = QMessageAuthenticationCode::hash(authMessage, serverKey, m_mechanism.qtAlgorithm());
 
         m_step++;
         return clientFinalMessageBare + QByteArrayLiteral(",p=") + clientProof.toBase64();
