@@ -818,6 +818,31 @@ QString SaslMechanism::toString() const
         *this);
 }
 
+std::optional<HtToken> HtToken::fromXml(QXmlStreamReader &r)
+{
+    if (r.name() != u"ht-token" || r.namespaceUri() != ns_qxmpp_credentials) {
+        return {};
+    }
+    const auto &attrs = r.attributes();
+    if (auto mechanism = SaslHtMechanism::fromString(attrs.value("mechanism"_L1))) {
+        return HtToken {
+            *mechanism,
+            attrs.value("secret"_L1).toString(),
+            QXmppUtils::datetimeFromString(toString60(attrs.value("expiry"_L1))),
+        };
+    }
+    return {};
+}
+
+void HtToken::toXml(QXmlStreamWriter &w) const
+{
+    w.writeStartElement(QSL65("ht-token"));
+    w.writeAttribute(QSL65("mechanism"), mechanism.toString());
+    w.writeAttribute(QSL65("secret"), secret);
+    w.writeAttribute(QSL65("expiry"), expiry.toString(Qt::ISODate));
+    w.writeEndElement();
+}
+
 }  // namespace QXmpp::Private
 
 ///
@@ -939,8 +964,10 @@ bool QXmppSaslClient::isMechanismAvailable(SaslMechanism mechanism, const Creden
 {
     return visit(
         overloaded {
-            [&](SaslHtMechanism) {
-                return false;
+            [&](SaslHtMechanism ht) {
+                return credentials.htToken &&
+                    credentials.htToken->mechanism == ht &&
+                    ht.channelBindingType == SaslHtMechanism::None;
             },
             [&](std::variant<SaslScramMechanism, SaslDigestMd5Mechanism, SaslPlainMechanism>) {
                 return !credentials.password.isEmpty();
