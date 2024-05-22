@@ -165,22 +165,24 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
 
 HandleElementResult SaslManager::handleElement(const QDomElement &el)
 {
+    using namespace Sasl;
+
     auto finish = [this](auto &&value) {
         auto p = std::move(*m_promise);
         m_promise.reset();
         p.finish(value);
     };
 
-    if (!m_promise.has_value() || el.namespaceURI() != ns_sasl) {
+    if (!m_promise.has_value()) {
         return Rejected;
     }
 
-    if (el.tagName() == u"success") {
-        finish(Success());
+    if (Success::fromDom(el)) {
+        finish(QXmpp::Success());
         return Finished;
-    } else if (auto challenge = Sasl::Challenge::fromDom(el)) {
+    } else if (auto challenge = Challenge::fromDom(el)) {
         if (auto response = m_saslClient->respond(challenge->value)) {
-            m_socket->sendData(serializeXml(Sasl::Response { *response }));
+            m_socket->sendData(serializeXml(Response { *response }));
             return Accepted;
         } else {
             finish(AuthError {
@@ -189,9 +191,9 @@ HandleElementResult SaslManager::handleElement(const QDomElement &el)
             });
             return Finished;
         }
-    } else if (auto failure = Sasl::Failure::fromDom(el)) {
+    } else if (auto failure = Failure::fromDom(el)) {
         auto text = failure->text.isEmpty()
-            ? Sasl::errorConditionToString(failure->condition.value_or(Sasl::ErrorCondition::NotAuthorized))
+            ? errorConditionToString(failure->condition.value_or(ErrorCondition::NotAuthorized))
             : failure->text;
 
         finish(AuthError {
@@ -247,13 +249,13 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
         state.p.finish(value);
     };
 
-    if (!m_state || el.namespaceURI() != ns_sasl_2) {
+    if (!m_state) {
         return Rejected;
     }
 
-    if (auto challenge = Sasl2::Challenge::fromDom(el)) {
+    if (auto challenge = Challenge::fromDom(el)) {
         if (auto response = m_state->sasl->respond(challenge->data)) {
-            m_socket->sendData(serializeXml(Sasl2::Response { *response }));
+            m_socket->sendData(serializeXml(Response { *response }));
             return Accepted;
         } else {
             finish(AuthError {
@@ -289,7 +291,7 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
     } else if (auto continueElement = Continue::fromDom(el)) {
         // no SASL 2 tasks are currently implemented
         m_state->unsupportedContinue = continueElement;
-        m_socket->sendData(serializeXml(Sasl2::Abort { u"SASL 2 tasks are not supported."_s }));
+        m_socket->sendData(serializeXml(Abort { u"SASL 2 tasks are not supported."_s }));
         return Accepted;
     }
     return Rejected;
