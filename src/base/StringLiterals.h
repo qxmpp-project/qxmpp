@@ -14,6 +14,11 @@ inline QString operator"" _s(const char16_t *str, size_t size) noexcept
 {
     return QString(QStringPrivate(nullptr, const_cast<char16_t *>(str), qsizetype(size)));
 }
+
+constexpr inline QLatin1String operator"" _L1(const char *str, size_t size) noexcept
+{
+    return QLatin1String { str, int(size) };
+}
 #else
 namespace QXmpp::Private {
 
@@ -51,6 +56,11 @@ QString operator""_s()
 {
     static const auto staticData = QXmpp::Private::StaticStringData<str.size>(str.data);
     return QString(QStringDataPtr { staticData.data_ptr() });
+}
+
+constexpr inline QLatin1String operator"" _L1(const char *str, size_t size) noexcept
+{
+    return QLatin1String { str, int(size) };
 }
 #endif
 
