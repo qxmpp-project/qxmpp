@@ -23,6 +23,8 @@
 #include <QUuid>
 #include <QXmlStreamWriter>
 
+using namespace QXmpp::Private;
+
 // adapted from public domain source by Ross Williams and Eric Durbin
 // FIXME : is this valid for big-endian machines?
 static quint32 crctable[256] = {
@@ -93,14 +95,22 @@ static quint32 crctable[256] = {
 };
 
 ///
-/// Parses a date-time from a string according to
-/// \xep{0082}: XMPP Date and Time Profiles.
+/// Parses a date-time from a string according to \xep{0082, XMPP Date and Time Profiles}.
 ///
-QDateTime QXmppUtils::datetimeFromString(const QString &str)
+/// Takes QStringView since QXmpp 1.8.
+///
+QDateTime QXmppUtils::datetimeFromString(QStringView str)
 {
     // Qt::ISODate parses milliseconds, but doesn't output them
+    return QDateTime::fromString(toString60(str), Qt::ISODate).toUTC();
+}
+
+/// \cond
+QDateTime QXmppUtils::datetimeFromString(const QString &str)
+{
     return QDateTime::fromString(str, Qt::ISODate).toUTC();
 }
+/// \endcond
 
 ///
 /// Serializes a date-time to a string according to
