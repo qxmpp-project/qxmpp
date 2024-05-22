@@ -18,8 +18,6 @@
 
 #include <QDomElement>
 
-#ifndef QXMPP_DOC
-
 namespace QXmpp::Private {
 
 static std::tuple<QString, QStringList> chooseMechanism(const QXmppConfiguration &config, const QList<QString> &availableMechanisms)
@@ -298,5 +296,3 @@ HandleElementResult Sasl2Manager::handleElement(const QDomElement &el)
 }
 
 }  // namespace QXmpp::Private
-
-#endif  // QXMPP_DOC
