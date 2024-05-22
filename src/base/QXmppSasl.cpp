@@ -769,23 +769,26 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
     return map;
 }
 
-///
-/// Returns a list of supported mechanisms.
-///
-QStringList QXmppSaslClient::availableMechanisms()
+bool QXmppSaslClient::isMechanismAvailable(SaslMechanism mechanism, const Credentials &credentials)
 {
-    return {
-        SaslScramMechanism(SaslScramMechanism::Sha3_512).toString(),
-        SaslScramMechanism(SaslScramMechanism::Sha512).toString(),
-        SaslScramMechanism(SaslScramMechanism::Sha256).toString(),
-        SaslScramMechanism(SaslScramMechanism::Sha1).toString(),
-        SaslMechanism(SaslDigestMd5Mechanism()).toString(),
-        SaslMechanism(SaslPlainMechanism()).toString(),
-        SaslMechanism(SaslAnonymousMechanism()).toString(),
-        SaslMechanism(SaslXFacebookMechanism()).toString(),
-        SaslMechanism(SaslXWindowsLiveMechanism()).toString(),
-        SaslMechanism(SaslXGoogleMechanism()).toString(),
-    };
+    return visit(
+        overloaded {
+            [&](std::variant<SaslScramMechanism, SaslDigestMd5Mechanism, SaslPlainMechanism>) {
+                return !credentials.password.isEmpty();
+            },
+            [&](SaslXFacebookMechanism) {
+                return !credentials.facebookAccessToken.isEmpty() && !credentials.facebookAppId.isEmpty();
+            },
+            [&](SaslXWindowsLiveMechanism) {
+                return !credentials.windowsLiveAccessToken.isEmpty();
+            },
+            [&](SaslXGoogleMechanism) {
+                return !credentials.googleAccessToken.isEmpty();
+            },
+            [](SaslAnonymousMechanism) {
+                return true;
+            } },
+        mechanism);
 }
 
 ///

@@ -300,7 +300,7 @@ public:
     virtual QXmpp::Private::SaslMechanism mechanism() const = 0;
     virtual std::optional<QByteArray> respond(const QByteArray &challenge) = 0;
 
-    static QStringList availableMechanisms();
+    static bool isMechanismAvailable(QXmpp::Private::SaslMechanism, const QXmpp::Private::Credentials &);
     static std::unique_ptr<QXmppSaslClient> create(const QString &mechanism, QObject *parent = nullptr);
     static std::unique_ptr<QXmppSaslClient> create(QXmpp::Private::SaslMechanism mechanism, QObject *parent = nullptr);
 
