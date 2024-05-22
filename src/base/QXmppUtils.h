@@ -25,7 +25,10 @@ class QXMPP_EXPORT QXmppUtils
 {
 public:
     // XEP-0082: XMPP Date and Time Profiles
+    static QDateTime datetimeFromString(QStringView str);
+    /// \cond
     static QDateTime datetimeFromString(const QString &str);
+    /// \endcond
     static QString datetimeToString(const QDateTime &dt);
     static int timezoneOffsetFromString(const QString &str);
     static QString timezoneOffsetToString(int secs);
