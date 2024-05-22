@@ -682,23 +682,6 @@ static QMap<char, QByteArray> parseGS2(const QByteArray &ba)
     return map;
 }
 
-class QXmppSaslClientPrivate
-{
-public:
-    QString host;
-    QString serviceType;
-    QString username;
-    QString password;
-};
-
-QXmppSaslClient::QXmppSaslClient(QObject *parent)
-    : QXmppLoggable(parent),
-      d(std::make_unique<QXmppSaslClientPrivate>())
-{
-}
-
-QXmppSaslClient::~QXmppSaslClient() = default;
-
 ///
 /// Returns a list of supported mechanisms.
 ///
@@ -740,54 +723,6 @@ std::unique_ptr<QXmppSaslClient> QXmppSaslClient::create(const QString &mechanis
     } else {
         return nullptr;
     }
-}
-
-/// Returns the host.
-QString QXmppSaslClient::host() const
-{
-    return d->host;
-}
-
-/// Sets the host.
-void QXmppSaslClient::setHost(const QString &host)
-{
-    d->host = host;
-}
-
-/// Returns the service type, e.g. "xmpp".
-QString QXmppSaslClient::serviceType() const
-{
-    return d->serviceType;
-}
-
-/// Sets the service type, e.g. "xmpp".
-void QXmppSaslClient::setServiceType(const QString &serviceType)
-{
-    d->serviceType = serviceType;
-}
-
-/// Returns the username.
-QString QXmppSaslClient::username() const
-{
-    return d->username;
-}
-
-/// Sets the username.
-void QXmppSaslClient::setUsername(const QString &username)
-{
-    d->username = username;
-}
-
-/// Returns the password.
-QString QXmppSaslClient::password() const
-{
-    return d->password;
-}
-
-/// Sets the password.
-void QXmppSaslClient::setPassword(const QString &password)
-{
-    d->password = password;
 }
 
 QXmppSaslClientAnonymous::QXmppSaslClientAnonymous(QObject *parent)
