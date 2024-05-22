@@ -29,6 +29,7 @@ IncludeCategories:
     Priority: 4
 InsertBraces: true
 Language: Cpp
+NamespaceIndentation: None
 PointerAlignment: Right
 ReflowComments: true
 SortIncludes: true
