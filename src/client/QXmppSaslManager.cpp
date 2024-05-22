@@ -13,50 +13,61 @@
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
 #include "StringLiterals.h"
 #include "XmppSocket.h"
 
+#include <ranges>
+
 #include <QDomElement>
+
+using namespace std::placeholders;
+namespace views = std::views;
+using std::ranges::max;
 
 namespace QXmpp::Private {
 
-static std::tuple<QString, QStringList> chooseMechanism(const QXmppConfiguration &config, const QList<QString> &availableMechanisms)
+static auto chooseMechanism(const QXmppConfiguration &config, const QList<QString> &availableMechanisms)
+    -> std::tuple<std::optional<SaslMechanism>, QStringList>
 {
-    // supported and preferred SASL auth mechanisms
-    const QString preferredMechanism = config.saslAuthMechanism();
-    QStringList supportedMechanisms = QXmppSaslClient::availableMechanisms();
-    if (supportedMechanisms.contains(preferredMechanism)) {
-        supportedMechanisms.removeAll(preferredMechanism);
-        supportedMechanisms.prepend(preferredMechanism);
-    }
-    if (config.facebookAppId().isEmpty() || config.facebookAccessToken().isEmpty()) {
-        supportedMechanisms.removeAll(u"X-FACEBOOK-PLATFORM"_s);
-    }
-    if (config.windowsLiveAccessToken().isEmpty()) {
-        supportedMechanisms.removeAll(u"X-MESSENGER-OAUTH2"_s);
-    }
-    if (config.googleAccessToken().isEmpty()) {
-        supportedMechanisms.removeAll(u"X-OAUTH2"_s);
-    }
-
-    // determine SASL Authentication mechanism to use
-    QStringList commonMechanisms;
-    for (const auto &mechanism : std::as_const(supportedMechanisms)) {
-        if (availableMechanisms.contains(mechanism)) {
-            commonMechanisms << mechanism;
-        }
-    }
-
-    // Remove disabled mechanisms and add to disabledAvailable
     const auto disabled = config.disabledSaslMechanisms();
     QStringList disabledAvailable;
-    for (const auto &m : disabled) {
-        if (commonMechanisms.removeAll(m)) {
-            disabledAvailable.push_back(m);
+    auto isEnabled = [&](const QString &mechanism) {
+        if (disabled.contains(mechanism)) {
+            disabledAvailable.push_back(mechanism);
+            return false;
+        }
+        return true;
+    };
+
+    // mechanisms that are available and supported by us
+    auto mechanismsView = availableMechanisms |
+        views::filter(isEnabled) |
+        views::transform(&SaslMechanism::fromString) |
+        views::filter(&std::optional<SaslMechanism>::has_value) |
+        views::transform([](const auto &v) { return *v; }) |
+        views::filter(std::bind(&QXmppSaslClient::isMechanismAvailable, _1, config.credentialData()));
+
+    std::vector<SaslMechanism> mechanisms(mechanismsView.begin(), mechanismsView.end());
+
+    // no mechanisms supported
+    if (mechanisms.empty()) {
+        return { std::nullopt, disabledAvailable };
+    }
+
+    // try to use configured mechanism
+    if (auto preferredString = config.saslAuthMechanism();
+        !preferredString.isEmpty()) {
+        // parse
+        if (auto preferred = SaslMechanism::fromString(preferredString)) {
+            if (contains(mechanisms, *preferred)) {
+                return { *preferred, {} };
+            }
         }
     }
 
-    return { commonMechanisms.empty() ? QString() : commonMechanisms.first(), disabledAvailable };
+    // max can be used: mechanisms is not empty (checked above)
+    return { max(mechanisms), disabledAvailable };
 }
 
 struct InitSaslAuthResult {
@@ -77,7 +88,7 @@ static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &confi
     };
 
     auto [mechanism, disabled] = chooseMechanism(config, availableMechanisms);
-    if (mechanism.isEmpty()) {
+    if (!mechanism) {
         auto text = disabled.empty()
             ? u"No supported SASL mechanism available"_s
             : u"No supported SASL mechanism available (%1 is disabled)"_s.arg(disabled.join(u", "));
@@ -85,7 +96,7 @@ static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &confi
         return error(std::move(text), { AuthenticationError::MechanismMismatch, {}, {} });
     }
 
-    auto saslClient = QXmppSaslClient::create(mechanism, parent);
+    auto saslClient = QXmppSaslClient::create(*mechanism, parent);
     if (!saslClient) {
         return error(u"SASL mechanism negotiation failed"_s,
                      AuthenticationError { AuthenticationError::ProcessingError, {}, {} });

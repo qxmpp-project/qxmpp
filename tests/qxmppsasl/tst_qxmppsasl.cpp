@@ -401,6 +401,7 @@ void tst_QXmppSasl::sasl2Abort()
 
 void tst_QXmppSasl::testClientAvailableMechanisms()
 {
+    QObject context;
     const QStringList expectedMechanisms = {
         "SCRAM-SHA3-512",
         "SCRAM-SHA-512",
@@ -414,7 +415,11 @@ void tst_QXmppSasl::testClientAvailableMechanisms()
         "X-OAUTH2"
     };
 
-    QCOMPARE(QXmppSaslClient::availableMechanisms(), expectedMechanisms);
+    for (const auto &mechanism : expectedMechanisms) {
+        auto parsed = SaslMechanism::fromString(mechanism);
+        QVERIFY(parsed);
+        QVERIFY(QXmppSaslClient::create(*parsed, &context) != nullptr);
+    }
 }
 
 void tst_QXmppSasl::testClientBadMechanism()
@@ -721,7 +726,7 @@ void tst_QXmppSasl::saslManagerNoMechanisms()
     config.setPassword("1234");
     config.setDisabledSaslMechanisms({ "SCRAM-SHA-1" });
 
-    QVERIFY(QXmppSaslClient::availableMechanisms().contains("SCRAM-SHA-1"));
+    QVERIFY(QXmppSaslClient::isMechanismAvailable({ SaslScramMechanism(SaslScramMechanism::Sha1) }, config.credentialData()));
 
     auto task = test.manager.authenticate(config, { "SCRAM-SHA-1" }, test.loggable.get());
 
