@@ -210,6 +210,60 @@ struct Abort {
 }  // namespace Sasl2
 
 //
+// SASL mechanisms
+//
+
+struct SaslScramMechanism {
+    static std::optional<SaslScramMechanism> fromString(QStringView str);
+    QString toString() const;
+
+    QCryptographicHash::Algorithm qtAlgorithm() const;
+
+    auto operator<=>(const SaslScramMechanism &) const = default;
+
+    enum Algorithm {
+        Sha1,
+        Sha256,
+        Sha512,
+        Sha3_512,
+    } algorithm;
+};
+
+struct SaslDigestMd5Mechanism {
+    auto operator<=>(const SaslDigestMd5Mechanism &) const = default;
+};
+struct SaslPlainMechanism {
+    auto operator<=>(const SaslPlainMechanism &) const = default;
+};
+struct SaslAnonymousMechanism {
+    auto operator<=>(const SaslAnonymousMechanism &) const = default;
+};
+struct SaslXFacebookMechanism {
+    auto operator<=>(const SaslXFacebookMechanism &) const = default;
+};
+struct SaslXWindowsLiveMechanism {
+    auto operator<=>(const SaslXWindowsLiveMechanism &) const = default;
+};
+struct SaslXGoogleMechanism {
+    auto operator<=>(const SaslXGoogleMechanism &) const = default;
+};
+
+// Note that the order of the variant alternatives defines the preference/strength of the mechanisms.
+struct SaslMechanism
+    : std::variant<SaslXGoogleMechanism,
+                   SaslXWindowsLiveMechanism,
+                   SaslXFacebookMechanism,
+                   SaslAnonymousMechanism,
+                   SaslPlainMechanism,
+                   SaslDigestMd5Mechanism,
+                   SaslScramMechanism> {
+    static std::optional<SaslMechanism> fromString(QStringView str);
+    QString toString() const;
+};
+
+inline QDebug operator<<(QDebug dbg, SaslMechanism mechanism) { return dbg << mechanism.toString(); }
+
+//
 // Credentials
 //
 
@@ -248,6 +302,7 @@ public:
 
     static QStringList availableMechanisms();
     static std::unique_ptr<QXmppSaslClient> create(const QString &mechanism, QObject *parent = nullptr);
+    static std::unique_ptr<QXmppSaslClient> create(QXmpp::Private::SaslMechanism mechanism, QObject *parent = nullptr);
 
 private:
     friend class QXmpp::Private::SaslManager;
@@ -381,13 +436,13 @@ class QXmppSaslClientScram : public QXmppSaslClient
 {
     Q_OBJECT
 public:
-    QXmppSaslClientScram(QCryptographicHash::Algorithm algorithm, QObject *parent = nullptr);
+    QXmppSaslClientScram(QXmpp::Private::SaslScramMechanism mechanism, QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override;
+    QString mechanism() const override { return m_mechanism.toString(); }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
-    QCryptographicHash::Algorithm m_algorithm;
+    QXmpp::Private::SaslScramMechanism m_mechanism;
     int m_step;
     QString m_password;
     uint32_t m_dklen;
