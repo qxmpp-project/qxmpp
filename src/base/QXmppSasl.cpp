@@ -16,6 +16,7 @@
 
 #include <QDomElement>
 #include <QMessageAuthenticationCode>
+#include <QPasswordDigestor>
 #include <QUrlQuery>
 #include <QXmlStreamWriter>
 #include <QtEndian>
@@ -714,36 +715,6 @@ static QByteArray calculateDigest(const QByteArray &method, const QByteArray &di
     return QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
 }
 
-// Perform PBKFD2 key derivation, code taken from Qt 5.12
-
-static QByteArray deriveKeyPbkdf2(QCryptographicHash::Algorithm algorithm,
-                                  const QByteArray &data, const QByteArray &salt,
-                                  int iterations, uint32_t dkLen)
-{
-    QByteArray key;
-    quint32 currentIteration = 1;
-    QMessageAuthenticationCode hmac(algorithm, data);
-    QByteArray index(4, Qt::Uninitialized);
-    while (key.length() < dkLen) {
-        hmac.addData(salt);
-        qToBigEndian(currentIteration, reinterpret_cast<uchar *>(index.data()));
-        hmac.addData(index);
-        QByteArray u = hmac.result();
-        hmac.reset();
-        QByteArray tkey = u;
-        for (int iter = 1; iter < iterations; iter++) {
-            hmac.addData(u);
-            u = hmac.result();
-            hmac.reset();
-            std::transform(tkey.cbegin(), tkey.cend(), u.cbegin(), tkey.begin(),
-                           std::bit_xor<char>());
-        }
-        key += tkey;
-        currentIteration++;
-    }
-    return key.left(dkLen);
-}
-
 static QByteArray generateNonce()
 {
     if (!forcedNonce.isEmpty()) {
@@ -1039,8 +1010,8 @@ std::optional<QByteArray> QXmppSaslClientScram::respond(const QByteArray &challe
 
         // calculate proofs
         const QByteArray clientFinalMessageBare = QByteArrayLiteral("c=") + m_gs2Header.toBase64() + QByteArrayLiteral(",r=") + nonce;
-        const QByteArray saltedPassword = deriveKeyPbkdf2(m_mechanism.qtAlgorithm(), m_password.toUtf8(), salt,
-                                                          iterations, m_dklen);
+        const QByteArray saltedPassword = QPasswordDigestor::deriveKeyPbkdf2(
+            m_mechanism.qtAlgorithm(), m_password.toUtf8(), salt, iterations, m_dklen);
         const QByteArray clientKey = QMessageAuthenticationCode::hash(QByteArrayLiteral("Client Key"), saltedPassword, m_mechanism.qtAlgorithm());
         const QByteArray storedKey = QCryptographicHash::hash(clientKey, m_mechanism.qtAlgorithm());
         const QByteArray authMessage = m_clientFirstMessageBare + QByteArrayLiteral(",") + challenge + QByteArrayLiteral(",") + clientFinalMessageBare;
