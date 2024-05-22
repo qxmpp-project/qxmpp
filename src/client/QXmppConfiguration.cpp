@@ -26,6 +26,15 @@ struct QXmppCredentialsPrivate : QSharedData, Credentials { };
 ///
 /// \brief Stores different kinds of credentials used for authentication.
 ///
+/// QXmppCredentials can be serialized to XML and parsed from XML again. This can be useful to
+/// store credentials permanently without needing to handle all the details of the different
+/// authentication methods. QXmpp can for example request and use \xep{0484, Fast Authentication
+/// Streamlining Tokens} tokens and might support other mechanisms in the future.
+/// The XML format is QXmpp specific and is not specified.
+///
+/// The XML output currently may contain:
+///  * an HT token for \xep{0484, Fast Authentication Streamlining Tokens}
+///
 /// \since QXmpp 1.8
 ///
 
@@ -45,8 +54,16 @@ std::optional<QXmppCredentials> QXmppCredentials::fromXml(QXmlStreamReader &r)
     if (!r.isStartElement() || r.name() != u"credentials" || r.namespaceUri() != ns_qxmpp_credentials) {
         return {};
     }
-    r.skipCurrentElement();
-    return QXmppCredentials {};
+
+    QXmppCredentials credentials;
+    while (r.readNextStartElement()) {
+        if (r.name() == u"ht-token") {
+            if (auto htToken = HtToken::fromXml(r)) {
+                credentials.d->htToken = std::move(*htToken);
+            }
+        }
+    }
+    return credentials;
 }
 
 ///
@@ -56,6 +73,9 @@ void QXmppCredentials::toXml(QXmlStreamWriter &writer) const
 {
     writer.writeStartElement(QSL65("credentials"));
     writer.writeDefaultNamespace(toString65(ns_qxmpp_credentials));
+    if (d->htToken) {
+        d->htToken->toXml(writer);
+    }
     writer.writeEndElement();
 }
 

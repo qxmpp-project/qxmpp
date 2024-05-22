@@ -338,8 +338,18 @@ inline QDebug operator<<(QDebug dbg, SaslMechanism mechanism) { return dbg << me
 // Credentials
 //
 
+struct HtToken {
+    static std::optional<HtToken> fromXml(QXmlStreamReader &);
+    void toXml(QXmlStreamWriter &) const;
+
+    SaslHtMechanism mechanism;
+    QString secret;
+    QDateTime expiry;
+};
+
 struct Credentials {
     QString password;
+    std::optional<HtToken> htToken;
 
     // Facebook
     QString facebookAccessToken;

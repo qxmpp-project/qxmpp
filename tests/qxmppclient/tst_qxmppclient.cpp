@@ -271,7 +271,10 @@ void tst_QXmppClient::csiManager()
 
 void tst_QXmppClient::credentialsSerialization()
 {
-    auto xml = "<credentials xmlns=\"org.qxmpp.credentials\"/>";
+    QByteArray xml =
+        "<credentials xmlns=\"org.qxmpp.credentials\">"
+        "<ht-token mechanism=\"HT-SHA3-384-UNIQ\" secret=\"t0k3n1234\" expiry=\"2024-09-21T18:00:00Z\"/>"
+        "</credentials>";
     QXmlStreamReader r(xml);
     r.readNextStartElement();
     auto credentials = unwrap(QXmppCredentials::fromXml(r));
