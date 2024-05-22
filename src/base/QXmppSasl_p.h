@@ -21,7 +21,6 @@
 
 class QDomElement;
 class QXmlStreamWriter;
-class QXmppSaslClientPrivate;
 class QXmppSaslServerPrivate;
 
 namespace QXmpp::Private {
@@ -216,20 +215,19 @@ class QXMPP_AUTOTEST_EXPORT QXmppSaslClient : public QXmppLoggable
 {
     Q_OBJECT
 public:
-    QXmppSaslClient(QObject *parent = nullptr);
-    ~QXmppSaslClient() override;
+    QXmppSaslClient(QObject *parent) : QXmppLoggable(parent) { }
 
-    QString host() const;
-    void setHost(const QString &host);
+    QString host() const { return m_host; }
+    void setHost(const QString &host) { m_host = host; }
 
-    QString serviceType() const;
-    void setServiceType(const QString &serviceType);
+    QString serviceType() const { return m_serviceType; }
+    void setServiceType(const QString &serviceType) { m_serviceType = serviceType; }
 
-    QString username() const;
-    void setUsername(const QString &username);
+    QString username() const { return m_username; }
+    void setUsername(const QString &username) { m_username = username; }
 
-    QString password() const;
-    void setPassword(const QString &password);
+    QString password() const { return m_password; }
+    void setPassword(const QString &password) { m_password = password; }
 
     virtual QString mechanism() const = 0;
     virtual std::optional<QByteArray> respond(const QByteArray &challenge) = 0;
@@ -240,7 +238,10 @@ public:
 private:
     friend class QXmpp::Private::SaslManager;
 
-    const std::unique_ptr<QXmppSaslClientPrivate> d;
+    QString m_host;
+    QString m_serviceType;
+    QString m_username;
+    QString m_password;
 };
 
 class QXMPP_AUTOTEST_EXPORT QXmppSaslServer : public QXmppLoggable
