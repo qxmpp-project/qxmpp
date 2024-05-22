@@ -37,7 +37,9 @@ constexpr auto SASL_ERROR_CONDITIONS = to_array<QStringView>({
     u"temporary-auth-failure",
 });
 
-namespace QXmpp::Private::Sasl {
+namespace QXmpp::Private {
+
+namespace Sasl {
 
 QString errorConditionToString(ErrorCondition c)
 {
@@ -170,9 +172,7 @@ void Success::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-}  // namespace QXmpp::Private::Sasl
-
-namespace QXmpp::Private {
+}  // namespace Sasl
 
 std::optional<Bind2Feature> Bind2Feature::fromDom(const QDomElement &el)
 {
@@ -262,9 +262,7 @@ void Bind2Bound::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-}  // namespace QXmpp::Private
-
-namespace QXmpp::Private::Sasl2 {
+namespace Sasl2 {
 
 std::optional<StreamFeature> StreamFeature::fromDom(const QDomElement &el)
 {
@@ -527,7 +525,9 @@ void Abort::toXml(QXmlStreamWriter *writer) const
     writer->writeEndElement();
 }
 
-}  // namespace QXmpp::Private::Sasl2
+}  // namespace Sasl2
+
+}  // namespace QXmpp::Private
 
 ///
 /// \class QXmppSasl2UserAgent
