@@ -50,11 +50,6 @@ public:
         NonSASLDigest      ///< Digest (default)
     };
 
-    /// An enumeration for various SASL authentication mechanisms available.
-    /// The server may or may not allow any particular mechanism. So depending
-    /// upon the availability of mechanisms on the server the library will choose
-    /// a mechanism.
-
     QXmppConfiguration();
     QXmppConfiguration(const QXmppConfiguration &other);
     ~QXmppConfiguration();
