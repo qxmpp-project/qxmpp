@@ -97,6 +97,9 @@ private:
     Q_SLOT void sasl2ManagerPlain();
     Q_SLOT void sasl2ManagerFailure();
     Q_SLOT void sasl2ManagerUnsupportedTasks();
+
+    // SASL 2 + FAST
+    Q_SLOT void sasl2Fast();
 };
 
 void tst_QXmppSasl::testParsing()
@@ -889,6 +892,80 @@ void tst_QXmppSasl::sasl2ManagerUnsupportedTasks()
     auto [text, err] = expectFutureVariant<Sasl2Manager::AuthError>(task);
     QCOMPARE(err.type, QXmpp::AuthenticationError::RequiredTasks);
     QCOMPARE(err.text, "This account requires 2FA");
+}
+
+void tst_QXmppSasl::sasl2Fast()
+{
+    Sasl2ManagerTest test;
+    auto &sent = test.socket.sent;
+
+    QXmppConfiguration config;
+    config.setUser("bowman");
+    config.setPassword("1234");
+    config.setDisabledSaslMechanisms({});
+    config.setSasl2UserAgent(QXmppSasl2UserAgent {
+        QUuid::fromString(u"d4565fa7-4d72-4749-b3d3-740edbf87770"_s),
+        "QXmpp",
+        "HAL 9000",
+    });
+
+    Sasl2::StreamFeature sasl2Feature {
+        { "PLAIN" },
+        {},
+        FastFeature { { "HT-SHA-256-NONE", "HT-SHA3-512-NONE" }, false },
+        false
+    };
+
+    Sasl2::Authenticate auth;
+
+    FastTokenManager fast(config);
+    fast.onSasl2Authenticate(auth, sasl2Feature);
+
+    // first: authenticate without fast, but request token
+    auto task = test.manager.authenticate(std::move(auth), config, sasl2Feature, test.loggable.get());
+
+    QVERIFY(!task.isFinished());
+    QCOMPARE(sent.size(), 1);
+    QByteArray authenticateXml =
+        "<authenticate xmlns=\"urn:xmpp:sasl:2\" mechanism=\"PLAIN\">"
+        "<initial-response>AGJvd21hbgAxMjM0</initial-response>"
+        "<user-agent id=\"d4565fa7-4d72-4749-b3d3-740edbf87770\"><software>QXmpp</software><device>HAL 9000</device></user-agent>"
+        "<request-token xmlns=\"urn:xmpp:fast:0\" mechanism=\"HT-SHA3-512-NONE\"/>"
+        "</authenticate>";
+    QCOMPARE(sent.at(0), authenticateXml);
+
+    test.manager.handleElement(xmlToDom("<success xmlns='urn:xmpp:sasl:2'><authorization-identifier>bowman@example.org</authorization-identifier><token xmlns='urn:xmpp:fast:0' token='s3cr3tt0k3n' expiry='2024-07-11T14:00:00Z'/></success>"));
+
+    QVERIFY(task.isFinished());
+    auto success = expectFutureVariant<Sasl2::Success>(task);
+    fast.onSasl2Success(success);
+
+    QVERIFY(config.credentialData().htToken.has_value());
+    auto token = unwrap(config.credentialData().htToken);
+    QCOMPARE(token.secret, u"s3cr3tt0k3n");
+    QCOMPARE(token.mechanism, SaslHtMechanism(IanaHashAlgorithm::Sha3_512, SaslHtMechanism::None));
+
+    // Now authenticate with FAST token
+    auth = Sasl2::Authenticate();
+    fast.onSasl2Authenticate(auth, sasl2Feature);
+    task = test.manager.authenticate(std::move(auth), config, sasl2Feature, test.loggable.get());
+    QVERIFY(!task.isFinished());
+    QCOMPARE(sent.size(), 2);
+    authenticateXml =
+        "<authenticate xmlns=\"urn:xmpp:sasl:2\" mechanism=\"HT-SHA3-512-NONE\">"
+        "<initial-response>Ym93bWFuAJvHQZJynTMTHwKpXP0AYsGYWSIJMiQn/esiN1G6daGDry+2Fruyr11JLvyWPEmP1VxEZ6qBdNd/es7G1pRpmDg=</initial-response>"
+        "<user-agent id=\"d4565fa7-4d72-4749-b3d3-740edbf87770\"><software>QXmpp</software><device>HAL 9000</device></user-agent>"
+        "<fast xmlns=\"urn:xmpp:fast:0\"/>"
+        "</authenticate>";
+    QCOMPARE(sent.at(1), authenticateXml);
+    test.manager.handleElement(xmlToDom("<success xmlns='urn:xmpp:sasl:2'><authorization-identifier>bowman@example.org</authorization-identifier><token xmlns='urn:xmpp:fast:0' token='t0k3n-rotation-token' expiry='2024-07-30T14:00:00Z'/></success>"));
+
+    QVERIFY(task.isFinished());
+    success = expectFutureVariant<Sasl2::Success>(task);
+    fast.onSasl2Success(success);
+    token = unwrap(config.credentialData().htToken);
+    QCOMPARE(token.secret, u"t0k3n-rotation-token");
+    QCOMPARE(token.mechanism, SaslHtMechanism(IanaHashAlgorithm::Sha3_512, SaslHtMechanism::None));
 }
 
 QTEST_MAIN(tst_QXmppSasl)
