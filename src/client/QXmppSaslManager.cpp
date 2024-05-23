@@ -24,6 +24,7 @@
 
 using namespace std::placeholders;
 namespace views = std::views;
+using std::ranges::copy;
 using std::ranges::empty;
 using std::ranges::max;
 
@@ -206,7 +207,16 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(Sasl2::Authentica
 {
     Q_ASSERT(!m_state.has_value());
 
-    auto result = initSaslAuthentication(config, feature.mechanisms, loggable);
+    // collect mechanisms
+    auto mechanisms = feature.mechanisms;
+
+    // additional mechanisms from extensions
+    bool fastAvailable = feature.fast && FastTokenManager::isFastEnabled(config);
+    if (fastAvailable) {
+        copy(feature.fast->mechanisms, std::back_inserter(mechanisms));
+    }
+
+    auto result = initSaslAuthentication(config, mechanisms, loggable);
     if (result.error) {
         return makeReadyTask<AuthResult>(std::move(*result.error));
     }
@@ -214,6 +224,10 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(Sasl2::Authentica
     // create request
     auth.mechanism = result.saslClient->mechanism().toString();
     auth.initialResponse = result.initialResponse;
+    // indicate usage of FAST
+    if (fastAvailable && contains(feature.fast->mechanisms, auth.mechanism)) {
+        auth.fast = FastRequest {};
+    }
 
     // set user-agent if enabled
     if (auto userAgent = config.sasl2UserAgent()) {
