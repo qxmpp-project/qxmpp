@@ -833,11 +833,6 @@ QXmppSaslClientAnonymous::QXmppSaslClientAnonymous(QObject *parent)
 {
 }
 
-QString QXmppSaslClientAnonymous::mechanism() const
-{
-    return u"ANONYMOUS"_s;
-}
-
 std::optional<QByteArray> QXmppSaslClientAnonymous::respond(const QByteArray &)
 {
     if (m_step == 0) {
@@ -858,11 +853,6 @@ QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5(QObject *parent)
 void QXmppSaslClientDigestMd5::setCredentials(const QXmpp::Private::Credentials &credentials)
 {
     m_password = credentials.password;
-}
-
-QString QXmppSaslClientDigestMd5::mechanism() const
-{
-    return u"DIGEST-MD5"_s;
 }
 
 std::optional<QByteArray> QXmppSaslClientDigestMd5::respond(const QByteArray &challenge)
@@ -938,12 +928,6 @@ void QXmppSaslClientFacebook::setCredentials(const QXmpp::Private::Credentials &
     m_accessToken = credentials.facebookAccessToken;
     m_appId = credentials.facebookAppId;
 }
-
-QString QXmppSaslClientFacebook::mechanism() const
-{
-    return u"X-FACEBOOK-PLATFORM"_s;
-}
-
 std::optional<QByteArray> QXmppSaslClientFacebook::respond(const QByteArray &challenge)
 {
     if (m_step == 0) {
@@ -985,11 +969,6 @@ void QXmppSaslClientGoogle::setCredentials(const QXmpp::Private::Credentials &cr
     m_accessToken = credentials.googleAccessToken;
 }
 
-QString QXmppSaslClientGoogle::mechanism() const
-{
-    return u"X-OAUTH2"_s;
-}
-
 std::optional<QByteArray> QXmppSaslClientGoogle::respond(const QByteArray &)
 {
     if (m_step == 0) {
@@ -1010,11 +989,6 @@ QXmppSaslClientPlain::QXmppSaslClientPlain(QObject *parent)
 void QXmppSaslClientPlain::setCredentials(const QXmpp::Private::Credentials &credentials)
 {
     m_password = credentials.password;
-}
-
-QString QXmppSaslClientPlain::mechanism() const
-{
-    return u"PLAIN"_s;
 }
 
 std::optional<QByteArray> QXmppSaslClientPlain::respond(const QByteArray &)
@@ -1097,11 +1071,6 @@ QXmppSaslClientWindowsLive::QXmppSaslClientWindowsLive(QObject *parent)
 void QXmppSaslClientWindowsLive::setCredentials(const QXmpp::Private::Credentials &credentials)
 {
     m_accessToken = credentials.windowsLiveAccessToken;
-}
-
-QString QXmppSaslClientWindowsLive::mechanism() const
-{
-    return u"X-MESSENGER-OAUTH2"_s;
 }
 
 std::optional<QByteArray> QXmppSaslClientWindowsLive::respond(const QByteArray &)

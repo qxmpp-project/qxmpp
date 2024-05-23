@@ -297,7 +297,7 @@ public:
     void setUsername(const QString &username) { m_username = username; }
 
     virtual void setCredentials(const QXmpp::Private::Credentials &) = 0;
-    virtual QString mechanism() const = 0;
+    virtual QXmpp::Private::SaslMechanism mechanism() const = 0;
     virtual std::optional<QByteArray> respond(const QByteArray &challenge) = 0;
 
     static QStringList availableMechanisms();
@@ -364,7 +364,7 @@ class QXmppSaslClientAnonymous : public QXmppSaslClient
 public:
     QXmppSaslClientAnonymous(QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override { }
-    QString mechanism() const override;
+    QXmpp::Private::SaslMechanism mechanism() const override { return { QXmpp::Private::SaslAnonymousMechanism() }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
@@ -377,7 +377,7 @@ class QXmppSaslClientDigestMd5 : public QXmppSaslClient
 public:
     QXmppSaslClientDigestMd5(QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override;
+    QXmpp::Private::SaslMechanism mechanism() const override { return { QXmpp::Private::SaslDigestMd5Mechanism() }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
@@ -395,7 +395,7 @@ class QXmppSaslClientFacebook : public QXmppSaslClient
 public:
     QXmppSaslClientFacebook(QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override;
+    QXmpp::Private::SaslMechanism mechanism() const override { return { QXmpp::Private::SaslXFacebookMechanism() }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
@@ -410,7 +410,7 @@ class QXmppSaslClientGoogle : public QXmppSaslClient
 public:
     QXmppSaslClientGoogle(QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override;
+    QXmpp::Private::SaslMechanism mechanism() const override { return { QXmpp::Private::SaslXGoogleMechanism() }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
@@ -424,7 +424,7 @@ class QXmppSaslClientPlain : public QXmppSaslClient
 public:
     QXmppSaslClientPlain(QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override;
+    QXmpp::Private::SaslMechanism mechanism() const override { return { QXmpp::Private::SaslPlainMechanism() }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
@@ -438,7 +438,7 @@ class QXmppSaslClientScram : public QXmppSaslClient
 public:
     QXmppSaslClientScram(QXmpp::Private::SaslScramMechanism mechanism, QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override { return m_mechanism.toString(); }
+    QXmpp::Private::SaslMechanism mechanism() const override { return { m_mechanism }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
@@ -458,7 +458,7 @@ class QXmppSaslClientWindowsLive : public QXmppSaslClient
 public:
     QXmppSaslClientWindowsLive(QObject *parent = nullptr);
     void setCredentials(const QXmpp::Private::Credentials &) override;
-    QString mechanism() const override;
+    QXmpp::Private::SaslMechanism mechanism() const override { return { QXmpp::Private::SaslXWindowsLiveMechanism() }; }
     std::optional<QByteArray> respond(const QByteArray &challenge) override;
 
 private:
