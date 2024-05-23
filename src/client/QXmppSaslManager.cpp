@@ -59,23 +59,6 @@ static std::tuple<QString, QStringList> chooseMechanism(const QXmppConfiguration
     return { commonMechanisms.empty() ? QString() : commonMechanisms.first(), disabledAvailable };
 }
 
-static void setCredentials(QXmppSaslClient *saslClient, const QXmppConfiguration &config)
-{
-    auto mechanism = saslClient->mechanism();
-    if (mechanism == u"X-FACEBOOK-PLATFORM") {
-        saslClient->setUsername(config.facebookAppId());
-        saslClient->setPassword(config.facebookAccessToken());
-    } else if (mechanism == u"X-MESSENGER-OAUTH2") {
-        saslClient->setPassword(config.windowsLiveAccessToken());
-    } else if (mechanism == u"X-OAUTH2") {
-        saslClient->setUsername(config.user());
-        saslClient->setPassword(config.googleAccessToken());
-    } else {
-        saslClient->setUsername(config.user());
-        saslClient->setPassword(config.password());
-    }
-}
-
 struct InitSaslAuthResult {
     std::unique_ptr<QXmppSaslClient> saslClient;
     std::optional<SaslManager::AuthError> error;
@@ -110,7 +93,8 @@ static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &confi
     info(u"SASL mechanism '%1' selected"_s.arg(saslClient->mechanism()));
     saslClient->setHost(config.domain());
     saslClient->setServiceType(u"xmpp"_s);
-    setCredentials(saslClient.get(), config);
+    saslClient->setUsername(config.user());
+    saslClient->setCredentials(config.credentialData());
 
     // send SASL auth request
     if (auto response = saslClient->respond(QByteArray())) {
