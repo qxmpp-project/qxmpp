@@ -125,6 +125,13 @@ T expectFutureVariant(QXmppTask<Input> &task)
 }
 
 template<typename T>
+const T &unwrap(const std::optional<T> &v)
+{
+    VERIFY2(v.has_value(), "Expected value, got empty optional");
+    return *v;
+}
+
+template<typename T>
 T unwrap(std::optional<T> &&v)
 {
     VERIFY2(v.has_value(), "Expected value, got empty optional");
