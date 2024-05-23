@@ -53,34 +53,6 @@ class QXmppVersionManager;
 /// QXmppClient::addExtension().
 ///
 
-///
-/// \brief The QXmppClient class is the main class for using QXmpp.
-///
-/// It provides the user all the required functionality to connect to the
-/// server and perform operations afterwards.
-///
-/// This class will provide the handle/reference to QXmppRosterManager
-/// (roster management), QXmppVCardManager (vCard manager), and
-/// QXmppVersionManager (software version information).
-///
-/// By default, the client will automatically try reconnecting to the server.
-/// You can change that behaviour using
-/// QXmppConfiguration::setAutoReconnectionEnabled().
-///
-/// Not all the managers or extensions have been enabled by default. One can
-/// enable/disable the managers using the functions \c addExtension() and
-/// \c removeExtension(). \c findExtension() can be used to find a
-/// reference/pointer to a particular instantiated and enabled manager.
-///
-/// List of managers enabled by default:
-/// - QXmppRosterManager
-/// - QXmppVCardManager
-/// - QXmppVersionManager
-/// - QXmppDiscoveryManager
-/// - QXmppEntityTimeManager
-///
-/// \ingroup Core
-///
 class QXMPP_EXPORT QXmppClient : public QXmppLoggable
 {
     Q_OBJECT
