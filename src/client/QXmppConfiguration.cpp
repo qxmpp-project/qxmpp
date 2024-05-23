@@ -101,6 +101,7 @@ public:
     bool autoReconnectionEnabled = true;
     // which authentication systems to use (if any)
     bool useSasl2Authentication = true;
+    bool useFastTokenAuthentication = true;
     bool useSASLAuthentication = true;
     bool useNonSASLAuthentication = true;
     bool ignoreSslErrors = false;
@@ -449,6 +450,32 @@ bool QXmppConfiguration::useSasl2Authentication() const
 void QXmppConfiguration::setUseSasl2Authentication(bool enabled)
 {
     d->useSasl2Authentication = enabled;
+}
+
+///
+/// Returns whether to use FAST token-based authentication from \xep{0484, Fast Authentication
+/// Streamlining Tokens} if available.
+///
+/// Note that FAST requires a valid SASL 2 user-agent to be set.
+///
+/// \since QXmpp 1.8
+///
+bool QXmppConfiguration::useFastTokenAuthentication() const
+{
+    return d->useFastTokenAuthentication;
+}
+
+///
+/// Sets whether to use FAST token-based authentication from \xep{0484, Fast Authentication
+/// Streamlining Tokens} if available.
+///
+/// Note that FAST requires a valid SASL 2 user-agent to be set.
+///
+/// \since QXmpp 1.8
+///
+void QXmppConfiguration::setUseFastTokenAuthentication(bool useFast)
+{
+    d->useFastTokenAuthentication = useFast;
 }
 
 /// Returns whether SSL errors (such as certificate validation errors)

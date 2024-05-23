@@ -315,7 +315,7 @@ FastTokenManager::FastTokenManager(QXmppConfiguration &config)
 
 bool FastTokenManager::isFastEnabled(const QXmppConfiguration &config)
 {
-    return config.sasl2UserAgent().has_value();
+    return config.useFastTokenAuthentication() && config.sasl2UserAgent().has_value();
 }
 
 bool FastTokenManager::hasToken() const
