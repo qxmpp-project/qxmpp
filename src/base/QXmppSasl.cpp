@@ -752,6 +752,11 @@ QXmppSaslClientDigestMd5::QXmppSaslClientDigestMd5(QObject *parent)
     m_cnonce = generateNonce();
 }
 
+void QXmppSaslClientDigestMd5::setCredentials(const QXmpp::Private::Credentials &credentials)
+{
+    m_password = credentials.password;
+}
+
 QString QXmppSaslClientDigestMd5::mechanism() const
 {
     return u"DIGEST-MD5"_s;
@@ -784,7 +789,7 @@ std::optional<QByteArray> QXmppSaslClientDigestMd5::respond(const QByteArray &ch
 
         m_nonce = input.value(QByteArrayLiteral("nonce"));
         m_secret = QCryptographicHash::hash(
-            QByteArray(username().toUtf8() + QByteArrayLiteral(":") + realm + QByteArrayLiteral(":") + password().toUtf8()),
+            QByteArray(username().toUtf8() + QByteArrayLiteral(":") + realm + QByteArrayLiteral(":") + m_password.toUtf8()),
             QCryptographicHash::Md5);
 
         // Build response
@@ -825,6 +830,12 @@ QXmppSaslClientFacebook::QXmppSaslClientFacebook(QObject *parent)
 {
 }
 
+void QXmppSaslClientFacebook::setCredentials(const QXmpp::Private::Credentials &credentials)
+{
+    m_accessToken = credentials.facebookAccessToken;
+    m_appId = credentials.facebookAppId;
+}
+
 QString QXmppSaslClientFacebook::mechanism() const
 {
     return u"X-FACEBOOK-PLATFORM"_s;
@@ -846,8 +857,8 @@ std::optional<QByteArray> QXmppSaslClientFacebook::respond(const QByteArray &cha
 
         // build response
         QUrlQuery responseUrl;
-        responseUrl.addQueryItem(u"access_token"_s, password());
-        responseUrl.addQueryItem(u"api_key"_s, username());
+        responseUrl.addQueryItem(u"access_token"_s, m_accessToken);
+        responseUrl.addQueryItem(u"api_key"_s, m_appId);
         responseUrl.addQueryItem(u"call_id"_s, QString());
         responseUrl.addQueryItem(u"method"_s, requestUrl.queryItemValue(u"method"_s));
         responseUrl.addQueryItem(u"nonce"_s, requestUrl.queryItemValue(u"nonce"_s));
@@ -866,6 +877,11 @@ QXmppSaslClientGoogle::QXmppSaslClientGoogle(QObject *parent)
 {
 }
 
+void QXmppSaslClientGoogle::setCredentials(const QXmpp::Private::Credentials &credentials)
+{
+    m_accessToken = credentials.googleAccessToken;
+}
+
 QString QXmppSaslClientGoogle::mechanism() const
 {
     return u"X-OAUTH2"_s;
@@ -876,7 +892,7 @@ std::optional<QByteArray> QXmppSaslClientGoogle::respond(const QByteArray &)
     if (m_step == 0) {
         // send initial response
         m_step++;
-        return QString(u'\0' + username() + u'\0' + password()).toUtf8();
+        return QString(u'\0' + username() + u'\0' + m_accessToken).toUtf8();
     } else {
         warning(u"QXmppSaslClientGoogle : Invalid step"_s);
         return {};
@@ -888,6 +904,11 @@ QXmppSaslClientPlain::QXmppSaslClientPlain(QObject *parent)
 {
 }
 
+void QXmppSaslClientPlain::setCredentials(const QXmpp::Private::Credentials &credentials)
+{
+    m_password = credentials.password;
+}
+
 QString QXmppSaslClientPlain::mechanism() const
 {
     return u"PLAIN"_s;
@@ -897,7 +918,7 @@ std::optional<QByteArray> QXmppSaslClientPlain::respond(const QByteArray &)
 {
     if (m_step == 0) {
         m_step++;
-        return QString(u'\0' + username() + u'\0' + password()).toUtf8();
+        return QString(u'\0' + username() + u'\0' + m_password).toUtf8();
     } else {
         warning(u"QXmppSaslClientPlain : Invalid step"_s);
         return {};
@@ -914,6 +935,11 @@ QXmppSaslClientScram::QXmppSaslClientScram(QCryptographicHash::Algorithm algorit
     Q_ASSERT(itr != SCRAM_ALGORITHMS.cend());
 
     m_nonce = generateNonce();
+}
+
+void QXmppSaslClientScram::setCredentials(const QXmpp::Private::Credentials &credentials)
+{
+    m_password = credentials.password;
 }
 
 QString QXmppSaslClientScram::mechanism() const
@@ -941,7 +967,7 @@ std::optional<QByteArray> QXmppSaslClientScram::respond(const QByteArray &challe
 
         // calculate proofs
         const QByteArray clientFinalMessageBare = QByteArrayLiteral("c=") + m_gs2Header.toBase64() + QByteArrayLiteral(",r=") + nonce;
-        const QByteArray saltedPassword = deriveKeyPbkdf2(m_algorithm, password().toUtf8(), salt,
+        const QByteArray saltedPassword = deriveKeyPbkdf2(m_algorithm, m_password.toUtf8(), salt,
                                                           iterations, m_dklen);
         const QByteArray clientKey = QMessageAuthenticationCode::hash(QByteArrayLiteral("Client Key"), saltedPassword, m_algorithm);
         const QByteArray storedKey = QCryptographicHash::hash(clientKey, m_algorithm);
@@ -973,6 +999,11 @@ QXmppSaslClientWindowsLive::QXmppSaslClientWindowsLive(QObject *parent)
 {
 }
 
+void QXmppSaslClientWindowsLive::setCredentials(const QXmpp::Private::Credentials &credentials)
+{
+    m_accessToken = credentials.windowsLiveAccessToken;
+}
+
 QString QXmppSaslClientWindowsLive::mechanism() const
 {
     return u"X-MESSENGER-OAUTH2"_s;
@@ -983,7 +1014,7 @@ std::optional<QByteArray> QXmppSaslClientWindowsLive::respond(const QByteArray &
     if (m_step == 0) {
         // send initial response
         m_step++;
-        return QByteArray::fromBase64(password().toLatin1());
+        return QByteArray::fromBase64(m_accessToken.toLatin1());
     } else {
         warning(u"QXmppSaslClientWindowsLive : Invalid step"_s);
         return {};

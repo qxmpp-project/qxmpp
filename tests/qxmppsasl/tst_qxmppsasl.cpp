@@ -463,7 +463,7 @@ void tst_QXmppSasl::testClientDigestMd5()
     QCOMPARE(client->mechanism(), "DIGEST-MD5");
 
     client->setUsername("qxmpp1");
-    client->setPassword("qxmpp123");
+    client->setCredentials(Credentials { .password = "qxmpp123" });
     client->setHost("jabber.ru");
     client->setServiceType("xmpp");
 
@@ -485,8 +485,10 @@ void tst_QXmppSasl::testClientFacebook()
     QVERIFY(client);
     QCOMPARE(client->mechanism(), QLatin1String("X-FACEBOOK-PLATFORM"));
 
-    client->setUsername("123456789012345");
-    client->setPassword("abcdefghijlkmno");
+    client->setCredentials(Credentials {
+        .facebookAccessToken = "abcdefghijlkmno",
+        .facebookAppId = "123456789012345",
+    });
 
     // initial step returns nothing
     QCOMPARE(client->respond(QByteArray()), QByteArray());
@@ -506,7 +508,7 @@ void tst_QXmppSasl::testClientGoogle()
     QCOMPARE(client->mechanism(), QLatin1String("X-OAUTH2"));
 
     client->setUsername("foo");
-    client->setPassword("bar");
+    client->setCredentials(Credentials { .googleAccessToken = "bar" });
 
     // initial step returns data
     QCOMPARE(client->respond(QByteArray()), QByteArray("\0foo\0bar", 8));
@@ -522,7 +524,7 @@ void tst_QXmppSasl::testClientPlain()
     QCOMPARE(client->mechanism(), QLatin1String("PLAIN"));
 
     client->setUsername("foo");
-    client->setPassword("bar");
+    client->setCredentials(Credentials { .password = "bar" });
 
     // initial step returns data
     QCOMPARE(client->respond(QByteArray()), QByteArray("\0foo\0bar", 8));
@@ -539,7 +541,7 @@ void tst_QXmppSasl::testClientScramSha1()
     QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-1"));
 
     client->setUsername("user");
-    client->setPassword("pencil");
+    client->setCredentials(Credentials { .password = "pencil" });
 
     // first step
     QCOMPARE(client->respond(QByteArray()), QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
@@ -563,7 +565,7 @@ void tst_QXmppSasl::testClientScramSha1_bad()
     QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-1"));
 
     client->setUsername("user");
-    client->setPassword("pencil");
+    client->setCredentials(Credentials { .password = "pencil" });
 
     // first step
     QCOMPARE(client->respond(QByteArray()), QByteArray("n,,n=user,r=fyko+d2lbbFgONRv9qkxdawL"));
@@ -587,7 +589,7 @@ void tst_QXmppSasl::testClientScramSha256()
     QCOMPARE(client->mechanism(), QLatin1String("SCRAM-SHA-256"));
 
     client->setUsername("user");
-    client->setPassword("pencil");
+    client->setCredentials(Credentials { .password = "pencil" });
 
     // first step
     QCOMPARE(client->respond(QByteArray()), QByteArray("n,,n=user,r=rOprNGfwEbeRWgbNEkqO"));
@@ -609,7 +611,9 @@ void tst_QXmppSasl::testClientWindowsLive()
     QVERIFY(client != 0);
     QCOMPARE(client->mechanism(), QLatin1String("X-MESSENGER-OAUTH2"));
 
-    client->setPassword(QByteArray("footoken").toBase64());
+    client->setCredentials(Credentials {
+        .windowsLiveAccessToken = QByteArray("footoken").toBase64(),
+    });
 
     // initial step returns data
     QCOMPARE(client->respond(QByteArray()), QByteArray("footoken", 8));
