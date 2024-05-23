@@ -450,7 +450,7 @@ QXmppTask<QByteArray> Manager::ownKey()
 
 ///
 /// Returns the JIDs of all key owners mapped to the IDs of their keys with
-/// specific trust levels.
+/// specific trust levels except for the own key.
 ///
 /// If no trust levels are passed, all keys are returned.
 ///
@@ -460,7 +460,8 @@ QXmppTask<QByteArray> Manager::ownKey()
 ///
 /// \param trustLevels trust levels of the keys
 ///
-/// \return the key owner JIDs mapped to their keys with specific trust levels
+/// \return the key owner JIDs mapped to their keys with specific trust levels except for the own
+///         key
 ///
 QXmppTask<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> Manager::keys(QXmpp::TrustLevels trustLevels)
 {
@@ -469,7 +470,7 @@ QXmppTask<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> Manager::ke
 
 ///
 /// Returns the IDs of keys mapped to their trust levels for specific key
-/// owners.
+/// owners except for the own key.
 ///
 /// If no trust levels are passed, all keys for jids are returned.
 ///
@@ -480,7 +481,7 @@ QXmppTask<QHash<QXmpp::TrustLevel, QMultiHash<QString, QByteArray>>> Manager::ke
 /// \param jids key owners' bare JIDs
 /// \param trustLevels trust levels of the keys
 ///
-/// \return the key IDs mapped to their trust levels for specific key owners
+/// \return the key IDs mapped to their trust levels for specific key owners except for the own key
 ///
 QXmppTask<QHash<QString, QHash<QByteArray, QXmpp::TrustLevel>>> Manager::keys(const QList<QString> &jids, QXmpp::TrustLevels trustLevels)
 {
