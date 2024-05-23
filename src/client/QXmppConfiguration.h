@@ -110,6 +110,9 @@ public:
     bool useSasl2Authentication() const;
     void setUseSasl2Authentication(bool);
 
+    bool useFastTokenAuthentication() const;
+    void setUseFastTokenAuthentication(bool);
+
     bool useSASLAuthentication() const;
     void setUseSASLAuthentication(bool);
 
