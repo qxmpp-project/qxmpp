@@ -90,7 +90,7 @@ static InitSaslAuthResult initSaslAuthentication(const QXmppConfiguration &confi
         return error(u"SASL mechanism negotiation failed"_s,
                      AuthenticationError { AuthenticationError::ProcessingError, {}, {} });
     }
-    info(u"SASL mechanism '%1' selected"_s.arg(saslClient->mechanism()));
+    info(u"SASL mechanism '%1' selected"_s.arg(saslClient->mechanism().toString()));
     saslClient->setHost(config.domain());
     saslClient->setServiceType(u"xmpp"_s);
     saslClient->setUsername(config.user());
@@ -140,7 +140,7 @@ QXmppTask<SaslManager::AuthResult> SaslManager::authenticate(const QXmppConfigur
         return makeReadyTask<AuthResult>(std::move(*result.error));
     }
 
-    m_socket->sendData(serializeXml(Sasl::Auth { result.saslClient->mechanism(), result.initialResponse }));
+    m_socket->sendData(serializeXml(Sasl::Auth { result.saslClient->mechanism().toString(), result.initialResponse }));
 
     m_promise = QXmppPromise<AuthResult>();
     m_saslClient = std::move(result.saslClient);
@@ -199,7 +199,7 @@ QXmppTask<Sasl2Manager::AuthResult> Sasl2Manager::authenticate(Sasl2::Authentica
     }
 
     // create request
-    auth.mechanism = result.saslClient->mechanism();
+    auth.mechanism = result.saslClient->mechanism().toString();
     auth.initialResponse = result.initialResponse;
 
     // set user-agent if enabled
