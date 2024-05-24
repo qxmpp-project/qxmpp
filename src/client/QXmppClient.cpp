@@ -199,7 +199,7 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
 ///
 /// \class QXmppClient
 ///
-/// \brief The QXmppClient class is the main class for using QXmpp.
+/// \brief Main class for starting and managing connections to XMPP servers.
 ///
 /// It provides the user all the required functionality to connect to the
 /// server and perform operations afterwards.
@@ -223,6 +223,25 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
 /// - QXmppVersionManager
 /// - QXmppDiscoveryManager
 /// - QXmppEntityTimeManager
+///
+/// ## Usage of FAST token-based authentication
+///
+/// QXmpp uses \xep{0484, Fast Authentication Streamlining Tokens} if enabled and supported by the
+/// server. FAST tokens can be requested after a first time authentication using a password or
+/// another strong authentication mechanism. The tokens can then be used to log in, without a
+/// password. The tokens are linked to a specific device ID (set via the SASL 2 user agent) and
+/// only this device can use the token. Tokens also expire and are rotated by the server.
+///
+/// The advantage of this mechanism is that a client does not necessarily need to store the
+/// password of an account and in the future clients that are logged in could be listed and logged
+/// out manually. FAST also allows for performance improvements as it only requires one round trip
+/// for authentication (and may be included in TLS 0-RTT data although that is not implemented in
+/// QXmpp) while other mechanisms like SCRAM need multiple round trips.
+///
+/// FAST itself is enabled by default (see QXmppConfiguration::useFastTokenAuthentication()), but
+/// you also need to set a SASL user agent with a stable device ID, so FAST can be used.
+/// After that you can login and use QXmppCredentials to serialize the token data and store it
+/// permanently. Note that the token may change over time, though.
 ///
 /// \ingroup Core
 ///
