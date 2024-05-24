@@ -81,6 +81,7 @@ private:
     Q_SLOT void testClientScramSha1_bad();
     Q_SLOT void testClientScramSha256();
     Q_SLOT void testClientWindowsLive();
+    Q_SLOT void clientHtSha256();
 
     // server
     Q_SLOT void testServerBadMechanism();
@@ -649,6 +650,29 @@ void tst_QXmppSasl::testClientWindowsLive()
 
     // any further step is an error
     QVERIFY(!client->respond(QByteArray()));
+}
+
+void tst_QXmppSasl::clientHtSha256()
+{
+    auto client = QXmppSaslClient::create({ SaslHtMechanism(IanaHashAlgorithm::Sha256, SaslHtMechanism::None) });
+    QVERIFY(client != nullptr);
+    QCOMPARE(client->mechanism().toString(), u"HT-SHA-256-NONE"_s);
+
+    client->setUsername(u"lnj"_s);
+    client->setCredentials(Credentials {
+        .htToken = HtToken {
+            SaslHtMechanism(IanaHashAlgorithm::Sha256, SaslHtMechanism::None),
+            u"secret-token:fast-Oeie4nmlUoLHXca_YhkjwkEBgCEKKHKCArT8"_s,
+            QDateTime(),
+        },
+    });
+
+    auto response = client->respond({});
+    QVERIFY(response.has_value());
+    QCOMPARE(response->toBase64(), "bG5qAKq/BuI7mZiZ6fByiqP1ARkYUI/WyFSh7tsYik1uUiB5");
+
+    // any further step is an error
+    QVERIFY(!client->respond({}));
 }
 
 void tst_QXmppSasl::testServerBadMechanism()
