@@ -41,6 +41,7 @@ SPDX-License-Identifier: CC0-1.0
     <implements rdf:resource='https://xmpp.org/rfcs/rfc6121.html'/>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc7590.html'/>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc7622.html'/>
+    <implements rdf:resource='https://www.ietf.org/archive/id/draft-schmaus-kitten-sasl-ht-09.html'/>
     <implements>
       <xmpp:SupportedXep>
         <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0004.html'/>
@@ -682,6 +683,14 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>complete</xmpp:status>
         <xmpp:version>0.1</xmpp:version>
         <xmpp:since>1.6</xmpp:since>
+      </xmpp:SupportedXep>
+    </implements>
+    <implements>
+      <xmpp:SupportedXep>
+        <xmpp:xep rdf:resource='https://xmpp.org/extensions/xep-0484.html'/>
+        <xmpp:status>complete</xmpp:status>
+        <xmpp:version>0.1.0</xmpp:version>
+        <xmpp:since>1.8</xmpp:since>
       </xmpp:SupportedXep>
     </implements>
     <release>
