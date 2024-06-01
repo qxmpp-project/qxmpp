@@ -523,11 +523,36 @@ void QXmppRosterManager::onRegistered(QXmppClient *client)
 {
     // data import/export
     if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
-        auto importData = [this](const RosterData &data) -> QXmppTask<std::variant<Success, QXmppError>> {
-            QXmppRosterIq iq;
-            iq.setItems(data.items);
-            iq.setType(QXmppIq::Set);
-            return this->client()->sendGenericIq(std::move(iq));
+        using Result = std::variant<Success, QXmppError>;
+        auto importData = [this](const RosterData &data) -> QXmppTask<Result> {
+            if (data.items.isEmpty()) {
+                return makeReadyTask<Result>(Success());
+            }
+
+            QXmppPromise<Result> promise;
+            auto counter = std::make_shared<int>(data.items.size());
+
+            for (const auto &item : std::as_const(data.items)) {
+                QXmppRosterIq iq;
+                iq.addItem(item);
+                iq.setType(QXmppIq::Set);
+
+                this->client()->sendGenericIq(std::move(iq)).then(this, [promise, counter](auto &&result) mutable {
+                    if (promise.task().isFinished()) {
+                        return;
+                    }
+
+                    if (std::holds_alternative<QXmppError>(result)) {
+                        return promise.finish(std::get<QXmppError>(std::move(result)));
+                    }
+
+                    if ((--(*counter)) == 0) {
+                        promise.finish(Success());
+                    }
+                });
+            }
+
+            return promise.task();
         };
 
         auto exportData = [this]() {
