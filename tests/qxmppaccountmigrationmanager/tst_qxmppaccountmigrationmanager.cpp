@@ -38,7 +38,7 @@ static QXmppRosterIq::Item newRosterItem(const QString &bareJid, const QString &
     return item;
 }
 
-static QXmppRosterIq newRoster(TestClient *client, int version, const std::optional<QString> &id, const std::optional<QXmppIq::Type> &type = {})
+static QXmppRosterIq newRoster(TestClient *client, int version, const std::optional<QString> &id, const std::optional<QXmppIq::Type> &type = {}, int index = -1)
 {
     QXmppRosterIq roster;
     roster.setId(id.value_or(QString()));
@@ -52,14 +52,16 @@ static QXmppRosterIq newRoster(TestClient *client, int version, const std::optio
     if (roster.type() == QXmppIq::Result || roster.type() == QXmppIq::Set) {
         switch (version) {
         case 0:
-            roster.addItem(newRosterItem(u"1@bare.com"_s, u"1 Bare"_s, { u"all"_s }));
-            roster.addItem(newRosterItem(u"2@bare.com"_s, u"2 Bare"_s, { u"all"_s }));
-            roster.addItem(newRosterItem(u"3@bare.com"_s, u"3 Bare"_s, { u"all"_s }));
+            if (index == -1 || index == 0)
+                roster.addItem(newRosterItem(u"1@bare.com"_s, u"1 Bare"_s, { u"all"_s }));
+            if (index == -1 || index == 1)
+                roster.addItem(newRosterItem(u"2@bare.com"_s, u"2 Bare"_s, { u"all"_s }));
             break;
         case 1:
-            roster.addItem(newRosterItem(u"4@gamer.com"_s, u"4 Gamer"_s, { u"gamers"_s }));
-            roster.addItem(newRosterItem(u"5@gamer.com"_s, u"5 Gamer"_s, { u"gamers"_s }));
-            roster.addItem(newRosterItem(u"6@gamer.com"_s, u"6 Gamer"_s, { u"gamers"_s }));
+            if (index == -1 || index == 0)
+                roster.addItem(newRosterItem(u"3@gamer.com"_s, u"3 Gamer"_s, { u"gamers"_s }));
+            if (index == -1 || index == 1)
+                roster.addItem(newRosterItem(u"4@gamer.com"_s, u"4 Gamer"_s, { u"gamers"_s }));
             break;
         default:
             Q_UNREACHABLE();
@@ -236,19 +238,21 @@ void tst_QXmppAccountMigrationManager::realImportExport()
                    "</iq>");
     client->expect("<iq id='qxmpp1' type='set'>"
                    "<query xmlns='jabber:iq:roster'>"
+                   "<item jid='3@gamer.com' name='3 Gamer'>"
+                   "<group>gamers</group>"
+                   "</item>"
+                   "</query>"
+                   "</iq>");
+    client->expect("<iq id='qxmpp2' type='set'>"
+                   "<query xmlns='jabber:iq:roster'>"
                    "<item jid='4@gamer.com' name='4 Gamer'>"
-                   "<group>gamers</group>"
-                   "</item>"
-                   "<item jid='5@gamer.com' name='5 Gamer'>"
-                   "<group>gamers</group>"
-                   "</item>"
-                   "<item jid='6@gamer.com' name='6 Gamer'>"
                    "<group>gamers</group>"
                    "</item>"
                    "</query>"
                    "</iq>");
     client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp3", QXmppIq::Result)));
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp1", QXmppIq::Result)));
+    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp1", QXmppIq::Result, 0)));
+    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result, 1)));
 
     expectFutureVariant<Success>(importTask);
 }
@@ -297,9 +301,8 @@ void tst_QXmppAccountMigrationManager::serialization()
         "</vCard>"
         "</vcard>"
         "<roster>"
+        "<item xmlns=\"jabber:iq:roster\" jid=\"3@gamer.com\" name=\"3 Gamer\"><group>gamers</group></item>"
         "<item xmlns=\"jabber:iq:roster\" jid=\"4@gamer.com\" name=\"4 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"5@gamer.com\" name=\"5 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"6@gamer.com\" name=\"6 Gamer\"><group>gamers</group></item>"
         "</roster>"
         "</account-data>\n";
 
@@ -318,9 +321,8 @@ void tst_QXmppAccountMigrationManager::serialization()
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         "<account-data xmlns=\"org.qxmpp.export\" jid=\"pasnox@xmpp.example\">"
         "<roster>"
+        "<item xmlns=\"jabber:iq:roster\" jid=\"3@gamer.com\" name=\"3 Gamer\"><group>gamers</group></item>"
         "<item xmlns=\"jabber:iq:roster\" jid=\"4@gamer.com\" name=\"4 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"5@gamer.com\" name=\"5 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"6@gamer.com\" name=\"6 Gamer\"><group>gamers</group></item>"
         "</roster>"
         "<vcard>"
         "<vCard xmlns=\"vcard-temp\">"
