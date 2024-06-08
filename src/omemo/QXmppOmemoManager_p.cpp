@@ -1637,13 +1637,12 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
             warning("OMEMO envelope data could not be deserialized");
             interface.finish(std::nullopt);
         } else {
-            BufferPtr publicIdentityKeyBuffer;
+            BufferPtr publicIdentityKeyBuffer(ec_public_key_get_ed(pre_key_signal_message_get_identity_key(omemoEnvelopeData.get())));
 
-            if (ec_public_key_serialize(publicIdentityKeyBuffer.ptrRef(), pre_key_signal_message_get_identity_key(omemoEnvelopeData.get())) < 0) {
+            if (const auto key = publicIdentityKeyBuffer.toByteArray(); key.isEmpty()) {
                 warning("Public Identity key could not be retrieved");
                 interface.finish(std::nullopt);
             } else {
-                const auto key = publicIdentityKeyBuffer.toByteArray();
                 auto &device = devices[senderJid][senderDeviceId];
                 auto &storedKeyId = device.keyId;
 
