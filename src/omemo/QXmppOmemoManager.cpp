@@ -1163,9 +1163,11 @@ bool Manager::handleMessage(const QXmppMessage &message)
 {
     if (d->isStarted && message.omemoElement()) {
         auto future = d->decryptMessage(message);
-        future.then(this, [=](std::optional<QXmppMessage> optionalDecryptedMessage) mutable {
+        future.then(this, [this, message](std::optional<QXmppMessage> optionalDecryptedMessage) {
             if (optionalDecryptedMessage) {
                 injectMessage(std::move(*optionalDecryptedMessage));
+            } else {
+                Q_EMIT client()->messageReceived(message);
             }
         });
 
