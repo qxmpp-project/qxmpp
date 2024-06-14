@@ -1023,8 +1023,7 @@ QXmppTask<QXmppE2eeExtension::MessageDecryptResult> QXmppOmemoManager::decryptMe
             SendError::EncryptionError });
     }
 
-    auto omemoElement = message.omemoElement();
-    if (!omemoElement) {
+    if (!message.omemoElement()) {
         return makeReadyTask<MessageDecryptResult>(NotEncrypted());
     }
 
