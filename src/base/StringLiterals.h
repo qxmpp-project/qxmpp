@@ -7,8 +7,13 @@
 
 #include <QString>
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 using namespace Qt::Literals::StringLiterals;
+#elif QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+inline QString operator"" _s(const char16_t *str, size_t size) noexcept
+{
+    return QString(QStringPrivate(nullptr, const_cast<char16_t *>(str), qsizetype(size)));
+}
 #else
 namespace QXmpp::Private {
 
