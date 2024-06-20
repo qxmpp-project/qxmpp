@@ -37,6 +37,10 @@ class QXmppRosterManager;
 class QXmppVCardManager;
 class QXmppVersionManager;
 
+namespace QXmpp::Private {
+struct SessionBegin;
+}
+
 ///
 /// \defgroup Core Core classes
 ///
@@ -296,6 +300,13 @@ Q_SIGNALS:
     /// This signal is emitted when the client state changes.
     void stateChanged(QXmppClient::State state);
 
+    /// Emitted when the credentials, e.g. tokens have changed.
+    ///
+    /// This means that the QXmppCredentials in the QXmppConfiguration of this client has changed.
+    ///
+    /// \since QXmpp 1.8
+    Q_SIGNAL void credentialsChanged();
+
 public Q_SLOTS:
     void connectToServer(const QXmppConfiguration &,
                          const QXmppPresence &initialPresence =
@@ -315,7 +326,7 @@ private Q_SLOTS:
     void _q_elementReceived(const QDomElement &element, bool &handled);
     void _q_reconnect();
     void _q_socketStateChanged(QAbstractSocket::SocketState state);
-    void _q_streamConnected();
+    void _q_streamConnected(const QXmpp::Private::SessionBegin &);
     void _q_streamDisconnected();
 
 private:

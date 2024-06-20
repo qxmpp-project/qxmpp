@@ -72,10 +72,12 @@ public:
     bool hasToken() const;
     void onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl2::StreamFeature &feature);
     void onSasl2Success(const Sasl2::Success &success);
+    bool tokenChanged() const { return m_tokenChanged; }
 
 private:
     QXmppConfiguration &config;
     std::optional<SaslHtMechanism> requestedMechanism;
+    bool m_tokenChanged = false;
 };
 
 }  // namespace QXmpp::Private

@@ -945,12 +945,15 @@ void QXmppClient::_q_socketStateChanged(QAbstractSocket::SocketState socketState
 }
 
 /// At connection establishment, send initial presence.
-void QXmppClient::_q_streamConnected()
+void QXmppClient::_q_streamConnected(const QXmpp::Private::SessionBegin &session)
 {
     d->receivedConflict = false;
     d->reconnectionTries = 0;
 
     // notify managers
+    if (session.fastTokenChanged) {
+        Q_EMIT credentialsChanged();
+    }
     Q_EMIT connected();
     Q_EMIT stateChanged(QXmppClient::ConnectedState);
 

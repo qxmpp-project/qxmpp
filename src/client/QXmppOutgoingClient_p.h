@@ -191,6 +191,7 @@ public:
     bool isAuthenticated = false;
     bool bindModeAvailable = false;
     bool sessionStarted = false;
+    AuthenticationMethod authenticationMethod = AuthenticationMethod::Sasl;
     std::optional<Bind2Bound> bind2Bound;
 
     std::variant<QXmppOutgoingClient *, StarttlsManager, NonSaslAuthManager, SaslManager, Sasl2Manager, C2sStreamManager *, BindManager> listener;
