@@ -939,6 +939,7 @@ void tst_QXmppSasl::sasl2Fast()
     QVERIFY(task.isFinished());
     auto success = expectFutureVariant<Sasl2::Success>(task);
     fast.onSasl2Success(success);
+    QVERIFY(fast.tokenChanged());
 
     QVERIFY(config.credentialData().htToken.has_value());
     auto token = unwrap(config.credentialData().htToken);
@@ -963,6 +964,7 @@ void tst_QXmppSasl::sasl2Fast()
     QVERIFY(task.isFinished());
     success = expectFutureVariant<Sasl2::Success>(task);
     fast.onSasl2Success(success);
+    QVERIFY(fast.tokenChanged());
     token = unwrap(config.credentialData().htToken);
     QCOMPARE(token.secret, u"t0k3n-rotation-token");
     QCOMPARE(token.mechanism, SaslHtMechanism(IanaHashAlgorithm::Sha3_512, SaslHtMechanism::None));

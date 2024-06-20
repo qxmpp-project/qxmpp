@@ -50,10 +50,18 @@ enum HandleElementResult {
     Finished,
 };
 
+enum class AuthenticationMethod {
+    NonSasl,
+    Sasl,
+    Sasl2,
+};
+
 struct SessionBegin {
     bool smEnabled;
     bool smResumed;
     bool bind2Used;
+    bool fastTokenChanged;
+    AuthenticationMethod authenticationMethod;
 };
 
 struct SessionEnd {

@@ -337,6 +337,7 @@ void FastTokenManager::onSasl2Authenticate(Sasl2::Authenticate &auth, const Sasl
     };
 
     requestedMechanism.reset();
+    m_tokenChanged = false;
 
     if (feature.fast && isFastEnabled(config) && !hasToken()) {
         // request token
@@ -356,6 +357,7 @@ void FastTokenManager::onSasl2Success(const Sasl2::Success &success)
             success.token->token,
             success.token->expiry,
         };
+        m_tokenChanged = true;
     }
 }
 

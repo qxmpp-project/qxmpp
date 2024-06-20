@@ -319,6 +319,7 @@ void QXmppOutgoingClient::startSasl2Auth(const Sasl2::StreamFeature &sasl2Featur
         if (auto success = std::get_if<Sasl2::Success>(&result)) {
             debug(u"Authenticated"_s);
             d->isAuthenticated = true;
+            d->authenticationMethod = AuthenticationMethod::Sasl2;
             d->config.setJid(success->authorizationIdentifier);
             d->bind2Bound = std::move(success->bound);
 
@@ -369,6 +370,7 @@ void QXmppOutgoingClient::startNonSaslAuth()
                     // successful Non-SASL Authentication
                     debug(u"Authenticated (Non-SASL)"_s);
                     d->isAuthenticated = true;
+                    d->authenticationMethod = AuthenticationMethod::NonSasl;
 
                     // xmpp connection made
                     openSession();
@@ -454,6 +456,8 @@ void QXmppOutgoingClient::openSession()
         d->c2sStreamManager.enabled(),
         d->c2sStreamManager.streamResumed(),
         d->bind2Bound.has_value(),
+        d->authenticationMethod == AuthenticationMethod::Sasl2 && d->fastTokenManager.tokenChanged(),
+        d->authenticationMethod,
     };
     d->bind2Bound.reset();
 
@@ -645,6 +649,7 @@ void QXmppOutgoingClient::handleStreamFeatures(const QXmppStreamFeatures &featur
             if (std::holds_alternative<Success>(result)) {
                 debug(u"Authenticated"_s);
                 d->isAuthenticated = true;
+                d->authenticationMethod = AuthenticationMethod::Sasl;
                 handleStart();
             } else {
                 auto [text, err] = std::get<SaslManager::AuthError>(std::move(result));
