@@ -1058,18 +1058,6 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                     const auto &deviceId = itr.key();
                     const auto &device = itr.value();
 
-                    // Skip encrypting for a device if it does not respond for a while.
-                    if (const auto unrespondedSentStanzasCount = device.unrespondedSentStanzasCount; unrespondedSentStanzasCount == UNRESPONDED_STANZAS_UNTIL_ENCRYPTION_IS_STOPPED) {
-                        if (++(*skippedDevicesCount) == devicesCount) {
-                            warning(u"OMEMO element could not be created because no recipient device responded to " +
-                                    QString::number(unrespondedSentStanzasCount) +
-                                    u" sent stanzas");
-                            interface.finish(std::nullopt);
-                        }
-
-                        continue;
-                    }
-
                     auto controlDeviceProcessing = [=, this](bool isSuccessful = true) mutable {
                         if (isSuccessful) {
                             ++(*successfullyProcessedDevicesCount);
@@ -1088,6 +1076,19 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                         }
                     };
 
+                    // Skip encrypting for a device if it does not respond for a while.
+                    if (const auto unrespondedSentStanzasCount = device.unrespondedSentStanzasCount; unrespondedSentStanzasCount == UNRESPONDED_STANZAS_UNTIL_ENCRYPTION_IS_STOPPED) {
+                        if (++(*skippedDevicesCount) == devicesCount) {
+                            warning(u"OMEMO element could not be created because no recipient device responded to " +
+                                    QString::number(unrespondedSentStanzasCount) + u" sent stanzas");
+                            interface.finish(std::nullopt);
+                        } else {
+                            controlDeviceProcessing(false);
+                        }
+
+                        continue;
+                    }
+
                     const auto address = Address(jid, deviceId);
 
                     auto addOmemoEnvelope = [this, payloadEncryptionResult, omemoElement, address, jid, deviceId, controlDeviceProcessing](bool isKeyExchange = false) mutable {
@@ -1100,7 +1101,11 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                         } else if (devices.value(jid).contains(deviceId)) {
                             auto &deviceBeingModified = devices[jid][deviceId];
                             deviceBeingModified.unrespondedReceivedStanzasCount = 0;
-                            ++deviceBeingModified.unrespondedSentStanzasCount;
+
+                            if (auto &unrespondedSentStanzasCount = deviceBeingModified.unrespondedSentStanzasCount; unrespondedSentStanzasCount + 1 <= UNRESPONDED_STANZAS_UNTIL_ENCRYPTION_IS_STOPPED) {
+                                ++unrespondedSentStanzasCount;
+                            }
+
                             omemoStorage->addDevice(jid, deviceId, deviceBeingModified);
 
                             QXmppOmemoEnvelope omemoEnvelope;
@@ -1610,13 +1615,12 @@ QXmppTask<std::optional<QCA::SecureArray>> ManagerPrivate::extractPayloadDecrypt
             warning(u"OMEMO envelope data could not be deserialized"_s);
             interface.finish(std::nullopt);
         } else {
-            BufferPtr publicIdentityKeyBuffer;
+            BufferPtr publicIdentityKeyBuffer(ec_public_key_get_ed(pre_key_signal_message_get_identity_key(omemoEnvelopeData.get())));
 
-            if (ec_public_key_serialize(publicIdentityKeyBuffer.ptrRef(), pre_key_signal_message_get_identity_key(omemoEnvelopeData.get())) < 0) {
+            if (const auto key = publicIdentityKeyBuffer.toByteArray(); key.isEmpty()) {
                 warning(u"Public Identity key could not be retrieved"_s);
                 interface.finish(std::nullopt);
             } else {
-                const auto key = publicIdentityKeyBuffer.toByteArray();
                 auto &device = devices[senderJid][senderDeviceId];
                 auto &storedKeyId = device.keyId;
 
