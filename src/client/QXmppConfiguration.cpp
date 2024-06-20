@@ -79,6 +79,11 @@ void QXmppCredentials::toXml(QXmlStreamWriter &writer) const
     writer.writeEndElement();
 }
 
+bool QXmppCredentials::operator==(const QXmppCredentials &other) const
+{
+    return d->htToken == other.d->htToken;
+}
+
 class QXmppConfigurationPrivate : public QSharedData
 {
 public:

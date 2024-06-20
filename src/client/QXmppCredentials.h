@@ -24,6 +24,11 @@ public:
     static std::optional<QXmppCredentials> fromXml(QXmlStreamReader &);
     void toXml(QXmlStreamWriter &) const;
 
+    /// Comparison operator
+    bool operator==(const QXmppCredentials &other) const;
+    /// Comparison operator
+    bool operator!=(const QXmppCredentials &other) const = default;
+
 private:
     friend class QXmppConfiguration;
 

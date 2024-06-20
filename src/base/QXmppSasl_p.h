@@ -341,6 +341,7 @@ inline QDebug operator<<(QDebug dbg, SaslMechanism mechanism) { return dbg << me
 struct HtToken {
     static std::optional<HtToken> fromXml(QXmlStreamReader &);
     void toXml(QXmlStreamWriter &) const;
+    bool operator==(const HtToken &other) const = default;
 
     SaslHtMechanism mechanism;
     QString secret;
