@@ -151,8 +151,12 @@ void tst_QXmppMessage::testBasic()
     QVERIFY(!message.hasHint(QXmppMessage::NoCopy));
     QVERIFY(!message.hasHint(QXmppMessage::Store));
     QCOMPARE(message.bitsOfBinaryData(), QXmppBitsOfBinaryDataList());
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     QVERIFY(message.stanzaId().isNull());
     QVERIFY(message.stanzaIdBy().isNull());
+    QT_WARNING_POP
+    QVERIFY(message.stanzaIds().isEmpty());
     QVERIFY(message.originId().isNull());
     QT_WARNING_PUSH
     QT_WARNING_DISABLE_DEPRECATED
@@ -1084,20 +1088,36 @@ void tst_QXmppMessage::testStanzaIds()
 {
     const QByteArray xml = QByteArrayLiteral(
         "<message type=\"chat\">"
+        "<stanza-id xmlns=\"urn:xmpp:sid:0\" id=\"123\" by=\"room@mix.qxmpp.org\"/>"
         "<stanza-id xmlns=\"urn:xmpp:sid:0\" id=\"1236\" by=\"server.tld\"/>"
         "<origin-id xmlns=\"urn:xmpp:sid:0\" id=\"5678\"/>"
         "</message>");
 
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     QXmppMessage msg;
     parsePacket(msg, xml);
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     QCOMPARE(msg.stanzaId(), u"1236"_s);
     QCOMPARE(msg.stanzaIdBy(), u"server.tld"_s);
+    QT_WARNING_POP
+    QCOMPARE(msg.stanzaIds().size(), 2);
     QCOMPARE(msg.originId(), u"5678"_s);
     serializePacket(msg, xml);
 
     QXmppMessage msg2;
+
+    // test both setters (single id / multiple ids)
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
     msg2.setStanzaId(u"1236"_s);
     msg2.setStanzaIdBy(u"server.tld"_s);
+    QT_WARNING_POP
+
+    auto ids = msg2.stanzaIds();
+    ids.prepend(QXmppStanzaId { "123", "room@mix.qxmpp.org" });
+    msg2.setStanzaIds(ids);
     msg2.setOriginId(u"5678"_s);
     serializePacket(msg2, xml);
 }

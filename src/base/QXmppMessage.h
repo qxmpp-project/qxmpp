@@ -30,6 +30,13 @@ class QXmppTrustMessageElement;
 class QXmppOutOfBandUrl;
 class QXmppCallInviteElement;
 
+struct QXmppStanzaId {
+    /// Identifier of the stanza element
+    QString id;
+    /// JID of the generating entity
+    QString by;
+};
+
 ///
 /// \brief The QXmppMessage class represents an XMPP message.
 ///
@@ -214,11 +221,20 @@ public:
     void setJingleMessageInitiationElement(const std::optional<QXmppJingleMessageInitiationElement> &jingleMessageInitiationElement);
 
     // XEP-0359: Unique and Stable Stanza IDs
+#if QXMPP_DEPRECATED_SINCE(1, 8)
+    [[deprecated("Use stanzaIds() instead.")]]
     QString stanzaId() const;
+    [[deprecated("Use setStanzaIds() instead.")]]
     void setStanzaId(const QString &id);
 
+    [[deprecated("Use stanzaIds() instead.")]]
     QString stanzaIdBy() const;
+    [[deprecated("Use setStanzaIds() instead.")]]
     void setStanzaIdBy(const QString &id);
+#endif
+
+    QVector<QXmppStanzaId> stanzaIds() const;
+    void setStanzaIds(const QVector<QXmppStanzaId> &);
 
     QString originId() const;
     void setOriginId(const QString &id);
