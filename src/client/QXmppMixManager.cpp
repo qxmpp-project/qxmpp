@@ -54,6 +54,23 @@ public:
 /// auto *manager = client->addNewExtension<QXmppMixManager>();
 /// \endcode
 ///
+/// Before calling one of the following methods, you need to request the information once per
+/// connection:
+///     * participantSupport()
+///     * messageArchivingSupport()
+/// That is done via QXmppDiscoveryManager::requestInfo():
+/// \code
+/// client->findExtension<QXmppDiscoveryManager>()->requestInfo(client->configuration().domain());
+/// \endcode
+///
+/// Before calling one of the following methods, you need to request the information once per
+/// connection:
+///     * services()
+/// That is done via QXmppDiscoveryManager::requestItems():
+/// \code
+/// client->findExtension<QXmppDiscoveryManager>()->requestItems(client->configuration().domain());
+/// \endcode
+///
 /// If you want to be informed about updates of the channel (e.g., its configuration or allowed
 /// JIDs), make sure to subscribe to the corresponding nodes.
 ///
@@ -170,13 +187,14 @@ public:
 ///
 /// Server support for a feature.
 ///
+/// The information is cached until a new connection is established.
+/// That makes it possible to retrieve the latest state even while the client is disconnected.
+///
 /// \var QXmppMixManager::Support::Unknown
 ///
 /// Whether the server supports the feature is not known.
 ///
 /// That means, there is no corresponding information from the server (yet).
-/// That is, for example, the case if the client is not connected or connected but has not received
-/// the information yet.
 ///
 /// \var QXmppMixManager::Unsupported
 ///
@@ -678,8 +696,7 @@ QXmppTask<QXmppMixManager::InvitationResult> QXmppMixManager::requestInvitation(
 /// Requests all JIDs which are allowed to participate in a MIX channel.
 ///
 /// The JIDs can specify users (e.g., "alice@example.org") or groups of users (e.g., "example.org")
-/// to let all users join which have a JID containing the specified domain.
-/// This is only relevant/used for private channels having a user-specified JID.
+/// for allowing all users to participate that have a JID containing the specified domain.
 ///
 /// \param channelJid JID of the channel
 ///
@@ -693,8 +710,8 @@ QXmppTask<QXmppMixManager::JidResult> QXmppMixManager::requestAllowedJids(const 
 ///
 /// Allows a JID to participate in a MIX channel.
 ///
-/// The JID can specify a user (e.g., "alice@example.org") or groups of users (e.g., "example.org")
-/// to let all users join which have a JID containing the specified domain.
+/// The JID can specify a user (e.g., "alice@example.org") or a group of users (e.g., "example.org")
+/// for allowing all users to participate that have a JID containing the specified domain.
 ///
 /// Allowing a JID is only needed if the channel does not allow anyone to participate.
 /// That is the case when QXmppMixConfigItem::Node::AllowedJids exists for the channel.
@@ -801,8 +818,8 @@ QXmppTask<QXmppMixManager::JidResult> QXmppMixManager::requestBannedJids(const Q
 ///
 /// Bans a JID from participating in a MIX channel.
 ///
-/// The JID can specify a user (e.g., "alice@example.org") or groups of users (e.g., "example.org")
-/// to ban all users which have a JID containing the specified domain.
+/// The JID can specify a user (e.g., "alice@example.org") or a group of users (e.g., "example.org")
+/// for banning all users that have a JID containing the specified domain.
 ///
 /// Before calling this, make sure that QXmppMixConfigItem::Node::BannedJids exists for the channel.
 /// Use requestChannelConfiguration() and QXmppMixConfigItem::nodes() to determine that.
