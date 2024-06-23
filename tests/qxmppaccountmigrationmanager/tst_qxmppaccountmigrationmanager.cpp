@@ -52,16 +52,20 @@ static QXmppRosterIq newRoster(TestClient *client, int version, const std::optio
     if (roster.type() == QXmppIq::Result || roster.type() == QXmppIq::Set) {
         switch (version) {
         case 0:
-            if (index == -1 || index == 0)
+            if (index == -1 || index == 0) {
                 roster.addItem(newRosterItem(u"1@bare.com"_s, u"1 Bare"_s, { u"all"_s }));
-            if (index == -1 || index == 1)
+            }
+            if (index == -1 || index == 1) {
                 roster.addItem(newRosterItem(u"2@bare.com"_s, u"2 Bare"_s, { u"all"_s }));
+            }
             break;
         case 1:
-            if (index == -1 || index == 0)
+            if (index == -1 || index == 0) {
                 roster.addItem(newRosterItem(u"3@gamer.com"_s, u"3 Gamer"_s, { u"gamers"_s }));
-            if (index == -1 || index == 1)
+            }
+            if (index == -1 || index == 1) {
                 roster.addItem(newRosterItem(u"4@gamer.com"_s, u"4 Gamer"_s, { u"gamers"_s }));
+            }
             break;
         default:
             Q_UNREACHABLE();
