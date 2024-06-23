@@ -70,6 +70,14 @@ static bool checkElement(const QDomElement &element, QStringView tagName, QStrin
     return element.tagName() == tagName && element.namespaceURI() == xmlns;
 }
 
+///
+/// \struct QXmppStanzaId
+///
+/// \brief Stanza ID element as defined in \xep{0359, Unique and Stable Stanza IDs}.
+///
+/// \since QXmpp 1.8
+///
+
 enum StampType {
     LegacyDelayedDelivery,  // XEP-0091: Legacy Delayed Delivery
     DelayedDelivery         // XEP-0203: Delayed Delivery
@@ -133,8 +141,7 @@ public:
     std::optional<QXmppJingleMessageInitiationElement> jingleMessageInitiationElement;
 
     // XEP-0359: Unique and Stable Stanza IDs
-    QString stanzaId;
-    QString stanzaIdBy;
+    QVector<QXmppStanzaId> stanzaIds;
     QString originId;
 
     // XEP-0367: Message Attaching
@@ -175,13 +182,14 @@ public:
     std::optional<QXmppCallInviteElement> callInviteElement;
 };
 
+///
 /// Constructs a QXmppMessage.
 ///
 /// \param from
 /// \param to
 /// \param body
 /// \param thread
-
+///
 QXmppMessage::QXmppMessage(const QString &from, const QString &to, const QString &body, const QString &thread)
     : QXmppStanza(from, to), d(new QXmppMessagePrivate)
 {
@@ -878,44 +886,80 @@ void QXmppMessage::setJingleMessageInitiationElement(const std::optional<QXmppJi
 /// Returns the stanza ID of the message according to \xep{0359}: Unique and
 /// Stable Stanza IDs.
 ///
+/// \deprecated Use stanzaIds() instead.
+///
 /// \since QXmpp 1.3
 ///
 QString QXmppMessage::stanzaId() const
 {
-    return d->stanzaId;
+    return d->stanzaIds.empty() ? QString() : d->stanzaIds.last().id;
 }
 
 ///
 /// Sets the stanza ID of the message according to \xep{0359}: Unique and
 /// Stable Stanza IDs.
 ///
+/// \deprecated Use setStanzaIds() instead.
+///
 /// \since QXmpp 1.3
 ///
 void QXmppMessage::setStanzaId(const QString &id)
 {
-    d->stanzaId = id;
+    if (d->stanzaIds.size() == 1) {
+        d->stanzaIds.first().id = id;
+    } else {
+        d->stanzaIds = { QXmppStanzaId { id, {} } };
+    }
 }
 
 ///
 /// Returns the creator of the stanza ID according to \xep{0359}: Unique and
 /// Stable Stanza IDs.
 ///
+/// \deprecated Use stanzaIds() instead.
+///
 /// \since QXmpp 1.3
 ///
 QString QXmppMessage::stanzaIdBy() const
 {
-    return d->stanzaIdBy;
+    return d->stanzaIds.empty() ? QString() : d->stanzaIds.last().by;
 }
 
 ///
 /// Sets the creator of the stanza ID according to \xep{0359}: Unique and
 /// Stable Stanza IDs.
 ///
+/// \deprecated Use setStanzaIds() instead.
+///
 /// \since QXmpp 1.3
 ///
 void QXmppMessage::setStanzaIdBy(const QString &by)
 {
-    d->stanzaIdBy = by;
+    if (d->stanzaIds.size() == 1) {
+        d->stanzaIds.first().by = by;
+    } else {
+        d->stanzaIds = { QXmppStanzaId { {}, by } };
+    }
+}
+
+///
+/// Returns the stanza IDs of the message as defined in \xep{0359, Unique and Stable Stanza IDs}.
+///
+/// \since QXmpp 1.8
+///
+QVector<QXmppStanzaId> QXmppMessage::stanzaIds() const
+{
+    return d->stanzaIds;
+}
+
+///
+/// Sets the stanza IDs of the message as defined in \xep{0359, Unique and Stable Stanza IDs}.
+///
+/// \since QXmpp 1.8
+///
+void QXmppMessage::setStanzaIds(const QVector<QXmppStanzaId> &ids)
+{
+    d->stanzaIds = ids;
 }
 
 ///
@@ -1472,8 +1516,10 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
         }
         // XEP-0359: Unique and Stable Stanza IDs
         if (checkElement(element, u"stanza-id", ns_sid)) {
-            d->stanzaId = element.attribute(u"id"_s);
-            d->stanzaIdBy = element.attribute(u"by"_s);
+            d->stanzaIds.push_back(QXmppStanzaId {
+                element.attribute(u"id"_s),
+                element.attribute(u"by"_s),
+            });
             return true;
         }
         if (checkElement(element, u"origin-id", ns_sid)) {
@@ -1716,13 +1762,11 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         }
 
         // XEP-0359: Unique and Stable Stanza IDs
-        if (!d->stanzaId.isNull()) {
+        for (const auto &stanzaId : d->stanzaIds) {
             writer->writeStartElement(QSL65("stanza-id"));
             writer->writeDefaultNamespace(toString65(ns_sid));
-            writer->writeAttribute(QSL65("id"), d->stanzaId);
-            if (!d->stanzaIdBy.isNull()) {
-                writer->writeAttribute(QSL65("by"), d->stanzaIdBy);
-            }
+            writer->writeAttribute(QSL65("id"), stanzaId.id);
+            writeOptionalXmlAttribute(writer, u"by", stanzaId.by);
             writer->writeEndElement();
         }
 
