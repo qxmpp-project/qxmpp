@@ -65,7 +65,8 @@ struct QXmppHttpUploadPrivate {
             Q_EMIT q->progressChanged();
         }
     }
-    [[nodiscard]] QXmppHttpUpload::Result result() const
+    [[nodiscard]]
+    QXmppHttpUpload::Result result() const
     {
         // assumes finished = true
         if (error) {
