@@ -206,6 +206,9 @@ struct QXmppAccountMigrationManagerPrivate {
 ///
 /// Constructs an account migration manager.
 ///
+/// \note You would need the `QXmppClient(QXmppClient::NoExtensions, this)` approach to use this manager
+/// because it needs to be instantiated before others using it.
+///
 QXmppAccountMigrationManager::QXmppAccountMigrationManager()
     : d(std::make_unique<QXmppAccountMigrationManagerPrivate>())
 {
