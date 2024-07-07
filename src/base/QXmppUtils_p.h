@@ -95,9 +95,9 @@ inline QString serializeInt(Int value) { return QString::number(value); }
 // DOM
 //
 
-bool isIqType(const QDomElement &, QStringView tagName, QStringView xmlns);
-QDomElement firstChildElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
-QDomElement nextSiblingElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
+QXMPP_EXPORT bool isIqType(const QDomElement &, QStringView tagName, QStringView xmlns);
+QXMPP_EXPORT QDomElement firstChildElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
+QXMPP_EXPORT QDomElement nextSiblingElement(const QDomElement &, QStringView tagName = {}, QStringView xmlNs = {});
 
 struct DomChildElements {
     QDomElement parent;
