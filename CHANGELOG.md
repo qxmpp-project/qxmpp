@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.7.1 (July 07, 2024)
+---------------------------
+
+ - OMEMO: Fix messages are dropped if decryption fails (@melvo, #634)
+ - Fix build issue with MSVC: missing export of utility functions (@lnjX)
+
 QXmpp 1.7.0 (May 19, 2024)
 --------------------------
 
