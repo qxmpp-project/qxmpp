@@ -9,6 +9,12 @@ QXmpp 1.8.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.7.1 (July 07, 2024)
+---------------------------
+
+ - OMEMO: Fix messages are dropped if decryption fails (@melvo, #634)
+ - Fix build issue with MSVC: missing export of utility functions (@lnjX)
+
 QXmpp 1.7.0 (May 19, 2024)
 --------------------------
 
