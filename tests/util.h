@@ -20,6 +20,8 @@
 #include <QDomDocument>
 #include <QtTest>
 
+struct QXmppError;
+
 // QVERIFY2 with empty return value (return {};)
 #define QVERIFY_RV(statement, description)                                       \
     if (!QTest::qVerify(statement, #statement, description, __FILE__, __LINE__)) \
