@@ -90,6 +90,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppTrustMessages.h
     base/QXmppUserTuneItem.h
     base/QXmppUtils.h
+    base/QXmppUri.h
     base/QXmppVCardIq.h
     base/QXmppVersionIq.h
     base/compat/QXmppSessionIq.h
@@ -230,6 +231,7 @@ set(SOURCE_FILES
     base/QXmppTask.cpp
     base/QXmppThumbnail.cpp
     base/QXmppTrustMessages.cpp
+    base/QXmppUri.cpp
     base/QXmppUserTuneItem.cpp
     base/QXmppUtils.cpp
     base/QXmppVCardIq.cpp
