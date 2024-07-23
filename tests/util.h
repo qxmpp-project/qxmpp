@@ -12,6 +12,7 @@
 
 #include "StringLiterals.h"
 
+#include <any>
 #include <memory>
 #include <variant>
 
@@ -136,6 +137,22 @@ T unwrap(std::optional<T> &&v)
 {
     VERIFY2(v.has_value(), "Expected value, got empty optional");
     return *v;
+}
+
+template<typename T>
+const T &unwrap(const std::any &v)
+{
+    VERIFY2(v.has_value(), "Expected non-empty std::any");
+    VERIFY2(v.type() == typeid(T), "Got std::any with wrong type");
+    return std::any_cast<T>(v);
+}
+
+template<typename T>
+T unwrap(std::any &&v)
+{
+    VERIFY2(v.has_value(), "Expected non-empty std::any");
+    VERIFY2(v.type() == typeid(T), "Got std::any with wrong type");
+    return std::any_cast<T>(std::move(v));
 }
 
 template<typename T>
