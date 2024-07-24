@@ -87,15 +87,14 @@ void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
     q->socket()->setPeerVerifyName(config.domain());
 
     // connect to host
-    const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
-    if (localSecurity == QXmppConfiguration::LegacySSL) {
-        if (!QSslSocket::supportsSsl()) {
-            q->warning(u"Not connecting as legacy SSL was requested, but SSL support is not available"_s);
-            return;
-        }
-        q->socket()->connectToHostEncrypted(address.host, address.port);
-    } else {
+    switch (address.type) {
+    case ServerAddress::Tcp:
         q->socket()->connectToHost(address.host, address.port);
+        break;
+    case ServerAddress::Tls:
+        Q_ASSERT(QSslSocket::supportsSsl());
+        q->socket()->connectToHostEncrypted(address.host, address.port);
+        break;
     }
 }
 
@@ -187,7 +186,27 @@ void QXmppOutgoingClient::connectToHost()
 
     // if an explicit host was provided, connect to it
     if (!d->config.host().isEmpty() && d->config.port()) {
-        d->connectToHost({ ServerAddress::Tcp, d->config.host(), d->config.port16() });
+        auto connectionType = d->config.streamSecurityMode() == QXmppConfiguration::LegacySSL
+            ? ServerAddress::Tls
+            : ServerAddress::Tcp;
+        d->connectToHost({ connectionType, d->config.host(), d->config.port16() });
+        return;
+    }
+
+    // legacy SSL
+    if (d->config.streamSecurityMode() == QXmppConfiguration::LegacySSL) {
+        if (!QSslSocket::supportsSsl()) {
+            setError(u"Direct TLS is configured, but TLS support is not available locally"_s,
+                     QAbstractSocket::SocketError::SslInternalError);
+            return;
+        }
+
+        d->serverAddresses = {
+            ServerAddress { ServerAddress::Tls, d->config.domain(), XMPPS_DEFAULT_PORT },
+            ServerAddress { ServerAddress::Tls, d->config.domain(), XMPP_DEFAULT_PORT },
+        };
+        d->nextServerAddressIndex = 0;
+        d->connectToNextAddress();
         return;
     }
 
