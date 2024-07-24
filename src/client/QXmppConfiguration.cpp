@@ -263,6 +263,19 @@ int QXmppConfiguration::port() const
     return d->port;
 }
 
+///
+/// Returns the port number as quint16.
+///
+/// \since QXmpp 1.8
+///
+quint16 QXmppConfiguration::port16() const
+{
+    if (d->port >= 0 && d->port <= std::numeric_limits<quint16>::max()) {
+        return d->port;
+    }
+    return 0;
+}
+
 /// Returns the localpart of the JID.
 QString QXmppConfiguration::user() const
 {
