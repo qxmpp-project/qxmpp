@@ -67,6 +67,7 @@ public:
     void setDomain(const QString &);
 
     int port() const;
+    quint16 port16() const;
     void setPort(int);
 
     QString user() const;
