@@ -7,11 +7,7 @@
 
 #include <algorithm>
 #include <functional>
-
-namespace std {
-template<typename T>
-class optional;
-}
+#include <optional>
 
 namespace QXmpp::Private {
 
