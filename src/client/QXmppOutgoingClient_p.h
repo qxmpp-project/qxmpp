@@ -27,6 +27,17 @@ namespace QXmpp::Private {
 
 using LegacyError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmppStanza::Error::Condition>;
 
+struct ServerAddress {
+    enum ConnectionType {
+        Tcp,
+        Tls,
+    };
+
+    ConnectionType type;
+    QString host;
+    quint16 port;
+};
+
 // STARTTLS
 class StarttlsManager
 {
@@ -162,8 +173,8 @@ public:
     };
 
     explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
-    void connectToHost(const QString &host, quint16 port);
-    void connectToNextDNSHost();
+    void connectToHost(const ServerAddress &);
+    void connectToNextAddress();
 
     // This object provides the configuration
     // required for connecting to the XMPP server.
@@ -176,8 +187,8 @@ public:
     OutgoingIqManager iqManager;
 
     // DNS
-    QList<QDnsServiceRecord> srvRecords;
-    int nextSrvRecordIdx = 0;
+    std::vector<ServerAddress> serverAddresses;
+    std::size_t nextServerAddressIndex = 0;
     enum {
         Current,
         TryNext,
