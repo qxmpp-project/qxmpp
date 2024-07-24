@@ -69,9 +69,9 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
 {
 }
 
-void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port)
+void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
 {
-    q->info(u"Connecting to %1:%2"_s.arg(host, QString::number(port)));
+    q->info(u"Connecting to %1:%2"_s.arg(address.host, QString::number(address.port)));
 
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
@@ -93,17 +93,16 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
             q->warning(u"Not connecting as legacy SSL was requested, but SSL support is not available"_s);
             return;
         }
-        q->socket()->connectToHostEncrypted(host, port);
+        q->socket()->connectToHostEncrypted(address.host, address.port);
     } else {
-        q->socket()->connectToHost(host, port);
+        q->socket()->connectToHost(address.host, address.port);
     }
 }
 
-void QXmppOutgoingClientPrivate::connectToNextDNSHost()
+void QXmppOutgoingClientPrivate::connectToNextAddress()
 {
     nextAddressState = Current;
-    auto curIdx = nextSrvRecordIdx++;
-    connectToHost(srvRecords.at(curIdx).target(), srvRecords.at(curIdx).port());
+    connectToHost(serverAddresses.at(nextServerAddressIndex++));
 }
 
 ///
@@ -182,13 +181,13 @@ void QXmppOutgoingClient::connectToHost()
     // if a host for resumption is available, connect to it
     if (d->c2sStreamManager.hasResumeAddress()) {
         auto [host, port] = d->c2sStreamManager.resumeAddress();
-        d->connectToHost(host, port);
+        d->connectToHost({ ServerAddress::Tcp, host, port });
         return;
     }
 
     // if an explicit host was provided, connect to it
     if (!d->config.host().isEmpty() && d->config.port()) {
-        d->connectToHost(d->config.host(), d->config.port());
+        d->connectToHost({ ServerAddress::Tcp, d->config.host(), d->config.port16() });
         return;
     }
 
@@ -200,23 +199,29 @@ void QXmppOutgoingClient::connectToHost()
             warning(u"Lookup for domain %1 failed: %2"_s
                         .arg(domain, error->description));
 
-            // as a fallback, use domain as the host name
-            d->connectToHost(d->config.domain(), d->config.port());
+            // as a fallback, use domain as hostname
+            d->connectToHost({ ServerAddress::Tcp, d->config.domain(), XMPP_DEFAULT_PORT });
             return;
         }
 
-        d->srvRecords = std::get<QList<QDnsServiceRecord>>(std::move(result));
-        d->nextSrvRecordIdx = 0;
+        d->serverAddresses = transform<std::vector<ServerAddress>>(std::get<QList<QDnsServiceRecord>>(result), [](auto record) {
+            return ServerAddress {
+                ServerAddress::Tcp,
+                record.target(),
+                record.port(),
+            };
+        });
+        d->nextServerAddressIndex = 0;
 
-        if (d->srvRecords.isEmpty()) {
+        if (d->serverAddresses.empty()) {
             warning(u"'%1' has no xmpp-client service records."_s.arg(domain));
 
-            // as a fallback, use domain as the host name
-            d->connectToHost(d->config.domain(), d->config.port());
+            // as a fallback, use domain as hostname
+            d->connectToHost({ ServerAddress::Tcp, d->config.host(), XMPP_DEFAULT_PORT });
             return;
         }
 
-        d->connectToNextDNSHost();
+        d->connectToNextAddress();
     });
 }
 
@@ -268,9 +273,9 @@ void QXmppOutgoingClient::_q_socketDisconnected()
     debug(u"Socket disconnected"_s);
     d->isAuthenticated = false;
     if (d->nextAddressState == QXmppOutgoingClientPrivate::TryNext) {
-        d->connectToNextDNSHost();
+        d->connectToNextAddress();
     } else if (d->redirect) {
-        d->connectToHost(d->redirect->host, d->redirect->port);
+        d->connectToHost({ ServerAddress::Tcp, d->redirect->host, d->redirect->port });
         d->redirect.reset();
     } else {
         closeSession();
@@ -523,7 +528,7 @@ void QXmppOutgoingClient::setError(const QString &text, ConnectionError &&detail
 void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
 {
     if (!d->sessionStarted &&
-        (d->srvRecords.count() > d->nextSrvRecordIdx)) {
+        (d->serverAddresses.size() > d->nextServerAddressIndex)) {
         // some network error occurred during startup -> try next available SRV record server
         d->nextAddressState = QXmppOutgoingClientPrivate::TryNext;
     } else {
