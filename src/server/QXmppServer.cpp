@@ -634,14 +634,9 @@ void QXmppServer::addIncomingClient(QXmppIncomingClient *stream)
 
     stream->setPasswordChecker(d->passwordChecker);
 
-    connect(stream, &QXmppStream::connected,
-            this, &QXmppServer::_q_clientConnected);
-
-    connect(stream, &QXmppStream::disconnected,
-            this, &QXmppServer::_q_clientDisconnected);
-
-    connect(stream, &QXmppIncomingClient::elementReceived,
-            this, &QXmppServer::handleElement);
+    connect(stream, &QXmppIncomingClient::connected, this, &QXmppServer::_q_clientConnected);
+    connect(stream, &QXmppIncomingClient::disconnected, this, &QXmppServer::_q_clientDisconnected);
+    connect(stream, &QXmppIncomingClient::elementReceived, this, &QXmppServer::handleElement);
 
     // add stream
     d->incomingClients.insert(stream);
