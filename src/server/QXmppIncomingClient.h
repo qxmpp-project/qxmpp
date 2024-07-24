@@ -5,40 +5,51 @@
 #ifndef QXMPPINCOMINGCLIENT_H
 #define QXMPPINCOMINGCLIENT_H
 
-#include "QXmppStream.h"
+#include "QXmppLogger.h"
 
+#include <memory>
+
+class QDomElement;
+class QSslSocket;
+class QXmppNonza;
 class QXmppIncomingClientPrivate;
 class QXmppPasswordChecker;
 
-/// \brief Interface for password checkers.
 ///
-
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream
 /// from an XMPP client.
 ///
-
-class QXMPP_EXPORT QXmppIncomingClient : public QXmppStream
+class QXMPP_EXPORT QXmppIncomingClient : public QXmppLoggable
 {
     Q_OBJECT
-
 public:
     QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent = nullptr);
     ~QXmppIncomingClient() override;
 
-    bool isConnected() const override;
+    bool isConnected() const;
     QString jid() const;
+
+    bool sendPacket(const QXmppNonza &);
+    Q_SLOT bool sendData(const QByteArray &);
+    void disconnectFromHost();
 
     void setInactivityTimeout(int secs);
     void setPasswordChecker(QXmppPasswordChecker *checker);
 
-Q_SIGNALS:
     /// This signal is emitted when an element is received.
-    void elementReceived(const QDomElement &element);
+    Q_SIGNAL void elementReceived(const QDomElement &element);
+
+    /// This signal is emitted when the stream is connected.
+    Q_SIGNAL void connected();
+
+    /// This signal is emitted when the stream is disconnected.
+    Q_SIGNAL void disconnected();
 
 protected:
     /// \cond
-    void handleStream(const QDomElement &element) override;
-    void handleStanza(const QDomElement &element) override;
+    void handleStart();
+    void handleStream(const QDomElement &element);
+    void handleStanza(const QDomElement &element);
     /// \endcond
 
 private Q_SLOTS:

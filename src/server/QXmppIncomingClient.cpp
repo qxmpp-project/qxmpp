@@ -14,6 +14,7 @@
 
 #include "Stream.h"
 #include "StringLiterals.h"
+#include "XmppSocket.h"
 
 #include <QDomElement>
 #include <QHostAddress>
@@ -29,7 +30,9 @@ class QXmppIncomingClientPrivate
 {
 public:
     QXmppIncomingClientPrivate(QXmppIncomingClient *qq);
+
     QTimer *idleTimer = nullptr;
+    XmppSocket socket;
 
     QString domain;
     QString jid;
@@ -50,7 +53,8 @@ private:
 };
 
 QXmppIncomingClientPrivate::QXmppIncomingClientPrivate(QXmppIncomingClient *qq)
-    : q(qq)
+    : socket(qq),
+      q(qq)
 {
 }
 
@@ -79,9 +83,9 @@ void QXmppIncomingClientPrivate::checkCredentials(const QByteArray &response)
 
 QString QXmppIncomingClientPrivate::origin() const
 {
-    QSslSocket *socket = q->socket();
-    if (socket) {
-        return socket->peerAddress().toString() + u' ' + QString::number(socket->peerPort());
+    auto *sslSocket = this->socket.socket();
+    if (sslSocket) {
+        return sslSocket->peerAddress().toString() + u' ' + QString::number(sslSocket->peerPort());
     } else {
         return u"<unknown>"_s;
     }
@@ -95,16 +99,21 @@ QString QXmppIncomingClientPrivate::origin() const
 /// \param parent The parent QObject for the stream (optional).
 ///
 QXmppIncomingClient::QXmppIncomingClient(QSslSocket *socket, const QString &domain, QObject *parent)
-    : QXmppStream(parent),
+    : QXmppLoggable(parent),
       d(std::make_unique<QXmppIncomingClientPrivate>(this))
 {
+    connect(&d->socket, &XmppSocket::started, this, &QXmppIncomingClient::handleStart);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppIncomingClient::handleStanza);
+    connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppIncomingClient::handleStream);
+    connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppIncomingClient::disconnectFromHost);
+
     d->domain = domain;
 
     if (socket) {
         connect(socket, &QAbstractSocket::disconnected,
                 this, &QXmppIncomingClient::onSocketDisconnected);
 
-        setSocket(socket);
+        d->socket.setSocket(socket);
     }
 
     info(u"Incoming client connection from %1"_s.arg(d->origin()));
@@ -124,22 +133,38 @@ QXmppIncomingClient::~QXmppIncomingClient() = default;
 ///
 bool QXmppIncomingClient::isConnected() const
 {
-    return QXmppStream::isConnected() &&
+    return d->socket.isConnected() &&
         !d->jid.isEmpty() &&
         !d->resource.isEmpty();
 }
 
 /// Returns the client's JID.
-///
-
+/// Sends an XMPP packet to the peer.
 QString QXmppIncomingClient::jid() const
 {
     return d->jid;
 }
 
+/// Sends an XMPP packet to the peer.
+bool QXmppIncomingClient::sendPacket(const QXmppNonza &packet)
+{
+    return d->socket.sendData(serializeXml(packet));
+}
+
+/// Sends raw data to the peer.
+bool QXmppIncomingClient::sendData(const QByteArray &data)
+{
+    return d->socket.sendData(data);
+}
+
+/// Disconnects from the remote host.
+void QXmppIncomingClient::disconnectFromHost()
+{
+    d->socket.disconnectFromHost();
+}
+
 /// Sets the number of seconds after which a client will be disconnected
 /// for inactivity.
-
 void QXmppIncomingClient::setInactivityTimeout(int secs)
 {
     d->idleTimer->stop();
@@ -149,17 +174,21 @@ void QXmppIncomingClient::setInactivityTimeout(int secs)
     }
 }
 
+///
 /// Sets the password checker used to verify client credentials.
 ///
 /// \param checker
 ///
-
 void QXmppIncomingClient::setPasswordChecker(QXmppPasswordChecker *checker)
 {
     d->passwordChecker = checker;
 }
 
 /// \cond
+void QXmppIncomingClient::handleStart()
+{
+}
+
 void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
 {
     if (d->idleTimer->interval()) {
@@ -199,7 +228,8 @@ void QXmppIncomingClient::sendStreamFeatures()
 {
     // send stream features
     QXmppStreamFeatures features;
-    if (socket() && !socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull()) {
+    auto *socket = d->socket.socket();
+    if (socket && !socket->isEncrypted() && !socket->localCertificate().isNull() && !socket->privateKey().isNull()) {
         features.setTlsMode(QXmppStreamFeatures::Enabled);
     }
     if (!d->jid.isEmpty()) {
@@ -234,8 +264,8 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
 
     if (StarttlsRequest::fromDom(nodeRecv)) {
         sendData(serializeXml(StarttlsProceed()));
-        socket()->flush();
-        socket()->startServerEncryption();
+        d->socket.socket()->flush();
+        d->socket.socket()->startServerEncryption();
         return;
     } else if (ns == ns_sasl_2) {
         if (!d->passwordChecker) {
@@ -531,7 +561,7 @@ void QXmppIncomingClient::onTimeout()
     disconnectFromHost();
 
     // make sure disconnected() gets emitted no matter what
-    QTimer::singleShot(30, this, &QXmppStream::disconnected);
+    QTimer::singleShot(30, this, &QXmppIncomingClient::disconnected);
 }
 
 void QXmppIncomingClient::onSasl2Authenticated()
