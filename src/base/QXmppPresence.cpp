@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -76,6 +77,9 @@ public:
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     QString mixUserJid;
     QString mixUserNick;
+
+    // XEP-0283: Moved
+    QString oldJid;
 };
 
 QXmppPresencePrivate::QXmppPresencePrivate()
@@ -410,6 +414,26 @@ void QXmppPresence::setMixUserNick(const QString &mixUserNick)
     d->mixUserNick = mixUserNick;
 }
 
+///
+/// Returns the \xep{0283, Moved} user's old jid.
+///
+/// \since QXmpp 1.8
+///
+QString QXmppPresence::oldJid() const
+{
+    return d->oldJid;
+}
+
+///
+/// Sets the \xep{0283, Moved} user's old jid.
+///
+/// \since QXmpp 1.8
+///
+void QXmppPresence::setOldJid(const QString &oldJid)
+{
+    d->oldJid = oldJid;
+}
+
 /// \cond
 void QXmppPresence::parse(const QDomElement &element)
 {
@@ -493,6 +517,9 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
     } else if (element.tagName() == u"mix" && element.namespaceURI() == ns_mix_presence) {
         d->mixUserJid = element.firstChildElement(u"jid"_s).text();
         d->mixUserNick = element.firstChildElement(u"nick"_s).text();
+        // XEP-0283: Moved
+    } else if (element.tagName() == u"moved" && element.namespaceURI() == ns_moved) {
+        d->oldJid = element.firstChildElement(u"old-jid"_s).text();
     } else {
         unknownElements << element;
     }
@@ -602,6 +629,14 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
         if (!d->mixUserNick.isEmpty()) {
             writeXmlTextElement(xmlWriter, u"nick", d->mixUserNick);
         }
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0283: Moved
+    if (!d->oldJid.isEmpty()) {
+        xmlWriter->writeStartElement(QSL65("moved"));
+        xmlWriter->writeDefaultNamespace(ns_moved.toString());
+        writeXmlTextElement(xmlWriter, u"old-jid", d->oldJid);
         xmlWriter->writeEndElement();
     }
 
