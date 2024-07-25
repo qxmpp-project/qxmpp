@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -114,6 +115,10 @@ public:
 
     QVector<QXmppJingleIq::Content> mujiContents() const;
     void setMujiContents(const QVector<QXmppJingleIq::Content> &mujiContents);
+
+    // XEP-0283: Moved
+    QString oldJid() const;
+    void setOldJid(const QString &oldJid);
 
     // XEP-0319: Last User Interaction in Presence
     QDateTime lastUserInteraction() const;
