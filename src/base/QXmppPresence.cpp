@@ -1,5 +1,6 @@
 // SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2022 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -76,6 +77,9 @@ public:
     // XEP-0405: Mediated Information eXchange (MIX): Participant Server Requirements
     QString mixUserJid;
     QString mixUserNick;
+
+    // XEP-0283: Moved
+    QString oldJid;
 };
 
 QXmppPresencePrivate::QXmppPresencePrivate()
@@ -349,6 +353,26 @@ void QXmppPresence::setMucSupported(bool supported)
 }
 
 ///
+/// Returns the \xep{0283, Moved} user's old jid.
+///
+/// \since QXmpp 1.9
+///
+QString QXmppPresence::oldJid() const
+{
+    return d->oldJid;
+}
+
+///
+/// Sets the \xep{0283, Moved} user's old jid.
+///
+/// \since QXmpp 1.9
+///
+void QXmppPresence::setOldJid(const QString &oldJid)
+{
+    d->oldJid = oldJid;
+}
+
+///
 /// Returns when the last user interaction with the client took place. See
 /// \xep{0319}: Last User Interaction in Presence for details.
 ///
@@ -483,6 +507,9 @@ void QXmppPresence::parseExtension(const QDomElement &element, QXmppElementList 
             content.parse(contentElement);
             d->mujiContents.append(content);
         }
+        // XEP-0283: Moved
+    } else if (element.tagName() == u"moved" && element.namespaceURI() == ns_moved) {
+        d->oldJid = element.firstChildElement(u"old-jid"_s).text();
         // XEP-0319: Last User Interaction in Presence
     } else if (element.tagName() == u"idle" && element.namespaceURI() == ns_idle) {
         if (element.hasAttribute(u"since"_s)) {
@@ -581,6 +608,14 @@ void QXmppPresence::toXml(QXmlStreamWriter *xmlWriter) const
             mujiContent.toXml(xmlWriter);
         }
 
+        xmlWriter->writeEndElement();
+    }
+
+    // XEP-0283: Moved
+    if (!d->oldJid.isEmpty()) {
+        xmlWriter->writeStartElement(QSL65("moved"));
+        xmlWriter->writeDefaultNamespace(ns_moved.toString());
+        writeXmlTextElement(xmlWriter, u"old-jid", d->oldJid);
         xmlWriter->writeEndElement();
     }
 
