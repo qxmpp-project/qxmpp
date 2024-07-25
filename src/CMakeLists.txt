@@ -53,6 +53,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppMixIq.h
     base/QXmppMixIq_p.h
     base/QXmppMixParticipantItem.h
+    base/QXmppMovedItem.h
     base/QXmppMucIq.h
     base/QXmppNonza.h
     base/QXmppNonSASLAuth.h
@@ -199,6 +200,7 @@ set(SOURCE_FILES
     base/QXmppMixInvitation.cpp
     base/QXmppMixIq.cpp
     base/QXmppMixItems.cpp
+    base/QXmppMovedItem.cpp
     base/QXmppMucIq.cpp
     base/QXmppNonza.cpp
     base/QXmppNonSASLAuth.cpp
