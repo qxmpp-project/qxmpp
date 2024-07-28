@@ -191,9 +191,11 @@ void XmppSocket::connectToHost(const ServerAddress &address)
     // connect to host
     switch (address.type) {
     case ServerAddress::Tcp:
+        info(u"Connecting to %1:%2 (TCP)"_s.arg(address.host, QString::number(address.port)));
         m_socket->connectToHost(address.host, address.port);
         break;
     case ServerAddress::Tls:
+        info(u"Connecting to %1:%2 (TLS)"_s.arg(address.host, QString::number(address.port)));
         Q_ASSERT(QSslSocket::supportsSsl());
         m_socket->connectToHostEncrypted(address.host, address.port);
         break;
