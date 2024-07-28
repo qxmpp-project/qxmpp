@@ -86,16 +86,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
     // set the name the SSL certificate should match
     q->socket()->setPeerVerifyName(config.domain());
 
-    // connect to host
-    switch (address.type) {
-    case ServerAddress::Tcp:
-        q->socket()->connectToHost(address.host, address.port);
-        break;
-    case ServerAddress::Tls:
-        Q_ASSERT(QSslSocket::supportsSsl());
-        q->socket()->connectToHostEncrypted(address.host, address.port);
-        break;
-    }
+    socket.connectToHost(address);
 }
 
 void QXmppOutgoingClientPrivate::connectToNextAddress()

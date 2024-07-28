@@ -156,12 +156,17 @@ void XmppSocket::setSocket(QSslSocket *socket)
         info(u"Socket connected to %1 %2"_s
                  .arg(m_socket->peerAddress().toString(),
                       QString::number(m_socket->peerPort())));
-        m_dataBuffer.clear();
-        m_streamOpenElement.clear();
-        Q_EMIT started();
+
+        // do not emit started() with direct TLS (this happens in encrypted())
+        if (!m_directTls) {
+            m_dataBuffer.clear();
+            m_streamOpenElement.clear();
+            Q_EMIT started();
+        }
     });
     QObject::connect(socket, &QSslSocket::encrypted, this, [this]() {
         debug(u"Socket encrypted"_s);
+        // this happens with direct TLS or STARTTLS
         m_dataBuffer.clear();
         m_streamOpenElement.clear();
         Q_EMIT started();
@@ -177,6 +182,22 @@ void XmppSocket::setSocket(QSslSocket *socket)
 bool XmppSocket::isConnected() const
 {
     return m_socket && m_socket->state() == QAbstractSocket::ConnectedState;
+}
+
+void XmppSocket::connectToHost(const ServerAddress &address)
+{
+    m_directTls = address.type == ServerAddress::Tls;
+
+    // connect to host
+    switch (address.type) {
+    case ServerAddress::Tcp:
+        m_socket->connectToHost(address.host, address.port);
+        break;
+    case ServerAddress::Tls:
+        Q_ASSERT(QSslSocket::supportsSsl());
+        m_socket->connectToHostEncrypted(address.host, address.port);
+        break;
+    }
 }
 
 void XmppSocket::disconnectFromHost()

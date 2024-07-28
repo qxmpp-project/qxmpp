@@ -27,17 +27,6 @@ namespace QXmpp::Private {
 
 using LegacyError = std::variant<QAbstractSocket::SocketError, QXmpp::TimeoutError, QXmppStanza::Error::Condition>;
 
-struct ServerAddress {
-    enum ConnectionType {
-        Tcp,
-        Tls,
-    };
-
-    ConnectionType type;
-    QString host;
-    quint16 port;
-};
-
 // STARTTLS
 class StarttlsManager
 {
