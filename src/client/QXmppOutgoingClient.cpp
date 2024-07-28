@@ -36,24 +36,83 @@ using namespace std::chrono_literals;
 using namespace QXmpp;
 using namespace QXmpp::Private;
 
-using DnsRecordsResult = std::variant<QList<QDnsServiceRecord>, QXmppError>;
-
-static QXmppTask<DnsRecordsResult> lookupXmppClientRecords(const QString &domain, QObject *context)
+template<typename Result1, typename Result2, typename Handler>
+auto join(QXmppTask<Result1> t1, QXmppTask<Result2> t2, QObject *context, Handler handler)
 {
-    QXmppPromise<DnsRecordsResult> p;
+    using T = std::invoke_result_t<Handler, Result1, Result2>;
+
+    QXmppPromise<T> p;
+    t1.then(context, [context, p, t2, handler = std::move(handler)](Result1 &&result1) mutable {
+        t2.then(context, [p = std::move(p), handler = std::move(handler), result1 = std::move(result1)](Result2 &&result2) mutable {
+            p.finish(handler(std::move(result1), std::move(result2)));
+        });
+    });
+
+    return p.task();
+}
+
+using ServerAddressesResult = std::variant<std::vector<ServerAddress>, QXmppError>;
+
+static QXmppTask<ServerAddressesResult> lookupXmppSrvRecords(const QString &domain, const QString &serviceName, ServerAddress::ConnectionType connectionType, QObject *context)
+{
+    QXmppPromise<ServerAddressesResult> p;
     auto task = p.task();
 
-    auto *dns = new QDnsLookup(QDnsLookup::SRV, u"_xmpp-client._tcp." + domain, context);
-    QObject::connect(dns, &QDnsLookup::finished, context, [dns, p = std::move(p)]() mutable {
+    auto *dns = new QDnsLookup(QDnsLookup::SRV, u"_" + serviceName + u"._tcp." + domain, context);
+    QObject::connect(dns, &QDnsLookup::finished, context, [dns, connectionType, p = std::move(p)]() mutable {
         if (auto error = dns->error(); error != QDnsLookup::NoError) {
             p.finish(QXmppError { dns->errorString(), error });
         } else {
-            p.finish(dns->serviceRecords());
+            p.finish(transform<std::vector<ServerAddress>>(dns->serviceRecords(), [connectionType](auto record) {
+                return ServerAddress { connectionType, record.target(), record.port() };
+            }));
         }
     });
 
     dns->lookup();
     return task;
+}
+
+static QXmppTask<ServerAddressesResult> lookupXmppClientRecords(const QString &domain, QObject *context)
+{
+    return lookupXmppSrvRecords(domain, u"xmpp-client"_s, ServerAddress::Tcp, context);
+}
+
+static QXmppTask<ServerAddressesResult> lookupXmppsClientRecords(const QString &domain, QObject *context)
+{
+    return lookupXmppSrvRecords(domain, u"xmpps-client"_s, ServerAddress::Tls, context);
+}
+
+// Looks up xmpps-client and xmpp-client and combines them.
+static QXmppTask<ServerAddressesResult> lookupXmppClientHybridRecords(const QString &domain, QObject *context)
+{
+    // prefer XMPPS records over XMPP records as direct TLS saves one round trip
+    return join(
+        lookupXmppsClientRecords(domain, context),
+        lookupXmppClientRecords(domain, context),
+        context,
+        [](ServerAddressesResult &&r1, ServerAddressesResult &&r2) -> ServerAddressesResult {
+            std::vector<ServerAddress> addresses;
+            bool isError1 = std::holds_alternative<QXmppError>(r1);
+            bool isError2 = std::holds_alternative<QXmppError>(r2);
+
+            // no records could be fetched
+            if (isError1 && isError2) {
+                return std::get<QXmppError>(std::move(r2));
+            }
+            if (!isError1) {
+                addresses = std::get<std::vector<ServerAddress>>(std::move(r1));
+            }
+            if (!isError2) {
+                // append other addresses
+                auto &&addresses2 = std::get<std::vector<ServerAddress>>(std::move(r2));
+                addresses.insert(addresses.end(),
+                                 std::make_move_iterator(addresses2.begin()),
+                                 std::make_move_iterator(addresses2.end()));
+            }
+
+            return std::move(addresses);
+        });
 }
 
 QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
@@ -71,8 +130,6 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
 
 void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
 {
-    q->info(u"Connecting to %1:%2"_s.arg(address.host, QString::number(address.port)));
-
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
         QSslConfiguration newSslConfig;
@@ -202,9 +259,14 @@ void QXmppOutgoingClient::connectToHost()
     }
 
     // otherwise, lookup server
-    const auto domain = configuration().domain();
+    const auto domain = d->config.domain();
+
     debug(u"Looking up service records for domain %1"_s.arg(domain));
-    lookupXmppClientRecords(domain, this).then(this, [this, domain](auto result) {
+    auto recordsTask = QSslSocket::supportsSsl()
+        ? lookupXmppClientHybridRecords(domain, this)
+        : lookupXmppClientRecords(domain, this);
+
+    recordsTask.then(this, [this, domain](auto result) {
         if (auto error = std::get_if<QXmppError>(&result)) {
             warning(u"Lookup for domain %1 failed: %2"_s
                         .arg(domain, error->description));
@@ -214,13 +276,7 @@ void QXmppOutgoingClient::connectToHost()
             return;
         }
 
-        d->serverAddresses = transform<std::vector<ServerAddress>>(std::get<QList<QDnsServiceRecord>>(result), [](auto record) {
-            return ServerAddress {
-                ServerAddress::Tcp,
-                record.target(),
-                record.port(),
-            };
-        });
+        d->serverAddresses = std::get<std::vector<ServerAddress>>(std::move(result));
         d->nextServerAddressIndex = 0;
 
         if (d->serverAddresses.empty()) {
