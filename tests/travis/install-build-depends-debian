@@ -35,7 +35,7 @@ esac
 
 # install base tools
 sudo apt-get update -qq
-sudo apt-get install -qq clang cmake git
+sudo apt-get install -qq clang cmake git curl
 
 # install extra dependencies
 case "$CONFIG" in
