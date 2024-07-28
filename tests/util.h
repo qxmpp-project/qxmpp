@@ -7,6 +7,7 @@
 #ifndef TESTS_UTIL_H
 #define TESTS_UTIL_H
 
+#include "QXmppError.h"
 #include "QXmppPasswordChecker.h"
 #include "QXmppTask.h"
 
@@ -137,6 +138,26 @@ T unwrap(std::optional<T> &&v)
 {
     VERIFY2(v.has_value(), "Expected value, got empty optional");
     return *v;
+}
+
+template<typename T>
+T unwrap(std::variant<T, QXmppError> &&v)
+{
+    if (std::holds_alternative<QXmppError>(v)) {
+        auto message = u"Expected value, got error: %1."_s.arg(std::get<QXmppError>(v).description);
+        VERIFY2(v.index() == 1, message.toLocal8Bit().constData());
+    }
+    return std::get<T>(std::move(v));
+}
+
+template<typename T>
+const T &unwrap(const std::variant<T, QXmppError> &v)
+{
+    if (std::holds_alternative<QXmppError>(v)) {
+        auto message = u"Expected value, got error: %1."_s.arg(std::get<QXmppError>(v).description);
+        VERIFY2(v.index() == 1, message.toLocal8Bit().constData());
+    }
+    return std::get<T>(v);
 }
 
 template<typename T>
