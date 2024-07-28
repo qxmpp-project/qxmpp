@@ -14,6 +14,17 @@ class tst_QXmppStream;
 
 namespace QXmpp::Private {
 
+struct ServerAddress {
+    enum ConnectionType {
+        Tcp,
+        Tls,
+    };
+
+    ConnectionType type;
+    QString host;
+    quint16 port;
+};
+
 class SendDataInterface
 {
 public:
@@ -31,6 +42,7 @@ public:
     void setSocket(QSslSocket *socket);
 
     bool isConnected() const;
+    void connectToHost(const ServerAddress &);
     void disconnectFromHost();
     bool sendData(const QByteArray &) override;
 
@@ -45,6 +57,7 @@ private:
     friend class ::tst_QXmppStream;
 
     QString m_dataBuffer;
+    bool m_directTls = false;
     QSslSocket *m_socket = nullptr;
 
     // incoming stream state
