@@ -130,16 +130,20 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
 
 void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
 {
+    QSslConfiguration sslConfig;
+
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
-        QSslConfiguration newSslConfig;
-        newSslConfig.setCaCertificates(config.caCertificates());
-        q->socket()->setSslConfiguration(newSslConfig);
+        sslConfig.setCaCertificates(config.caCertificates());
     }
+    // ALPN protocol 'xmpp-client'
+    sslConfig.setAllowedNextProtocols({ QByteArrayLiteral("xmpp-client") });
+
+    // set new ssl config
+    q->socket()->setSslConfiguration(sslConfig);
 
     // respect proxy
     q->socket()->setProxy(config.networkProxy());
-
     // set the name the SSL certificate should match
     q->socket()->setPeerVerifyName(config.domain());
 
