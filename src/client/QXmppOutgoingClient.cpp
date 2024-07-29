@@ -150,6 +150,13 @@ void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
     socket.connectToHost(address);
 }
 
+void QXmppOutgoingClientPrivate::connectToAddressList(std::vector<ServerAddress> &&addresses)
+{
+    serverAddresses = std::move(addresses);
+    nextServerAddressIndex = 0;
+    connectToNextAddress();
+}
+
 void QXmppOutgoingClientPrivate::connectToNextAddress()
 {
     nextAddressState = Current;
@@ -253,12 +260,10 @@ void QXmppOutgoingClient::connectToHost()
             return;
         }
 
-        d->serverAddresses = {
+        d->connectToAddressList({
             ServerAddress { ServerAddress::Tls, d->config.domain(), XMPPS_DEFAULT_PORT },
             ServerAddress { ServerAddress::Tls, d->config.domain(), XMPP_DEFAULT_PORT },
-        };
-        d->nextServerAddressIndex = 0;
-        d->connectToNextAddress();
+        });
         return;
     }
 
@@ -276,22 +281,25 @@ void QXmppOutgoingClient::connectToHost()
                         .arg(domain, error->description));
 
             // as a fallback, use domain as hostname
-            d->connectToHost({ ServerAddress::Tcp, d->config.domain(), XMPP_DEFAULT_PORT });
+            d->connectToAddressList({
+                ServerAddress { ServerAddress::Tls, d->config.domain(), XMPPS_DEFAULT_PORT },
+                ServerAddress { ServerAddress::Tcp, d->config.domain(), XMPP_DEFAULT_PORT },
+            });
             return;
         }
 
-        d->serverAddresses = std::get<std::vector<ServerAddress>>(std::move(result));
-        d->nextServerAddressIndex = 0;
-
-        if (d->serverAddresses.empty()) {
+        if (std::get<std::vector<ServerAddress>>(result).empty()) {
             warning(u"'%1' has no xmpp-client service records."_s.arg(domain));
 
             // as a fallback, use domain as hostname
-            d->connectToHost({ ServerAddress::Tcp, d->config.host(), XMPP_DEFAULT_PORT });
+            d->connectToAddressList({
+                ServerAddress { ServerAddress::Tls, d->config.domain(), XMPPS_DEFAULT_PORT },
+                ServerAddress { ServerAddress::Tcp, d->config.domain(), XMPP_DEFAULT_PORT },
+            });
             return;
         }
 
-        d->connectToNextAddress();
+        d->connectToAddressList(std::get<std::vector<ServerAddress>>(std::move(result)));
     });
 }
 

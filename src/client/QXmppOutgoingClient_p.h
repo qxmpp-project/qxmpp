@@ -163,6 +163,7 @@ public:
 
     explicit QXmppOutgoingClientPrivate(QXmppOutgoingClient *q);
     void connectToHost(const ServerAddress &);
+    void connectToAddressList(std::vector<ServerAddress> &&);
     void connectToNextAddress();
 
     // This object provides the configuration
