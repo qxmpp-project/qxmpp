@@ -44,7 +44,9 @@ public:
         TLSDisabled,     ///< No encryption even if the server offers it.
         TLSRequired,     ///< Encryption must be available, otherwise the
                          ///< connection will not be established.
-        LegacySSL        ///< Use only legacy SSL mode.
+        /// Use direct TLS connection only and connect to configured host and port or domain and
+        /// 5223 or 5222. No SRV records are looked up.
+        LegacySSL
     };
 
     /// An enumeration for various Non-SASL authentication mechanisms available.

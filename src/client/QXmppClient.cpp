@@ -224,6 +224,18 @@ bool process(QXmppClient *client, const QList<QXmppClientExtension *> &extension
 /// - QXmppDiscoveryManager
 /// - QXmppEntityTimeManager
 ///
+/// ## Connection details
+///
+/// If no explicit host and port are configured, the client will look up the SRV records of the
+/// domain of the configured JID. Since QXmpp 1.8 both TCP and direct TLS records are looked up
+/// and connection via direct TLS is preferred as it saves the extra round trip from STARTTLS. See
+/// also \xep{0368, SRV records for XMPP over TLS}.
+///
+/// On connection errors the other SRV records are tested too (if multiple are available).
+///
+/// For servers without SRV records or if looking up the records did not succeed, domain and the
+/// default port of 5223 (TLS) and 5222 (TCP/STARTTLS) are tried.
+///
 /// ## Usage of FAST token-based authentication
 ///
 /// QXmpp uses \xep{0484, Fast Authentication Streamlining Tokens} if enabled and supported by the
