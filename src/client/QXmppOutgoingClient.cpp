@@ -101,6 +101,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
 
 void QXmppOutgoingClientPrivate::connectToNextDNSHost()
 {
+    nextAddressState = Current;
     auto curIdx = nextSrvRecordIdx++;
     connectToHost(srvRecords.at(curIdx).target(), srvRecords.at(curIdx).port());
 }
@@ -266,7 +267,9 @@ void QXmppOutgoingClient::_q_socketDisconnected()
 {
     debug(u"Socket disconnected"_s);
     d->isAuthenticated = false;
-    if (d->redirect) {
+    if (d->nextAddressState == QXmppOutgoingClientPrivate::TryNext) {
+        d->connectToNextDNSHost();
+    } else if (d->redirect) {
         d->connectToHost(d->redirect->host, d->redirect->port);
         d->redirect.reset();
     } else {
@@ -522,7 +525,7 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
     if (!d->sessionStarted &&
         (d->srvRecords.count() > d->nextSrvRecordIdx)) {
         // some network error occurred during startup -> try next available SRV record server
-        d->connectToNextDNSHost();
+        d->nextAddressState = QXmppOutgoingClientPrivate::TryNext;
     } else {
         setError(d->socket.socket()->errorString(), socketError);
     }

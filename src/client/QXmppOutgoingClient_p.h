@@ -178,6 +178,10 @@ public:
     // DNS
     QList<QDnsServiceRecord> srvRecords;
     int nextSrvRecordIdx = 0;
+    enum {
+        Current,
+        TryNext,
+    } nextAddressState = Current;
 
     // Stream
     QString streamId;
