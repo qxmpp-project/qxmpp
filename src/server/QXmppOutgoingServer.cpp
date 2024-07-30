@@ -67,11 +67,11 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppOutgoingServer::handleStanza);
     connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppOutgoingServer::handleStream);
     connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppOutgoingServer::disconnectFromHost);
-    connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingServer::_q_socketDisconnected);
+    connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingServer::onSocketDisconnected);
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingServer::socketError);
 
     // DNS lookups
-    connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingServer::_q_dnsLookupFinished);
+    connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingServer::onDnsLookupFinished);
 
     d->dialbackTimer = new QTimer(this);
     d->dialbackTimer->setInterval(5s);
@@ -102,7 +102,7 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
     d->dns.lookup();
 }
 
-void QXmppOutgoingServer::_q_dnsLookupFinished()
+void QXmppOutgoingServer::onDnsLookupFinished()
 {
     QString host;
     quint16 port = 0;
@@ -128,7 +128,7 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
     d->socket.socket()->connectToHost(host, port);
 }
 
-void QXmppOutgoingServer::_q_socketDisconnected()
+void QXmppOutgoingServer::onSocketDisconnected()
 {
     debug(u"Socket disconnected"_s);
     Q_EMIT disconnected();
