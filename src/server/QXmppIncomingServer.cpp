@@ -13,6 +13,7 @@
 
 #include "Stream.h"
 #include "StringLiterals.h"
+#include "XmppSocket.h"
 
 #include <QDomElement>
 #include <QHostAddress>
@@ -27,6 +28,7 @@ public:
     QXmppIncomingServerPrivate(QXmppIncomingServer *qq);
     QString origin() const;
 
+    XmppSocket socket;
     QSet<QString> authenticated;
     QString domain;
     QString localStreamId;
@@ -36,15 +38,16 @@ private:
 };
 
 QXmppIncomingServerPrivate::QXmppIncomingServerPrivate(QXmppIncomingServer *qq)
-    : q(qq)
+    : q(qq),
+      socket(qq)
 {
 }
 
 QString QXmppIncomingServerPrivate::origin() const
 {
-    QSslSocket *socket = q->socket();
-    if (socket) {
-        return socket->peerAddress().toString() + u' ' + QString::number(socket->peerPort());
+    auto *tcpSocket = socket.socket();
+    if (tcpSocket) {
+        return tcpSocket->peerAddress().toString() + u' ' + QString::number(tcpSocket->peerPort());
     } else {
         return u"<unknown>"_s;
     }
@@ -58,16 +61,21 @@ QString QXmppIncomingServerPrivate::origin() const
 /// \param parent The parent QObject for the stream (optional).
 ///
 QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent)
-    : QXmppStream(parent),
+    : QXmppLoggable(parent),
       d(std::make_unique<QXmppIncomingServerPrivate>(this))
 {
+    connect(&d->socket, &XmppSocket::started, this, &QXmppIncomingServer::handleStart);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppIncomingServer::handleStanza);
+    connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppIncomingServer::handleStream);
+    connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppIncomingServer::disconnectFromHost);
+
     d->domain = domain;
 
     if (socket) {
         connect(socket, &QAbstractSocket::disconnected,
                 this, &QXmppIncomingServer::slotSocketDisconnected);
 
-        setSocket(socket);
+        d->socket.setSocket(socket);
     }
 
     info(u"Incoming server connection from %1"_s.arg(d->origin()));
@@ -75,15 +83,43 @@ QXmppIncomingServer::QXmppIncomingServer(QSslSocket *socket, const QString &doma
 
 QXmppIncomingServer::~QXmppIncomingServer() = default;
 
-///
+/// Returns true if the socket is connected and the remote server is
+/// authenticated.
+bool QXmppIncomingServer::isConnected() const
+{
+    return d->socket.isConnected() && !d->authenticated.isEmpty();
+}
+
+/// Disconnects from the remote host.
+void QXmppIncomingServer::disconnectFromHost()
+{
+    d->socket.disconnectFromHost();
+}
+
 /// Returns the stream's identifier.
-///
 QString QXmppIncomingServer::localStreamId() const
 {
     return d->localStreamId;
 }
 
-/// \cond
+/// Sends an XMPP packet to the peer.
+bool QXmppIncomingServer::sendPacket(const QXmppNonza &nonza)
+{
+    return d->socket.sendData(serializeXml(nonza));
+}
+
+/// Sends raw data to the peer.
+bool QXmppIncomingServer::sendData(const QByteArray &data)
+{
+    return d->socket.sendData(data);
+}
+
+/// Handles a stream start event, which occurs when the underlying transport
+/// becomes ready (socket connected, encryption started).
+void QXmppIncomingServer::handleStart()
+{
+}
+
 void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 {
     const QString from = streamElement.attribute(u"from"_s);
@@ -105,7 +141,8 @@ void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
 
     // send stream features
     QXmppStreamFeatures features;
-    if (!socket()->isEncrypted() && !socket()->localCertificate().isNull() && !socket()->privateKey().isNull()) {
+    auto *socket = d->socket.socket();
+    if (!socket->isEncrypted() && !socket->localCertificate().isNull() && !socket->privateKey().isNull()) {
         features.setTlsMode(QXmppStreamFeatures::Enabled);
     }
     sendPacket(features);
@@ -115,8 +152,8 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
 {
     if (StarttlsRequest::fromDom(stanza)) {
         sendData(serializeXml(StarttlsProceed()));
-        socket()->flush();
-        socket()->startServerEncryption();
+        d->socket.socket()->flush();
+        d->socket.socket()->startServerEncryption();
         return;
     } else if (QXmppDialback::isDialback(stanza)) {
         QXmppDialback request;
@@ -153,22 +190,8 @@ void QXmppIncomingServer::handleStanza(const QDomElement &stanza)
         disconnectFromHost();
     }
 }
-/// \endcond
-
-/// Returns true if the socket is connected and the remote server is
-/// authenticated.
-///
-
-bool QXmppIncomingServer::isConnected() const
-{
-    return QXmppStream::isConnected() && !d->authenticated.isEmpty();
-}
 
 /// Handles a dialback response received from the authority server.
-///
-/// \param response
-///
-
 void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dialback)
 {
     auto *stream = qobject_cast<QXmppOutgoingServer *>(sender());

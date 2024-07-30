@@ -5,17 +5,21 @@
 #ifndef QXMPPINCOMINGSERVER_H
 #define QXMPPINCOMINGSERVER_H
 
-#include "QXmppStream.h"
+#include "QXmppLogger.h"
 
+#include <memory>
+
+class QDomElement;
+class QSslSocket;
 class QXmppDialback;
 class QXmppIncomingServerPrivate;
-class QXmppOutgoingServer;
+class QXmppNonza;
 
+///
 /// \brief The QXmppIncomingServer class represents an incoming XMPP stream
 /// from an XMPP server.
 ///
-
-class QXMPP_EXPORT QXmppIncomingServer : public QXmppStream
+class QXMPP_EXPORT QXmppIncomingServer : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -23,27 +27,31 @@ public:
     QXmppIncomingServer(QSslSocket *socket, const QString &domain, QObject *parent);
     ~QXmppIncomingServer() override;
 
-    bool isConnected() const override;
+    bool isConnected() const;
+    void disconnectFromHost();
+
     QString localStreamId() const;
 
-Q_SIGNALS:
+    bool sendPacket(const QXmppNonza &);
+    Q_SLOT bool sendData(const QByteArray &);
+
+    /// This signal is emitted when the stream is connected.
+    Q_SIGNAL void connected();
+    /// This signal is emitted when the stream is disconnected.
+    Q_SIGNAL void disconnected();
     /// This signal is emitted when a dialback verify request is received.
-    void dialbackRequestReceived(const QXmppDialback &result);
-
+    Q_SIGNAL void dialbackRequestReceived(const QXmppDialback &result);
     /// This signal is emitted when an element is received.
-    void elementReceived(const QDomElement &element);
+    Q_SIGNAL void elementReceived(const QDomElement &element);
 
-protected:
-    /// \cond
-    void handleStanza(const QDomElement &stanzaElement) override;
-    void handleStream(const QDomElement &streamElement) override;
-    /// \endcond
+private:
+    void handleStart();
+    void handleStanza(const QDomElement &element);
+    void handleStream(const QDomElement &element);
 
-private Q_SLOTS:
     void slotDialbackResponseReceived(const QXmppDialback &dialback);
     void slotSocketDisconnected();
 
-private:
     const std::unique_ptr<QXmppIncomingServerPrivate> d;
     friend class QXmppIncomingServerPrivate;
 };
