@@ -94,11 +94,11 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
     QString host;
     quint16 port = 0;
 
-    if (d->dns.error() == QDnsLookup::NoError &&
-        !d->dns.serviceRecords().isEmpty()) {
+    const auto dnsRecords = d->dns.serviceRecords();
+    if (d->dns.error() == QDnsLookup::NoError && !dnsRecords.isEmpty()) {
         // take the first returned record
-        host = d->dns.serviceRecords().first().target();
-        port = d->dns.serviceRecords().first().port();
+        host = dnsRecords.first().target();
+        port = dnsRecords.first().port();
     } else {
         // as a fallback, use domain as the host name
         warning(u"Lookup for domain %1 failed: %2"_s
