@@ -779,7 +779,7 @@ void QXmppServer::_q_serverConnection(QSslSocket *socket)
     auto *stream = new QXmppIncomingServer(socket, d->domain, this);
     socket->setParent(stream);
 
-    connect(stream, &QXmppStream::disconnected,
+    connect(stream, &QXmppIncomingServer::disconnected,
             this, &QXmppServer::_q_serverDisconnected);
 
     connect(stream, &QXmppIncomingServer::dialbackRequestReceived,
