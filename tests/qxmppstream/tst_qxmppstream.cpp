@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppConstants_p.h"
-#include "QXmppStream.h"
 #include "QXmppStreamError_p.h"
 
 #include "Stream.h"
@@ -15,42 +14,6 @@ using namespace QXmpp;
 using namespace QXmpp::Private;
 
 Q_DECLARE_METATYPE(QDomElement)
-
-class TestStream : public QXmppStream
-{
-    Q_OBJECT
-
-public:
-    TestStream(QObject *parent)
-        : QXmppStream(parent)
-    {
-    }
-
-    void handleStart() override
-    {
-        QXmppStream::handleStart();
-        Q_EMIT started();
-    }
-
-    void handleStream(const QDomElement &element) override
-    {
-        Q_EMIT streamReceived(element);
-    }
-
-    void handleStanza(const QDomElement &element) override
-    {
-        Q_EMIT stanzaReceived(element);
-    }
-
-    void processData(const QString &data)
-    {
-        xmppSocket().processData(data);
-    }
-
-    Q_SIGNAL void started();
-    Q_SIGNAL void streamReceived(const QDomElement &element);
-    Q_SIGNAL void stanzaReceived(const QDomElement &element);
-};
 
 class tst_QXmppStream : public QObject
 {
@@ -77,14 +40,14 @@ void tst_QXmppStream::initTestCase()
 
 void tst_QXmppStream::testProcessData()
 {
-    TestStream stream(this);
+    XmppSocket socket(this);
 
-    QSignalSpy onStarted(&stream, &TestStream::started);
-    QSignalSpy onStreamReceived(&stream, &TestStream::streamReceived);
-    QSignalSpy onStanzaReceived(&stream, &TestStream::stanzaReceived);
+    QSignalSpy onStarted(&socket, &XmppSocket::started);
+    QSignalSpy onStreamReceived(&socket, &XmppSocket::streamReceived);
+    QSignalSpy onStanzaReceived(&socket, &XmppSocket::stanzaReceived);
 
-    stream.processData(R"(<?xml version="1.0" encoding="UTF-8"?>)");
-    stream.processData(R"(
+    socket.processData(R"(<?xml version="1.0" encoding="UTF-8"?>)");
+    socket.processData(R"(
         <stream:stream from='juliet@im.example.com'
                        to='im.example.com'
                        version='1.0'
@@ -106,7 +69,7 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(streamElement.attribute("version"), u"1.0"_s);
     QCOMPARE(streamElement.attribute("lang"), u"en"_s);
 
-    stream.processData(R"(
+    socket.processData(R"(
         <stream:features>
             <starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'>
                 <required/>
@@ -122,13 +85,13 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(features.namespaceURI(), u"http://etherx.jabber.org/streams"_s);
 
     // test partial data
-    stream.processData(R"(<message from="juliet@im.example.co)");
+    socket.processData(R"(<message from="juliet@im.example.co)");
     QCOMPARE(onStreamReceived.size(), 1);
     QCOMPARE(onStanzaReceived.size(), 1);
     QCOMPARE(onStarted.size(), 0);
-    stream.processData(R"(m" to="stpeter@im.example.com">)");
-    stream.processData(R"(<body>Moin</body>)");
-    stream.processData(R"(</message>)");
+    socket.processData(R"(m" to="stpeter@im.example.com">)");
+    socket.processData(R"(<body>Moin</body>)");
+    socket.processData(R"(</message>)");
     QCOMPARE(onStreamReceived.size(), 1);
     QCOMPARE(onStanzaReceived.size(), 2);
     QCOMPARE(onStarted.size(), 0);
@@ -137,7 +100,7 @@ void tst_QXmppStream::testProcessData()
     QCOMPARE(message.tagName(), u"message"_s);
     QCOMPARE(message.namespaceURI(), u"jabber:client"_s);
 
-    stream.processData(R"(</stream:stream>)");
+    socket.processData(R"(</stream:stream>)");
 }
 
 #ifdef BUILD_INTERNAL_TESTS

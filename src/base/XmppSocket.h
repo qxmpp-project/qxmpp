@@ -10,6 +10,7 @@
 class QDomElement;
 class QSslSocket;
 class TestStream;
+class tst_QXmppStream;
 
 namespace QXmpp::Private {
 
@@ -41,7 +42,7 @@ public:
 private:
     void processData(const QString &data);
 
-    friend class ::TestStream;
+    friend class ::tst_QXmppStream;
 
     QString m_dataBuffer;
     QSslSocket *m_socket = nullptr;
