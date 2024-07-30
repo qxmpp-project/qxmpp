@@ -4,10 +4,31 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-QXmpp 1.8.0 (UNRELEASED)
-------------------------
+QXmpp 1.8.0 (July 30, 2024)
+---------------------------
 
-*under development*
+ - QXmpp now requires C++20
+ - Fix connection to next SRV record if connection to first address fails (@lnjX, #644)
+ - Implement XMPP over TLS ("direct TLS" instead of STARTTLS, XEP-0368) (@lnjX, #642)
+   - Support of protocol/server name multiplexing, ALPN and SNI extensions
+ - New Bind 2 support (XEP-0386) (@lnjX, #614)
+   - Client and server support of resource binding through SASL2 + Bind2
+   - Resource prefix can be configured in QXmppConfiguration
+   - Setting of Client State Indication (CSI) initial state on connection
+   - Enabling of Stream Management (through Bind 2) and stream resumption (through SASL 2)
+   - Enabling of Message Carbons (through Bind 2)
+ - Support FAST, token-based authentication (XEP-0484) (@lnjX, #630)
+   - Offers single round trip authentication (but doesn't replace strong authentication methods
+     like SCRAM+password)
+   - FAST tokens (and other credentials) can be stored permanently via QXmppCredentials
+   - Tokens are generated if a SASL 2 user agent is set and FAST is not disabled in the config
+ - New QXmppUri for parsing XMPP URIs (XEP-0147) (@lnjX, #641)
+ - New AccountMigrationManager for importing and exporting account data (@lnjX, @pasnox, #623)
+ - Message: Parse all stanza IDs (XEP-0359) (@lnjX, #638)
+ - CSI state is automatically restored across reconnects, also without Bind 2 or stream management (@lnjX, #622)
+ - Use smaller stream management acks instead of ping IQs if possible (@lnjX, #625)
+ - Moved STARTTLS handling into the core client again (was in client extension) (@lnjX, #627)
+ - VCardManager: New task-based API (@lnjX, #623)
 
 QXmpp 1.7.1 (July 07, 2024)
 ---------------------------
