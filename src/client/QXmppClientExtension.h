@@ -16,7 +16,6 @@ class QDomElement;
 class QXmppClient;
 class QXmppClientExtensionPrivate;
 class QXmppMessage;
-class QXmppStream;
 
 ///
 /// \brief The QXmppClientExtension class is the base class for QXmppClient

@@ -15,7 +15,7 @@ class QXmlStreamWriter;
 
 namespace QXmpp::Private {
 
-// implemented in QXmppStream.cpp
+// implemented in Stream.cpp
 struct StreamErrorElement {
     struct SeeOtherHost {
         QString host;

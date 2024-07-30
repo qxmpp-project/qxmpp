@@ -29,7 +29,6 @@ class QXmppMessage;
 class QXmppOutgoingClient;
 class QXmppPresence;
 class QXmppIq;
-class QXmppStream;
 
 // managers
 class QXmppDiscoveryIq;

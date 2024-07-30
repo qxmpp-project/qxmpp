@@ -13,7 +13,6 @@
 #include <QDomDocument>
 #include <QXmlStreamWriter>
 
-class QXmppStream;
 class QXmppPacket;
 
 namespace QXmpp::Private {

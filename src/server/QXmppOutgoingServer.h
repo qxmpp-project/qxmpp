@@ -5,12 +5,14 @@
 #ifndef QXMPPOUTGOINGSERVER_H
 #define QXMPPOUTGOINGSERVER_H
 
-#include "QXmppStream.h"
+#include "QXmppLogger.h"
 
 #include <QAbstractSocket>
 
+class QDomElement;
 class QSslError;
 class QXmppDialback;
+class QXmppNonza;
 class QXmppOutgoingServer;
 class QXmppOutgoingServerPrivate;
 

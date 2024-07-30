@@ -6,7 +6,6 @@
 #include "QXmppGlobal.h"
 #include "QXmppPacket_p.h"
 #include "QXmppStanza_p.h"
-#include "QXmppStream.h"
 #include "QXmppStreamManagement_p.h"
 #include "QXmppUtils_p.h"
 
@@ -250,8 +249,7 @@ bool StreamAckManager::sendPacketCompat(QXmppPacket &&packet)
 // Returns written to socket (bool) and QXmppTask
 std::tuple<bool, QXmppTask<SendResult>> StreamAckManager::internalSend(QXmppPacket &&packet)
 {
-    // the writtenToSocket parameter is just for backwards compat (see
-    // QXmppStream::sendPacket())
+    // the writtenToSocket parameter is just for backwards compat
     bool writtenToSocket = socket.sendData(packet.data());
 
     // handle stream management

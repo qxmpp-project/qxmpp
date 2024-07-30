@@ -13,8 +13,8 @@ class QDomElement;
 
 class QXmppServer;
 class QXmppServerExtensionPrivate;
-class QXmppStream;
 
+///
 /// \brief The QXmppServerExtension class is the base class for QXmppServer
 /// extensions.
 ///
@@ -24,7 +24,7 @@ class QXmppStream;
 /// client instance using QXmppServer::addExtension().
 ///
 /// \ingroup Core
-
+///
 class QXMPP_EXPORT QXmppServerExtension : public QXmppLoggable
 {
     Q_OBJECT

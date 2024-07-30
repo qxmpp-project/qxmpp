@@ -10,7 +10,6 @@
 #include "QXmppSasl2UserAgent.h"
 #include "QXmppSaslManager_p.h"
 #include "QXmppSasl_p.h"
-#include "QXmppStream.h"
 #include "QXmppStreamFeatures.h"
 #include "QXmppUtils_p.h"
 
