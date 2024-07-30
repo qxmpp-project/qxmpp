@@ -4,11 +4,12 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
+#include "Stream.h"
+
 #include "QXmppConstants_p.h"
 #include "QXmppStreamError_p.h"
 #include "QXmppUtils_p.h"
 
-#include "Stream.h"
 #include "StringLiterals.h"
 #include "XmppSocket.h"
 

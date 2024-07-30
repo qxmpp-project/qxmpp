@@ -5,8 +5,11 @@
 #ifndef STREAM_H
 #define STREAM_H
 
+#include <optional>
+
 #include <QString>
 
+class QDomElement;
 class QXmlStreamWriter;
 
 namespace QXmpp::Private {

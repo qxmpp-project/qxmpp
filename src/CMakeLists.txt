@@ -165,6 +165,7 @@ set(INSTALL_HEADER_FILES
 
 set(SOURCE_FILES
     # Base
+    base/Stream.cpp
     base/QXmppArchiveIq.cpp
     base/QXmppBindIq.cpp
     base/QXmppBitsOfBinaryContentId.cpp
@@ -222,7 +223,6 @@ set(SOURCE_FILES
     base/QXmppSasl.cpp
     base/QXmppSocks.cpp
     base/QXmppStanza.cpp
-    base/QXmppStream.cpp
     base/QXmppStreamFeatures.cpp
     base/QXmppStreamInitiationIq.cpp
     base/QXmppStreamManagement.cpp
