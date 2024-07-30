@@ -14,11 +14,11 @@ class QXmppDialback;
 class QXmppOutgoingServer;
 class QXmppOutgoingServerPrivate;
 
+///
 /// \brief The QXmppOutgoingServer class represents an outgoing XMPP stream
 /// to another XMPP server.
 ///
-
-class QXMPP_EXPORT QXmppOutgoingServer : public QXmppStream
+class QXMPP_EXPORT QXmppOutgoingServer : public QXmppLoggable
 {
     Q_OBJECT
 
@@ -26,7 +26,16 @@ public:
     QXmppOutgoingServer(const QString &domain, QObject *parent);
     ~QXmppOutgoingServer() override;
 
-    bool isConnected() const override;
+    bool isConnected() const;
+    void disconnectFromHost();
+
+    /// This signal is emitted when the stream is connected.
+    Q_SIGNAL void connected();
+    /// This signal is emitted when the stream is disconnected.
+    Q_SIGNAL void disconnected();
+
+    bool sendData(const QByteArray &);
+    bool sendPacket(const QXmppNonza &);
 
     QString localStreamKey() const;
     void setLocalStreamKey(const QString &key);
@@ -38,12 +47,10 @@ Q_SIGNALS:
     /// This signal is emitted when a dialback verify response is received.
     void dialbackResponseReceived(const QXmppDialback &response);
 
-protected:
-    /// \cond
-    void handleStart() override;
-    void handleStream(const QDomElement &streamElement) override;
-    void handleStanza(const QDomElement &stanzaElement) override;
-    /// \endcond
+private:
+    void handleStart();
+    void handleStream(const QDomElement &streamElement);
+    void handleStanza(const QDomElement &stanzaElement);
 
 public Q_SLOTS:
     void connectToHost(const QString &domain);

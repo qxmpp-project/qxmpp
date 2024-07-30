@@ -154,7 +154,7 @@ bool QXmppServerPrivate::routeData(const QString &to, const QByteArray &data)
         conn->moveToThread(q->thread());
         conn->setParent(q);
 
-        QObject::connect(conn, &QXmppStream::disconnected,
+        QObject::connect(conn, &QXmppOutgoingServer::disconnected,
                          q, &QXmppServer::_q_outgoingServerDisconnected);
 
         // add stream

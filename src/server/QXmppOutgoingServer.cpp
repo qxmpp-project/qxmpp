@@ -12,6 +12,7 @@
 
 #include "Stream.h"
 #include "StringLiterals.h"
+#include "XmppSocket.h"
 
 #include <chrono>
 
@@ -29,6 +30,9 @@ using namespace QXmpp::Private;
 class QXmppOutgoingServerPrivate
 {
 public:
+    explicit QXmppOutgoingServerPrivate(QObject *q);
+
+    XmppSocket socket;
     QList<QByteArray> dataQueue;
     QDnsLookup dns;
     QString localDomain;
@@ -40,6 +44,11 @@ public:
     bool ready;
 };
 
+QXmppOutgoingServerPrivate::QXmppOutgoingServerPrivate(QObject *q)
+    : socket(q)
+{
+}
+
 ///
 /// Constructs a new outgoing server-to-server stream.
 ///
@@ -47,13 +56,17 @@ public:
 /// \param parent the parent object
 ///
 QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
-    : QXmppStream(parent),
-      d(std::make_unique<QXmppOutgoingServerPrivate>())
+    : QXmppLoggable(parent),
+      d(std::make_unique<QXmppOutgoingServerPrivate>(this))
 {
     // socket initialisation
     auto *socket = new QSslSocket(this);
-    setSocket(socket);
+    d->socket.setSocket(socket);
 
+    connect(&d->socket, &XmppSocket::started, this, &QXmppOutgoingServer::handleStart);
+    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppOutgoingServer::handleStanza);
+    connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppOutgoingServer::handleStream);
+    connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppOutgoingServer::disconnectFromHost);
     connect(socket, &QAbstractSocket::disconnected, this, &QXmppOutgoingServer::_q_socketDisconnected);
     connect(socket, &QSslSocket::errorOccurred, this, &QXmppOutgoingServer::socketError);
 
@@ -108,11 +121,11 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
     }
 
     // set the name the SSL certificate should match
-    socket()->setPeerVerifyName(d->remoteDomain);
+    d->socket.socket()->setPeerVerifyName(d->remoteDomain);
 
     // connect to server
     info(u"Connecting to %1:%2"_s.arg(host, QString::number(port)));
-    socket()->connectToHost(host, port);
+    d->socket.socket()->connectToHost(host, port);
 }
 
 void QXmppOutgoingServer::_q_socketDisconnected()
@@ -121,12 +134,8 @@ void QXmppOutgoingServer::_q_socketDisconnected()
     Q_EMIT disconnected();
 }
 
-/// \cond
-
 void QXmppOutgoingServer::handleStart()
 {
-    QXmppStream::handleStart();
-
     QString data = u"<?xml version='1.0'?><stream:stream"
                    " xmlns='%1' xmlns:db='%2' xmlns:stream='%3' version='1.0'"
                    " from='%4' to='%5'>"_s
@@ -154,7 +163,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         QXmppStreamFeatures features;
         features.parse(stanza);
 
-        if (!socket()->isEncrypted()) {
+        if (!d->socket.socket()->isEncrypted()) {
             // check we can satisfy TLS constraints
             if (!QSslSocket::supportsSsl() &&
                 features.tlsMode() == QXmppStreamFeatures::Required) {
@@ -176,7 +185,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         sendDialback();
     } else if (StarttlsProceed::fromDom(stanza)) {
         debug(u"Starting encryption"_s);
-        socket()->startClientEncryption();
+        d->socket.socket()->startClientEncryption();
         return;
     } else if (QXmppDialback::isDialback(stanza)) {
         QXmppDialback response;
@@ -208,12 +217,29 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
         }
     }
 }
-/// \endcond
 
 /// Returns true if the socket is connected and authentication succeeded.
 bool QXmppOutgoingServer::isConnected() const
 {
-    return QXmppStream::isConnected() && d->ready;
+    return d->socket.isConnected() && d->ready;
+}
+
+/// Disconnects from the remote host.
+void QXmppOutgoingServer::disconnectFromHost()
+{
+    d->socket.disconnectFromHost();
+}
+
+/// Sends raw data to the peer.
+bool QXmppOutgoingServer::sendData(const QByteArray &data)
+{
+    return d->socket.sendData(data);
+}
+
+/// Sends an XMPP packet to the peer.
+bool QXmppOutgoingServer::sendPacket(const QXmppNonza &nonza)
+{
+    return d->socket.sendData(serializeXml(nonza));
 }
 
 /// Returns the stream's local dialback key.
@@ -281,7 +307,7 @@ void QXmppOutgoingServer::slotSslErrors(const QList<QSslError> &errors)
     for (int i = 0; i < errors.count(); ++i) {
         warning(errors.at(i).errorString());
     }
-    socket()->ignoreSslErrors();
+    d->socket.socket()->ignoreSslErrors();
 }
 
 void QXmppOutgoingServer::socketError(QAbstractSocket::SocketError error)
