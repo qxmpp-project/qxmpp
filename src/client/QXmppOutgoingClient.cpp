@@ -89,7 +89,7 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
     // connect to host
     const QXmppConfiguration::StreamSecurityMode localSecurity = q->configuration().streamSecurityMode();
     if (localSecurity == QXmppConfiguration::LegacySSL) {
-        if (!q->socket()->supportsSsl()) {
+        if (!QSslSocket::supportsSsl()) {
             q->warning(u"Not connecting as legacy SSL was requested, but SSL support is not available"_s);
             return;
         }
@@ -772,7 +772,7 @@ bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
         }
 
         // TLS not available locally, but required by server/config
-        if (!socket()->supportsSsl() &&
+        if (!QSslSocket::supportsSsl() &&
             (localSecurity == QXmppConfiguration::TLSRequired || remoteSecurity == QXmppStreamFeatures::Required)) {
             warning(u"TLS is required to connect but not available locally"_s);
             disconnectFromHost();
@@ -780,7 +780,7 @@ bool QXmppOutgoingClient::handleStarttls(const QXmppStreamFeatures &features)
         }
 
         // supported by server, locally and enabled in config
-        if (socket()->supportsSsl() &&
+        if (QSslSocket::supportsSsl() &&
             (localSecurity != QXmppConfiguration::TLSDisabled && remoteSecurity != QXmppStreamFeatures::Disabled)) {
             // enable TLS as it is support by both parties
             d->socket.sendData(serializeXml(StarttlsRequest()));

@@ -153,7 +153,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
 
         if (!socket()->isEncrypted()) {
             // check we can satisfy TLS constraints
-            if (!socket()->supportsSsl() &&
+            if (!QSslSocket::supportsSsl() &&
                 features.tlsMode() == QXmppStreamFeatures::Required) {
                 warning(u"Disconnecting as TLS is required, but SSL support is not available"_s);
                 disconnectFromHost();
@@ -161,7 +161,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             }
 
             // enable TLS if possible
-            if (socket()->supportsSsl() &&
+            if (QSslSocket::supportsSsl() &&
                 features.tlsMode() != QXmppStreamFeatures::Disabled) {
                 sendData(serializeXml(StarttlsRequest()));
                 return;
