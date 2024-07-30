@@ -21,7 +21,7 @@
 namespace QXmpp::Private {
 
 constexpr int XMPP_DEFAULT_PORT = 5222;
-
+constexpr quint16 XMPP_SERVER_DEFAULT_PORT = 5269;
 }
 
 // QXmpp
