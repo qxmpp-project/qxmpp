@@ -104,7 +104,7 @@ void QXmppOutgoingServer::_q_dnsLookupFinished()
         warning(u"Lookup for domain %1 failed: %2"_s
                     .arg(d->dns.name(), d->dns.errorString()));
         host = d->remoteDomain;
-        port = 5269;
+        port = XMPP_SERVER_DEFAULT_PORT;
     }
 
     // set the name the SSL certificate should match
