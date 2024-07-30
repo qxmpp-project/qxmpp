@@ -360,11 +360,11 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
             }
         }
     } else if (ns == ns_client) {
-        if (nodeRecv.tagName() == QLatin1String("iq")) {
+        if (nodeRecv.tagName() == u"iq") {
             const QString type = nodeRecv.attribute(u"type"_s);
             const auto id = nodeRecv.attribute(u"id"_s);
 
-            if (QXmppBindIq::isBindIq(nodeRecv) && type == QLatin1String("set")) {
+            if (QXmppBindIq::isBindIq(nodeRecv) && type == u"set") {
                 QXmppBindIq bindSet;
                 bindSet.parse(nodeRecv);
                 d->resource = bindSet.resource().trimmed();
@@ -400,14 +400,13 @@ void QXmppIncomingClient::handleStanza(const QDomElement &nodeRecv)
         }
 
         // process unhandled stanzas
-        if (nodeRecv.tagName() == QLatin1String("iq") ||
-            nodeRecv.tagName() == QLatin1String("message") ||
-            nodeRecv.tagName() == QLatin1String("presence")) {
+        auto tagName = nodeRecv.tagName();
+        if (tagName == u"iq" || tagName == u"message" || tagName == u"presence") {
             QDomElement nodeFull(nodeRecv);
 
             // if the sender is empty, set it to the appropriate JID
             if (nodeFull.attribute(u"from"_s).isEmpty()) {
-                if (nodeFull.tagName() == QLatin1String("presence") &&
+                if (nodeFull.tagName() == u"presence" &&
                     (nodeFull.attribute(u"type"_s) == u"subscribe" ||
                      nodeFull.attribute(u"type"_s) == u"subscribed")) {
                     nodeFull.setAttribute(u"from"_s, QXmppUtils::jidToBareJid(d->jid));

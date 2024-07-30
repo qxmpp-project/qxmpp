@@ -42,7 +42,7 @@ void rpcClient::slotInvokeRemoteMethod()
 
 void rpcClient::slotPresenceReceived(const QXmppPresence &presence)
 {
-    const QLatin1String recipient("qxmpp.test1@qxmpp.org");
+    QStringView recipient = u"qxmpp.test1@qxmpp.org";
 
     // if we are the recipient, or if the presence is not from the recipient,
     // do nothing

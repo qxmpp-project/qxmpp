@@ -187,7 +187,7 @@ void QXmppOutgoingServer::handleStanza(const QDomElement &stanza)
             return;
         }
         if (response.command() == QXmppDialback::Result) {
-            if (response.type() == QLatin1String("valid")) {
+            if (response.type() == u"valid") {
                 info(u"Outgoing server stream to %1 is ready"_s.arg(response.from()));
                 d->ready = true;
 

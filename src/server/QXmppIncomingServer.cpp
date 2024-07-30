@@ -188,7 +188,7 @@ void QXmppIncomingServer::slotDialbackResponseReceived(const QXmppDialback &dial
     sendPacket(response);
 
     // check for success
-    if (response.type() == QLatin1String("valid")) {
+    if (response.type() == u"valid") {
         info(u"Verified incoming domain '%1' on %2"_s.arg(dialback.from(), d->origin()));
         const bool wasConnected = !d->authenticated.isEmpty();
         d->authenticated.insert(dialback.from());
