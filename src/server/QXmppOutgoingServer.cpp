@@ -92,7 +92,7 @@ void QXmppOutgoingServer::connectToHost(const QString &domain)
 void QXmppOutgoingServer::_q_dnsLookupFinished()
 {
     QString host;
-    quint16 port;
+    quint16 port = 0;
 
     if (d->dns.error() == QDnsLookup::NoError &&
         !d->dns.serviceRecords().isEmpty()) {
