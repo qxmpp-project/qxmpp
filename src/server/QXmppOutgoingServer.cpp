@@ -13,6 +13,8 @@
 #include "Stream.h"
 #include "StringLiterals.h"
 
+#include <chrono>
+
 #include <QDnsLookup>
 #include <QDomElement>
 #include <QList>
@@ -21,6 +23,7 @@
 #include <QSslSocket>
 #include <QTimer>
 
+using namespace std::chrono_literals;
 using namespace QXmpp::Private;
 
 class QXmppOutgoingServerPrivate
@@ -58,7 +61,7 @@ QXmppOutgoingServer::QXmppOutgoingServer(const QString &domain, QObject *parent)
     connect(&d->dns, &QDnsLookup::finished, this, &QXmppOutgoingServer::_q_dnsLookupFinished);
 
     d->dialbackTimer = new QTimer(this);
-    d->dialbackTimer->setInterval(5000);
+    d->dialbackTimer->setInterval(5s);
     d->dialbackTimer->setSingleShot(true);
     connect(d->dialbackTimer, &QTimer::timeout, this, &QXmppOutgoingServer::sendDialback);
 
