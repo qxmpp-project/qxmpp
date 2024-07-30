@@ -4,124 +4,22 @@
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
-#include "QXmppStream.h"
-
 #include "QXmppConstants_p.h"
-#include "QXmppError.h"
-#include "QXmppNonza.h"
 #include "QXmppStreamError_p.h"
 #include "QXmppUtils_p.h"
 
 #include "Stream.h"
 #include "StringLiterals.h"
 #include "XmppSocket.h"
-#include "qxmlstream.h"
 
 #include <QDomDocument>
 #include <QHostAddress>
 #include <QRegularExpression>
 #include <QSslSocket>
+#include <QXmlStreamWriter>
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
-
-class QXmppStreamPrivate
-{
-public:
-    QXmppStreamPrivate(QXmppStream *stream);
-
-    XmppSocket socket;
-};
-
-QXmppStreamPrivate::QXmppStreamPrivate(QXmppStream *stream)
-    : socket(stream)
-{
-}
-
-///
-/// Constructs a base XMPP stream.
-///
-/// \param parent
-///
-QXmppStream::QXmppStream(QObject *parent)
-    : QXmppLoggable(parent),
-      d(std::make_unique<QXmppStreamPrivate>(this))
-{
-    connect(&d->socket, &XmppSocket::started, this, &QXmppStream::handleStart);
-    connect(&d->socket, &XmppSocket::stanzaReceived, this, &QXmppStream::handleStanza);
-    connect(&d->socket, &XmppSocket::streamReceived, this, &QXmppStream::handleStream);
-    connect(&d->socket, &XmppSocket::streamClosed, this, &QXmppStream::disconnectFromHost);
-}
-
-QXmppStream::~QXmppStream() = default;
-
-///
-/// Disconnects from the remote host.
-///
-void QXmppStream::disconnectFromHost()
-{
-    d->socket.disconnectFromHost();
-}
-
-///
-/// Handles a stream start event, which occurs when the underlying transport
-/// becomes ready (socket connected, encryption started).
-///
-void QXmppStream::handleStart()
-{
-}
-
-///
-/// Returns true if the stream is connected.
-///
-bool QXmppStream::isConnected() const
-{
-    return d->socket.isConnected();
-}
-
-///
-/// Sends raw data to the peer.
-///
-/// \param data
-///
-bool QXmppStream::sendData(const QByteArray &data)
-{
-    return d->socket.sendData(data);
-}
-
-///
-/// Sends an XMPP packet to the peer.
-///
-/// \param nonza
-///
-bool QXmppStream::sendPacket(const QXmppNonza &nonza)
-{
-    return d->socket.sendData(serializeXml(nonza));
-}
-
-///
-/// Returns access to the XMPP socket.
-///
-XmppSocket &QXmppStream::xmppSocket() const
-{
-    return d->socket;
-}
-
-///
-/// Returns the QSslSocket used for this stream.
-///
-QSslSocket *QXmppStream::socket() const
-{
-    return d->socket.socket();
-}
-
-///
-/// Sets the QSslSocket used for this stream.
-///
-void QXmppStream::setSocket(QSslSocket *socket)
-{
-    d->socket.setSocket(socket);
-}
 
 namespace QXmpp::Private {
 

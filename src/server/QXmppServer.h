@@ -24,7 +24,6 @@ class QXmppServerExtension;
 class QXmppServerPrivate;
 class QXmppSslServer;
 class QXmppStanza;
-class QXmppStream;
 
 ///
 /// \brief The QXmppServer class represents an XMPP server.
