@@ -1049,11 +1049,11 @@ OutgoingIqManager::~OutgoingIqManager() = default;
 QXmppTask<IqResult> OutgoingIqManager::sendIq(QXmppIq &&iq, const QString &to)
 {
     if (iq.id().isEmpty()) {
-        warning(u"QXmppStream::sendIq() error: ID is empty. Using random ID."_s);
+        warning(u"QXmpp: sendIq() error: ID is empty. Using random ID."_s);
         iq.setId(QXmppUtils::generateStanzaUuid());
     }
     if (hasId(iq.id())) {
-        warning(u"QXmppStream::sendIq() error:"
+        warning(u"QXmpp: sendIq() error:"
                 "The IQ's ID (\"%1\") is already in use. Using random ID."_s
                     .arg(iq.id()));
         iq.setId(QXmppUtils::generateStanzaUuid());
