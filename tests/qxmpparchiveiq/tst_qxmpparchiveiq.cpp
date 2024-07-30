@@ -53,8 +53,8 @@ void tst_QXmppArchiveIq::testArchiveList()
     QXmppArchiveListIq iq;
     parsePacket(iq, xml);
     QCOMPARE(iq.type(), QXmppIq::Get);
-    QCOMPARE(iq.id(), QLatin1String("list_1"));
-    QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
+    QCOMPARE(iq.id(), u"list_1");
+    QCOMPARE(iq.with(), u"juliet@capulet.com");
     QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
     QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), Qt::UTC));
     QCOMPARE(iq.resultSetQuery().max(), max);

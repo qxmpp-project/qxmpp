@@ -102,7 +102,7 @@ private:
     void onLoggerMessage(QXmppLogger::MessageType type, const QString &text)
     {
         if (type != QXmppLogger::SentMessage ||
-            text == QLatin1String("<r xmlns=\"urn:xmpp:sm:3\"/>")) {
+            text == u"<r xmlns=\"urn:xmpp:sm:3\"/>") {
             return;
         }
 

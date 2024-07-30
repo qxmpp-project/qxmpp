@@ -188,7 +188,7 @@ static void handleStanza(QXmppServer *server, const QDomElement &element)
     const QString domain = server->domain();
     const QString to = element.attribute(u"to"_s);
     if (to == domain) {
-        if (element.tagName() == QLatin1String("iq")) {
+        if (element.tagName() == u"iq") {
             // we do not support the given IQ
             QXmppIq request;
             request.parse(element);
@@ -208,7 +208,7 @@ static void handleStanza(QXmppServer *server, const QDomElement &element)
     } else {
 
         // route element or reply on behalf of missing peer
-        if (!server->sendElement(element) && element.tagName() == QLatin1String("iq")) {
+        if (!server->sendElement(element) && element.tagName() == u"iq") {
             QXmppIq request;
             request.parse(element);
 
