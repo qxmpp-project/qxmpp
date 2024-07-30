@@ -31,6 +31,19 @@ public:
     void setAccountJid(const QString &jid);
 
     template<typename T>
+    std::optional<T> extension() const
+    {
+        const auto it = extensions().find(std::type_index(typeid(T)));
+        return it != extensions().cend() ? std::any_cast<T>(it->second) : std::optional<T>();
+    }
+
+    template<typename T>
+    void setExtension(T &&value)
+    {
+        setExtension(std::any(std::move(value)));
+    }
+
+    template<typename T>
     using ExtensionParser = Result<T> (*)(const QDomElement &);
     template<typename T>
     using ExtensionSerializer = void (*)(const T &, QXmlStreamWriter &);
