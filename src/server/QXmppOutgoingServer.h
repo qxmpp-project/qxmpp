@@ -27,7 +27,9 @@ public:
     ~QXmppOutgoingServer() override;
 
     bool isConnected() const;
+    Q_SLOT void connectToHost(const QString &domain);
     void disconnectFromHost();
+    Q_SLOT void queueData(const QByteArray &data);
 
     /// This signal is emitted when the stream is connected.
     Q_SIGNAL void connected();
@@ -43,27 +45,20 @@ public:
 
     QString remoteDomain() const;
 
-Q_SIGNALS:
     /// This signal is emitted when a dialback verify response is received.
-    void dialbackResponseReceived(const QXmppDialback &response);
+    Q_SIGNAL void dialbackResponseReceived(const QXmppDialback &response);
 
 private:
     void handleStart();
     void handleStream(const QDomElement &streamElement);
     void handleStanza(const QDomElement &stanzaElement);
 
-public Q_SLOTS:
-    void connectToHost(const QString &domain);
-    void queueData(const QByteArray &data);
-
-private Q_SLOTS:
-    void _q_dnsLookupFinished();
-    void _q_socketDisconnected();
+    void onDnsLookupFinished();
+    void onSocketDisconnected();
     void sendDialback();
     void slotSslErrors(const QList<QSslError> &errors);
     void socketError(QAbstractSocket::SocketError error);
 
-private:
     const std::unique_ptr<QXmppOutgoingServerPrivate> d;
 };
 
