@@ -32,6 +32,7 @@
 #include <QTextStream>
 #include <QXmlStreamWriter>
 
+using namespace QXmpp;
 using namespace QXmpp::Private;
 
 constexpr auto CHAT_STATES = to_array<QStringView>({
@@ -178,6 +179,9 @@ public:
     QVector<QXmppFileShare> sharedFiles;
     QVector<QXmppFileSourcesAttachment> fileSourcesAttachments;
 
+    // XEP-0461: Message Replies
+    std::optional<Reply> reply;
+
     // XEP-0482: Call Invites
     std::optional<QXmppCallInviteElement> callInviteElement;
 };
@@ -219,16 +223,12 @@ bool QXmppMessage::isXmppStanza() const
 }
 
 /// Returns the message's body.
-
 QString QXmppMessage::body() const
 {
     return d->body;
 }
 
 /// Sets the message's body.
-///
-/// \param body
-
 void QXmppMessage::setBody(const QString &body)
 {
     d->body = body;
@@ -1394,6 +1394,26 @@ void QXmppMessage::setFileSourcesAttachments(const QVector<QXmppFileSourcesAttac
 }
 
 ///
+/// Returns the message reply extension as defined in \xep{0461, Message Replies}.
+///
+/// \since QXmpp 1.9
+///
+std::optional<QXmpp::Reply> QXmppMessage::reply() const
+{
+    return d->reply;
+}
+
+///
+/// Sets the message reply extension as defined in \xep{0461, Message Replies}.
+///
+/// \since QXmpp 1.9
+///
+void QXmppMessage::setReply(const std::optional<QXmpp::Reply> &reply)
+{
+    d->reply = reply;
+}
+
+///
 /// Returns a Call Invite element as defined in \xep{0482, Call Invites}.
 ///
 std::optional<QXmppCallInviteElement> QXmppMessage::callInviteElement() const
@@ -1717,6 +1737,14 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
             return true;
         }
+        // XEP-0461: Message Replies
+        if (checkElement(element, u"reply", ns_reply)) {
+            d->reply = Reply {
+                element.attribute(u"to"_s),
+                element.attribute(u"id"_s),
+            };
+            return true;
+        }
         if (checkElement(element, u"sources", ns_sfs)) {
             if (auto fileSources = QXmppFileSourcesAttachment::fromDom(element)) {
                 d->fileSourcesAttachments.push_back(std::move(*fileSources));
@@ -1983,6 +2011,15 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         }
         for (const auto &fileSources : d->fileSourcesAttachments) {
             fileSources.toXml(writer);
+        }
+
+        // XEP-0461: Message Replies
+        if (d->reply) {
+            writer->writeStartElement(QSL65("reply"));
+            writer->writeDefaultNamespace(toString65(ns_reply));
+            writeOptionalXmlAttribute(writer, u"to", d->reply->to);
+            writer->writeAttribute(QSL65("id"), d->reply->id);
+            writer->writeEndElement();
         }
 
         // XEP-0482: Call Invites

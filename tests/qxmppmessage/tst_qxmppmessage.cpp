@@ -62,6 +62,7 @@ private:
     Q_SLOT void testE2eeFallbackBody();
     Q_SLOT void testFileSharing();
     Q_SLOT void testEncryptedFileSource();
+    Q_SLOT void testReplies();
     Q_SLOT void testJingleMessageInitiationElement();
 };
 
@@ -1389,6 +1390,22 @@ void tst_QXmppMessage::testEncryptedFileSource()
         parsePacket(encryptedSource, xml);
         serializePacket(encryptedSource, xml);
     }
+}
+
+void tst_QXmppMessage::testReplies()
+{
+    const QByteArray xml =
+        "<message id='message-id2' to='anna@example.com' type='chat'>"
+        "<body>Great idea!</body>"
+        "<reply xmlns='urn:xmpp:reply:0' to='anna@example.com/tablet' id='message-id1'/>"
+        "</message>";
+
+    QXmppMessage m;
+    parsePacket(m, xml);
+    QVERIFY(m.reply().has_value());
+    QCOMPARE(m.reply()->id, "message-id1");
+    QCOMPARE(m.reply()->to, "anna@example.com/tablet");
+    serializePacket(m, xml);
 }
 
 void tst_QXmppMessage::testJingleMessageInitiationElement()
