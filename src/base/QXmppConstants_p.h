@@ -258,6 +258,8 @@ inline constexpr QStringView ns_sfs = u"urn:xmpp:sfs:0";
 inline constexpr QStringView ns_esfs = u"urn:xmpp:esfs:0";
 // XEP-0450: Automatic Trust Management (ATM)
 inline constexpr QStringView ns_atm = u"urn:xmpp:atm:1";
+// XEP-0461: Message Replies
+inline constexpr QStringView ns_reply = u"urn:xmpp:reply:0";
 // XEP-0482: Call Invites
 inline constexpr QStringView ns_call_invites = u"urn:xmpp:call-invites:0";
 // XEP-0484: Fast Authentication Streamlining Tokens

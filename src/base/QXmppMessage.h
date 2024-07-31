@@ -30,6 +30,22 @@ class QXmppTrustMessageElement;
 class QXmppOutOfBandUrl;
 class QXmppCallInviteElement;
 
+namespace QXmpp {
+
+///
+/// Message reply as defined in \xep{0461, Message Replies}.
+///
+/// \since QXmpp 1.9
+///
+struct Reply {
+    /// Full JID of the sender of the referenced message (optional).
+    QString to;
+    /// ID of the referenced message.
+    QString id;
+};
+
+}  // namespace QXmpp
+
 struct QXmppStanzaId {
     /// Identifier of the stanza element
     QString id;
@@ -293,6 +309,10 @@ public:
     void setSharedFiles(const QVector<QXmppFileShare> &sharedFiles);
     QVector<QXmppFileSourcesAttachment> fileSourcesAttachments() const;
     void setFileSourcesAttachments(const QVector<QXmppFileSourcesAttachment> &);
+
+    // XEP-0461: Message Replies
+    std::optional<QXmpp::Reply> reply() const;
+    void setReply(const std::optional<QXmpp::Reply> &);
 
     // XEP-0482: Call Invites
     std::optional<QXmppCallInviteElement> callInviteElement() const;
