@@ -53,6 +53,7 @@ private:
     Q_SLOT void testProcessingHints();
     Q_SLOT void testBobData();
     Q_SLOT void testFallbackIndication();
+    Q_SLOT void fallbackBodies();
     Q_SLOT void testStanzaIds();
     Q_SLOT void testSlashMe_data();
     Q_SLOT void testSlashMe();
@@ -1083,6 +1084,33 @@ void tst_QXmppMessage::testFallbackIndication()
         },
     });
     serializePacket(message, xml);
+}
+
+void tst_QXmppMessage::fallbackBodies()
+{
+    const QByteArray xml = QByteArrayLiteral(
+        "<message to='anna@example.com' id='message-id2' type='groupchat'>"
+        "<body>"
+        "> Anna wrote:\n"
+        "> Hi, how are you?\n"
+        "Great"
+        "</body>"
+        "<reply to='anna@example.com' id='message-id1' xmlns='urn:xmpp:reply:0'/>"
+        "<fallback xmlns='urn:xmpp:fallback:0' for='urn:xmpp:reply:0'>"
+        "<body start='0' end='33' />"
+        "</fallback>"
+        "</message>");
+
+    QXmppMessage message;
+    parsePacket(message, xml);
+
+    QCOMPARE(message.readFallbackRemovedText(QXmppFallback::Body, { "urn:xmpp:reply:0" }), "Great");
+    QCOMPARE(message.readFallbackRemovedText(QXmppFallback::Subject, { "urn:xmpp:reply:0" }), QString());
+
+    QCOMPARE(message.readFallbackText(QXmppFallback::Body, u"urn:xmpp:reply:0"), "> Anna wrote:\n> Hi, how are you?\n");
+    QCOMPARE(message.readFallbackText(QXmppFallback::Subject, u"urn:xmpp:reply:0"), QString());
+
+    QCOMPARE(message.readReplyQuoteFromBody(), "Anna wrote:\nHi, how are you?\n");
 }
 
 void tst_QXmppMessage::testStanzaIds()

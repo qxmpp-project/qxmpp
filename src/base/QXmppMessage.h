@@ -9,6 +9,7 @@
 #ifndef QXMPPMESSAGE_H
 #define QXMPPMESSAGE_H
 
+#include "QXmppFallback.h"
 #include "QXmppFileShare.h"
 #include "QXmppStanza.h"
 
@@ -296,6 +297,8 @@ public:
 #endif
     const QVector<QXmppFallback> &fallbackMarkers() const;
     void setFallbackMarkers(const QVector<QXmppFallback> &);
+    QString readFallbackRemovedText(QXmppFallback::Element element, const QVector<QString> &supportedNamespaces) const;
+    QString readFallbackText(QXmppFallback::Element element, QStringView forNamespace) const;
 
     // XEP-0434: Trust Messages (TM)
     std::optional<QXmppTrustMessageElement> trustMessageElement() const;
@@ -314,6 +317,7 @@ public:
     // XEP-0461: Message Replies
     std::optional<QXmpp::Reply> reply() const;
     void setReply(const std::optional<QXmpp::Reply> &);
+    QString readReplyQuoteFromBody() const;
 
     // XEP-0482: Call Invites
     std::optional<QXmppCallInviteElement> callInviteElement() const;
