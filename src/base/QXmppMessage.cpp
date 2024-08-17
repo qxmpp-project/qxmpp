@@ -17,6 +17,7 @@
 #include "QXmppMessageReaction.h"
 #include "QXmppMixInvitation.h"
 
+#include "Algorithms.h"
 #include "StringLiterals.h"
 #ifdef BUILD_OMEMO
 #include "QXmppOmemoElement_p.h"
@@ -27,6 +28,8 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include <ranges>
+
 #include <QDateTime>
 #include <QDomElement>
 #include <QTextStream>
@@ -34,6 +37,7 @@
 
 using namespace QXmpp;
 using namespace QXmpp::Private;
+namespace views = std::views;
 
 constexpr auto CHAT_STATES = to_array<QStringView>({
     {},
@@ -1305,6 +1309,105 @@ void QXmppMessage::setFallbackMarkers(const QVector<QXmppFallback> &fallbackMark
 }
 
 ///
+/// Returns the body or subject text of the message without parts that have a fallback marker
+/// with a supported namespace.
+///
+/// \param element whether to use the body or the subject text
+/// \param supportedNamespaces
+///
+/// \since QXmpp 1.9
+///
+QString QXmppMessage::readFallbackRemovedText(QXmppFallback::Element element, const QVector<QString> &supportedNamespaces) const
+{
+    // filter out all QXmppFallback::Reference s
+    auto markers = d->fallbackMarkers |
+        views::filter([&](const auto &marker) { return contains(supportedNamespaces, marker.forNamespace()); }) |
+        views::transform([](auto &&marker) { return marker.references(); });
+
+    // collect references with correct namespace and element type (body or subject)
+    QVector<QXmppFallback::Range> references;
+    for (const auto &markerReferences : markers) {
+        for (const auto &ref : markerReferences) {
+            if (ref.element == element) {
+                // early exit: element without range means whole text is fallback
+                if (!ref.range) {
+                    return {};
+                }
+                references.push_back(ref.range.value());
+            }
+        }
+    }
+
+    // sort by begin of fallback
+    std::ranges::sort(references, {}, &QXmppFallback::Range::start);
+
+    const auto &fullText = element == QXmppFallback::Subject ? d->subject : d->body;
+    QString output;
+    qsizetype index = 0;
+    for (const auto &range : std::as_const(references)) {
+        if (!(range.start < fullText.size()) || !(0 < range.end <= fullText.size())) {
+            // skip markers with invalid start/begin
+            continue;
+        }
+
+        // fallback marker marks [start, end)
+        // we want to copy the section before the marker: [index, start)
+
+        if (index < range.start) {
+            output.append(QStringView(fullText.data() + index, fullText.data() + range.start));
+        }
+        index = range.end;
+    }
+    // append rest of the string (after the last fallback marker)
+    if (index < fullText.size()) {
+        output.append(QStringView(fullText.data() + index, fullText.data() + fullText.size()));
+    }
+
+    return output;
+}
+
+///
+/// Returns the parts of the body or subject that are marked as fallback for this namespace.
+///
+/// \param element whether to use the body or the subject text
+/// \param forNamespace
+///
+/// \since QXmpp 1.9
+///
+QString QXmppMessage::readFallbackText(QXmppFallback::Element element, QStringView forNamespace) const
+{
+    const auto &fullText = element == QXmppFallback::Subject ? d->subject : d->body;
+
+    // filter out all QXmppFallback::Reference s
+    auto markers = d->fallbackMarkers |
+        views::filter([&](const auto &marker) { return marker.forNamespace() == forNamespace; }) |
+        views::transform([](auto &&marker) { return marker.references(); });
+
+    // collect references with correct namespace and element type (body or subject)
+    QVector<QXmppFallback::Range> references;
+    for (const auto &markerReferences : markers) {
+        for (const auto &ref : markerReferences) {
+            if (ref.element == element) {
+                // early exit: element without range means whole text is fallback
+                if (!ref.range) {
+                    return fullText;
+                }
+                references.push_back(ref.range.value());
+            }
+        }
+    }
+
+    // sort by begin of fallback
+    std::ranges::sort(references, {}, &QXmppFallback::Range::start);
+
+    QString output;
+    for (const auto &range : references) {
+        output.append(QStringView(fullText.data() + range.start, fullText.data() + range.end));
+    }
+    return output;
+}
+
+///
 /// Returns an included trust message element as defined by
 /// \xep{0434, Trust Messages (TM)}.
 ///
@@ -1411,6 +1514,27 @@ std::optional<QXmpp::Reply> QXmppMessage::reply() const
 void QXmppMessage::setReply(const std::optional<QXmpp::Reply> &reply)
 {
     d->reply = reply;
+}
+
+///
+/// Returns the part of the body that is marked as fallback for \xep{0461, Message Replies},
+/// without any quotation marks ('> ').
+///
+/// \since QXmpp 1.9
+///
+QString QXmppMessage::readReplyQuoteFromBody() const
+{
+    auto replyFallbackBody = readFallbackText(QXmppFallback::Body, ns_reply.toString());
+    auto lines = replyFallbackBody.split(u'\n');
+    // remove '> ' quotation
+    for (auto &line : lines) {
+        if (line == u'>') {
+            line = QString();
+        } else if (line.startsWith(u"> ")) {
+            line = line.mid(QStringView(u"> ").size());
+        }
+    }
+    return lines.join(u'\n');
 }
 
 ///
