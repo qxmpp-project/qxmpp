@@ -992,6 +992,11 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
                 // Whether to advise the server to store other kinds of messages is up to the
                 // client.
                 // That facilitates a consistent handling of message processing hints.
+
+                // reset fallback markers: they are serialized in both public and private modes,
+                // so this is needed to avoid leaking sensitive content
+                message.setFallbackMarkers({});
+
                 if (!message.body().isEmpty() || message.trustMessageElement()) {
                     QXmppFallback fallback { ns_omemo_2.toString(), { { QXmppFallback::Body, {} } } };
 
