@@ -40,6 +40,7 @@ public:
     template<typename T>
     void setExtension(T &&value)
     {
+        Q_ASSERT(isExtensionRegistered<T>());
         setExtension(std::any(std::move(value)));
     }
 
@@ -70,6 +71,9 @@ public:
         registerExtensionInternal(std::type_index(typeid(T)), parseAny, serializeAny, tagName, xmlns);
     }
 
+    template<typename T>
+    static bool isExtensionRegistered() { return isExtensionRegistered(std::type_index(typeid(T))); }
+
 private:
     friend class QXmppAccountMigrationManager;
     friend class tst_QXmppAccountMigrationManager;
@@ -78,6 +82,7 @@ private:
     void setExtension(std::any value);
 
     static void registerExtensionInternal(std::type_index, ExtensionParser<std::any>, ExtensionSerializer<std::any>, QStringView tagName, QStringView xmlns);
+    static bool isExtensionRegistered(std::type_index);
 
     QSharedDataPointer<QXmppExportDataPrivate> d;
 };
