@@ -1691,13 +1691,6 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             return true;
         }
 #endif
-        // XEP-0428: Fallback Indication
-        if (checkElement(element, u"fallback", ns_fallback_indication)) {
-            if (auto fallback = QXmppFallback::fromDom(element)) {
-                d->fallbackMarkers.push_back(std::move(*fallback));
-            }
-            return true;
-        }
         // XEP-0482: Call Invites
         if (QXmppCallInviteElement::isCallInviteElement(element)) {
             QXmppCallInviteElement callInviteElement;
@@ -1875,6 +1868,16 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
             }
             return true;
         }
+    }
+
+    // read from both public and private extensions:
+
+    // XEP-0428: Fallback Indication
+    if (checkElement(element, u"fallback", ns_fallback_indication)) {
+        if (auto fallback = QXmppFallback::fromDom(element)) {
+            d->fallbackMarkers.push_back(std::move(*fallback));
+        }
+        return true;
     }
     return false;
 }
