@@ -1953,11 +1953,6 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
             d->omemoElement->toXml(writer);
         }
 #endif
-
-        // XEP-0428: Fallback Indication
-        for (const auto &fallback : d->fallbackMarkers) {
-            fallback.toXml(writer);
-        }
     }
 
     if (sceMode & QXmpp::SceSensitive) {
@@ -2150,6 +2145,15 @@ void QXmppMessage::serializeExtensions(QXmlStreamWriter *writer, QXmpp::SceMode 
         if (d->callInviteElement) {
             d->callInviteElement->toXml(writer);
         }
+    }
+
+    // serialize in private and in public part
+
+    // XEP-0428: Fallback Indication
+    // fallback markers may be used in the private part (e.g. message replies) but also in the
+    // public part (e.g. the fallback body for e2ee messages)
+    for (const auto &fallback : d->fallbackMarkers) {
+        fallback.toXml(writer);
     }
 }
 
