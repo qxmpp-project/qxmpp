@@ -147,6 +147,11 @@ void QXmppExportData::registerExtensionInternal(std::type_index type, ExtensionP
     accountDataSerializers().emplace(type, serialize);
 }
 
+bool QXmppExportData::isExtensionRegistered(std::type_index type)
+{
+    return accountDataSerializers().contains(type);
+}
+
 struct QXmppAccountMigrationManagerPrivate {
     template<typename T = Success>
     using Result = std::variant<T, QXmppError>;
