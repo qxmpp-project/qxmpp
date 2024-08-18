@@ -1397,6 +1397,9 @@ QXmppTask<std::optional<QXmppMessage>> ManagerPrivate::decryptMessage(QXmppMessa
             auto future = decryptStanza(stanza, senderJid, senderDeviceId, *omemoEnvelope, omemoPayload);
             future.then(q, [=](std::optional<DecryptionResult> optionalDecryptionResult) mutable {
                 if (optionalDecryptionResult) {
+                    // prevent that public fallback markers are used on the private body
+                    stanza.setFallbackMarkers({});
+
                     const auto decryptionResult = std::move(*optionalDecryptionResult);
                     stanza.parseExtensions(decryptionResult.sceContent, SceSensitive);
 
