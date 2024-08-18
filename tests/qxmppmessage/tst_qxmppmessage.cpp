@@ -1342,13 +1342,13 @@ void tst_QXmppMessage::testFileSharing()
     serializePacket(message, xml);
 
     xml = "<message id='adding-photo1' to='juliet@shakespeare.lit' from='romeo@montague.lit/resource' type='normal'>"
-          "<fallback xmlns='urn:xmpp:fallback:0' for='urn:xmpp:sfs:0'><body/></fallback>"
           "<body>https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg</body>"
           "<x xmlns='jabber:x:oob'><url>https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg</url></x>"
           "<attach-to xmlns='urn:xmpp:message-attaching:1' id='sharing-files'/>"
           "<sources xmlns='urn:xmpp:sfs:0' id='photo1.jpg'>"
           "<url-data xmlns='http://jabber.org/protocol/url-data' target='https://download.montague.lit/4a771ac1-f0b2-4a4a-9700-f2a26fa2bb67/photo1.jpg'/>"
           "</sources>"
+          "<fallback xmlns='urn:xmpp:fallback:0' for='urn:xmpp:sfs:0'><body/></fallback>"
           "</message>";
     message = {};
 
