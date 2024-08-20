@@ -609,6 +609,12 @@ void QXmppOutgoingClient::socketError(QAbstractSocket::SocketError socketError)
         (d->serverAddresses.size() > d->nextServerAddressIndex)) {
         // some network error occurred during startup -> try next available SRV record server
         d->nextAddressState = QXmppOutgoingClientPrivate::TryNext;
+
+        // If the socket is connected, wait for disconnect first.
+        // If the socket isn't connected, we can directly try the next address.
+        if (!d->socket.isConnected()) {
+            d->connectToNextAddress();
+        }
     } else {
         setError(d->socket.socket()->errorString(), socketError);
     }
