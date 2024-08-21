@@ -46,7 +46,7 @@ static auto chooseMechanism(const QXmppConfiguration &config, const QList<QStrin
     auto mechanismsView = availableMechanisms |
         views::filter(isEnabled) |
         views::transform(&SaslMechanism::fromString) |
-        views::filter(&std::optional<SaslMechanism>::has_value) |
+        views::filter([](const auto &o) { return o.has_value(); }) |
         views::transform([](const auto &v) { return *v; }) |
         views::filter(std::bind(&QXmppSaslClient::isMechanismAvailable, _1, config.credentialData()));
 
