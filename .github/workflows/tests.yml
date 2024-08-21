@@ -43,7 +43,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
   macos:
-    runs-on: macos-latest
+    runs-on: macos-13
     env:
       CONFIG: ${{ matrix.config }}
       QT_VERSION: ${{ matrix.qt_version }}

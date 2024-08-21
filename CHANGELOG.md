@@ -9,6 +9,12 @@ QXmpp 1.9.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.8.1 (August 21, 2024)
+-----------------------------
+
+ - Fix other DNS records are not tried if host does not exist (@lnjX)
+ - Fix clang build (@lnjX)
+
 QXmpp 1.8.0 (July 30, 2024)
 ---------------------------
 
