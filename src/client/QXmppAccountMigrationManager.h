@@ -12,6 +12,7 @@
 
 #include <any>
 #include <typeindex>
+#include <unordered_map>
 
 struct QXmppExportDataPrivate;
 
