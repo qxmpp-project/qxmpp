@@ -102,7 +102,6 @@ constexpr auto STREAM_ERROR_CONDITIONS = to_array<QStringView>({
     u"unsupported-version",
 });
 
-/// \cond
 QString StreamErrorElement::streamErrorToString(StreamError e)
 {
     return STREAM_ERROR_CONDITIONS.at(size_t(e)).toString();
@@ -139,7 +138,23 @@ std::variant<StreamErrorElement, QXmppError> StreamErrorElement::fromDom(const Q
         std::move(errorText),
     };
 }
-/// \endcond
+
+void StreamErrorElement::toXml(QXmlStreamWriter *writer) const
+{
+    writer->writeStartElement(u"stream:error"_s);
+    if (const auto *streamError = std::get_if<StreamError>(&condition)) {
+        writer->writeStartElement(toString65(STREAM_ERROR_CONDITIONS.at(size_t(*streamError))));
+        writer->writeDefaultNamespace(toString65(ns_stream_error));
+        writer->writeEndElement();
+    } else if (const auto *seeOtherHost = std::get_if<SeeOtherHost>(&condition)) {
+        writer->writeStartElement(u"see-other-host"_s);
+        writer->writeDefaultNamespace(toString65(ns_stream_error));
+        writer->writeCharacters(seeOtherHost->host + u':' + QString::number(seeOtherHost->port));
+        writer->writeEndElement();
+    }
+    writeOptionalXmlTextElement(writer, u"text", text);
+    writer->writeEndElement();
+}
 
 XmppSocket::XmppSocket(QObject *parent)
     : QXmppLoggable(parent)
