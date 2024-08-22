@@ -636,6 +636,8 @@ void QXmppOutgoingClient::handleStart()
     d->socket.sendData(serializeXml(StreamOpen {
         d->config.domain(),
         d->config.user().isEmpty() ? QString() : d->config.jidBare(),
+        {},
+        u"1.0"_s,
         ns_client.toString(),
     }));
 }

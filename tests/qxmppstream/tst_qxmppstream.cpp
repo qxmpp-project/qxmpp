@@ -106,9 +106,15 @@ void tst_QXmppStream::testProcessData()
 #ifdef BUILD_INTERNAL_TESTS
 void tst_QXmppStream::streamOpen()
 {
-    auto xml = "<?xml version='1.0' encoding='UTF-8'?><stream:stream from='juliet@im.example.com' to='im.example.com' version='1.0' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>";
+    auto xml = "<?xml version='1.0' encoding='UTF-8'?><stream:stream from='juliet@im.example.com' to='im.example.com' id='abcdefg' version='1.0' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>";
 
-    StreamOpen s { "im.example.com", "juliet@im.example.com", ns_client.toString() };
+    StreamOpen s {
+        .to = "im.example.com",
+        .from = "juliet@im.example.com",
+        .id = "abcdefg",
+        .version = "1.0",
+        .xmlns = ns_client.toString(),
+    };
     serializePacket(s, xml);
 
     QXmlStreamReader r(xml);
@@ -117,6 +123,8 @@ void tst_QXmppStream::streamOpen()
     auto streamOpen = StreamOpen::fromXml(r);
     QCOMPARE(streamOpen.from, "juliet@im.example.com");
     QCOMPARE(streamOpen.to, "im.example.com");
+    QCOMPARE(streamOpen.id, "abcdefg");
+    QCOMPARE(streamOpen.version, "1.0");
     QCOMPARE(streamOpen.xmlns, ns_client);
 }
 

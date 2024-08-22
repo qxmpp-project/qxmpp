@@ -21,6 +21,8 @@ struct StreamOpen {
 
     QString to;
     QString from;
+    QString id;
+    QString version;
     QString xmlns;
 };
 
