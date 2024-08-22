@@ -317,6 +317,7 @@ public:
     QXmppTask<Result> unsubscribeFromDeviceList(const QString &jid);
 
     QXmppTask<bool> resetOwnDevice();
+    QXmppTask<void> resetOwnDeviceLocally();
     QXmppTask<bool> resetAll();
 
     QXmppTask<bool> buildSessionForNewDevice(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device);

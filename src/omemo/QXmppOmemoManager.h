@@ -113,6 +113,7 @@ public:
     QXmppTask<void> buildMissingSessions(const QList<QString> &jids);
 
     QXmppTask<bool> resetOwnDevice();
+    QXmppTask<void> resetOwnDeviceLocally();
     QXmppTask<bool> resetAll();
 
     QXmppTask<void> setSecurityPolicy(QXmpp::TrustSecurityPolicy securityPolicy);

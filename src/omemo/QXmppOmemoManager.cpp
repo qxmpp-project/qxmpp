@@ -907,6 +907,22 @@ QXmppTask<void> Manager::buildMissingSessions(const QList<QString> &jids)
 }
 
 ///
+/// Resets all local OMEMO data for this device and the trust data used by OMEMO.
+///
+/// ATTENTION: This should only be called after an account is removed from the server since the data
+/// on the server is not reset.
+///
+/// Call \c setUp() once this method is finished and you are logged in to a new account if you want
+/// to set up everything for it.
+///
+/// \since QXmpp 1.9
+///
+QXmppTask<void> QXmppOmemoManager::resetOwnDeviceLocally()
+{
+    return d->resetOwnDeviceLocally();
+}
+
+///
 /// Resets all OMEMO data for this device and the trust data used by OMEMO.
 ///
 /// ATTENTION: This should only be called when an account is removed locally or
