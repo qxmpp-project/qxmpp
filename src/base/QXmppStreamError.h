@@ -22,6 +22,7 @@ enum class StreamError {
     ImproperAddressing,
     InternalServerError,
     InvalidFrom,
+    InvalidId,
     InvalidNamespace,
     InvalidXml,
     NotAuthorized,
