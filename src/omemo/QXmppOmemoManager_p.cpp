@@ -3135,29 +3135,43 @@ QXmppTask<bool> ManagerPrivate::resetOwnDevice()
 
     isStarted = false;
 
+    resetOwnDeviceLocally().then(q, [this, interface]() mutable {
+        deleteDeviceElement([=, this](bool isDeviceElementDeleted) mutable {
+            if (isDeviceElementDeleted) {
+                deleteDeviceBundle([=, this](bool isDeviceBundleDeleted) mutable {
+                    if (isDeviceBundleDeleted) {
+                        ownDevice = {};
+                        preKeyPairs.clear();
+                        signedPreKeyPairs.clear();
+                        deviceBundle = {};
+                        devices.clear();
+
+                        Q_EMIT q->allDevicesRemoved();
+                    }
+
+                    interface.finish(std::move(isDeviceBundleDeleted));
+                });
+            } else {
+                interface.finish(false);
+            }
+        });
+    });
+
+    return interface.task();
+}
+
+// See QXmppOmemoManager for documentation
+QXmppTask<void> QXmppOmemoManagerPrivate::resetOwnDeviceLocally()
+{
+    QXmppPromise<void> interface;
+
+    isStarted = false;
+
     auto future = trustManager->resetAll(ns_omemo_2.toString());
-    future.then(q, [=, this]() mutable {
+    future.then(q, [this, interface]() mutable {
         auto future = omemoStorage->resetAll();
-        future.then(q, [=, this]() mutable {
-            deleteDeviceElement([=, this](bool isDeviceElementDeleted) mutable {
-                if (isDeviceElementDeleted) {
-                    deleteDeviceBundle([=, this](bool isDeviceBundleDeleted) mutable {
-                        if (isDeviceBundleDeleted) {
-                            ownDevice = {};
-                            preKeyPairs.clear();
-                            signedPreKeyPairs.clear();
-                            deviceBundle = {};
-                            devices.clear();
-
-                            Q_EMIT q->allDevicesRemoved();
-                        }
-
-                        interface.finish(std::move(isDeviceBundleDeleted));
-                    });
-                } else {
-                    interface.finish(false);
-                }
-            });
+        future.then(q, [this, interface]() mutable {
+            interface.finish();
         });
     });
 
@@ -3171,29 +3185,25 @@ QXmppTask<bool> ManagerPrivate::resetAll()
 
     isStarted = false;
 
-    auto future = trustManager->resetAll(ns_omemo_2.toString());
-    future.then(q, [this, interface]() mutable {
-        auto future = omemoStorage->resetAll();
-        future.then(q, [this, interface]() mutable {
-            deleteNode(ns_omemo_2_devices.toString(), [this, interface](bool isDevicesNodeDeleted) mutable {
-                if (isDevicesNodeDeleted) {
-                    deleteNode(ns_omemo_2_bundles.toString(), [this, interface](bool isBundlesNodeDeleted) mutable {
-                        if (isBundlesNodeDeleted) {
-                            ownDevice = {};
-                            preKeyPairs.clear();
-                            signedPreKeyPairs.clear();
-                            deviceBundle = {};
-                            devices.clear();
+    resetOwnDeviceLocally().then(q, [this, interface]() mutable {
+        deleteNode(ns_omemo_2_devices.toString(), [this, interface](bool isDevicesNodeDeleted) mutable {
+            if (isDevicesNodeDeleted) {
+                deleteNode(ns_omemo_2_bundles.toString(), [this, interface](bool isBundlesNodeDeleted) mutable {
+                    if (isBundlesNodeDeleted) {
+                        ownDevice = {};
+                        preKeyPairs.clear();
+                        signedPreKeyPairs.clear();
+                        deviceBundle = {};
+                        devices.clear();
 
-                            Q_EMIT q->allDevicesRemoved();
-                        }
+                        Q_EMIT q->allDevicesRemoved();
+                    }
 
-                        interface.finish(std::move(isBundlesNodeDeleted));
-                    });
-                } else {
-                    interface.finish(false);
-                }
-            });
+                    interface.finish(std::move(isBundlesNodeDeleted));
+                });
+            } else {
+                interface.finish(false);
+            }
         });
     });
 
