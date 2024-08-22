@@ -161,6 +161,7 @@ constexpr auto STREAM_ERROR_CONDITIONS = to_array<QStringView>({
     u"system-shutdown",
     u"undefined-condition",
     u"unsupported-encoding",
+    u"unsupported-feature",
     u"unsupported-stanza-type",
     u"unsupported-version",
 });
