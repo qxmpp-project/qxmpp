@@ -282,7 +282,20 @@ bool QXmppRegistrationManager::handleStanza(const QDomElement &stanza)
             QXmppRegisterIq iq;
             iq.parse(stanza);
 
-            Q_EMIT registrationFormReceived(iq);
+            switch (iq.type()) {
+            case QXmppIq::Result:
+                info(u"Received registration form."_s);
+                Q_EMIT registrationFormReceived(iq);
+                break;
+            case QXmppIq::Error:
+                warning(u"Registration form could not be received: "_s.append(iq.error().text()));
+                Q_EMIT registrationFailed(iq.error());
+                break;
+            default:
+                break;  // should never occur
+            }
+
+            return true;
         }
     }
     return false;
