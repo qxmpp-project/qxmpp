@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2020 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -10,6 +11,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
+#include "QXmppMovedManager.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 #include "QXmppUtils.h"
@@ -69,8 +71,8 @@ static void serializeRosterData(const RosterData &d, QXmlStreamWriter &writer)
 /// The user can either accept the request by calling acceptSubscription() or refuse it
 /// by calling refuseSubscription().
 ///
-/// \note If QXmppConfiguration::autoAcceptSubscriptions() is set to true, this
-/// signal will not be emitted.
+/// \note If QXmppConfiguration::autoAcceptSubscriptions() is set to true or the subscription
+/// request is automatically accepted by the QXmppMovedManager, this signal will not be emitted.
 ///
 /// \param subscriberBareJid bare JID that wants to subscribe to the user's presence
 /// \param presence presence stanza containing the reason / message (presence.statusText())
@@ -259,20 +261,43 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
         d->presences[bareJid].remove(resource);
         Q_EMIT presenceChanged(bareJid, resource);
         break;
-    case QXmppPresence::Subscribe:
+    case QXmppPresence::Subscribe: {
+        // accept all incoming subscription requests if enabled
         if (client()->configuration().autoAcceptSubscriptions()) {
-            // accept subscription request
-            acceptSubscription(bareJid);
-
-            // ask for reciprocal subscription
-            subscribe(bareJid);
-        } else {
-            Q_EMIT subscriptionReceived(bareJid);
-            Q_EMIT subscriptionRequestReceived(bareJid, presence);
+            handleSubscriptionRequest(bareJid, presence, true);
+            break;
         }
+
+        // check for XEP-0283: Moved subscription requests and verify them
+        if (auto *movedManager = client()->findExtension<QXmppMovedManager>()) {
+            if (auto verificationTask = movedManager->handleSubscriptionRequest(presence)) {
+                verificationTask->then(this, [this, presence, bareJid](bool valid) {
+                    handleSubscriptionRequest(bareJid, presence, valid);
+                });
+                break;
+            }
+        }
+
+        handleSubscriptionRequest(bareJid, presence, false);
         break;
+    }
     default:
         break;
+    }
+}
+
+void QXmppRosterManager::handleSubscriptionRequest(const QString &bareJid, const QXmppPresence &presence, bool accept)
+{
+    if (accept) {
+        // accept subscription request
+        acceptSubscription(bareJid);
+
+        // ask for reciprocal subscription
+        subscribe(bareJid);
+    } else {
+        // let user decide whether to accept the subscription request
+        Q_EMIT subscriptionReceived(bareJid);
+        Q_EMIT subscriptionRequestReceived(bareJid, presence);
     }
 }
 

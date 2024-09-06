@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2010 Manjeet Dahiya <manjeetdahiya@gmail.com>
 // SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 // SPDX-FileCopyrightText: 2021 Melvin Keskin <melvo@olomono.de>
+// SPDX-FileCopyrightText: 2024 Filipe Azevedo <pasnox@gmail.com>
 //
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
@@ -112,7 +113,9 @@ Q_SIGNALS:
     /// by calling refuseSubscription().
     ///
     /// \note If you set QXmppConfiguration::autoAcceptSubscriptions() to true, this
-    /// signal will not be emitted.
+    /// signal will not be emitted. This is only valid for non moved or verified moved subscription.
+    /// If the subscription is a moved one and the roster's old-jid's subscription is not either from
+    /// or both then QXmppConfiguration::autoAcceptSubscriptions() is ignored.
     void subscriptionReceived(const QString &bareJid);
 
     void subscriptionRequestReceived(const QString &subscriberBareJid, const QXmppPresence &presence);
@@ -140,6 +143,8 @@ private Q_SLOTS:
 
 private:
     using RosterResult = std::variant<QXmppRosterIq, QXmppError>;
+
+    void handleSubscriptionRequest(const QString &bareJid, const QXmppPresence &presence, bool accept);
     QXmppTask<RosterResult> requestRoster();
 
     const std::unique_ptr<QXmppRosterManagerPrivate> d;

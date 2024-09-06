@@ -171,6 +171,8 @@ inline constexpr QStringView ns_thumbs = u"urn:xmpp:thumbs:1";
 inline constexpr QStringView ns_muji = u"urn:xmpp:jingle:muji:0";
 // XEP-0280: Message Carbons
 inline constexpr QStringView ns_carbons = u"urn:xmpp:carbons:2";
+// XEP-0283: Moved
+inline constexpr QStringView ns_moved = u"urn:xmpp:moved:1";
 // XEP-0293: Jingle RTP Feedback Negotiation
 inline constexpr QStringView ns_jingle_rtp_feedback_negotiation = u"urn:xmpp:jingle:apps:rtp:rtcp-fb:0";
 // XEP-0294: Jingle RTP Header Extensions Negotiation
