@@ -73,7 +73,14 @@ class QXmppRegistrationManagerPrivate;
 /// If you want to delete your account on the server, you can do that using
 /// deleteAccount(). When the result is received either accountDeleted() or
 /// accountDeletionFailed() is emitted. In case it was successful, the manager
-/// automatically disconnects from the client.
+/// automatically disconnects from the client. If the server takes too much time to confirm the
+/// account deletion, you may disconnect manually after a reasonable timeout.
+///
+/// QXmpp periodically sends pings to the server. If the server does not respond to it within
+/// QXmppConfiguration::keepAliveInterval(), QXmpp disconnects from the server. Make sure to handle
+/// that case if it happens during account deletion. E.g., you could try to connect to the server
+/// again with the same account and check whether QXmpp::AuthenticationError::NotAuthorized occurs.
+/// In that case, the account can be considered as deleted.
 ///
 /// \code
 /// auto *registrationManager = client->findExtension<QXmppRegistrationManager>();
