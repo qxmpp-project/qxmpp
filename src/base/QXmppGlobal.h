@@ -178,7 +178,9 @@ struct Success { };
 struct Cancelled { };
 
 ///
-/// Unit struct indicating a timeout (or keep-alive) error.
+/// Unit struct indicating a client-side timeout (or keep-alive) error.
+///
+/// It occurs if no response is received from the connected entity within a given timeout.
 ///
 /// \since QXmpp 1.7
 ///
