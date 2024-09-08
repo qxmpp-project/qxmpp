@@ -153,10 +153,13 @@ class QXmppRegistrationManagerPrivate;
 ///
 /// <h4>Filling out the registration form</h4>
 ///
-/// Now you need to fill out the registration form. If this requires user
-/// interaction, it is recommended that you disconnect from the server at this
-/// point now. This is required, because some servers will kick inactive, not
-/// authorized clients after a few seconds.
+/// Now you need to fill out the registration form. The server can close the connection during that
+/// time. If that happens, QXmppClient::errorOccurred() is emitted with
+/// QXmpp::StreamError::ConnectionTimeout as its parameter. That is due to some servers kicking
+/// unauthorized clients after some time when the clients are inactive. That is often the case when
+/// user interaction is required before the completed form is submitted to the server. In order to
+/// support account creation for both servers closing the connection and servers keeping it open,
+/// you need to handle those cases appropriately.
 ///
 /// If the returned IQ contains a data form, that can be displayed to a user or
 /// can be filled out in another way.
@@ -173,24 +176,20 @@ class QXmppRegistrationManagerPrivate;
 ///
 /// <h4>Sending the completed form to the server</h4>
 ///
-/// <b>Option A</b>: If filling out the form goes very quick, you can set the
-/// filled out form directly using setRegistrationFormToSend() and then
-/// directly trigger the form to be sent using sendCachedRegistrationForm().
+/// <b>Option A</b>: If the connection is still open once the form is filled out, set the form using
+/// setRegistrationFormToSend() and then trigger the form to be directly sent using
+/// sendCachedRegistrationForm().
 ///
 /// \code
 /// registrationManager->setRegistrationFormToSend(completedForm);
 /// registrationManager->sendCachedRegistrationForm();
 /// \endcode
 ///
-/// <b>Option B</b>: If filling out the form takes longer, i.e. because user
-/// interaction is required, you should disconnect now. As soon as you have
-/// completed the form, you can set it using setRegistrationFormToSend(). After
-/// that you can reconnect to the server and the registration manager will
-/// automatically send the set form.
+/// <b>Option B</b>: If the connection is closed before the form is filled out, set the form using
+/// setRegistrationFormToSend() and connect to the server again. The registration manager will
+/// automatically send the set form once connected.
 ///
 /// \code
-/// client->disconnectFromServer();
-/// // user fills out form ...
 /// registrationManager->setRegistrationFormToSend(completedForm);
 ///
 /// // As before, you only need to provide a domain to connectToServer()
@@ -287,13 +286,6 @@ Q_SIGNALS:
 
     ///
     /// Emitted, when a registration form has been received.
-    ///
-    /// When registering an account on the server and user interaction is
-    /// required now to complete the form, it is recommended to disconnect and
-    /// sending the completed registration form on reconnect using
-    /// QXmppRegistrationManager::setRegistrationFormToSend(). Some servers
-    /// (i.e. ejabberd) kick their clients after a timeout when they are not
-    /// active. This can be avoided this way.
     ///
     /// \param iq The received form. If it does not contain a valid data form
     /// (see QXmppRegisterIq::form()), the required fields should be marked by
