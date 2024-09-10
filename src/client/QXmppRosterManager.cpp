@@ -557,7 +557,15 @@ void QXmppRosterManager::onRegistered(QXmppClient *client)
 
         auto exportData = [this]() {
             return chainMapSuccess(requestRoster(), this, [](QXmppRosterIq &&iq) -> RosterData {
-                return { iq.items() };
+                auto items = iq.items();
+
+                // We don't want this to be sent while importing.
+                // See https://datatracker.ietf.org/doc/html/rfc6121#section-2.1.2.2
+                for (auto &item: items) {
+                    item.setSubscriptionStatus({});
+                }
+
+                return { items };
             });
         };
 
