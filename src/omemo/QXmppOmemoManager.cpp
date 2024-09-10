@@ -333,6 +333,9 @@ void QXmppOmemoDevice::setTrustLevel(TrustLevel trustLevel)
 QXmppOmemoManager::QXmppOmemoManager(QXmppOmemoStorage *omemoStorage)
     : d(new ManagerPrivate(this, omemoStorage))
 {
+    qRegisterMetaType<uint32_t>("uint32_t");
+    qRegisterMetaType<QMultiHash<QString, QByteArray>>("QMultiHash<QString, QByteArray>");
+
     d->ownDevice.label = DEVICE_LABEL;
     d->init();
     d->schedulePeriodicTasks();
