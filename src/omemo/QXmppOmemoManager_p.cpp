@@ -957,7 +957,7 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
             u"OMEMO manager must be started before encrypting"_s,
             SendError::EncryptionError
         };
-        interface.finish(error);
+        interface.finish(std::move(error));
     } else {
         recipientJids.append(ownBareJid());
 
@@ -968,7 +968,7 @@ QXmppTask<QXmppE2eeExtension::MessageEncryptResult> ManagerPrivate::encryptMessa
                     u"OMEMO element could not be created"_s,
                     QXmpp::SendError::EncryptionError,
                 };
-                interface.finish(error);
+                interface.finish(std::move(error));
             } else {
                 // Messages with a body or trust messages use
                 // \xep{0380, Explicit Message Encryption} and a fallback body.
@@ -3558,7 +3558,7 @@ QXmppTask<QXmpp::SendResult> ManagerPrivate::sendEmptyMessage(const QString &rec
             u"OMEMO envelope could not be created"_s,
             SendError::EncryptionError
         };
-        interface.finish(error);
+        interface.finish(std::move(error));
     } else {
         QXmppOmemoEnvelope omemoEnvelope;
         omemoEnvelope.setRecipientDeviceId(recipientDeviceId);
