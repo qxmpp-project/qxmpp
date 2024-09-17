@@ -421,7 +421,6 @@ SPDX-License-Identifier: CC0-1.0
         <xmpp:status>complete</xmpp:status>
         <xmpp:version>0.2</xmpp:version>
         <xmpp:since>1.5</xmpp:since>
-        <xmpp:note>Based on https://github.com/xsf/xeps/pull/1139</xmpp:note>
       </xmpp:SupportedXep>
     </implements>
     <implements>
