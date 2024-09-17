@@ -37,6 +37,7 @@ SPDX-License-Identifier: CC0-1.0
         <location rdf:resource='https://github.com/qxmpp-project/qxmpp.git'/>
       </GitRepository>
     </repository>
+    <implements rdf:resource='https://xmpp.org/rfcs/rfc5122.html'/>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc6120.html'/>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc6121.html'/>
     <implements rdf:resource='https://xmpp.org/rfcs/rfc7590.html'/>
