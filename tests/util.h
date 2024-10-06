@@ -32,15 +32,15 @@ struct QXmppError;
         throw std::runtime_error(description);
 
 template<typename String>
-inline QDomElement xmlToDom(const String &xml)
+inline QDomDocument xmlToDomDoc(const String &xml, bool namespaceProcessing)
 {
     QDomDocument doc;
     QString errorText;
     bool success = false;
     if constexpr (std::is_same_v<String, QString> || std::is_same_v<String, QByteArray>) {
-        success = doc.setContent(xml, true, &errorText);
+        success = doc.setContent(xml, namespaceProcessing, &errorText);
     } else {
-        success = doc.setContent(QString(xml), true, &errorText);
+        success = doc.setContent(QString(xml), namespaceProcessing, &errorText);
     }
     if (!success) {
         qDebug() << "Parsing error:";
@@ -48,7 +48,19 @@ inline QDomElement xmlToDom(const String &xml)
         qDebug().noquote() << "Error:" << errorText;
         QTest::qFail("Invalid XML", __FILE__, __LINE__);
     }
-    return doc.documentElement();
+    return doc;
+}
+
+template<typename String>
+inline QDomElement xmlToDom(const String &xml)
+{
+    return xmlToDomDoc(xml, true).documentElement();
+}
+
+template<typename String>
+inline QByteArray xmlToFormattedByteArray(const String &xml)
+{
+    return xmlToDomDoc(xml, false).toByteArray(4);
 }
 
 template<typename String>
