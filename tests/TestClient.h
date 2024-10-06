@@ -16,9 +16,10 @@ class TestClient : public QXmppClient
 {
     Q_OBJECT
 public:
-    TestClient(bool enableDebug = false)
+    TestClient(bool enableDebug = false, bool enableAutoReset = true)
         : QXmppClient(),
-          debugEnabled(enableDebug)
+          debugEnabled(enableDebug),
+          autoResetEnabled(enableAutoReset)
     {
         // clear extensions
         qDeleteAll(d->extensions);
@@ -28,6 +29,7 @@ public:
         // setup logging (for expect())
         logger()->setLoggingType(QXmppLogger::SignalLogging);
         connect(logger(), &QXmppLogger::message, this, &TestClient::onLoggerMessage);
+        // In all case, start with a 0 default id
         resetIdCount();
     }
 
@@ -41,7 +43,9 @@ public:
     {
         d->stream->handleIqResponse(xmlToDom(xml));
         QCoreApplication::processEvents();
-        resetIdCount();
+        if (autoResetEnabled) {
+            resetIdCount();
+        }
     }
     void expect(QString &&packet)
     {
@@ -51,7 +55,9 @@ public:
         auto actualXml = rewriteXml(m_sentPackets.takeFirst());
         QCOMPARE(actualXml, expectedXml);
 
-        resetIdCount();
+        if (autoResetEnabled) {
+            resetIdCount();
+        }
     }
     // compares packets, ignoring different IDs and order of sending
     // returns ID of the packet that matched
@@ -104,7 +110,9 @@ public:
     void ignore()
     {
         m_sentPackets.takeFirst();
-        resetIdCount();
+        if (autoResetEnabled) {
+            resetIdCount();
+        }
     }
 
     void resetIdCount()
@@ -145,6 +153,7 @@ private:
     }
 
     bool debugEnabled;
+    bool autoResetEnabled;
     QList<QString> m_sentPackets;
 };
 
