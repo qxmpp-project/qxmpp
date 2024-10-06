@@ -10,10 +10,13 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppFutureUtils_p.h"
+#include "QXmppMixManager.h"
 #include "QXmppPresence.h"
 #include "QXmppRosterIq.h"
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
+#include "QXmppVCardIq.h"
+#include "QXmppVCardManager.h"
 
 #include "StringLiterals.h"
 
@@ -25,7 +28,25 @@ using namespace QXmpp::Private;
 namespace QXmpp::Private {
 
 struct RosterData {
+    struct Mix {
+        QString channel;
+        QString nick;
+
+        void parse(const QDomElement &element) {
+            channel = element.attribute(u"channel"_s);
+            nick = element.attribute(u"nick"_s);
+        }
+
+        void toXml(QXmlStreamWriter *writer) const {
+            writer->writeStartElement(QSL65("mix"));
+            writeOptionalXmlAttribute(writer, u"channel", channel);
+            writeOptionalXmlAttribute(writer, u"nick", nick);
+            writer->writeEndElement();
+        }
+    };
+
     QList<QXmppRosterIq::Item> items;
+    QList<Mix> mixes;
 
     static std::variant<RosterData, QXmppError> fromDom(const QDomElement &el)
     {
@@ -41,6 +62,12 @@ struct RosterData {
             d.items.push_back(std::move(item));
         }
 
+        for (const auto &itemEl : iterChildElements(el, u"mix")) {
+            Mix mix;
+            mix.parse(itemEl);
+            d.mixes.push_back(std::move(mix));
+        }
+
         return d;
     }
 
@@ -49,6 +76,9 @@ struct RosterData {
         writer.writeStartElement(QSL65("roster"));
         for (const auto &item : items) {
             item.toXml(&writer, true);
+        }
+        for (const auto &mix : mixes) {
+            mix.toXml(&writer);
         }
         writer.writeEndElement();
     }
@@ -523,42 +553,125 @@ void QXmppRosterManager::onRegistered(QXmppClient *client)
 {
     // data import/export
     if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
-        using Result = std::variant<Success, QXmppError>;
-        auto importData = [this](const RosterData &data) -> QXmppTask<Result> {
+        const auto mixManager = client->findExtension<QXmppMixManager>();
+        using ImportResult = std::variant<Success, QXmppError>;
+        auto importData = [this, client, manager, mixManager](const RosterData &data) -> QXmppTask<ImportResult> {
             if (data.items.isEmpty()) {
-                return makeReadyTask<Result>(Success());
+                return makeReadyTask<ImportResult>(Success());
             }
 
-            QXmppPromise<Result> promise;
+            const auto defaultNick = client->findExtension<QXmppVCardManager>()->clientVCard().nickName();
+            QXmppPromise<ImportResult> promise;
             auto counter = std::make_shared<int>(data.items.size());
 
             for (const auto &item : std::as_const(data.items)) {
-                QXmppRosterIq iq;
-                iq.addItem(item);
-                iq.setType(QXmppIq::Set);
+                if (item.isMixChannel()) {
+                    if (!mixManager) {
+                        if ((--(*counter)) == 0) {
+                            promise.finish(Success());
+                        }
 
-                this->client()->sendGenericIq(std::move(iq)).then(this, [promise, counter](auto &&result) mutable {
-                    if (promise.task().isFinished()) {
-                        return;
+                        continue;
                     }
 
-                    if (std::holds_alternative<QXmppError>(result)) {
-                        return promise.finish(std::get<QXmppError>(std::move(result)));
-                    }
+                    const auto it = std::find_if(data.mixes.constBegin(), data.mixes.constEnd(), [item](const RosterData::Mix &mix) {
+                        return item.bareJid() == mix.channel;
+                    });
+                    const auto nick = it != data.mixes.constEnd() ? it->nick : defaultNick;
 
-                    if ((--(*counter)) == 0) {
-                        promise.finish(Success());
-                    }
-                });
+                    mixManager->joinChannel(item.bareJid(), nick).then(this, [manager, promise, counter](auto &&result) mutable {
+                        if (promise.task().isFinished()) {
+                            return;
+                        }
+
+                        // We do not break import/export on mix errors, we only notify about it
+                        if (auto error = std::get_if<QXmppError>(&result); error) {
+                            Q_EMIT manager->errorOccured(std::move(*error));
+                        }
+
+                        if ((--(*counter)) == 0) {
+                            return promise.finish(Success());
+                        }
+                    });
+                } else {
+                    QXmppRosterIq iq;
+                    iq.addItem(item);
+                    iq.setType(QXmppIq::Set);
+
+                    client->sendGenericIq(std::move(iq)).then(this, [promise, counter](auto &&result) mutable {
+                        if (promise.task().isFinished()) {
+                            return;
+                        }
+
+                        if (auto error = std::get_if<QXmppError>(&result); error) {
+                            return promise.finish(std::move(*error));
+                        }
+
+                        if ((--(*counter)) == 0) {
+                            return promise.finish(Success());
+                        }
+                    });
+                }
             }
 
             return promise.task();
         };
 
-        auto exportData = [this]() {
-            return chainMapSuccess(requestRoster(), this, [](QXmppRosterIq &&iq) -> RosterData {
-                return { iq.items() };
+        using ExportResult = std::variant<RosterData, QXmppError>;
+        auto exportData = [this, client, manager, mixManager]() -> QXmppTask<ExportResult> {
+            QXmppPromise<ExportResult> promise;
+
+            requestRoster().then(this, [this, manager, mixManager, promise](auto &&rosterResult) mutable {
+                if (auto error = std::get_if<QXmppError>(&rosterResult); error) {
+                    return promise.finish(std::move(*error));
+                }
+
+                const auto iq = std::move(std::get<QXmppRosterIq>(rosterResult));                
+                auto result = std::make_shared<RosterData>(iq.items());
+                auto counter = std::make_shared<int>(result->items.size());
+
+                if (result->items.isEmpty()) {
+                    return promise.finish(*result.get());
+                }
+
+                result->mixes.reserve(result->items.count());
+
+                for (const auto &item : std::as_const(result->items)) {
+                    if (!item.isMixChannel()) {
+                        if ((--(*counter)) == 0) {
+                            return promise.finish(*result.get());
+                        }
+
+                        continue;
+                    }
+
+                    mixManager->requestParticipants(item.bareJid()).then(this, [manager, result, promise, counter, channelId = item.bareJid(), participantId = item.mixParticipantId()](auto &&participantsResult) mutable {
+                        if (promise.task().isFinished()) {
+                            return;
+                        }
+
+                        // We do not break import/export on mix errors, we only notify about it
+                        if (auto error = std::get_if<QXmppError>(&participantsResult); error) {
+                            Q_EMIT manager->errorOccured(std::move(*error));
+                        } else {
+                            const auto participants = std::get<QVector<QXmppMixParticipantItem>>(participantsResult);
+
+                            for (const QXmppMixParticipantItem &participant: participants) {
+                                if (participant.id() == participantId) {
+                                    result->mixes.append({ channelId, participant.nick() });
+                                    break;
+                                }
+                            }
+                        }
+
+                        if ((--(*counter)) == 0) {
+                            return promise.finish(*result.get());
+                        }
+                    });
+                }
             });
+
+            return promise.task();
         };
 
         manager->registerExportData<RosterData>(importData, exportData);

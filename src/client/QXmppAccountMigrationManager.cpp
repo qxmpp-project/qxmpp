@@ -30,38 +30,36 @@ struct XmlElementId {
     {
         return tagName == other.tagName && xmlns == other.xmlns;
     }
-};
 
-#ifndef QXMPP_DOC
-template<>
-struct std::hash<XmlElementId> {
-    std::size_t operator()(const XmlElementId &m) const noexcept
-    {
-        std::size_t h1 = std::hash<QString> {}(m.tagName);
-        std::size_t h2 = std::hash<QString> {}(m.xmlns);
-        return h1 ^ (h2 << 1);
+    bool operator<(const XmlElementId &other) const {
+        const auto result = tagName.compare(other.tagName);
+
+        if (result == 0) {
+            return xmlns.compare(other.xmlns) < 0;
+        }
+
+        return result < 0;
     }
 };
-#endif
 
 using AnyParser = QXmppExportData::ExtensionParser<std::any>;
 using AnySerializer = QXmppExportData::ExtensionSerializer<std::any>;
 
-static std::unordered_map<XmlElementId, AnyParser> &accountDataParsers()
+static std::map<XmlElementId, AnyParser> &accountDataParsers()
 {
-    thread_local static std::unordered_map<XmlElementId, AnyParser> registry;
+    thread_local static std::map<XmlElementId, AnyParser> registry;
     return registry;
 }
 
-static std::unordered_map<std::type_index, AnySerializer> &accountDataSerializers()
+static std::map<std::type_index, AnySerializer> &accountDataSerializers()
 {
-    thread_local static std::unordered_map<std::type_index, AnySerializer> registry;
+    thread_local static std::map<std::type_index, AnySerializer> registry;
     return registry;
 }
 
 struct QXmppExportDataPrivate : QSharedData {
     QString accountJid;
-    std::unordered_map<std::type_index, std::any> extensions;
+    std::map<std::type_index, std::any> extensions;
 };
 
 QXmppExportData::QXmppExportData()
@@ -131,7 +129,7 @@ void QXmppExportData::setAccountJid(const QString &jid)
     d->accountJid = jid;
 }
 
-const std::unordered_map<std::type_index, std::any> &QXmppExportData::extensions() const
+const std::map<std::type_index, std::any> &QXmppExportData::extensions() const
 {
     return d->extensions;
 }
@@ -161,7 +159,7 @@ struct QXmppAccountMigrationManagerPrivate {
         std::function<QXmppTask<Result<std::any>>()> exportFunction;
     };
 
-    std::unordered_map<std::type_index, ExtensionData> extensions;
+    std::map<std::type_index, ExtensionData> extensions;
 };
 
 ///

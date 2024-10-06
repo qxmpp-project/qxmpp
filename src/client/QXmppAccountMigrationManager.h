@@ -12,7 +12,7 @@
 
 #include <any>
 #include <typeindex>
-#include <unordered_map>
+#include <map>
 
 struct QXmppExportDataPrivate;
 
@@ -79,7 +79,7 @@ private:
     friend class QXmppAccountMigrationManager;
     friend class tst_QXmppAccountMigrationManager;
 
-    const std::unordered_map<std::type_index, std::any> &extensions() const;
+    const std::map<std::type_index, std::any> &extensions() const;
     void setExtension(std::any value);
 
     static void registerExtensionInternal(std::type_index, ExtensionParser<std::any>, ExtensionSerializer<std::any>, QStringView tagName, QStringView xmlns);
@@ -111,6 +111,8 @@ public:
 
     template<typename DataType>
     void unregisterExportData();
+
+    Q_SIGNAL void errorOccured(const QXmppError &error);
 
 private:
     void registerMigrationDataInternal(std::type_index dataType, std::function<QXmppTask<Result<>>(std::any)>, std::function<QXmppTask<Result<std::any>>()>);
@@ -153,5 +155,13 @@ void QXmppAccountMigrationManager::unregisterExportData()
 {
     unregisterMigrationDataInternal(std::type_index(typeid(DataType)));
 }
+
+///
+/// \fn QXmppAccountMigrationManager::errorOccured(const QXmppError &error)
+///
+/// Emitted when an error occured during export or import.
+///
+/// \param error The occured error
+///
 
 #endif

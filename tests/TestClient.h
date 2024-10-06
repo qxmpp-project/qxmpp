@@ -16,9 +16,10 @@ class TestClient : public QXmppClient
 {
     Q_OBJECT
 public:
-    TestClient(bool enableDebug = false)
+    TestClient(bool enableDebug = false, bool disableAutoReset = false)
         : QXmppClient(),
-          debugEnabled(enableDebug)
+          debugEnabled(enableDebug),
+          disableAutoReset(disableAutoReset)
     {
         // clear extensions
         qDeleteAll(d->extensions);
@@ -28,6 +29,7 @@ public:
         // setup logging (for expect())
         logger()->setLoggingType(QXmppLogger::SignalLogging);
         connect(logger(), &QXmppLogger::message, this, &TestClient::onLoggerMessage);
+        // In all case, start with a 0 default id
         resetIdCount();
     }
 
@@ -41,14 +43,18 @@ public:
     {
         d->stream->handleIqResponse(xmlToDom(xml));
         QCoreApplication::processEvents();
-        resetIdCount();
+        if (!disableAutoReset) {
+            resetIdCount();
+        }
     }
 
     void expect(QString &&packet)
     {
         QVERIFY2(!m_sentPackets.empty(), "No packet was sent!");
         QCOMPARE(m_sentPackets.takeFirst().replace(u'\'', u'"'), packet.replace(u'\'', u'"'));
-        resetIdCount();
+        if (!disableAutoReset) {
+            resetIdCount();
+        }
     }
     QString takePacket()
     {
@@ -73,7 +79,9 @@ public:
     void ignore()
     {
         m_sentPackets.takeFirst();
-        resetIdCount();
+        if (!disableAutoReset) {
+            resetIdCount();
+        }
     }
 
     void resetIdCount()
@@ -114,6 +122,7 @@ private:
     }
 
     bool debugEnabled;
+    bool disableAutoReset;
     QList<QString> m_sentPackets;
 };
 
