@@ -227,6 +227,14 @@ struct QXmppAccountMigrationManagerPrivate {
 ///
 
 ///
+/// \fn QXmppAccountMigrationManager::errorOccurred(const QXmppError &error)
+///
+/// Emitted when an error occured during export or import.
+///
+/// \param error The occured error
+///
+
+///
 /// \fn QXmppAccountMigrationManager::registerExportData(ImportFunc importFunc, ExportFunc exportFunc)
 ///
 /// Registers a data type that can be imported to an account using importFunc and generated using
