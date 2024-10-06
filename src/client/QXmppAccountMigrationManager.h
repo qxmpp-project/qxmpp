@@ -156,4 +156,12 @@ void QXmppAccountMigrationManager::unregisterExportData()
     unregisterMigrationDataInternal(std::type_index(typeid(DataType)));
 }
 
+///
+/// \fn QXmppAccountMigrationManager::errorOccured(const QXmppError &error)
+///
+/// Emitted when an error occured during export or import.
+///
+/// \param error The occured error
+///
+
 #endif
