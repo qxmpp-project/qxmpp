@@ -90,7 +90,14 @@ jobs:
       - name: Run tests
         run: |
           ${env:PATH} += ";D:/a/qxmpp/qxmpp/src/Debug"
-          cmake . && cmake --build .
+          git clone https://github.com/dino/libomemo-c
+          cd libomemo-c
+          mkdir D:/a/usr
+          cmake . -DCMAKE_INSTALL_PREFIX="D:/a/usr"
+          cmake --build .
+          cmake --install .
+          cd ..
+          cmake . -DBUILD_OMEMO=ON && cmake --build .
           # ctest
           # ctest --rerun-failed --output-on-failure
 
