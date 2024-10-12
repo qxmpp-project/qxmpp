@@ -148,6 +148,8 @@ private:
     QXmppTask<RosterResult> requestRoster();
 
     const std::unique_ptr<QXmppRosterManagerPrivate> d;
+
+    friend class QXmppMixManager;
 };
 
 #endif  // QXMPPROSTER_H
