@@ -17,6 +17,7 @@
 #include "QXmppUtils.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
 #include "StringLiterals.h"
 
 #include <QDomElement>
@@ -27,7 +28,9 @@ using namespace QXmpp::Private;
 namespace QXmpp::Private {
 
 struct RosterData {
-    QList<QXmppRosterIq::Item> items;
+    using Items = QList<QXmppRosterIq::Item>;
+
+    Items items;
 
     static std::variant<RosterData, QXmppError> fromDom(const QDomElement &el)
     {
@@ -548,47 +551,54 @@ void QXmppRosterManager::onRegistered(QXmppClient *client)
 {
     // data import/export
     if (auto manager = client->findExtension<QXmppAccountMigrationManager>()) {
-        using Result = std::variant<Success, QXmppError>;
-        auto importData = [this](const RosterData &data) -> QXmppTask<Result> {
+        using ImportResult = std::variant<Success, QXmppError>;
+        auto importData = [this, client, manager](const RosterData &data) -> QXmppTask<ImportResult> {
             if (data.items.isEmpty()) {
-                return makeReadyTask<Result>(Success());
+                return makeReadyTask<ImportResult>(Success());
             }
 
-            QXmppPromise<Result> promise;
+            QXmppPromise<ImportResult> promise;
             auto counter = std::make_shared<int>(data.items.size());
 
             for (const auto &item : std::as_const(data.items)) {
+                Q_ASSERT(!item.isMixChannel());
+
                 QXmppRosterIq iq;
                 iq.addItem(item);
                 iq.setType(QXmppIq::Set);
 
-                this->client()->sendGenericIq(std::move(iq)).then(this, [promise, counter](auto &&result) mutable {
+                client->sendGenericIq(std::move(iq)).then(this, [promise, counter](auto &&result) mutable {
                     if (promise.task().isFinished()) {
                         return;
                     }
 
-                    if (std::holds_alternative<QXmppError>(result)) {
-                        return promise.finish(std::get<QXmppError>(std::move(result)));
+                    if (auto error = std::get_if<QXmppError>(&result); error) {
+                        return promise.finish(std::move(*error));
                     }
 
                     if ((--(*counter)) == 0) {
-                        promise.finish(Success());
+                        return promise.finish(Success());
                     }
                 });
             }
 
             return promise.task();
         };
-
         auto exportData = [this]() {
             return chainMapSuccess(requestRoster(), this, [](QXmppRosterIq &&iq) -> RosterData {
-                auto items = iq.items();
+                const auto items = transformFilter<RosterData::Items>(iq.items(), [](const auto &item) -> std::optional<QXmppRosterIq::Item> {
+                    if (item.isMixChannel()) {
+                        return {};
+                    }
 
-                // We don't want this to be sent while importing.
-                // See https://datatracker.ietf.org/doc/html/rfc6121#section-2.1.2.2
-                for (auto &item: items) {
-                    item.setSubscriptionStatus({});
-                }
+                    auto fixed = item;
+
+                    // We don't want this to be sent while importing.
+                    // See https://datatracker.ietf.org/doc/html/rfc6121#section-2.1.2.2
+                    fixed.setSubscriptionStatus({});
+
+                    return fixed;
+                });
 
                 return { items };
             });
