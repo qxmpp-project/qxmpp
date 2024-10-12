@@ -4,6 +4,9 @@
 
 #include "QXmppAccountMigrationManager.h"
 #include "QXmppClient.h"
+#include "QXmppDiscoveryManager.h"
+#include "QXmppMixManager.h"
+#include "QXmppPubSubManager.h"
 #include "QXmppRosterManager.h"
 #include "QXmppUtils_p.h"
 #include "QXmppVCardIq.h"
@@ -38,6 +41,17 @@ static QXmppRosterIq::Item newRosterItem(const QString &bareJid, const QString &
     return item;
 }
 
+static QXmppRosterIq::Item newMixRosterItem(const QString &channelId, const QString &channelName, const QString &participantId)
+{
+    QXmppRosterIq::Item item;
+    item.setBareJid(channelId);
+    item.setName(channelName);
+    item.setIsMixChannel(true);
+    item.setMixParticipantId(participantId);
+    item.setSubscriptionType(QXmppRosterIq::Item::NotSet);
+    return item;
+}
+
 static QXmppRosterIq newRoster(TestClient *client, int version, const std::optional<QString> &id, const std::optional<QXmppIq::Type> &type = {}, int index = -1)
 {
     QXmppRosterIq roster;
@@ -56,7 +70,7 @@ static QXmppRosterIq newRoster(TestClient *client, int version, const std::optio
                 roster.addItem(newRosterItem(u"1@bare.com"_s, u"1 Bare"_s, { u"all"_s }));
             }
             if (index == -1 || index == 1) {
-                roster.addItem(newRosterItem(u"2@bare.com"_s, u"2 Bare"_s, { u"all"_s }));
+                roster.addItem(newMixRosterItem(u"mix1@bare.com"_s, u"Mix 1 Bare"_s, u"mix1BareId"_s));
             }
             break;
         case 1:
@@ -64,7 +78,7 @@ static QXmppRosterIq newRoster(TestClient *client, int version, const std::optio
                 roster.addItem(newRosterItem(u"3@gamer.com"_s, u"3 Gamer"_s, { u"gamers"_s }));
             }
             if (index == -1 || index == 1) {
-                roster.addItem(newRosterItem(u"4@gamer.com"_s, u"4 Gamer"_s, { u"gamers"_s }));
+                roster.addItem(newMixRosterItem(u"mix2@gamer.com"_s, u"Mix 2 Gamer"_s, u"mix2BareId"_s));
             }
             break;
         default:
@@ -106,16 +120,19 @@ static QXmppVCardIq newClientVCard(TestClient *client, int version, const std::o
     return vcard;
 }
 
-static std::unique_ptr<TestClient> newClient(bool withManagers)
+static std::unique_ptr<TestClient> newClient(bool withManagers, bool autoResetEnabled = true)
 {
-    auto client = std::make_unique<TestClient>();
+    auto client = std::make_unique<TestClient>(false, autoResetEnabled);
 
     client->addNewExtension<QXmppAccountMigrationManager>();
     client->configuration().setJid("pasnox@xmpp.example");
 
     if (withManagers) {
         client->addNewExtension<QXmppVCardManager>();
+        client->addNewExtension<QXmppDiscoveryManager>();
+        client->addNewExtension<QXmppPubSubManager>();
         client->addNewExtension<QXmppRosterManager>(client.get());
+        client->addNewExtension<QXmppMixManager>();
     }
 
     return client;
@@ -127,8 +144,8 @@ class tst_QXmppAccountMigrationManager : public QObject
 
 private:
     Q_SLOT void testImportExport();
-    Q_SLOT void realImportExport();
-    Q_SLOT void serialization();
+    Q_SLOT void testRealImportExport();
+    Q_SLOT void testSerialization();
 };
 
 struct DataExtension {
@@ -198,9 +215,9 @@ void tst_QXmppAccountMigrationManager::testImportExport()
     expectFutureVariant<Success>(importTask);
 }
 
-void tst_QXmppAccountMigrationManager::realImportExport()
+void tst_QXmppAccountMigrationManager::testRealImportExport()
 {
-    auto client = newClient(true);
+    auto client = newClient(true, false);
     auto *manager = client->findExtension<QXmppAccountMigrationManager>();
     auto *rosterManager = client->findExtension<QXmppRosterManager>();
     auto *vcardManager = client->findExtension<QXmppVCardManager>();
@@ -217,53 +234,102 @@ void tst_QXmppAccountMigrationManager::realImportExport()
                    "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
                    "</query>"
                    "</iq>"_s);
-    client->expect(u"<iq id='qxmpp3' to='pasnox@xmpp.example' type='get'>"
+    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result)));
+
+    client->expect(u"<iq id='qxmpp3' from='pasnox@xmpp.example/QXmpp' type='get'>"
+                   "<query xmlns='jabber:iq:roster'>"
+                   "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
+                   "</query>"
+                   "</iq>"_s);
+    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp3", QXmppIq::Result)));
+
+    client->expect(u"<iq id='qxmpp4' to='pasnox@xmpp.example' type='get'>"
                    "<vCard xmlns='vcard-temp'>"
                    "<TITLE/>"
                    "<ROLE/>"
                    "</vCard>"
                    "</iq>"_s);
+    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp4", QXmppIq::Result)));
 
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result)));
-    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp3", QXmppIq::Result)));
+    client->expect(u"<iq id='qxmpp7' to='mix2@gamer.com' type='get'>"
+                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                   "<items node='urn:xmpp:mix:nodes:participants'/>"
+                   "</pubsub>"
+                   "</iq>"_s);
+    client->inject(u"<iq id='qxmpp7' from='mix2@gamer.com' type='result'>"
+                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                   "<items node='urn:xmpp:mix:nodes:participants'>"
+                   "<item id='mix2BareId'>"
+                   "<participant xmlns='urn:xmpp:mix:core:1'>"
+                   "<nick>Joe @ Mix 2 Gamer</nick>"
+                   "<jid>mix_user@domain.ext</jid>"
+                   "</participant>"
+                   "</item>"
+                   "</items>"
+                   "</pubsub>"
+                   "</iq>"_s);
+
+    client->expectNoPacket();
 
     auto data = expectFutureVariant<QXmppExportData>(exportTask);
 
     // import exported data
     auto importTask = manager->importData(data);
 
-    client->expect("<iq id='qxmpp3' to='pasnox@xmpp.example' type='set'>"
+    client->expect(u"<iq id='qxmpp13' to='pasnox@xmpp.example' type='set'>"
+                   "<client-join xmlns='urn:xmpp:mix:pam:2' channel='mix2@gamer.com'>"
+                   "<join xmlns='urn:xmpp:mix:core:1'>"
+                   "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+                   "<subscribe node='urn:xmpp:avatar:data'/>"
+                   "<subscribe node='urn:xmpp:avatar:metadata'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+                   "<nick>Joe @ Mix 2 Gamer</nick>"
+                   "</join>"
+                   "</client-join>"
+                   "</iq>"_s);
+    client->inject(u"<iq id='qxmpp13' type='result'>"
+                   "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+                   "<join xmlns='urn:xmpp:mix:core:1' id='mix2BareId'>"
+                   "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+                   "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+                   "<nick>Joe @ Mix 2 Gamer</nick>"
+                   "</join>"
+                   "</client-join>"
+                   "</iq>"_s);
+
+    client->expect(u"<iq id='qxmpp4' to='pasnox@xmpp.example' type='set'>"
                    "<vCard xmlns='vcard-temp'>"
                    "<NICKNAME>It is me Bookri</NICKNAME>"
                    "<N><GIVEN>Nox</GIVEN><FAMILY>Bookri</FAMILY></N>"
                    "<TITLE/>"
                    "<ROLE/>"
                    "</vCard>"
-                   "</iq>");
-    client->expect("<iq id='qxmpp1' type='set'>"
+                   "</iq>"_s);
+    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp4", QXmppIq::Result)));
+
+    client->expect(u"<iq id='qxmpp14' type='set'>"
                    "<query xmlns='jabber:iq:roster'>"
                    "<item jid='3@gamer.com' name='3 Gamer'>"
                    "<group>gamers</group>"
                    "</item>"
                    "</query>"
-                   "</iq>");
-    client->expect("<iq id='qxmpp2' type='set'>"
-                   "<query xmlns='jabber:iq:roster'>"
-                   "<item jid='4@gamer.com' name='4 Gamer'>"
-                   "<group>gamers</group>"
-                   "</item>"
-                   "</query>"
-                   "</iq>");
-    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp3", QXmppIq::Result)));
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp1", QXmppIq::Result, 0)));
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result, 1)));
+                   "</iq>"_s);
+    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp14", QXmppIq::Result, 0)));
+
+    client->expectNoPacket();
 
     expectFutureVariant<Success>(importTask);
 }
 
-void tst_QXmppAccountMigrationManager::serialization()
+void tst_QXmppAccountMigrationManager::testSerialization()
 {
-    auto client = newClient(true);
+    auto client = newClient(true, false);
     auto *manager = client->findExtension<QXmppAccountMigrationManager>();
     auto *rosterManager = client->findExtension<QXmppRosterManager>();
     auto *vcardManager = client->findExtension<QXmppVCardManager>();
@@ -276,30 +342,60 @@ void tst_QXmppAccountMigrationManager::serialization()
     auto exportTask = manager->exportData();
     QVERIFY(!exportTask.isFinished());
 
-    client->expect(QStringLiteral("<iq id='qxmpp2' from='pasnox@xmpp.example/QXmpp' type='get'>"
-                                  "<query xmlns='jabber:iq:roster'>"
-                                  "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
-                                  "</query>"
-                                  "</iq>"));
-    client->expect(QStringLiteral("<iq id='qxmpp3' to='pasnox@xmpp.example' type='get'>"
-                                  "<vCard xmlns='vcard-temp'>"
-                                  "<TITLE/>"
-                                  "<ROLE/>"
-                                  "</vCard>"
-                                  "</iq>"));
-
+    client->expect(u"<iq id='qxmpp2' from='pasnox@xmpp.example/QXmpp' type='get'>"
+                   "<query xmlns='jabber:iq:roster'>"
+                   "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
+                   "</query>"
+                   "</iq>"_s);
     client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result)));
-    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp3", QXmppIq::Result)));
+
+    client->expect(u"<iq id='qxmpp3' from='pasnox@xmpp.example/QXmpp' type='get'>"
+                   "<query xmlns='jabber:iq:roster'>"
+                   "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
+                   "</query>"
+                   "</iq>"_s);
+    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp3", QXmppIq::Result)));
+
+    client->expect(u"<iq id='qxmpp4' to='pasnox@xmpp.example' type='get'>"
+                   "<vCard xmlns='vcard-temp'>"
+                   "<TITLE/>"
+                   "<ROLE/>"
+                   "</vCard>"
+                   "</iq>"_s);
+    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp4", QXmppIq::Result)));
+
+    client->expect(u"<iq id='qxmpp7' to='mix2@gamer.com' type='get'>"
+                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                   "<items node='urn:xmpp:mix:nodes:participants'/>"
+                   "</pubsub>"
+                   "</iq>"_s);
+    client->inject(u"<iq id='qxmpp7' from='mix2@gamer.com' type='result'>"
+                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+                   "<items node='urn:xmpp:mix:nodes:participants'>"
+                   "<item id='mix2BareId'>"
+                   "<participant xmlns='urn:xmpp:mix:core:1'>"
+                   "<nick>Joe @ Mix 2 Gamer</nick>"
+                   "<jid>mix_user@domain.ext</jid>"
+                   "</participant>"
+                   "</item>"
+                   "</items>"
+                   "</pubsub>"
+                   "</iq>"_s);
+
+    client->expectNoPacket();
 
     // test serialize
-    auto data = expectFutureVariant<QXmppExportData>(exportTask);
-    auto xml1 = packetToXml(data);
-    QByteArray xml2 =
+    const auto data = expectFutureVariant<QXmppExportData>(exportTask);
+
+    const auto xml1 = packetToXml(data);
+    const QByteArray xml2 =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         "<account-data xmlns=\"org.qxmpp.export\" jid=\"pasnox@xmpp.example\">"
+        "<mix>"
+        "<item jid=\"mix2@gamer.com\" nick=\"Joe @ Mix 2 Gamer\"/>"
+        "</mix>"
         "<roster>"
         "<item xmlns=\"jabber:iq:roster\" jid=\"3@gamer.com\" name=\"3 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"4@gamer.com\" name=\"4 Gamer\"><group>gamers</group></item>"
         "</roster>"
         "<vcard>"
         "<vCard xmlns=\"vcard-temp\">"
@@ -312,21 +408,23 @@ void tst_QXmppAccountMigrationManager::serialization()
 
     if (xml1 != xml2) {
         qDebug() << "Actual:\n"
-                 << xml1;
+                 << xml1.constData();
         qDebug() << "Expected:\n"
-                 << xml2;
+                 << xml2.constData();
     }
     QCOMPARE(xml1, xml2);
 
     // test parse (and re-serialize)
     auto parsedData = expectVariant<QXmppExportData>(QXmppExportData::fromDom(xmlToDom(xml2)));
-    auto xml3 = packetToXml(parsedData);
-    QByteArray xml4 =
+    const auto xml3 = packetToXml(parsedData);
+    const QByteArray xml4 =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         "<account-data xmlns=\"org.qxmpp.export\" jid=\"pasnox@xmpp.example\">"
+        "<mix>"
+        "<item jid=\"mix2@gamer.com\" nick=\"Joe @ Mix 2 Gamer\"/>"
+        "</mix>"
         "<roster>"
         "<item xmlns=\"jabber:iq:roster\" jid=\"3@gamer.com\" name=\"3 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"4@gamer.com\" name=\"4 Gamer\"><group>gamers</group></item>"
         "</roster>"
         "<vcard>"
         "<vCard xmlns=\"vcard-temp\">"
@@ -339,9 +437,9 @@ void tst_QXmppAccountMigrationManager::serialization()
 
     if (xml3 != xml4) {
         qDebug() << "Actual:\n"
-                 << xml3;
+                 << xml3.constData();
         qDebug() << "Expected:\n"
-                 << xml4;
+                 << xml4.constData();
     }
     QCOMPARE(xml3, xml4);
 }
