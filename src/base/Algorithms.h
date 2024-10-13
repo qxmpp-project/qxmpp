@@ -24,6 +24,21 @@ auto transform(const InputVector &input, Converter convert)
     return output;
 }
 
+template<typename OutputVector, typename InputVector, typename Converter>
+auto filtered(const InputVector &input, Converter convert)
+{
+    OutputVector output;
+    if constexpr (std::ranges::sized_range<InputVector>) {
+        output.reserve(input.size());
+    }
+    for (const auto &value : input) {
+        if (const std::optional<std::decay_t<decltype(value)>> result = std::invoke(convert, value)) {
+            output.push_back(*result);
+        }
+    }
+    return output;
+}
+
 template<typename Vec, typename T>
 auto contains(const Vec &vec, const T &value)
 {
