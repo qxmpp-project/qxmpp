@@ -11,6 +11,16 @@
 
 namespace QXmpp::Private {
 
+template<typename T>
+constexpr bool HasShrinkToFit = requires(const T &t) {
+    t.shrink_to_fit();
+};
+
+template<typename T>
+constexpr bool HasSqueeze = requires(const T &t) {
+    t.squeeze();
+};
+
 template<typename OutputVector, typename InputVector, typename Converter>
 auto transform(const InputVector &input, Converter convert)
 {
@@ -20,6 +30,26 @@ auto transform(const InputVector &input, Converter convert)
     }
     for (const auto &value : input) {
         output.push_back(std::invoke(convert, value));
+    }
+    return output;
+}
+
+template<typename OutputVector, typename InputVector, typename Converter>
+auto transformFilter(const InputVector &input, Converter convert)
+{
+    OutputVector output;
+    if constexpr (std::ranges::sized_range<InputVector>) {
+        output.reserve(input.size());
+    }
+    for (const auto &value : input) {
+        if (const std::optional<std::decay_t<decltype(value)>> result = std::invoke(convert, value)) {
+            output.push_back(*result);
+        }
+    }
+    if constexpr (HasShrinkToFit<InputVector>) {
+        output.shrink_to_fit();
+    } else if constexpr (HasSqueeze<InputVector>) {
+        output.squeeze();
     }
     return output;
 }
