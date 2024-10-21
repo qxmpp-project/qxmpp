@@ -293,7 +293,7 @@ Join parseJoinQuery(const QUrlQuery &q)
 Login parseLoginQuery(const QUrlQuery &q)
 {
     return {
-        queryItemValue(q, u"login"_s),
+        queryItemValue(q, u"password"_s),
     };
 }
 

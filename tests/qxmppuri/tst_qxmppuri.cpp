@@ -81,6 +81,11 @@ void tst_QXmppUri::queryOther()
     QCOMPARE(unwrap<Uri::Join>(uri.query()), (Uri::Join { u"1234"_s }));
     QCOMPARE(uri.toString(), string);
 
+    string = u"xmpp:alice@example.org?login;password=1234"_s;
+    uri = unwrap(QXmppUri::fromString(string));
+    QCOMPARE(unwrap<Uri::Login>(uri.query()), (Uri::Login { u"1234"_s }));
+    QCOMPARE(uri.toString(), string);
+
     string = u"xmpp:qxmpp.org?register"_s;
     uri = unwrap(QXmppUri::fromString(string));
     QCOMPARE(unwrap<Uri::Register>(uri.query()), (Uri::Register {}));
