@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.8.2 (October 21, 2024)
+------------------------------
+
+ - StreamError: Fix parsing of stream error conditions and missing "invalid-id" condition (@lnjX)
+ - Omemo: Fix windows/msvc build (@lnjX, #658)
+
 QXmpp 1.8.1 (August 21, 2024)
 -----------------------------
 
