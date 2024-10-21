@@ -1071,7 +1071,7 @@ QXmppTask<std::optional<QXmppOmemoElement>> ManagerPrivate::encryptStanza(const 
                         if (++(*processedDevicesCount) == devicesCount) {
                             if (*successfullyProcessedDevicesCount == 0) {
                                 warning(u"OMEMO element could not be created because no recipient "
-                                        "devices with keys having accepted trust levels could be found"_s);
+                                        u"devices with keys having accepted trust levels could be found"_s);
                                 interface.finish(std::nullopt);
                             } else {
                                 omemoElement->setSenderDeviceId(ownDevice.id);
