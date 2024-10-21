@@ -112,6 +112,8 @@ public:
     template<typename DataType>
     void unregisterExportData();
 
+    Q_SIGNAL void errorOccurred(const QXmppError &error);
+
 private:
     void registerMigrationDataInternal(std::type_index dataType, std::function<QXmppTask<Result<>>(std::any)>, std::function<QXmppTask<Result<std::any>>()>);
     void unregisterMigrationDataInternal(std::type_index dataType);

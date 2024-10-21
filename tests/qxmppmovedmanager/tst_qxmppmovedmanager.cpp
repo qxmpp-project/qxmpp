@@ -293,11 +293,11 @@ template<typename T>
 void tst_QXmppMovedManager::testError(QXmppTask<T> &task, TestClient &client, const QString &id, const QString &from)
 {
     client.ignore();
-    client.inject(u"<iq id='%1' from='%2' type='error'>"
+    client.inject(QStringLiteral("<iq id='%1' from='%2' type='error'>"
                                  "<error type='cancel'>"
                                  "<not-allowed xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
                                  "</error>"
-                                 "</iq>"_s
+                                 "</iq>")
                       .arg(id, from));
 
     expectFutureVariant<QXmppError>(task);

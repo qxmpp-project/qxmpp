@@ -102,18 +102,28 @@ std::variant<QXmppExportData, QXmppError> QXmppExportData::fromDom(const QDomEle
 
 void QXmppExportData::toXml(QXmlStreamWriter *writer) const
 {
+    // We need to generate the xml file with nodes always in the same order.
+    // This is needed for our unit tests which are based on xml generation.
+    const auto sortedExtensionsKeys = [this]() {
+        const auto key_selector = [](auto pair) { return pair.first; };
+        std::vector<std::type_index> keys(d->extensions.size(), std::type_index(typeid(std::nullptr_t)));
+        std::transform(d->extensions.begin(), d->extensions.end(), keys.begin(), key_selector);
+        std::stable_sort(keys.begin(), keys.end());
+        return keys;
+    }();
+
     writer->writeStartDocument();
     writer->writeStartElement(QSL65("account-data"));
     writer->writeDefaultNamespace(toString65(ns_qxmpp_export));
     writer->writeAttribute(QSL65("jid"), d->accountJid);
 
     const auto &serializers = accountDataSerializers();
-    for (const auto &[typeIndex, extension] : std::as_const(d->extensions)) {
+    for (const auto &typeIndex: sortedExtensionsKeys) {
         const auto serializer = serializers.find(typeIndex);
         if (serializer != serializers.end()) {
             const auto &[_, serialize] = *serializer;
 
-            serialize(extension, *writer);
+            serialize(d->extensions.at(typeIndex), *writer);
         }
     }
 
@@ -187,6 +197,14 @@ struct QXmppAccountMigrationManagerPrivate {
 /// \typedef QXmppAccountMigrationManager::Result<T>
 ///
 /// Contains T or QXmppError.
+///
+
+///
+/// \fn QXmppAccountMigrationManager::errorOccurred(const QXmppError &error)
+///
+/// Emitted when an error occured during export or import.
+///
+/// \param error The occured error
 ///
 
 ///

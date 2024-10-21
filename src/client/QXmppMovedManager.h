@@ -16,8 +16,6 @@ class QXMPP_EXPORT QXmppMovedManager : public QXmppClientExtension
     Q_PROPERTY(bool supportedByServer READ supportedByServer NOTIFY supportedByServerChanged)
 
 public:
-    using Result = std::variant<QXmpp::Success, QXmppError>;
-
     explicit QXmppMovedManager();
     ~QXmppMovedManager() override;
 
@@ -26,8 +24,8 @@ public:
     bool supportedByServer() const;
     Q_SIGNAL void supportedByServerChanged();
 
-    QXmppTask<Result> publishStatement(const QString &newBareJid);
-    QXmppTask<Result> verifyStatement(const QString &oldBareJid, const QString &newBareJid);
+    QXmppTask<QXmppClient::EmptyResult> publishStatement(const QString &newBareJid);
+    QXmppTask<QXmppClient::EmptyResult> verifyStatement(const QString &oldBareJid, const QString &newBareJid);
 
     QXmppTask<QXmpp::SendResult> notifyContact(const QString &contactBareJid, const QString &oldBareJid, bool sensitive = true, const QString &reason = {});
 

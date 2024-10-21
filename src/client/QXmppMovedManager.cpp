@@ -41,6 +41,7 @@ bool QXmppMovedItem::isItem(const QDomElement &itemElement)
     });
 }
 
+/// \cond
 void QXmppMovedItem::parsePayload(const QDomElement &payloadElement)
 {
     m_newJid = payloadElement.firstChildElement(u"new-jid"_s).text();
@@ -57,6 +58,7 @@ void QXmppMovedItem::serializePayload(QXmlStreamWriter *writer) const
     writer->writeTextElement(QSL65("new-jid"), m_newJid);
     writer->writeEndElement();
 }
+/// \endcond
 
 class QXmppMovedManagerPrivate
 {
@@ -160,7 +162,7 @@ QXmppTask<QXmppClient::EmptyResult> QXmppMovedManager::publishStatement(const QS
 ///
 /// \return the result of the action
 ///
-QXmppTask<QXmppMovedManager::Result> QXmppMovedManager::verifyStatement(const QString &oldBareJid, const QString &newBareJid)
+QXmppTask<QXmppClient::EmptyResult> QXmppMovedManager::verifyStatement(const QString &oldBareJid, const QString &newBareJid)
 {
     return chain<QXmppClient::EmptyResult>(
         client()->findExtension<QXmppPubSubManager>()->requestItem<QXmppMovedItem>(oldBareJid, ns_moved.toString(), u"current"_s),
@@ -168,10 +170,10 @@ QXmppTask<QXmppMovedManager::Result> QXmppMovedManager::verifyStatement(const QS
         [=, this](QXmppPubSubManager::ItemResult<QXmppMovedItem> &&result) {
             return std::visit(
                 overloaded {
-                    [newBareJid, this](QXmppMovedItem item) -> Result {
+                    [newBareJid, this](QXmppMovedItem item) -> QXmppClient::EmptyResult {
                         return movedJidsMatch(newBareJid, item.newJid());
                     },
-                    [newBareJid, this](QXmppError err) -> Result {
+                    [newBareJid, this](QXmppError err) -> QXmppClient::EmptyResult {
                         // As a special case, if the attempt to retrieve the moved statement results in an error with the <gone/> condition
                         // as defined in RFC 6120, and that <gone/> element contains a valid XMPP URI (e.g. xmpp:user@example.com), then the
                         // error response MUST be handled equivalent to a <moved/> statement containing a <new-jid/> element with the JID
@@ -281,7 +283,7 @@ std::optional<QXmppTask<bool>> QXmppMovedManager::handleSubscriptionRequest(cons
     }
 
     // return verification result
-    return chain<bool>(verifyStatement(presence.oldJid(), QXmppUtils::jidToBareJid(presence.from())), this, [this](Result &&result) mutable {
+    return chain<bool>(verifyStatement(presence.oldJid(), QXmppUtils::jidToBareJid(presence.from())), this, [this](auto &&result) mutable {
         return std::holds_alternative<Success>(result);
     });
 }
@@ -308,7 +310,7 @@ void QXmppMovedManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 ///
 /// \return the result of the action
 ///
-QXmppMovedManager::Result QXmppMovedManager::movedJidsMatch(const QString &newBareJid, const QString &pepBareJid) const
+QXmppClient::EmptyResult QXmppMovedManager::movedJidsMatch(const QString &newBareJid, const QString &pepBareJid) const
 {
     if (newBareJid == pepBareJid) {
         return Success();
