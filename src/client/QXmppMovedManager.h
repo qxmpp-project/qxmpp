@@ -5,9 +5,12 @@
 #ifndef QXMPPMOVEDMANAGER_H
 #define QXMPPMOVEDMANAGER_H
 
-#include "QXmppClient.h"
 #include "QXmppClientExtension.h"
+#include "QXmppSendResult.h"
+#include "QXmppTask.h"
 
+class QXmppPresence;
+class QXmppError;
 class QXmppMovedManagerPrivate;
 
 class QXMPP_EXPORT QXmppMovedManager : public QXmppClientExtension
@@ -40,7 +43,7 @@ protected:
 private:
     std::optional<QXmppTask<bool>> handleSubscriptionRequest(const QXmppPresence &presence);
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);
-    QXmppClient::EmptyResult movedJidsMatch(const QString &newBareJid, const QString &pepBareJid) const;
+    Result movedJidsMatch(const QString &newBareJid, const QString &pepBareJid) const;
 
     void setSupportedByServer(bool supportedByServer);
     void resetCachedData();
