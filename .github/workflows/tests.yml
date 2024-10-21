@@ -54,7 +54,7 @@ jobs:
         qt_version: ['5.15.*']
         include:
           - config: full-debug
-            qt_version: 6.*.*
+            qt_version: 6.7.*
     steps:
       - uses: actions/checkout@v2
       - name: Install Qt
