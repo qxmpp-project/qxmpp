@@ -28,9 +28,7 @@ QXmppMovedItem::QXmppMovedItem(const QString &newJid)
     setId(QXmppPubSubManager::standardItemIdToString(QXmppPubSubManager::Current));
 }
 
-///
-/// Returns true if the given DOM element is a valid \xep{0283, Moved} item.
-///
+// Returns true if the given DOM element is a valid \xep{0283, Moved} item.
 bool QXmppMovedItem::isItem(const QDomElement &itemElement)
 {
     return QXmppPubSubBaseItem::isItem(itemElement, [](const QDomElement &payload) {
@@ -101,6 +99,12 @@ public:
 /// \ingroup Managers
 ///
 /// \since QXmpp 1.9
+///
+
+///
+/// \typedef QXmppMovedManager::Result
+///
+/// Contains QXmpp::Success or an error.
 ///
 
 ///
