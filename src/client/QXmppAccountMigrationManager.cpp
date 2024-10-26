@@ -11,6 +11,7 @@
 #include "QXmppTask.h"
 #include "QXmppUtils_p.h"
 
+#include "Algorithms.h"
 #include "StringLiterals.h"
 
 #include <QDomElement>
@@ -30,6 +31,16 @@ struct XmlElementId {
     {
         return tagName == other.tagName && xmlns == other.xmlns;
     }
+
+    bool operator<(const XmlElementId &other) const {
+        const auto result = xmlns.compare(other.xmlns);
+
+        if (result == 0) {
+            return tagName.compare(other.tagName) < 0;
+        }
+
+        return result < 0;
+    }
 };
 
 #ifndef QXMPP_DOC
@@ -46,6 +57,12 @@ struct std::hash<XmlElementId> {
 
 using AnyParser = QXmppExportData::ExtensionParser<std::any>;
 using AnySerializer = QXmppExportData::ExtensionSerializer<std::any>;
+
+static std::unordered_map<std::type_index, XmlElementId> &accountDataMapping()
+{
+    thread_local static std::unordered_map<std::type_index, XmlElementId> registry;
+    return registry;
+}
 
 static std::unordered_map<XmlElementId, AnyParser> &accountDataParsers()
 {
@@ -102,18 +119,36 @@ std::variant<QXmppExportData, QXmppError> QXmppExportData::fromDom(const QDomEle
 
 void QXmppExportData::toXml(QXmlStreamWriter *writer) const
 {
+    // We need to generate the xml file with nodes always in the same order.
+    // This is needed for our unit tests which are based on xml generation.
+    const auto sortedExtensionsKeys = [this]() {
+        auto keys = transform<std::vector<std::pair<std::type_index, XmlElementId>>>(accountDataMapping(), [](auto pair) {
+            return pair;
+        });
+        std::ranges::stable_sort(keys, [](const auto &left, const auto &right) {
+            return left.second < right.second;
+        });
+        return keys;
+    }();
+
     writer->writeStartDocument();
     writer->writeStartElement(QSL65("account-data"));
     writer->writeDefaultNamespace(toString65(ns_qxmpp_export));
     writer->writeAttribute(QSL65("jid"), d->accountJid);
 
     const auto &serializers = accountDataSerializers();
-    for (const auto &[typeIndex, extension] : std::as_const(d->extensions)) {
+    for (const auto &sortedKey : sortedExtensionsKeys) {
+        const auto &typeIndex = sortedKey.first;
+
+        if (!d->extensions.contains(typeIndex)) {
+            continue;
+        }
+
         const auto serializer = serializers.find(typeIndex);
         if (serializer != serializers.end()) {
             const auto &[_, serialize] = *serializer;
 
-            serialize(extension, *writer);
+            serialize(d->extensions.at(typeIndex), *writer);
         }
     }
 
@@ -143,7 +178,9 @@ void QXmppExportData::setExtension(std::any value)
 
 void QXmppExportData::registerExtensionInternal(std::type_index type, ExtensionParser<std::any> parse, ExtensionSerializer<std::any> serialize, QStringView tagName, QStringView xmlns)
 {
-    accountDataParsers().emplace(XmlElementId { tagName.toString(), xmlns.toString() }, parse);
+    const auto id = XmlElementId { tagName.toString(), xmlns.toString() };
+    accountDataMapping().emplace(type, id);
+    accountDataParsers().emplace(id, parse);
     accountDataSerializers().emplace(type, serialize);
 }
 
