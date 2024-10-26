@@ -297,6 +297,10 @@ void tst_QXmppAccountMigrationManager::serialization()
     QByteArray xml2 =
         "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
         "<account-data xmlns=\"org.qxmpp.export\" jid=\"pasnox@xmpp.example\">"
+        "<roster>"
+        "<item xmlns=\"jabber:iq:roster\" jid=\"3@gamer.com\" name=\"3 Gamer\"><group>gamers</group></item>"
+        "<item xmlns=\"jabber:iq:roster\" jid=\"4@gamer.com\" name=\"4 Gamer\"><group>gamers</group></item>"
+        "</roster>"
         "<vcard>"
         "<vCard xmlns=\"vcard-temp\">"
         "<NICKNAME>It is me Bookri</NICKNAME>"
@@ -304,10 +308,6 @@ void tst_QXmppAccountMigrationManager::serialization()
         "<TITLE/><ROLE/>"
         "</vCard>"
         "</vcard>"
-        "<roster>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"3@gamer.com\" name=\"3 Gamer\"><group>gamers</group></item>"
-        "<item xmlns=\"jabber:iq:roster\" jid=\"4@gamer.com\" name=\"4 Gamer\"><group>gamers</group></item>"
-        "</roster>"
         "</account-data>\n";
 
     if (xml1 != xml2) {
