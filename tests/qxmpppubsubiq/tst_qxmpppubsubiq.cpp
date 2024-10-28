@@ -374,11 +374,7 @@ void tst_QXmppPubSubIq::testIsPubSubIq()
     QFETCH(QByteArray, xml);
     QFETCH(bool, isValid);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
-
-    QCOMPARE(PubSubIq<>::isPubSubIq(element), isValid);
+    QCOMPARE(PubSubIq<>::isPubSubIq(xmlToDom(xml)), isValid);
 }
 
 void tst_QXmppPubSubIq::testCustomItem()

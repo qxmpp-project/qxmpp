@@ -127,10 +127,6 @@ void tst_QXmppMamManager::testHandleStanza()
     QFETCH(QByteArray, expectedMessage);
     QFETCH(QString, expectedQueryId);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
-
     m_helper.m_signalTriggered = false;
     m_helper.m_expectedMessage = QXmppMessage();
     if (!expectedMessage.isEmpty()) {
@@ -138,7 +134,7 @@ void tst_QXmppMamManager::testHandleStanza()
     }
     m_helper.m_expectedQueryId = expectedQueryId;
 
-    bool accepted = m_manager.handleStanza(element);
+    bool accepted = m_manager.handleStanza(xmlToDom(xml));
     QCOMPARE(accepted, accept);
     QCOMPARE(m_helper.m_signalTriggered, accept);
 }
@@ -190,10 +186,6 @@ void tst_QXmppMamManager::testHandleResultIq()
     QFETCH(QByteArray, expectedResultSetReply);
     QFETCH(bool, expectedComplete);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
-
     m_helper.m_signalTriggered = false;
     m_helper.m_expectedResultSetReply = QXmppResultSetReply();
     if (!expectedResultSetReply.isEmpty()) {
@@ -201,7 +193,7 @@ void tst_QXmppMamManager::testHandleResultIq()
     }
     m_helper.m_expectedComplete = expectedComplete;
 
-    bool accepted = m_manager.handleStanza(element);
+    bool accepted = m_manager.handleStanza(xmlToDom(xml));
     QCOMPARE(accepted, accept);
     QCOMPARE(m_helper.m_signalTriggered, accept);
 }

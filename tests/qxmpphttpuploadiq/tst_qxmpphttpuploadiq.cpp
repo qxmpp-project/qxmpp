@@ -71,9 +71,7 @@ void tst_QXmppHttpUploadIq::testIsRequest()
     QFETCH(QByteArray, xml);
     QFETCH(bool, isRequest);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QCOMPARE(QXmppHttpUploadRequestIq::isHttpUploadRequestIq(doc.documentElement()), isRequest);
+    QCOMPARE(QXmppHttpUploadRequestIq::isHttpUploadRequestIq(xmlToDom(xml)), isRequest);
 }
 
 void tst_QXmppHttpUploadIq::testSlot()
@@ -137,9 +135,7 @@ void tst_QXmppHttpUploadIq::testIsSlot()
     QFETCH(QByteArray, xml);
     QFETCH(bool, isSlot);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QCOMPARE(QXmppHttpUploadSlotIq::isHttpUploadSlotIq(doc.documentElement()), isSlot);
+    QCOMPARE(QXmppHttpUploadSlotIq::isHttpUploadSlotIq(xmlToDom(xml)), isSlot);
 }
 
 QTEST_MAIN(tst_QXmppHttpUploadIq)

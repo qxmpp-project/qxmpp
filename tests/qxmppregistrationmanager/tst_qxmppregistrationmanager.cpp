@@ -495,9 +495,7 @@ void tst_QXmppRegistrationManager::sendStreamFeaturesToManager(bool registration
         manipulatedXml.replace("stream:", QByteArray());
         manipulatedXml.insert(9, QByteArrayLiteral(" xmlns=\"http://etherx.jabber.org/streams\""));
 
-        QDomDocument doc;
-        doc.setContent(manipulatedXml, true);
-        return doc.documentElement();
+        return xmlToDom(manipulatedXml);
     };
 
     manager->handleStanza(writeFeaturesToDom());

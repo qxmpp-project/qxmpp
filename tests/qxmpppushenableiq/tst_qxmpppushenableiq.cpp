@@ -134,22 +134,14 @@ void tst_QXmppPushEnableIq::testIsEnableIq()
         R"(<enable xmlns="urn:xmpp:push:0" jid="push-5.client.example" node="yxs32uqsflafdk3iuqo"/>)"
         "</iq>");
 
-    QDomDocument doc;
-    doc.setContent(xml, true);
-    bool isPushEnable = QXmppPushEnableIq::isPushEnableIq(doc.documentElement());
-    QCOMPARE(isPushEnable, true);
-
-    // reset
-    isPushEnable = false;
+    QVERIFY(QXmppPushEnableIq::isPushEnableIq(xmlToDom(xml)));
 
     const QByteArray xml2(
         R"(<iq id="x97" type="set">)"
         R"(<disable xmlns="urn:xmpp:push:0" jid="push-5.client.example" node="yxs32uqsflafdk3iuqo"/>)"
         "</iq>");
 
-    doc.setContent(xml2, true);
-    isPushEnable = QXmppPushEnableIq::isPushEnableIq(doc.documentElement());
-    QCOMPARE(isPushEnable, true);
+    QVERIFY(QXmppPushEnableIq::isPushEnableIq(xmlToDom(xml2)));
 }
 
 QTEST_MAIN(tst_QXmppPushEnableIq);

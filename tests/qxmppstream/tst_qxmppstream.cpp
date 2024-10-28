@@ -192,16 +192,15 @@ void tst_QXmppStream::testStartTlsPacket()
     QFETCH(bool, valid);
     QFETCH(QXmppStartTlsPacket::Type, type);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement()), valid);
-    QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement(), type), valid);
+    auto element = xmlToDom(xml);
+    QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(element), valid);
+    QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(element, type), valid);
 
     // test other types return false
     for (auto testValue : { QXmppStartTlsPacket::StartTls,
                             QXmppStartTlsPacket::Proceed,
                             QXmppStartTlsPacket::Failure }) {
-        QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(doc.documentElement(), testValue), testValue == type && valid);
+        QCOMPARE(QXmppStartTlsPacket::isStartTlsPacket(element, testValue), testValue == type && valid);
     }
 
     if (valid) {

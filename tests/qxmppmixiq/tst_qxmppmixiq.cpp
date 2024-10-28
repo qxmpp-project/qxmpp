@@ -581,18 +581,9 @@ void tst_QXmppMixIq::testIsMixIq()
         "<destroy xmlns=\"something:else\" channel=\"coven\"/>"
         "</iq>");
 
-    QDomDocument doc;
-    doc.setContent(trueXml, true);
-    QDomElement trueElement = doc.documentElement();
-    QVERIFY(QXmppMixIq::isMixIq(trueElement));
-
-    doc.setContent(truePamXml, true);
-    QDomElement truePamElement = doc.documentElement();
-    QVERIFY(QXmppMixIq::isMixIq(truePamElement));
-
-    doc.setContent(falseXml, true);
-    QDomElement falseElement = doc.documentElement();
-    QVERIFY(!QXmppMixIq::isMixIq(falseElement));
+    QVERIFY(QXmppMixIq::isMixIq(xmlToDom(trueXml)));
+    QVERIFY(QXmppMixIq::isMixIq(xmlToDom(truePamXml)));
+    QVERIFY(!QXmppMixIq::isMixIq(xmlToDom(falseXml)));
 }
 
 void tst_QXmppMixIq::testListToMixNodes()

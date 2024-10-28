@@ -59,9 +59,6 @@ void tst_QXmppMixInvitation::testInvitation()
 
 void tst_QXmppMixInvitation::testIsInvitation()
 {
-    QDomDocument doc;
-    QDomElement element;
-
     const QByteArray correctInvitationWithNamespace(
         "<invitation xmlns=\"urn:xmpp:mix:misc:0\">"
         "<inviter>hag66@shakespeare.example</inviter>"
@@ -69,9 +66,7 @@ void tst_QXmppMixInvitation::testIsInvitation()
         "<channel>coven@mix.shakespeare.example</channel>"
         "<token>ABCDEF</token>"
         "</invitation>");
-    QVERIFY(doc.setContent(correctInvitationWithNamespace, true));
-    element = doc.documentElement();
-    QVERIFY(QXmppMixInvitation::isMixInvitation(element));
+    QVERIFY(QXmppMixInvitation::isMixInvitation(xmlToDom(correctInvitationWithNamespace)));
 
     const QByteArray invitationWithoutNamespace(
         "<invitation>"
@@ -80,9 +75,7 @@ void tst_QXmppMixInvitation::testIsInvitation()
         "<channel>coven@mix.shakespeare.example</channel>"
         "<token>ABCDEF</token>"
         "</invitation>");
-    QVERIFY(doc.setContent(invitationWithoutNamespace, true));
-    element = doc.documentElement();
-    QVERIFY(!QXmppMixInvitation::isMixInvitation(element));
+    QVERIFY(!QXmppMixInvitation::isMixInvitation(xmlToDom(invitationWithoutNamespace)));
 
     const QByteArray invitationWithIncorrectNamespace(
         "<invitation xmlns=\"urn:xmpp:example\">"
@@ -91,9 +84,7 @@ void tst_QXmppMixInvitation::testIsInvitation()
         "<channel>coven@mix.shakespeare.example</channel>"
         "<token>ABCDEF</token>"
         "</invitation>");
-    QVERIFY(doc.setContent(invitationWithIncorrectNamespace, true));
-    element = doc.documentElement();
-    QVERIFY(!QXmppMixInvitation::isMixInvitation(element));
+    QVERIFY(!QXmppMixInvitation::isMixInvitation(xmlToDom(invitationWithIncorrectNamespace)));
 }
 
 QTEST_MAIN(tst_QXmppMixInvitation)

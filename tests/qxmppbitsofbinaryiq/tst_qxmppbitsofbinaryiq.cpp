@@ -158,8 +158,6 @@ void tst_QXmppBitsOfBinaryIq::testOtherSubelement()
 
 void tst_QXmppBitsOfBinaryIq::testIsBobIq()
 {
-    QDomDocument doc;
-
     const QByteArray xmlSimple(
         "<iq id=\"get-data-1\" "
         "to=\"ladymacbeth@shakespeare.lit/castle\" "
@@ -167,8 +165,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "type=\"get\">"
         "<data xmlns=\"urn:xmpp:bob\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
-    QVERIFY(doc.setContent(xmlSimple, true));
-    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), true);
+    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(xmlToDom(xmlSimple)), true);
 
     // IQs must have only one child element
     const QByteArray xmlMultipleElements(
@@ -179,8 +176,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "<data xmlns=\"urn:xmpp:other-data-format:0\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "<data xmlns=\"urn:xmpp:bob\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
-    QVERIFY(doc.setContent(xmlMultipleElements, true));
-    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), false);
+    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(xmlToDom(xmlMultipleElements)), false);
 
     const QByteArray xmlWithoutBobData(
         "<iq id=\"get-data-1\" "
@@ -189,8 +185,7 @@ void tst_QXmppBitsOfBinaryIq::testIsBobIq()
         "type=\"get\">"
         "<data xmlns=\"urn:xmpp:other-data-format:0\" cid=\"sha1+8f35fef110ffc5df08d579a50083ff9308fb6242@bob.xmpp.org\"></data>"
         "</iq>");
-    QVERIFY(doc.setContent(xmlWithoutBobData, true));
-    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(doc.documentElement()), false);
+    QCOMPARE(QXmppBitsOfBinaryIq::isBitsOfBinaryIq(xmlToDom(xmlWithoutBobData)), false);
 }
 
 void tst_QXmppBitsOfBinaryIq::fromByteArray()

@@ -204,9 +204,6 @@ void tst_QXmppMixItem::testConfig()
 
 void tst_QXmppMixItem::testIsConfigItem()
 {
-    QDomDocument doc;
-    QDomElement element;
-
     const QByteArray xmlCorrect(
         "<item>"
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
@@ -215,9 +212,7 @@ void tst_QXmppMixItem::testIsConfigItem()
         "</field>"
         "</x>"
         "</item>");
-    QVERIFY(doc.setContent(xmlCorrect, true));
-    element = doc.documentElement();
-    QVERIFY(QXmppMixConfigItem::isItem(element));
+    QVERIFY(QXmppMixConfigItem::isItem(xmlToDom(xmlCorrect)));
 
     const QByteArray xmlWrong(
         "<item>"
@@ -227,9 +222,7 @@ void tst_QXmppMixItem::testIsConfigItem()
         "</field>"
         "</x>"
         "</item>");
-    QVERIFY(doc.setContent(xmlWrong, true));
-    element = doc.documentElement();
-    QVERIFY(!QXmppMixConfigItem::isItem(element));
+    QVERIFY(!QXmppMixConfigItem::isItem(xmlToDom(xmlWrong)));
 }
 
 void tst_QXmppMixItem::testInfo()
@@ -282,9 +275,6 @@ void tst_QXmppMixItem::testInfo()
 
 void tst_QXmppMixItem::testIsInfoItem()
 {
-    QDomDocument doc;
-    QDomElement element;
-
     const QByteArray xmlCorrect(
         "<item>"
         "<x xmlns=\"jabber:x:data\" type=\"result\">"
@@ -293,9 +283,7 @@ void tst_QXmppMixItem::testIsInfoItem()
         "</field>"
         "</x>"
         "</item>");
-    QVERIFY(doc.setContent(xmlCorrect, true));
-    element = doc.documentElement();
-    QVERIFY(QXmppMixInfoItem::isItem(element));
+    QVERIFY(QXmppMixInfoItem::isItem(xmlToDom(xmlCorrect)));
 
     const QByteArray xmlWrong(
         "<item>"
@@ -305,9 +293,7 @@ void tst_QXmppMixItem::testIsInfoItem()
         "</field>"
         "</x>"
         "</item>");
-    QVERIFY(doc.setContent(xmlWrong, true));
-    element = doc.documentElement();
-    QVERIFY(!QXmppMixInfoItem::isItem(element));
+    QVERIFY(!QXmppMixInfoItem::isItem(xmlToDom(xmlWrong)));
 }
 
 void tst_QXmppMixItem::testParticipant()
@@ -338,26 +324,19 @@ void tst_QXmppMixItem::testParticipant()
 
 void tst_QXmppMixItem::testIsParticipantItem()
 {
-    QDomDocument doc;
-    QDomElement element;
-
     const QByteArray xmlCorrect(
         "<item>"
         "<participant xmlns=\"urn:xmpp:mix:core:1\">"
         "</participant>"
         "</item>");
-    QVERIFY(doc.setContent(xmlCorrect, true));
-    element = doc.documentElement();
-    QVERIFY(QXmppMixParticipantItem::isItem(element));
+    QVERIFY(QXmppMixParticipantItem::isItem(xmlToDom(xmlCorrect)));
 
     const QByteArray xmlWrong(
         "<item>"
         "<participant xmlns=\"other:namespace:1\">"
         "</participant>"
         "</item>");
-    QVERIFY(doc.setContent(xmlWrong, true));
-    element = doc.documentElement();
-    QVERIFY(!QXmppMixParticipantItem::isItem(element));
+    QVERIFY(!QXmppMixParticipantItem::isItem(xmlToDom(xmlWrong)));
 }
 
 QTEST_MAIN(tst_QXmppMixItem)

@@ -162,11 +162,8 @@ void tst_QXmppMessageReceiptManager::testReceipt()
     QFETCH(bool, sent);
     QFETCH(bool, handled);
 
-    QDomDocument doc;
-    QVERIFY(doc.setContent(xml, true));
-    QDomElement element = doc.documentElement();
     QXmppMessage msg;
-    msg.parse(element);
+    msg.parse(xmlToDom(xml));
 
     QCOMPARE(m_manager->handleMessage(msg), handled);
     QCOMPARE(m_messageDelivered, accept);
