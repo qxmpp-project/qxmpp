@@ -43,11 +43,14 @@ public:
         QCoreApplication::processEvents();
         resetIdCount();
     }
-
     void expect(QString &&packet)
     {
         QVERIFY2(!m_sentPackets.empty(), "No packet was sent!");
-        QCOMPARE(m_sentPackets.takeFirst().replace(u'\'', u'"'), packet.replace(u'\'', u'"'));
+
+        auto expectedXml = rewriteXml(packet);
+        auto actualXml = rewriteXml(m_sentPackets.takeFirst());
+        QCOMPARE(actualXml, expectedXml);
+
         resetIdCount();
     }
     QString takePacket()

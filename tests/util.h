@@ -51,6 +51,29 @@ inline QDomElement xmlToDom(const String &xml)
     return doc.documentElement();
 }
 
+template<typename String>
+QString rewriteXml(const String &inputXml)
+{
+    QString outputXml;
+    QXmlStreamReader reader(inputXml);
+    QXmlStreamWriter writer(&outputXml);
+    while (reader.readNext() != QXmlStreamReader::EndDocument) {
+        if (reader.hasError()) {
+            qDebug() << "Parsing error:";
+            qDebug().noquote() << inputXml;
+            qDebug().noquote() << reader.error() << reader.errorString();
+            throw std::exception();
+        }
+
+        // do not generate '<?xml version="1.0"?>'
+        if (reader.tokenType() == QXmlStreamReader::StartDocument) {
+            continue;
+        }
+        writer.writeCurrentToken(reader);
+    }
+    return outputXml;
+}
+
 template<typename T>
 static QByteArray packetToXml(const T &packet)
 {
