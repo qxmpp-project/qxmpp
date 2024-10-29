@@ -321,58 +321,57 @@ QXmppTask<QXmppMamManager::RetrieveResult> QXmppMamManager::retrieveMessages(con
             // initialize processed messages (we need random access because
             // decryptMessage() may finish in random order)
             state.processedMessages.resize(state.messages.size());
+            state.runningDecryptionJobs = state.messages.size();
 
-            // check for encrypted messages (once)
-            auto messagesEncrypted = transform(state.messages, [&](const auto &m) {
-                return e2eeExt->isEncrypted(m.element);
-            });
-            auto encryptedCount = sum(messagesEncrypted);
+            const auto size = state.messages.size();
+            for (qsizetype i = 0; i < size; i++) {
+                const auto &message = state.messages.at(i);
 
-            // We can't do this on the fly (with ++ and --) in the for loop
-            // because some decryptMessage() jobs could finish instantly
-            state.runningDecryptionJobs = encryptedCount;
+                // decrypt message if needed
+                if (e2eeExt->isEncrypted(message.element)) {
+                    e2eeExt->decryptMessage(parseMamMessage(state.messages.at(i), Encrypted)).then(this, [this, i, queryId](auto result) {
+                        // find state (again)
+                        auto itr = d->ongoingRequests.find(queryId.toStdString());
+                        Q_ASSERT(itr != d->ongoingRequests.end());
 
-            int size = state.messages.size();
-            for (auto i = 0; i < size; i++) {
-                if (!messagesEncrypted[i]) {
-                    continue;
-                }
+                        auto &state = itr->second;
 
-                e2eeExt->decryptMessage(parseMamMessage(state.messages.at(i), Encrypted)).then(this, [this, i, queryId](auto result) {
-                    auto itr = d->ongoingRequests.find(queryId.toStdString());
-                    Q_ASSERT(itr != d->ongoingRequests.end());
+                        // store decrypted message, fallback to encrypted message
+                        if (std::holds_alternative<QXmppMessage>(result)) {
+                            state.processedMessages[i] = std::get<QXmppMessage>(std::move(result));
+                        } else {
+                            warning("Error decrypting message.");
+                            state.processedMessages[i] = parseMamMessage(state.messages[i], Unencrypted);
+                        }
 
-                    auto &state = itr->second;
+                        // finish promise on last job
+                        state.runningDecryptionJobs--;
+                        if (state.runningDecryptionJobs == 0) {
+                            state.finish();
+                            d->ongoingRequests.erase(itr);
+                        }
+                    });
+                } else {
+                    state.processedMessages[i] = parseMamMessage(state.messages.at(i), Unencrypted);
 
-                    // store decrypted message, fallback to encrypted message
-                    if (std::holds_alternative<QXmppMessage>(result)) {
-                        state.processedMessages[i] = std::get<QXmppMessage>(std::move(result));
-                    } else {
-                        warning(QStringLiteral("Error decrypting message."));
-                        state.processedMessages[i] = parseMamMessage(state.messages[i], Unencrypted);
-                    }
-
-                    // finish promise if this was the last job
+                    // finish promise on last job (may be needed if no messages are encrypted or
+                    // decryption finishes instantly)
                     state.runningDecryptionJobs--;
                     if (state.runningDecryptionJobs == 0) {
                         state.finish();
                         d->ongoingRequests.erase(itr);
                     }
-                });
+                }
             }
+        } else {
+            // for the case without decryption
+            state.processedMessages = transform(state.messages, [](const auto &m) {
+                return parseMamMessage(m, Unencrypted);
+            });
 
-            // finishing the promise is done after decryptMessage()
-            if (encryptedCount > 0) {
-                return;
-            }
+            state.finish();
+            d->ongoingRequests.erase(itr);
         }
-
-        // for the case without decryption, finish here
-        state.processedMessages = transform(state.messages, [](const auto &m) {
-            return parseMamMessage(m, Unencrypted);
-        });
-        state.finish();
-        d->ongoingRequests.erase(itr);
     });
 
     return task;
