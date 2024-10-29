@@ -4,6 +4,11 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.8.3 (October 29, 2024)
+------------------------------
+
+ - MamManager: Fix some unencrypted are not parsed when end-to-end-encryption is enabled (@lnjX, #662)
+
 QXmpp 1.8.2 (October 21, 2024)
 ------------------------------
 
