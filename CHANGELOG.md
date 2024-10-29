@@ -9,6 +9,11 @@ QXmpp 1.9.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.8.3 (October 29, 2024)
+------------------------------
+
+ - MamManager: Fix some unencrypted are not parsed when end-to-end-encryption is enabled (@lnjX, #662)
+
 QXmpp 1.8.2 (October 21, 2024)
 ------------------------------
 
