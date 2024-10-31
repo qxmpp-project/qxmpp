@@ -273,8 +273,7 @@ QString QXmppMamManager::retrieveArchivedMessages(const QString &to,
 /// \param resultSetQuery Optional Result Set Management query. This can be used
 ///                       to limit the number of results and to page through the
 ///                       archive.
-/// \return query id of the request. This can be used to associate the
-///         corresponding resultsRecieved signal.
+/// \return result of the query
 ///
 /// \since QXmpp 1.5
 ///
