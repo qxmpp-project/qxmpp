@@ -203,33 +203,44 @@ void tst_QXmppMixManager::testHandleDiscoInfo()
 {
     auto [client, manager] = Tester(QStringLiteral("hag66@shakespeare.example"));
 
+    QXmppDiscoveryIq userIq;
+    userIq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2"),
+                         QStringLiteral("urn:xmpp:mix:pam:2#archive") });
+
+    manager->handleDiscoInfo(userIq);
+
+    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Supported);
+    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Supported);
+
+    userIq.setFeatures({});
+
+    manager->handleDiscoInfo(userIq);
+
+    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Unsupported);
+    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Unsupported);
+
     QXmppDiscoveryIq::Identity identity;
     identity.setCategory(QStringLiteral("conference"));
     identity.setType(QStringLiteral("mix"));
 
-    QXmppDiscoveryIq iq;
-    iq.setFeatures({ QStringLiteral("urn:xmpp:mix:pam:2"),
-                     QStringLiteral("urn:xmpp:mix:pam:2#archive"),
-                     QStringLiteral("urn:xmpp:mix:core:1"),
-                     QStringLiteral("urn:xmpp:mix:core:1#searchable"),
-                     QStringLiteral("urn:xmpp:mix:core:1#create-channel") });
-    iq.setIdentities({ identity });
+    QXmppDiscoveryIq serverIq;
+    serverIq.setFrom(QStringLiteral("mix.shakespeare.example"));
+    serverIq.setFeatures({ QStringLiteral("urn:xmpp:mix:core:1"),
+                           QStringLiteral("urn:xmpp:mix:core:1#searchable"),
+                           QStringLiteral("urn:xmpp:mix:core:1#create-channel") });
+    serverIq.setIdentities({ identity });
 
-    manager->handleDiscoInfo(iq);
+    manager->handleDiscoInfo(serverIq);
 
-    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Supported);
-    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Supported);
-    QCOMPARE(manager->services().at(0).jid, QStringLiteral("shakespeare.example"));
+    QCOMPARE(manager->services().at(0).jid, QStringLiteral("mix.shakespeare.example"));
     QVERIFY(manager->services().at(0).channelsSearchable);
     QVERIFY(manager->services().at(0).channelCreationAllowed);
 
-    iq.setFeatures({});
-    iq.setIdentities({});
+    serverIq.setFeatures({});
+    serverIq.setIdentities({});
 
-    manager->handleDiscoInfo(iq);
+    manager->handleDiscoInfo(serverIq);
 
-    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Unsupported);
-    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Unsupported);
     QVERIFY(manager->services().isEmpty());
 }
 
