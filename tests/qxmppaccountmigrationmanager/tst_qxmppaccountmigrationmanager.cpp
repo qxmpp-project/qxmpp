@@ -229,45 +229,50 @@ void tst_QXmppAccountMigrationManager::testRealImportExport()
     auto exportTask = manager->exportData();
     QVERIFY(!exportTask.isFinished());
 
-    client->expect(u"<iq id='qxmpp2' from='pasnox@xmpp.example/QXmpp' type='get'>"
-                   "<query xmlns='jabber:iq:roster'>"
-                   "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
-                   "</query>"
-                   "</iq>"_s);
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp2", QXmppIq::Result)));
+    auto id = client->expectPacketRandomOrder(
+        u"<iq from='pasnox@xmpp.example/QXmpp' type='get'>"
+        "<query xmlns='jabber:iq:roster'>"
+        "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
+        "</query>"
+        "</iq>"_s);
+    client->inject(packetToXml(newRoster(client.get(), 1, id, QXmppIq::Result)));
 
-    client->expect(u"<iq id='qxmpp3' from='pasnox@xmpp.example/QXmpp' type='get'>"
-                   "<query xmlns='jabber:iq:roster'>"
-                   "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
-                   "</query>"
-                   "</iq>"_s);
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp3", QXmppIq::Result)));
+    id = client->expectPacketRandomOrder(
+        u"<iq from='pasnox@xmpp.example/QXmpp' type='get'>"
+        "<query xmlns='jabber:iq:roster'>"
+        "<annotate xmlns='urn:xmpp:mix:roster:0'/>"
+        "</query>"
+        "</iq>"_s);
+    client->inject(packetToXml(newRoster(client.get(), 1, id, QXmppIq::Result)));
 
-    client->expect(u"<iq id='qxmpp4' to='pasnox@xmpp.example' type='get'>"
-                   "<vCard xmlns='vcard-temp'>"
-                   "<TITLE/>"
-                   "<ROLE/>"
-                   "</vCard>"
-                   "</iq>"_s);
-    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp4", QXmppIq::Result)));
+    id = client->expectPacketRandomOrder(
+        u"<iq to='pasnox@xmpp.example' type='get'>"
+        "<vCard xmlns='vcard-temp'>"
+        "<TITLE/>"
+        "<ROLE/>"
+        "</vCard>"
+        "</iq>"_s);
+    client->inject(packetToXml(newClientVCard(client.get(), 1, id, QXmppIq::Result)));
 
-    client->expect(u"<iq id='qxmpp7' to='mix2@gamer.com' type='get'>"
-                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                   "<items node='urn:xmpp:mix:nodes:participants'/>"
-                   "</pubsub>"
-                   "</iq>"_s);
-    client->inject(u"<iq id='qxmpp7' from='mix2@gamer.com' type='result'>"
-                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                   "<items node='urn:xmpp:mix:nodes:participants'>"
-                   "<item id='mix2BareId'>"
-                   "<participant xmlns='urn:xmpp:mix:core:1'>"
-                   "<nick>Joe @ Mix 2 Gamer</nick>"
-                   "<jid>mix_user@domain.ext</jid>"
-                   "</participant>"
-                   "</item>"
-                   "</items>"
-                   "</pubsub>"
-                   "</iq>"_s);
+    id = client->expectPacketRandomOrder(
+        u"<iq to='mix2@gamer.com' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:participants'/>"
+        "</pubsub>"
+        "</iq>"_s);
+    client->inject(
+        u"<iq id='%1' from='mix2@gamer.com' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:participants'>"
+        "<item id='mix2BareId'>"
+        "<participant xmlns='urn:xmpp:mix:core:1'>"
+        "<nick>Joe @ Mix 2 Gamer</nick>"
+        "<jid>mix_user@domain.ext</jid>"
+        "</participant>"
+        "</item>"
+        "</items>"
+        "</pubsub>"
+        "</iq>"_s.arg(id));
 
     client->expectNoPacket();
 
@@ -276,51 +281,55 @@ void tst_QXmppAccountMigrationManager::testRealImportExport()
     // import exported data
     auto importTask = manager->importData(data);
 
-    client->expect(u"<iq id='qxmpp13' to='pasnox@xmpp.example' type='set'>"
-                   "<client-join xmlns='urn:xmpp:mix:pam:2' channel='mix2@gamer.com'>"
-                   "<join xmlns='urn:xmpp:mix:core:1'>"
-                   "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                   "<subscribe node='urn:xmpp:avatar:data'/>"
-                   "<subscribe node='urn:xmpp:avatar:metadata'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:config'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:info'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                   "<nick>Joe @ Mix 2 Gamer</nick>"
-                   "</join>"
-                   "</client-join>"
-                   "</iq>"_s);
-    client->inject(u"<iq id='qxmpp13' type='result'>"
-                   "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                   "<join xmlns='urn:xmpp:mix:core:1' id='mix2BareId'>"
-                   "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                   "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                   "<nick>Joe @ Mix 2 Gamer</nick>"
-                   "</join>"
-                   "</client-join>"
-                   "</iq>"_s);
+    id = client->expectPacketRandomOrder(
+        u"<iq to='pasnox@xmpp.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='mix2@gamer.com'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<nick>Joe @ Mix 2 Gamer</nick>"
+        "</join>"
+        "</client-join>"
+        "</iq>"_s);
+    client->inject(
+        u"<iq id='%1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='mix2BareId'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<nick>Joe @ Mix 2 Gamer</nick>"
+        "</join>"
+        "</client-join>"
+        "</iq>"_s.arg(id));
 
-    client->expect(u"<iq id='qxmpp4' to='pasnox@xmpp.example' type='set'>"
-                   "<vCard xmlns='vcard-temp'>"
-                   "<NICKNAME>It is me Bookri</NICKNAME>"
-                   "<N><GIVEN>Nox</GIVEN><FAMILY>Bookri</FAMILY></N>"
-                   "<TITLE/>"
-                   "<ROLE/>"
-                   "</vCard>"
-                   "</iq>"_s);
-    client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp4", QXmppIq::Result)));
+    id = client->expectPacketRandomOrder(
+        u"<iq to='pasnox@xmpp.example' type='set'>"
+        "<vCard xmlns='vcard-temp'>"
+        "<NICKNAME>It is me Bookri</NICKNAME>"
+        "<N><GIVEN>Nox</GIVEN><FAMILY>Bookri</FAMILY></N>"
+        "<TITLE/>"
+        "<ROLE/>"
+        "</vCard>"
+        "</iq>"_s);
+    client->inject(packetToXml(newClientVCard(client.get(), 1, id, QXmppIq::Result)));
 
-    client->expect(u"<iq id='qxmpp14' type='set'>"
-                   "<query xmlns='jabber:iq:roster'>"
-                   "<item jid='3@gamer.com' name='3 Gamer'>"
-                   "<group>gamers</group>"
-                   "</item>"
-                   "</query>"
-                   "</iq>"_s);
-    client->inject(packetToXml(newRoster(client.get(), 1, "qxmpp14", QXmppIq::Result, 0)));
+    id = client->expectPacketRandomOrder(
+        u"<iq type='set'>"
+        "<query xmlns='jabber:iq:roster'>"
+        "<item jid='3@gamer.com' name='3 Gamer'>"
+        "<group>gamers</group>"
+        "</item>"
+        "</query>"
+        "</iq>"_s);
+    client->inject(packetToXml(newRoster(client.get(), 1, id, QXmppIq::Result, 0)));
 
     client->expectNoPacket();
 
