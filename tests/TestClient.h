@@ -53,6 +53,34 @@ public:
 
         resetIdCount();
     }
+    // compares packets, ignoring different IDs and order of sending
+    // returns ID of the packet that matched
+    QString expectPacketRandomOrder(QString &&expected)
+    {
+        VERIFY2(!m_sentPackets.empty(), "No packet was sent!");
+
+        auto [expectedXml, _] = rewriteXmlWithoutStanzaId(expected);
+        for (const auto &packet : std::as_const(m_sentPackets)) {
+            auto [packetFormattedXml, stanzaId] = rewriteXmlWithoutStanzaId(packet);
+            if (packetFormattedXml == expectedXml) {
+                []() { QVERIFY(true); }();
+                m_sentPackets.removeOne(packet);
+                return stanzaId;
+            }
+        }
+
+        // Failure
+        qDebug() << "Expected:";
+        qDebug() << expectedXml;
+        qDebug() << "Got:";
+        for (const auto &packet : m_sentPackets) {
+            auto [xml, id] = rewriteXmlWithoutStanzaId(packet);
+            qDebug() << xml;
+        }
+
+        []() { QFAIL("Expected packet was not sent!"); }();
+        return {};
+    }
     QString takePacket()
     {
         [this]() { QVERIFY(!m_sentPackets.isEmpty()); }();
