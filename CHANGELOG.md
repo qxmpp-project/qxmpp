@@ -4,10 +4,13 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-QXmpp 1.9.0 (UNRELEASED)
-------------------------
+QXmpp 1.9.0 (November 17, 2024)
+-------------------------------
 
-*under development*
+ - Implement XEP-0461: Message Replies parsing (@lnjX, #645)
+ - Prevent unencrypted fallback markers are applied to encrypted body (@lnjX, #647)
+ - Implement XEP-0283: Moved (@pasnox, #621)
+ - AccountMigration: Implement restoring of joined MIX channels (@pasnox, #657)
 
 QXmpp 1.8.3 (October 29, 2024)
 ------------------------------

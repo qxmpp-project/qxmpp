@@ -727,6 +727,13 @@ SPDX-License-Identifier: CC0-1.0
     </implements>
     <release>
       <Version>
+        <revision>1.9.0</revision>
+        <created>2024-11-17</created>
+        <file-release rdf:resource='https://github.com/qxmpp-project/qxmpp/archive/refs/tags/v1.9.0.tar.gz'/>
+      </Version>
+    </release>
+    <release>
+      <Version>
         <revision>1.8.3</revision>
         <created>2024-10-29</created>
         <file-release rdf:resource='https://github.com/qxmpp-project/qxmpp/archive/refs/tags/v1.8.3.tar.gz'/>
