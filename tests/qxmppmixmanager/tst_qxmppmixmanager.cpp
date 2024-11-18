@@ -1163,11 +1163,84 @@ void tst_QXmppMixManager::testUpdateSubscriptions()
     auto &client = tester.client;
     auto manager = tester.manager;
 
+    auto defaultParametersCall = [&client, manager]() {
+        return manager->updateSubscriptions(QStringLiteral("coven@mix.shakespeare.example"));
+    };
+
+    auto task = defaultParametersCall();
+
+    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+                                 "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+                                 "<subscribe node='urn:xmpp:avatar:data'/>"
+                                 "<subscribe node='urn:xmpp:avatar:metadata'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+                                 "</update-subscription>"
+                                 "</iq>"));
+    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+                                 "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+                                 "<subscribe node='urn:xmpp:avatar:data'/>"
+                                 "<subscribe node='urn:xmpp:avatar:metadata'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+                                 "</update-subscription>"
+                                 "</iq>"));
+
+    auto subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::AllowedJids));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::AvatarData));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::AvatarMetadata));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::BannedJids));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Configuration));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Information));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::JidMap));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Messages));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Participants));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Presence));
+    // "QCOMPARE(subscription.additions, ~QXmppMixConfigItem::Nodes());" does not work.
+    QCOMPARE(subscription.additions, QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::AvatarData | QXmppMixConfigItem::Node::AvatarMetadata | QXmppMixConfigItem::Node::BannedJids | QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information | QXmppMixConfigItem::Node::JidMap | QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Participants | QXmppMixConfigItem::Node::Presence);
+    QCOMPARE(subscription.removals, QXmppMixConfigItem::Nodes());
+
+    auto defaultRemovalParameterCall = [&client, manager]() {
+        return manager->updateSubscriptions(QStringLiteral("coven@mix.shakespeare.example"), QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids);
+    };
+
+    task = defaultRemovalParameterCall();
+
+    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+                                 "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+                                 "</update-subscription>"
+                                 "</iq>"));
+    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+                                 "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+                                 "</update-subscription>"
+                                 "</iq>"));
+
+    subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
+    QCOMPARE(subscription.additions, QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids);
+    QCOMPARE(subscription.removals, QXmppMixConfigItem::Nodes());
+
     auto call = [&client, manager]() {
         return manager->updateSubscriptions(QStringLiteral("coven@mix.shakespeare.example"), QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence, QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information);
     };
 
-    auto task = call();
+    task = call();
 
     client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
                                  "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
@@ -1186,7 +1259,7 @@ void tst_QXmppMixManager::testUpdateSubscriptions()
                                  "</update-subscription>"
                                  "</iq>"));
 
-    auto subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
+    subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
     QCOMPARE(subscription.additions, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
     QCOMPARE(subscription.removals, QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information);
 
