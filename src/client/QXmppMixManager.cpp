@@ -121,17 +121,30 @@ static void serializeMixData(const MixData &d, QXmlStreamWriter &writer)
 /// connection:
 ///     * participantSupport()
 ///     * messageArchivingSupport()
-/// That is done via QXmppDiscoveryManager::requestInfo():
+/// That is done via QXmppDiscoveryManager::requestInfo() for the user JID (i.e., no recipient JID):
 /// \code
-/// client->findExtension<QXmppDiscoveryManager>()->requestInfo(client->configuration().domain());
+/// client->findExtension<QXmppDiscoveryManager>()->requestInfo({});
 /// \endcode
 ///
 /// Before calling one of the following methods, you need to request the information once per
 /// connection:
 ///     * services()
-/// That is done via QXmppDiscoveryManager::requestItems():
+/// That is done via QXmppDiscoveryManager::requestDiscoItems() for the server JID and
+/// QXmppDiscoveryManager::requestInfo() for each item it provides:
 /// \code
-/// client->findExtension<QXmppDiscoveryManager>()->requestItems(client->configuration().domain());
+/// const auto *discoveryManager = client->findExtension<QXmppDiscoveryManager>();
+/// discoveryManager->requestDiscoItems(client->configuration().domain())
+///     .then(this, [this](QXmppDiscoveryManager::ItemsResult &&result) {
+///         if (const auto *error = std::get_if<QXmppError>(&result)) {
+///             // Handle the error.
+///         } else {
+///             const auto items = std::get<QList<QXmppDiscoveryIq::Item>>(std::move(result));
+///             for (const auto &item : items) {
+///                 discoveryManager->requestInfo(item.jid());
+///             }
+///         }
+///     }
+/// );
 /// \endcode
 ///
 /// If you want to be informed about updates of the channel (e.g., its configuration or allowed
@@ -1394,7 +1407,7 @@ QXmppTask<QXmppClient::EmptyResult> QXmppMixManager::addJidToNode(const QString 
 void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
 {
     // Check the server's functionality to support MIX clients.
-    if (iq.from().isEmpty() || iq.from() == client()->configuration().domain()) {
+    if (iq.from().isEmpty() || iq.from() == client()->configuration().jidBare()) {
         // Check whether MIX is supported.
         if (iq.features().contains(ns_mix_pam)) {
             setParticipantSupport(QXmppMixManager::Support::Supported);
@@ -1409,7 +1422,7 @@ void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
         }
     }
 
-    const auto jid = iq.from().isEmpty() ? client()->configuration().domain() : iq.from();
+    const auto jid = iq.from();
 
     // If no MIX service is provided by the JID, remove it from the cache.
     if (!iq.features().contains(ns_mix)) {
@@ -1424,7 +1437,7 @@ void QXmppMixManager::handleDiscoInfo(const QXmppDiscoveryIq &iq)
         // ' || identity.type() == u"text"' is a workaround for older ejabberd versions.
         if (identity.category() == u"conference" && (identity.type() == MIX_SERVICE_DISCOVERY_NODE || identity.type() == u"text")) {
             Service service;
-            service.jid = iq.from().isEmpty() ? client()->configuration().domain() : iq.from();
+            service.jid = jid;
             service.channelsSearchable = iq.features().contains(ns_mix_searchable);
             service.channelCreationAllowed = iq.features().contains(ns_mix_create_channel);
 
