@@ -203,33 +203,44 @@ void tst_QXmppMixManager::testHandleDiscoInfo()
 {
     auto [client, manager] = Tester(u"hag66@shakespeare.example"_s);
 
+    QXmppDiscoveryIq userIq;
+    userIq.setFeatures({ u"urn:xmpp:mix:pam:2"_s,
+                         u"urn:xmpp:mix:pam:2#archive"_s });
+
+    manager->handleDiscoInfo(userIq);
+
+    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Supported);
+    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Supported);
+
+    userIq.setFeatures({});
+
+    manager->handleDiscoInfo(userIq);
+
+    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Unsupported);
+    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Unsupported);
+
     QXmppDiscoveryIq::Identity identity;
     identity.setCategory(u"conference"_s);
     identity.setType(u"mix"_s);
 
-    QXmppDiscoveryIq iq;
-    iq.setFeatures({ u"urn:xmpp:mix:pam:2"_s,
-                     u"urn:xmpp:mix:pam:2#archive"_s,
-                     u"urn:xmpp:mix:core:1"_s,
-                     u"urn:xmpp:mix:core:1#searchable"_s,
-                     u"urn:xmpp:mix:core:1#create-channel"_s });
-    iq.setIdentities({ identity });
+    QXmppDiscoveryIq serverIq;
+    serverIq.setFrom(u"mix.shakespeare.example"_s);
+    serverIq.setFeatures({ u"urn:xmpp:mix:core:1"_s,
+                           u"urn:xmpp:mix:core:1#searchable"_s,
+                           u"urn:xmpp:mix:core:1#create-channel"_s });
+    serverIq.setIdentities({ identity });
 
-    manager->handleDiscoInfo(iq);
+    manager->handleDiscoInfo(serverIq);
 
-    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Supported);
-    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Supported);
-    QCOMPARE(manager->services().at(0).jid, u"shakespeare.example"_s);
+    QCOMPARE(manager->services().at(0).jid, u"mix.shakespeare.example"_s);
     QVERIFY(manager->services().at(0).channelsSearchable);
     QVERIFY(manager->services().at(0).channelCreationAllowed);
 
-    iq.setFeatures({});
-    iq.setIdentities({});
+    serverIq.setFeatures({});
+    serverIq.setIdentities({});
 
-    manager->handleDiscoInfo(iq);
+    manager->handleDiscoInfo(serverIq);
 
-    QCOMPARE(manager->participantSupport(), QXmppMixManager::Support::Unsupported);
-    QCOMPARE(manager->messageArchivingSupport(), QXmppMixManager::Support::Unsupported);
     QVERIFY(manager->services().isEmpty());
 }
 
@@ -245,13 +256,14 @@ void tst_QXmppMixManager::testAddJidToNode()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:allowed'>"
-                                 "<item id='alice@wonderland.example'/>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:allowed'>"
+        "<item id='alice@wonderland.example'/>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -271,19 +283,21 @@ void tst_QXmppMixManager::testRequestJids()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:allowed'>"
-                                 "<item id='shakespeare.example'/>"
-                                 "<item id='alice@wonderland.example'/>"
-                                 "</items>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:allowed'/>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:allowed'>"
+        "<item id='shakespeare.example'/>"
+        "<item id='alice@wonderland.example'/>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
     auto jids = expectFutureVariant<QVector<QXmppMixManager::Jid>>(task);
     QCOMPARE(jids.at(0), u"shakespeare.example"_s);
@@ -319,29 +333,31 @@ void tst_QXmppMixManager::testJoinChannelPrivate()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
-                                 "<nick>third witch</nick>"
-                                 "<invitation xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<inviter>hag66@shakespeare.example</inviter>"
-                                 "<invitee>cat@shakespeare.example</invitee>"
-                                 "<channel>coven@mix.shakespeare.example</channel>"
-                                 "<token>ABCDEF</token>"
-                                 "</invitation>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "<nick>third witch 2</nick>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<nick>third witch</nick>"
+        "<invitation xmlns='urn:xmpp:mix:misc:0'>"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<nick>third witch 2</nick>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, u"123456"_s);
@@ -587,12 +603,14 @@ void tst_QXmppMixManager::testCreateChannel()
 
     auto task = call();
 
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='mix.shakespeare.example' type='result'>"
-                                 "<create xmlns='urn:xmpp:mix:core:1' channel='A1B2C345'/>"
-                                 "</iq>"));
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
-                                 "<create xmlns='urn:xmpp:mix:core:1'/>"
-                                 "</iq>"));
+    client.inject(
+        "<iq id='qxmpp1' from='mix.shakespeare.example' type='result'>"
+        "<create xmlns='urn:xmpp:mix:core:1' channel='A1B2C345'/>"
+        "</iq>");
+    client.expect(
+        "<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
+        "<create xmlns='urn:xmpp:mix:core:1'/>"
+        "</iq>");
 
     auto channelJid = expectFutureVariant<QXmppMixManager::ChannelJid>(task);
     QCOMPARE(channelJid, u"A1B2C345@mix.shakespeare.example"_s);
@@ -612,12 +630,14 @@ void tst_QXmppMixManager::testCreateChannelWithId()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
-                                 "<create xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='mix.shakespeare.example' type='result'>"
-                                 "<create xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
+        "<create xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='mix.shakespeare.example' type='result'>"
+        "<create xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
+        "</iq>");
 
     auto channelJid = expectFutureVariant<QXmppMixManager::ChannelJid>(task);
     QCOMPARE(channelJid, u"coven@mix.shakespeare.example"_s);
@@ -637,16 +657,18 @@ void tst_QXmppMixManager::testRequestChannelJids()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='mix.shakespeare.example' type='get'>"
-                                 "<query xmlns='http://jabber.org/protocol/disco#items'/>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='mix.shakespeare.example' type='result'>"
-                                 "<query xmlns='http://jabber.org/protocol/disco#items'>"
-                                 "<item jid='coven@mix.shakespeare.example'/>"
-                                 "<item jid='spells@mix.shakespeare.example'/>"
-                                 "<item jid='wizards@mix.shakespeare.example'/>"
-                                 "</query>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='mix.shakespeare.example' type='get'>"
+        "<query xmlns='http://jabber.org/protocol/disco#items'/>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='mix.shakespeare.example' type='result'>"
+        "<query xmlns='http://jabber.org/protocol/disco#items'>"
+        "<item jid='coven@mix.shakespeare.example'/>"
+        "<item jid='spells@mix.shakespeare.example'/>"
+        "<item jid='wizards@mix.shakespeare.example'/>"
+        "</query>"
+        "</iq>");
 
     auto jids = expectFutureVariant<QVector<QXmppMixManager::ChannelJid>>(task);
     QCOMPARE(jids.size(), 3);
@@ -669,15 +691,17 @@ void tst_QXmppMixManager::testRequestChannelNodes()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<query xmlns='http://jabber.org/protocol/disco#items' node='mix'/>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<query xmlns='http://jabber.org/protocol/disco#items' node='mix'>"
-                                 "<item jid='coven@mix.shakespeare.example' node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<item jid='coven@mix.shakespeare.example' node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "</query>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<query xmlns='http://jabber.org/protocol/disco#items' node='mix'/>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<query xmlns='http://jabber.org/protocol/disco#items' node='mix'>"
+        "<item jid='coven@mix.shakespeare.example' node='urn:xmpp:mix:nodes:presence'/>"
+        "<item jid='coven@mix.shakespeare.example' node='urn:xmpp:mix:nodes:allowed'/>"
+        "</query>"
+        "</iq>");
 
     auto nodes = expectFutureVariant<QXmppMixConfigItem::Nodes>(task);
     QCOMPARE(nodes, QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Presence);
@@ -697,27 +721,29 @@ void tst_QXmppMixManager::testRequestChannelConfiguration()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:config'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:config'>"
-                                 "<item id='2016-05-30T09:00:00'>"
-                                 "<x xmlns='jabber:x:data' type='result'>"
-                                 "<field type='hidden' var='FORM_TYPE'>"
-                                 "<value>urn:xmpp:mix:admin:0</value>"
-                                 "</field>"
-                                 "<field type='jid-single' var='Last Change Made By'>"
-                                 "<value>greymalkin@shakespeare.example</value>"
-                                 "</field>"
-                                 "</x>"
-                                 "</item>"
-                                 "</items>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:config'/>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:config'>"
+        "<item id='2016-05-30T09:00:00'>"
+        "<x xmlns='jabber:x:data' type='result'>"
+        "<field type='hidden' var='FORM_TYPE'>"
+        "<value>urn:xmpp:mix:admin:0</value>"
+        "</field>"
+        "<field type='jid-single' var='Last Change Made By'>"
+        "<value>greymalkin@shakespeare.example</value>"
+        "</field>"
+        "</x>"
+        "</item>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
     auto configuration = expectFutureVariant<QXmppMixConfigItem>(task);
     QCOMPARE(configuration.lastEditorJid(), u"greymalkin@shakespeare.example"_s);
@@ -741,29 +767,31 @@ void tst_QXmppMixManager::testUpdateChannelConfiguration()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:config'>"
-                                 "<item id='2016-05-30T09:00:00'>"
-                                 "<x xmlns='jabber:x:data' type='submit'>"
-                                 "<field type='hidden' var='FORM_TYPE'>"
-                                 "<value>urn:xmpp:mix:admin:0</value>"
-                                 "</field>"
-                                 "<field type='jid-multi' var='Owner'>"
-                                 "<value>greymalkin@shakespeare.example</value>"
-                                 "</field>"
-                                 "</x>"
-                                 "</item>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:config'>"
-                                 "<item id='2016-05-30T09:00:00'/>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:config'>"
+        "<item id='2016-05-30T09:00:00'>"
+        "<x xmlns='jabber:x:data' type='submit'>"
+        "<field type='hidden' var='FORM_TYPE'>"
+        "<value>urn:xmpp:mix:admin:0</value>"
+        "</field>"
+        "<field type='jid-multi' var='Owner'>"
+        "<value>greymalkin@shakespeare.example</value>"
+        "</field>"
+        "</x>"
+        "</item>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:config'>"
+        "<item id='2016-05-30T09:00:00'/>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -782,27 +810,29 @@ void tst_QXmppMixManager::testRequestChannelInformation()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:info'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:info'>"
-                                 "<item id='2016-05-30T09:00:00'>"
-                                 "<x xmlns='jabber:x:data' type='result'>"
-                                 "<field type='hidden' var='FORM_TYPE'>"
-                                 "<value>urn:xmpp:mix:core:1</value>"
-                                 "</field>"
-                                 "<field type='text-single' var='Name'>"
-                                 "<value>Witches Coven</value>"
-                                 "</field>"
-                                 "</x>"
-                                 "</item>"
-                                 "</items>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:info'/>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:info'>"
+        "<item id='2016-05-30T09:00:00'>"
+        "<x xmlns='jabber:x:data' type='result'>"
+        "<field type='hidden' var='FORM_TYPE'>"
+        "<value>urn:xmpp:mix:core:1</value>"
+        "</field>"
+        "<field type='text-single' var='Name'>"
+        "<value>Witches Coven</value>"
+        "</field>"
+        "</x>"
+        "</item>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
     auto information = expectFutureVariant<QXmppMixInfoItem>(task);
     QCOMPARE(information.name(), u"Witches Coven"_s);
@@ -826,29 +856,31 @@ void tst_QXmppMixManager::testUpdateChannelInformation()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:info'>"
-                                 "<item id='2016-05-30T09:00:00'>"
-                                 "<x xmlns='jabber:x:data' type='submit'>"
-                                 "<field type='hidden' var='FORM_TYPE'>"
-                                 "<value>urn:xmpp:mix:core:1</value>"
-                                 "</field>"
-                                 "<field type='text-single' var='Name'>"
-                                 "<value>The Coven</value>"
-                                 "</field>"
-                                 "</x>"
-                                 "</item>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:info'>"
-                                 "<item id='2016-05-30T09:00:00'/>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:info'>"
+        "<item id='2016-05-30T09:00:00'>"
+        "<x xmlns='jabber:x:data' type='submit'>"
+        "<field type='hidden' var='FORM_TYPE'>"
+        "<value>urn:xmpp:mix:core:1</value>"
+        "</field>"
+        "<field type='text-single' var='Name'>"
+        "<value>The Coven</value>"
+        "</field>"
+        "</x>"
+        "</item>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:info'>"
+        "<item id='2016-05-30T09:00:00'/>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -867,30 +899,32 @@ void tst_QXmppMixManager::testJoinChannel()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "<subscribe node='urn:xmpp:avatar:data'/>"
-                                 "<subscribe node='urn:xmpp:avatar:metadata'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:config'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:info'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, u"123456"_s);
@@ -906,32 +940,34 @@ void tst_QXmppMixManager::testJoinChannelWithNickname()
 
     auto task = manager->joinChannel(u"coven@mix.shakespeare.example"_s, u"third witch"_s);
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "<subscribe node='urn:xmpp:avatar:data'/>"
-                                 "<subscribe node='urn:xmpp:avatar:metadata'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:config'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:info'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<nick>third witch</nick>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<nick>third witch</nick>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<nick>third witch</nick>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<nick>third witch</nick>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, u"123456"_s);
@@ -945,22 +981,24 @@ void tst_QXmppMixManager::testJoinChannelWithNodes()
 
     auto task = manager->joinChannel(u"coven@mix.shakespeare.example"_s, {}, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123456'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, "123456");
@@ -986,36 +1024,38 @@ void tst_QXmppMixManager::testJoinChannelViaInvitation()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "<subscribe node='urn:xmpp:avatar:data'/>"
-                                 "<subscribe node='urn:xmpp:avatar:metadata'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:config'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:info'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<invitation xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<inviter>hag66@shakespeare.example</inviter>"
-                                 "<invitee>cat@shakespeare.example</invitee>"
-                                 "<channel>coven@mix.shakespeare.example</channel>"
-                                 "<token>ABCDEF</token>"
-                                 "</invitation>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123457'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<invitation xmlns='urn:xmpp:mix:misc:0'>"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123457'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, u"123457"_s);
@@ -1037,38 +1077,40 @@ void tst_QXmppMixManager::testJoinChannelViaInvitationWithNickname()
 
     auto task = manager->joinChannel(invitation, u"fourth witch"_s);
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "<subscribe node='urn:xmpp:avatar:data'/>"
-                                 "<subscribe node='urn:xmpp:avatar:metadata'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:config'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:info'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<nick>fourth witch</nick>"
-                                 "<invitation xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<inviter>hag66@shakespeare.example</inviter>"
-                                 "<invitee>cat@shakespeare.example</invitee>"
-                                 "<channel>coven@mix.shakespeare.example</channel>"
-                                 "<token>ABCDEF</token>"
-                                 "</invitation>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123457'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<nick>fourth witch</nick>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<nick>fourth witch</nick>"
+        "<invitation xmlns='urn:xmpp:mix:misc:0'>"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123457'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<nick>fourth witch</nick>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, u"123457"_s);
@@ -1088,28 +1130,30 @@ void tst_QXmppMixManager::testJoinChannelViaInvitationWithNodes()
 
     auto task = manager->joinChannel(invitation, {}, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<invitation xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<inviter>hag66@shakespeare.example</inviter>"
-                                 "<invitee>cat@shakespeare.example</invitee>"
-                                 "<channel>coven@mix.shakespeare.example</channel>"
-                                 "<token>ABCDEF</token>"
-                                 "</invitation>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-join xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<join xmlns='urn:xmpp:mix:core:1' id='123457'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "</join>"
-                                 "</client-join>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='cat@shakespeare.example' type='set'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<join xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<invitation xmlns='urn:xmpp:mix:misc:0'>"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-join xmlns='urn:xmpp:mix:pam:2'>"
+        "<join xmlns='urn:xmpp:mix:core:1' id='123457'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</join>"
+        "</client-join>"
+        "</iq>");
 
     auto result = expectFutureVariant<QXmppMixManager::Participation>(task);
     QCOMPARE(result.participantId, "123457");
@@ -1129,16 +1173,18 @@ void tst_QXmppMixManager::testUpdateNickname()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<setnick xmlns='urn:xmpp:mix:core:1'>"
-                                 "<nick>third witch</nick>"
-                                 "</setnick>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<setnick xmlns='urn:xmpp:mix:core:1'>"
-                                 "<nick>third witch 2</nick>"
-                                 "</setnick>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<setnick xmlns='urn:xmpp:mix:core:1'>"
+        "<nick>third witch</nick>"
+        "</setnick>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<setnick xmlns='urn:xmpp:mix:core:1'>"
+        "<nick>third witch 2</nick>"
+        "</setnick>"
+        "</iq>");
 
     auto nickname = expectFutureVariant<QXmppMixManager::Nickname>(task);
     QCOMPARE(nickname, "third witch 2");
@@ -1152,30 +1198,109 @@ void tst_QXmppMixManager::testUpdateSubscriptions()
     auto &client = tester.client;
     auto manager = tester.manager;
 
+    auto defaultParametersCall = [&client, manager]() {
+        return manager->updateSubscriptions("coven@mix.shakespeare.example");
+    };
+
+    auto task = defaultParametersCall();
+
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</update-subscription>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:avatar:data'/>"
+        "<subscribe node='urn:xmpp:avatar:metadata'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:info'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:jidmap'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:participants'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "</update-subscription>"
+        "</iq>");
+
+    auto subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::AllowedJids));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::AvatarData));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::AvatarMetadata));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::BannedJids));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Configuration));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Information));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::JidMap));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Messages));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Participants));
+    QVERIFY(subscription.additions.testFlag(QXmppMixConfigItem::Node::Presence));
+    // "QCOMPARE(subscription.additions, ~QXmppMixConfigItem::Nodes());" does not work.
+    QCOMPARE(subscription.additions, QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::AvatarData | QXmppMixConfigItem::Node::AvatarMetadata | QXmppMixConfigItem::Node::BannedJids | QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information | QXmppMixConfigItem::Node::JidMap | QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Participants | QXmppMixConfigItem::Node::Presence);
+    QCOMPARE(subscription.removals, QXmppMixConfigItem::Nodes());
+
+    auto defaultRemovalParameterCall = [&client, manager]() {
+        return manager->updateSubscriptions("coven@mix.shakespeare.example", QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids);
+    };
+
+    task = defaultRemovalParameterCall();
+
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "</update-subscription>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:allowed'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:banned'/>"
+        "</update-subscription>"
+        "</iq>");
+
+    subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
+    QCOMPARE(subscription.additions, QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::BannedJids);
+    QCOMPARE(subscription.removals, QXmppMixConfigItem::Nodes());
+
     auto call = [&client, manager]() {
         return manager->updateSubscriptions(u"coven@mix.shakespeare.example"_s, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence, QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information);
     };
 
-    auto task = call();
+    task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<unsubscribe node='urn:xmpp:mix:nodes:config'/>"
-                                 "<unsubscribe node='urn:xmpp:mix:nodes:info'/>"
-                                 "</update-subscription>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
-                                 "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
-                                 "<unsubscribe node='urn:xmpp:mix:nodes:config'/>"
-                                 "<unsubscribe node='urn:xmpp:mix:nodes:info'/>"
-                                 "</update-subscription>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<unsubscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<unsubscribe node='urn:xmpp:mix:nodes:info'/>"
+        "</update-subscription>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<update-subscription xmlns='urn:xmpp:mix:core:1'>"
+        "<subscribe node='urn:xmpp:mix:nodes:messages'/>"
+        "<subscribe node='urn:xmpp:mix:nodes:presence'/>"
+        "<unsubscribe node='urn:xmpp:mix:nodes:config'/>"
+        "<unsubscribe node='urn:xmpp:mix:nodes:info'/>"
+        "</update-subscription>"
+        "</iq>");
 
-    auto subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
+    subscription = expectFutureVariant<QXmppMixManager::Subscription>(task);
     QCOMPARE(subscription.additions, QXmppMixConfigItem::Node::Messages | QXmppMixConfigItem::Node::Presence);
     QCOMPARE(subscription.removals, QXmppMixConfigItem::Node::Configuration | QXmppMixConfigItem::Node::Information);
 
@@ -1195,21 +1320,23 @@ void tst_QXmppMixManager::testRequestInvitation()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<invite xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<invitee>cat@shakespeare.example</invitee>"
-                                 "</invite>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<invite xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<invitation xmlns='urn:xmpp:mix:misc:0'>"
-                                 "<inviter>hag66@shakespeare.example</inviter>"
-                                 "<invitee>cat@shakespeare.example</invitee>"
-                                 "<channel>coven@mix.shakespeare.example</channel>"
-                                 "<token>ABCDEF</token>"
-                                 "</invitation>"
-                                 "</invite>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<invite xmlns='urn:xmpp:mix:misc:0'>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "</invite>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<invite xmlns='urn:xmpp:mix:misc:0'>"
+        "<invitation xmlns='urn:xmpp:mix:misc:0'>"
+        "<inviter>hag66@shakespeare.example</inviter>"
+        "<invitee>cat@shakespeare.example</invitee>"
+        "<channel>coven@mix.shakespeare.example</channel>"
+        "<token>ABCDEF</token>"
+        "</invitation>"
+        "</invite>"
+        "</iq>");
 
     const auto invitation = expectFutureVariant<QXmppMixInvitation>(task);
     QCOMPARE(invitation.token(), u"ABCDEF"_s);
@@ -1229,19 +1356,21 @@ void tst_QXmppMixManager::testRequestAllowedJids()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:allowed'>"
-                                 "<item id='shakespeare.example'/>"
-                                 "<item id='alice@wonderland.example'/>"
-                                 "</items>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:allowed'/>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:allowed'>"
+        "<item id='shakespeare.example'/>"
+        "<item id='alice@wonderland.example'/>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
     auto allowedJids = expectFutureVariant<QVector<QXmppMixManager::Jid>>(task);
     QCOMPARE(allowedJids.at(0), u"shakespeare.example"_s);
@@ -1262,13 +1391,14 @@ void tst_QXmppMixManager::testAllowJid()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:allowed'>"
-                                 "<item id='alice@wonderland.example'/>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:allowed'>"
+        "<item id='alice@wonderland.example'/>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1288,13 +1418,14 @@ void tst_QXmppMixManager::testDisallowJid()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<retract node='urn:xmpp:mix:nodes:allowed'>"
-                                 "<item id='alice@wonderland.example'/>"
-                                 "</retract>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<retract node='urn:xmpp:mix:nodes:allowed'>"
+        "<item id='alice@wonderland.example'/>"
+        "</retract>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1314,11 +1445,12 @@ void tst_QXmppMixManager::testDisallowAllJids()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
-                                 "<purge node='urn:xmpp:mix:nodes:allowed'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+        "<purge node='urn:xmpp:mix:nodes:allowed'/>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1338,19 +1470,21 @@ void tst_QXmppMixManager::testRequestBannedJids()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:banned'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:banned'>"
-                                 "<item id='lear@shakespeare.example'/>"
-                                 "<item id='macbeth@shakespeare.example'/>"
-                                 "</items>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:banned'/>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:banned'>"
+        "<item id='lear@shakespeare.example'/>"
+        "<item id='macbeth@shakespeare.example'/>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
     auto allowedJids = expectFutureVariant<QVector<QXmppMixManager::Jid>>(task);
     QCOMPARE(allowedJids.at(0), u"lear@shakespeare.example"_s);
@@ -1371,13 +1505,14 @@ void tst_QXmppMixManager::testBanJid()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<publish node='urn:xmpp:mix:nodes:banned'>"
-                                 "<item id='macbeth@shakespeare.example'/>"
-                                 "</publish>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<publish node='urn:xmpp:mix:nodes:banned'>"
+        "<item id='macbeth@shakespeare.example'/>"
+        "</publish>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1397,13 +1532,14 @@ void tst_QXmppMixManager::testUnbanJid()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<retract node='urn:xmpp:mix:nodes:banned'>"
-                                 "<item id='macbeth@shakespeare.example'/>"
-                                 "</retract>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<retract node='urn:xmpp:mix:nodes:banned'>"
+        "<item id='macbeth@shakespeare.example'/>"
+        "</retract>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1423,11 +1559,12 @@ void tst_QXmppMixManager::testUnbanAllJids()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
-                                 "<purge node='urn:xmpp:mix:nodes:banned'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='set'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub#owner'>"
+        "<purge node='urn:xmpp:mix:nodes:banned'/>"
+        "</pubsub>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1447,29 +1584,31 @@ void tst_QXmppMixManager::testRequestParticipants()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:participants'/>"
-                                 "</pubsub>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
-                                 "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                                 "<items node='urn:xmpp:mix:nodes:participants'>"
-                                 "<item id='123456'>"
-                                 "<participant xmlns='urn:xmpp:mix:core:1'>"
-                                 "<nick>thirdwitch</nick>"
-                                 "<jid>hag66@shakespeare.example</jid>"
-                                 "</participant>"
-                                 "</item>"
-                                 "<item id='123457'>"
-                                 "<participant xmlns='urn:xmpp:mix:core:1'>"
-                                 "<nick>fourthwitch</nick>"
-                                 "<jid>hag67@shakespeare.example</jid>"
-                                 "</participant>"
-                                 "</item>"
-                                 "</items>"
-                                 "</pubsub>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='coven@mix.shakespeare.example' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:participants'/>"
+        "</pubsub>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' from='coven@mix.shakespeare.example' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:participants'>"
+        "<item id='123456'>"
+        "<participant xmlns='urn:xmpp:mix:core:1'>"
+        "<nick>thirdwitch</nick>"
+        "<jid>hag66@shakespeare.example</jid>"
+        "</participant>"
+        "</item>"
+        "<item id='123457'>"
+        "<participant xmlns='urn:xmpp:mix:core:1'>"
+        "<nick>fourthwitch</nick>"
+        "<jid>hag67@shakespeare.example</jid>"
+        "</participant>"
+        "</item>"
+        "</items>"
+        "</pubsub>"
+        "</iq>");
 
     auto participants = expectFutureVariant<QVector<QXmppMixParticipantItem>>(task);
     QCOMPARE(participants.at(0).jid(), u"hag66@shakespeare.example"_s);
@@ -1490,16 +1629,18 @@ void tst_QXmppMixManager::testLeaveChannel()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
-                                 "<client-leave xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
-                                 "<leave xmlns='urn:xmpp:mix:core:1'/>"
-                                 "</client-leave>"
-                                 "</iq>"));
-    client.inject(QStringLiteral("<iq id='qxmpp1' type='result'>"
-                                 "<client-leave xmlns='urn:xmpp:mix:pam:2'>"
-                                 "<leave xmlns='urn:xmpp:mix:core:1'/>"
-                                 "</client-leave>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='hag66@shakespeare.example' type='set'>"
+        "<client-leave xmlns='urn:xmpp:mix:pam:2' channel='coven@mix.shakespeare.example'>"
+        "<leave xmlns='urn:xmpp:mix:core:1'/>"
+        "</client-leave>"
+        "</iq>");
+    client.inject(
+        "<iq id='qxmpp1' type='result'>"
+        "<client-leave xmlns='urn:xmpp:mix:pam:2'>"
+        "<leave xmlns='urn:xmpp:mix:core:1'/>"
+        "</client-leave>"
+        "</iq>");
 
     expectFutureVariant<QXmpp::Success>(task);
 
@@ -1518,9 +1659,10 @@ void tst_QXmppMixManager::testDeleteChannel()
 
     auto task = call();
 
-    client.expect(QStringLiteral("<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
-                                 "<destroy xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
-                                 "</iq>"));
+    client.expect(
+        "<iq id='qxmpp1' to='mix.shakespeare.example' type='set'>"
+        "<destroy xmlns='urn:xmpp:mix:core:1' channel='coven'/>"
+        "</iq>");
     client.inject(u"<iq id='qxmpp1' from='mix.shakespeare.example' type='result'/>"_s);
 
     expectFutureVariant<QXmpp::Success>(task);
@@ -1544,11 +1686,11 @@ template<typename T>
 void tst_QXmppMixManager::testError(QXmppTask<T> &task, TestClient &client, const QString &id, const QString &from)
 {
     client.ignore();
-    client.inject(QStringLiteral("<iq id='%1' from='%2' type='error'>"
-                                 "<error type='cancel'>"
-                                 "<not-allowed xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
-                                 "</error>"
-                                 "</iq>")
+    client.inject(u"<iq id='%1' from='%2' type='error'>"
+                  "<error type='cancel'>"
+                  "<not-allowed xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
+                  "</error>"
+                  "</iq>"_s
                       .arg(id, from));
 
     expectFutureVariant<QXmppError>(task);

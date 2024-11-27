@@ -98,7 +98,7 @@ public:
     QXmppTask<JoiningResult> joinChannel(const QXmppMixInvitation &invitation, const QString &nickname = {}, QXmppMixConfigItem::Nodes nodes = ~QXmppMixConfigItem::Nodes());
 
     QXmppTask<NicknameResult> updateNickname(const QString &channelJid, const QString &nickname);
-    QXmppTask<SubscriptionResult> updateSubscriptions(const QString &channelJid, QXmppMixConfigItem::Nodes subscriptionAdditions = ~QXmppMixConfigItem::Nodes(), QXmppMixConfigItem::Nodes subscriptionRemovals = ~QXmppMixConfigItem::Nodes());
+    QXmppTask<SubscriptionResult> updateSubscriptions(const QString &channelJid, QXmppMixConfigItem::Nodes subscriptionAdditions = ~QXmppMixConfigItem::Nodes(), QXmppMixConfigItem::Nodes subscriptionRemovals = {});
 
     QXmppTask<InvitationResult> requestInvitation(const QString &channelJid, const QString &inviteeJid);
 
