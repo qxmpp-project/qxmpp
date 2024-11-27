@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.9.1 (November 27, 2024)
+-------------------------------
+
+ - MixManager: Fix update node subscriptions adds *and* removes all nodes with default parameters
+   (@melvo, #670)
+
 QXmpp 1.9.0 (November 17, 2024)
 -------------------------------
 
