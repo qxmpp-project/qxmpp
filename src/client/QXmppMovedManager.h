@@ -10,7 +10,7 @@
 #include "QXmppTask.h"
 
 class QXmppPresence;
-class QXmppError;
+struct QXmppError;
 class QXmppMovedManagerPrivate;
 
 class QXMPP_EXPORT QXmppMovedManager : public QXmppClientExtension
