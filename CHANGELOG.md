@@ -4,6 +4,11 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.9.2 (December 07, 2024)
+-------------------------------
+
+ - Fix build of unit tests with MSVC (@lnjX)
+
 QXmpp 1.9.1 (November 27, 2024)
 -------------------------------
 
