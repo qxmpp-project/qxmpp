@@ -9,6 +9,11 @@ QXmpp 1.10.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.9.2 (December 07, 2024)
+-------------------------------
+
+ - Fix build of unit tests with MSVC (@lnjX)
+
 QXmpp 1.9.1 (November 27, 2024)
 -------------------------------
 
