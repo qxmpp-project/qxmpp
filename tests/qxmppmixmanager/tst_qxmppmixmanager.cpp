@@ -1687,10 +1687,10 @@ void tst_QXmppMixManager::testError(QXmppTask<T> &task, TestClient &client, cons
 {
     client.ignore();
     client.inject(u"<iq id='%1' from='%2' type='error'>"
-                  "<error type='cancel'>"
-                  "<not-allowed xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
-                  "</error>"
-                  "</iq>"_s
+                  u"<error type='cancel'>"
+                  u"<not-allowed xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>"
+                  u"</error>"
+                  u"</iq>"_s
                       .arg(id, from));
 
     expectFutureVariant<QXmppError>(task);
