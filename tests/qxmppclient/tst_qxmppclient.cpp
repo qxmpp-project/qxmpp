@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: LGPL-2.1-or-later
 
 #include "QXmppClient.h"
+#include "QXmppColorGeneration.h"
 #include "QXmppCredentials.h"
 #include "QXmppE2eeExtension.h"
 #include "QXmppFutureUtils_p.h"
@@ -35,6 +36,7 @@ private:
     Q_SLOT void testE2eeExtension();
     Q_SLOT void testTaskDirect();
     Q_SLOT void testTaskStore();
+    Q_SLOT void colorGeneration();
 
     // outgoing client
 #if BUILD_INTERNAL_TESTS
@@ -228,6 +230,18 @@ void tst_QXmppClient::testTaskStore()
 
     QVERIFY(p.task().isFinished());
     QVERIFY(!p.task().hasResult());
+}
+
+void tst_QXmppClient::colorGeneration()
+{
+#ifdef BUILD_INTERNAL_TESTS
+    QCOMPARE(QString::number(generateColorAngle(u"Romeo")), u"327.255");
+#endif
+
+    auto rgb = QXmppColorGeneration::generateRgb(u"Romeo");
+    QCOMPARE(rgb.red, quint8(0.865 * 255));
+    QCOMPARE(rgb.green, 0);
+    QCOMPARE(rgb.blue, quint8(0.686 * 255));
 }
 
 #if BUILD_INTERNAL_TESTS
