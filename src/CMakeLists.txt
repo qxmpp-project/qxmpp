@@ -19,6 +19,7 @@ set(INSTALL_HEADER_FILES
     base/QXmppBitsOfBinaryIq.h
     base/QXmppBookmarkSet.h
     base/QXmppByteStreamIq.h
+    base/QXmppColorGeneration.h
     base/QXmppDataForm.h
     base/QXmppDataFormBase.h
     base/QXmppDiscoveryIq.h
@@ -174,6 +175,7 @@ set(SOURCE_FILES
     base/QXmppBitsOfBinaryIq.cpp
     base/QXmppBookmarkSet.cpp
     base/QXmppByteStreamIq.cpp
+    base/QXmppColorGeneration.cpp
     base/QXmppDataForm.cpp
     base/QXmppDataFormBase.cpp
     base/QXmppDiscoveryIq.cpp
@@ -237,6 +239,7 @@ set(SOURCE_FILES
     base/QXmppVCardIq.cpp
     base/QXmppVersionIq.cpp
     base/compat/removed_api.cpp
+    base/hsluv/hsluv.c
     # to trigger MOC
     base/XmppSocket.h
 
