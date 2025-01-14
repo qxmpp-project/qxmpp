@@ -723,8 +723,8 @@ void ManagerPrivate::renewSignedPreKeyPairs()
         // Remove signed pre key pairs older than
         // SIGNED_PRE_KEY_RENEWAL_INTERVAL.
         if (currentDate - creationDate > SIGNED_PRE_KEY_RENEWAL_INTERVAL) {
-            itr = signedPreKeyPairs.erase(itr);
             omemoStorage->removeSignedPreKeyPair(itr.key());
+            itr = signedPreKeyPairs.erase(itr);
             isSignedPreKeyPairRemoved = true;
         } else {
             ++itr;
