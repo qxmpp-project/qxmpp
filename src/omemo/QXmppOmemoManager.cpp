@@ -373,7 +373,6 @@ QXmppTask<bool> Manager::load()
             return;
         } else {
             d->signedPreKeyPairs = signedPreKeyPairs;
-            d->renewSignedPreKeyPairs();
         }
 
         const auto &preKeyPairs = omemoData.preKeyPairs;
