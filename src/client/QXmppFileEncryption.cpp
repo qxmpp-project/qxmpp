@@ -154,7 +154,6 @@ EncryptionDevice::EncryptionDevice(std::unique_ptr<QIODevice> input,
     setOpenMode(m_input->openMode() & QIODevice::ReadOnly);
 
     Q_ASSERT(m_cipher->validKeyLength(int(key.length())));
-    Q_ASSERT(m_cipher->ok());
 }
 
 EncryptionDevice::~EncryptionDevice() = default;
@@ -270,7 +269,6 @@ DecryptionDevice::DecryptionDevice(std::unique_ptr<QIODevice> input,
     setOpenMode(m_output->openMode() & QIODevice::WriteOnly);
 
     Q_ASSERT(m_cipher->validKeyLength(int(key.length())));
-    Q_ASSERT(m_cipher->ok());
 }
 
 DecryptionDevice::~DecryptionDevice() = default;
