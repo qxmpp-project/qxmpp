@@ -130,7 +130,7 @@ QXmppOutgoingClientPrivate::QXmppOutgoingClientPrivate(QXmppOutgoingClient *qq)
 
 void QXmppOutgoingClientPrivate::connectToHost(const ServerAddress &address)
 {
-    QSslConfiguration sslConfig;
+    auto sslConfig = QSslConfiguration::defaultConfiguration();
 
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
