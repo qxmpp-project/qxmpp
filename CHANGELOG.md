@@ -4,6 +4,14 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.9.3 (January 23, 2025)
+------------------------------
+
+ - OutgoingClient: Fix ssl connection/setting invalid ssl config (@pasnox, #675)
+ - FileEncryption: Fix wrong Cipher::ok() assert (@pasnox, #676)
+ - OmemoManager: Fix removing old signed pre key pairs (@melvo, #674)
+ - OmemoManager: Do not try to renew signed pre key pairs while loading (@melvo, #674)
+
 QXmpp 1.9.2 (December 07, 2024)
 -------------------------------
 
