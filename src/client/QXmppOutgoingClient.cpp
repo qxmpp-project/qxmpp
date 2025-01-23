@@ -238,12 +238,15 @@ void QXmppOutgoingClientPrivate::connectToHost(const QString &host, quint16 port
 {
     q->info(QStringLiteral("Connecting to %1:%2").arg(host, QString::number(port)));
 
+    auto sslConfig = QSslConfiguration::defaultConfiguration();
+
     // override CA certificates if requested
     if (!config.caCertificates().isEmpty()) {
-        QSslConfiguration newSslConfig;
-        newSslConfig.setCaCertificates(config.caCertificates());
-        q->socket()->setSslConfiguration(newSslConfig);
+        sslConfig.setCaCertificates(config.caCertificates());
     }
+
+    // set new ssl config
+    q->socket()->setSslConfiguration(sslConfig);
 
     // respect proxy
     q->socket()->setProxy(config.networkProxy());
