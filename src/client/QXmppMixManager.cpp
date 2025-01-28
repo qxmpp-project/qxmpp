@@ -1126,6 +1126,10 @@ void QXmppMixManager::onRegistered(QXmppClient *client)
 
                 result->items.reserve(*counter);
 
+                if (iqItems.empty()) {
+                    return promise.finish(*result.get());
+                }
+
                 for (const auto &item : std::as_const(iqItems)) {
                     requestParticipants(item.bareJid()).then(this, [manager, result, promise, counter, channelId = item.bareJid(), participantId = item.mixParticipantId()](auto &&participantsResult) mutable {
                         if (promise.task().isFinished()) {
