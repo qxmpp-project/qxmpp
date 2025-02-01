@@ -147,8 +147,8 @@ inline QByteArray serializeXml(const T &packet)
     });
 }
 
-QXMPP_EXPORT QByteArray generateRandomBytes(uint32_t minimumByteCount, uint32_t maximumByteCount);
-QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, uint32_t byteCount);
+QXMPP_EXPORT QByteArray generateRandomBytes(size_t minimumByteCount, size_t maximumByteCount);
+QXMPP_EXPORT void generateRandomBytes(uint8_t *bytes, size_t byteCount);
 float calculateProgress(qint64 transferred, qint64 total);
 
 QXMPP_EXPORT std::pair<QString, int> parseHostAddress(const QString &address);
