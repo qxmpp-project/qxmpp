@@ -9,6 +9,11 @@ QXmpp 1.10.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.9.4 (February 2, 2025)
+------------------------------
+
+ - MixManager: Account export: Fix not finishing task when nothing to export (@pasnox, #677)
+
 QXmpp 1.9.3 (January 23, 2025)
 ------------------------------
 
