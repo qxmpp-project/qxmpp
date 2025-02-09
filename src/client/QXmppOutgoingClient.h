@@ -43,6 +43,7 @@ struct SmEnabled;
 struct SmFailed;
 struct SmResumed;
 struct StreamErrorElement;
+struct StreamOpen;
 
 enum HandleElementResult {
     Accepted,
@@ -133,7 +134,7 @@ public:
 
 private:
     void handleStart();
-    void handleStream(const QDomElement &element);
+    void handleStream(const QXmpp::Private::StreamOpen &stream);
     void handlePacketReceived(const QDomElement &element);
     QXmpp::Private::HandleElementResult handleElement(const QDomElement &nodeRecv);
     void handleStreamFeatures(const QXmppStreamFeatures &features);
