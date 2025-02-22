@@ -4,10 +4,10 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-QXmpp 1.10.0 (UNRELEASED)
--------------------------
+QXmpp 1.10.0 (February 22, 2025)
+--------------------------------
 
-*under development*
+ - Implement XEP-0392: Consistent Color Generation (@lnjX, #672)
 
 QXmpp 1.9.4 (February 2, 2025)
 ------------------------------
