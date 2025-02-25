@@ -31,6 +31,12 @@ struct QXmppError;
     if (!QTest::qVerify(bool(statement), #statement, static_cast<const char *>(description), __FILE__, __LINE__)) \
         throw std::runtime_error(description);
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+constexpr auto TimeZoneUTC = QTimeZone::Initialization::UTC;
+#else
+constexpr auto TimeZoneUTC = Qt::UTC;
+#endif
+
 template<typename String>
 inline QDomDocument xmlToDomDoc(const String &xml, bool namespaceProcessing)
 {

@@ -180,7 +180,7 @@ void tst_QXmppPubSubEvent::testBasic_data()
                                 "ba49252aaa4f5d320c24d3766f0bdcade78c78d3",
                                 QXmppPubSubSubscription::Subscribed,
                                 QXmppPubSubSubscription::Unavailable,
-                                QDateTime({ 2006, 02, 28 }, { 23, 59, 59 }, Qt::UTC)),
+                                QDateTime({ 2006, 02, 28 }, { 23, 59, 59 }, TimeZoneUTC)),
         QVector<QXmppPubSubBaseItem>(),
         std::nullopt);
 

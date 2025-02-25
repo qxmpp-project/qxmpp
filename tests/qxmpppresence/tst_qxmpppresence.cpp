@@ -304,10 +304,10 @@ void tst_QXmppPresence::testPresenceWithLastUserInteraction()
     parsePacket(presence, xml);
     QVERIFY(!presence.lastUserInteraction().isNull());
     QVERIFY(presence.lastUserInteraction().isValid());
-    QCOMPARE(presence.lastUserInteraction(), QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), Qt::UTC));
+    QCOMPARE(presence.lastUserInteraction(), QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), TimeZoneUTC));
     serializePacket(presence, xml);
 
-    QDateTime another(QDate(2025, 2, 5), QTime(15, 32, 8), Qt::UTC);
+    QDateTime another(QDate(2025, 2, 5), QTime(15, 32, 8), TimeZoneUTC);
     presence.setLastUserInteraction(another);
     QCOMPARE(presence.lastUserInteraction(), another);
 }

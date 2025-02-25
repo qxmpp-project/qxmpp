@@ -379,7 +379,7 @@ void tst_QXmppStanza::testErrorRetry()
     QCOMPARE(error.text(), QStringLiteral("Quota reached. You can only upload 5 "
                                           "files in 5 minutes"));
     QCOMPARE(error.condition(), QXmppStanza::Error::ResourceConstraint);
-    QCOMPARE(error.retryDate(), QDateTime(QDate(2017, 12, 03), QTime(23, 42, 05), Qt::UTC));
+    QCOMPARE(error.retryDate(), QDateTime(QDate(2017, 12, 03), QTime(23, 42, 05), TimeZoneUTC));
     serializePacket(error, xml);
 
     // test setter
