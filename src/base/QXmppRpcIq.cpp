@@ -22,30 +22,63 @@ using namespace QXmpp::Private;
 void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &value)
 {
     writer->writeStartElement(QSL65("value"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    switch (value.typeId()) {
+    case QMetaType::Type::Int:
+    case QMetaType::Type::UInt:
+    case QMetaType::Type::LongLong:
+    case QMetaType::Type::ULongLong:
+#else
     switch (value.type()) {
     case QVariant::Int:
     case QVariant::UInt:
     case QVariant::LongLong:
     case QVariant::ULongLong:
+#endif
         writer->writeTextElement(QSL65("i4"), value.toString());
         break;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::Double:
+#else
     case QVariant::Double:
+#endif
         writer->writeTextElement(QSL65("double"), value.toString());
         break;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::Bool:
+#else
     case QVariant::Bool:
+#endif
         writer->writeTextElement(QSL65("boolean"), value.toBool() ? u"1"_s : u"0"_s);
         break;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::QDate:
+#else
     case QVariant::Date:
+#endif
         writer->writeTextElement(QSL65("dateTime.iso8601"), value.toDate().toString(Qt::ISODate));
         break;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::QDateTime:
+#else
     case QVariant::DateTime:
+#endif
         writer->writeTextElement(QSL65("dateTime.iso8601"), value.toDateTime().toString(Qt::ISODate));
         break;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::QTime:
+#else
     case QVariant::Time:
+#endif
         writer->writeTextElement(QSL65("dateTime.iso8601"), value.toTime().toString(Qt::ISODate));
         break;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::QStringList:
+    case QMetaType::Type::QVariantList: {
+#else
     case QVariant::StringList:
     case QVariant::List: {
+#endif
         writer->writeStartElement(QSL65("array"));
         writer->writeStartElement(QSL65("data"));
         const auto list = value.toList();
@@ -56,7 +89,11 @@ void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &valu
         writer->writeEndElement();
         break;
     }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::QVariantMap: {
+#else
     case QVariant::Map: {
+#endif
         writer->writeStartElement(QSL65("struct"));
         const QMap<QString, QVariant> map = value.toMap();
         QMap<QString, QVariant>::ConstIterator index = map.begin();
@@ -70,7 +107,11 @@ void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &valu
         writer->writeEndElement();
         break;
     }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    case QMetaType::Type::QByteArray: {
+#else
     case QVariant::ByteArray: {
+#endif
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
         writer->writeTextElement("base64", value.toByteArray().toBase64());
 #else
@@ -81,7 +122,11 @@ void QXmppRpcMarshaller::marshall(QXmlStreamWriter *writer, const QVariant &valu
     default: {
         if (value.isNull()) {
             writer->writeEmptyElement(u"nil"_s);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        } else if (value.canConvert(QMetaType(QMetaType::Type::QString))) {
+#else
         } else if (value.canConvert(QVariant::String)) {
+#endif
             writer->writeTextElement(QSL65("string"), value.toString());
         }
         break;

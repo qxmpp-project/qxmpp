@@ -43,7 +43,11 @@ protected:
 
     std::optional<bool> parseBool(const QVariant &variant)
     {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        if (variant.typeId() == QMetaType::Type::Bool) {
+#else
         if (variant.type() == QVariant::Bool) {
+#endif
             return variant.toBool();
         }
         return std::nullopt;
