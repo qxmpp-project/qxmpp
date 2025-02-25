@@ -65,7 +65,10 @@ struct first_argument {
 template<typename F>
 using first_argument_t = typename first_argument<F>::type;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 1, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+template<typename T>
+QFuture<T> makeReadyFuture(T &&value) { return QtFuture::makeReadyValueFuture(std::move(value)); }
+#elif QT_VERSION >= QT_VERSION_CHECK(6, 1, 0)
 using QtFuture::makeReadyFuture;
 #else
 template<typename T>
