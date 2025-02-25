@@ -297,7 +297,11 @@ void XmppSocket::processData(const QString &data)
     // Try to parse the wrapped XML
     //
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    if (!doc.setContent(wrappedStanzas, QDomDocument::ParseOption::UseNamespaceProcessing)) {
+#else
     if (!doc.setContent(wrappedStanzas, true)) {
+#endif
         return;
     }
 

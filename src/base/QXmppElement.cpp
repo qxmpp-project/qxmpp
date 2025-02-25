@@ -147,7 +147,11 @@ QDomElement QXmppElement::sourceDomElement() const
     }
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    if (!doc.setContent(d->serializedSource, QDomDocument::ParseOption::UseNamespaceProcessing)) {
+#else
     if (!doc.setContent(d->serializedSource, true)) {
+#endif
         qWarning("[QXmpp] QXmppElement::sourceDomElement(): cannot parse source element");
         return QDomElement();
     }

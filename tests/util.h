@@ -38,23 +38,45 @@ constexpr auto TimeZoneUTC = Qt::UTC;
 #endif
 
 template<typename String>
-inline QDomDocument xmlToDomDoc(const String &xml, bool namespaceProcessing)
+inline std::variant<QDomDocument, QString> internalParseDomDocument(const String &xml, bool namespaceProcessing)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
     QDomDocument doc;
-    QString errorText;
-    bool success = false;
-    if constexpr (std::is_same_v<String, QString> || std::is_same_v<String, QByteArray>) {
-        success = doc.setContent(xml, namespaceProcessing, &errorText);
-    } else {
-        success = doc.setContent(QString(xml), namespaceProcessing, &errorText);
-    }
-    if (!success) {
-        qDebug() << "Parsing error:";
-        qDebug().noquote() << xml;
-        qDebug().noquote() << "Error:" << errorText;
-        QTest::qFail("Invalid XML", __FILE__, __LINE__);
+    auto options = namespaceProcessing ? QDomDocument::ParseOption::UseNamespaceProcessing : QDomDocument::ParseOption::Default;
+    if (auto result = doc.setContent(xml, options); !result) {
+        return result.errorMessage;
     }
     return doc;
+#else
+    QDomDocument doc;
+    QString errorMessage;
+    if (!doc.setContent(xml, namespaceProcessing, &errorMessage)) {
+        return errorMessage;
+    }
+    return doc;
+#endif
+}
+
+template<typename String>
+inline QDomDocument xmlToDomDoc(const String &xml, bool namespaceProcessing)
+{
+    std::variant<QDomDocument, QString> result;
+
+    if constexpr (std::is_same_v<String, QString> || std::is_same_v<String, QByteArray>) {
+        result = internalParseDomDocument(xml, namespaceProcessing);
+    } else {
+        result = internalParseDomDocument(QString(xml), namespaceProcessing);
+    }
+
+    // error
+    if (std::holds_alternative<QString>(result)) {
+        qDebug() << "Parsing error:";
+        qDebug().noquote() << xml;
+        qDebug().noquote() << "Error:" << std::get<QString>(result);
+        QTest::qFail("Invalid XML", __FILE__, __LINE__);
+        return {};
+    }
+    return std::get<QDomDocument>(result);
 }
 
 template<typename String>
@@ -179,7 +201,11 @@ QDomElement writePacketToDom(T packet)
     packet.toXml(&writer);
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    doc.setContent(buffer.data(), QDomDocument::ParseOption::UseNamespaceProcessing);
+#else
     doc.setContent(buffer.data(), true);
+#endif
 
     return doc.documentElement();
 }
