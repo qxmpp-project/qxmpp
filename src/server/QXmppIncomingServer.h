@@ -15,6 +15,10 @@ class QXmppDialback;
 class QXmppIncomingServerPrivate;
 class QXmppNonza;
 
+namespace QXmpp::Private {
+struct StreamOpen;
+}
+
 ///
 /// \brief The QXmppIncomingServer class represents an incoming XMPP stream
 /// from an XMPP server.
@@ -47,7 +51,7 @@ public:
 private:
     void handleStart();
     void handleStanza(const QDomElement &element);
-    void handleStream(const QDomElement &element);
+    void handleStream(const QXmpp::Private::StreamOpen &element);
 
     void slotDialbackResponseReceived(const QXmppDialback &dialback);
     void slotSocketDisconnected();

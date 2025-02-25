@@ -120,11 +120,10 @@ void QXmppIncomingServer::handleStart()
 {
 }
 
-void QXmppIncomingServer::handleStream(const QDomElement &streamElement)
+void QXmppIncomingServer::handleStream(const StreamOpen &stream)
 {
-    const QString from = streamElement.attribute(u"from"_s);
-    if (!from.isEmpty()) {
-        info(u"Incoming server stream from %1 on %2"_s.arg(from, d->origin()));
+    if (!stream.from.isEmpty()) {
+        info(u"Incoming server stream from %1 on %2"_s.arg(stream.from, d->origin()));
     }
 
     // start stream
