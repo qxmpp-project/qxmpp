@@ -17,12 +17,19 @@ static void parsePacketWithStream(T &packet, const QByteArray &xml)
         QByteArrayLiteral("<stream:stream xmlns:stream='http://etherx.jabber.org/streams'>") +
         xml + QByteArrayLiteral("</stream:stream>");
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    if (auto result = doc.setContent(wrappedXml, QDomDocument::ParseOption::UseNamespaceProcessing); !result) {
+        qDebug() << result.errorMessage;
+        QFAIL("Could not parse XML.");
+    }
+#else
     QString err;
     bool parsingSuccess = doc.setContent(wrappedXml, true, &err);
     if (!err.isNull()) {
         qDebug() << err;
     }
     QVERIFY(parsingSuccess);
+#endif
 
     packet.parse(doc.documentElement().firstChildElement());
 }
