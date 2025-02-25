@@ -4,6 +4,13 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.10.1 (February 25, 2025)
+--------------------------------
+
+ - ColorGeneration: Fix MSVC linkage of header-only generateColor() (@lnjX, #686)
+ - Fix comparison for checking validity of fallback markers sections (@lnjX, #678)
+ - Stun: Include QSet to fix incomplete type with some Qt versions (@melvo, #681) 
+
 QXmpp 1.10.0 (February 22, 2025)
 --------------------------------
 
