@@ -33,6 +33,7 @@
 #include <QDateTime>
 #include <QDomElement>
 #include <QTextStream>
+#include <QTimeZone>
 #include <QXmlStreamWriter>
 
 using namespace QXmpp;
@@ -1722,7 +1723,11 @@ bool QXmppMessage::parseExtension(const QDomElement &element, QXmpp::SceMode sce
                     d->stamp = QDateTime::fromString(
                         element.attribute(u"stamp"_s),
                         u"yyyyMMddThh:mm:ss"_s);
-                    d->stamp.setTimeSpec(Qt::UTC);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+                    d->stamp.setTimeZone(QTimeZone::Initialization::UTC);
+#else
+                    d->stamp.setTimeZone(QTimeZone(0));
+#endif
                     d->stampType = LegacyDelayedDelivery;
                 }
                 return true;
