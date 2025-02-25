@@ -31,7 +31,7 @@ void tst_QXmppSceEnvelope::testReader()
     QXmppSceEnvelopeReader reader(xmlToDom(xml));
     QCOMPARE(reader.from(), u"opportunity@mars.planet"_s);
     QCOMPARE(reader.to(), u"missioncontrol@houston.nasa.gov"_s);
-    QCOMPARE(reader.timestamp(), QDateTime({ 2004, 01, 25 }, { 05, 05, 00 }, Qt::UTC));
+    QCOMPARE(reader.timestamp(), QDateTime({ 2004, 01, 25 }, { 05, 05, 00 }, TimeZoneUTC));
     QCOMPARE(reader.contentElement().firstChildElement().tagName(), u"body"_s);
 }
 
@@ -60,7 +60,7 @@ void tst_QXmppSceEnvelope::testWriter()
         writer.writeTextElement("url", "https://en.wikipedia.org/wiki/Fight_Club#Plot");
         writer.writeEndElement();
     });
-    envelope.writeTimestamp(QDateTime({ 2004, 01, 25 }, { 05, 05, 00 }, Qt::UTC));
+    envelope.writeTimestamp(QDateTime({ 2004, 01, 25 }, { 05, 05, 00 }, TimeZoneUTC));
     envelope.writeTo("missioncontrol@houston.nasa.gov");
     envelope.writeFrom("opportunity@mars.planet");
     envelope.writeRpad("C1DHN9HK-9A25tSmwK4hU!Jji9%GKYK^syIlHJT9TnI4");
