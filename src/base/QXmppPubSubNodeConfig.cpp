@@ -678,7 +678,11 @@ bool QXmppPubSubNodeConfig::parseField(const QXmppDataForm::Field &field)
         bool ok = false;
         if (const auto maxItems = value.toULongLong(&ok); ok) {
             d->maxItems = maxItems;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        } else if (value.typeId() == QMetaType::Type::QString && value.toString() == u"max") {
+#else
         } else if (value.type() == QVariant::String && value.toString() == u"max") {
+#endif
             d->maxItems = Max();
         } else {
             d->maxItems = Unset();
