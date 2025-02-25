@@ -15,6 +15,7 @@
 
 #include <QDateTime>
 #include <QDomElement>
+#include <QTimeZone>
 
 using namespace QXmpp::Private;
 
@@ -100,7 +101,11 @@ std::variant<QXmppEntityTimeIq, QXmppStanza::Error> QXmppEntityTimeManager::hand
     QDateTime utc = currentTime.toUTC();
     responseIq.setUtc(utc);
 
-    currentTime.setTimeSpec(Qt::UTC);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    currentTime.setTimeZone(QTimeZone::Initialization::UTC);
+#else
+    currentTime.setTimeZone(QTimeZone(0));
+#endif
     responseIq.setTzo(utc.secsTo(currentTime));
     return responseIq;
 }
