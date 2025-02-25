@@ -1346,7 +1346,7 @@ QString QXmppMessage::readFallbackRemovedText(QXmppFallback::Element element, co
     QString output;
     qsizetype index = 0;
     for (const auto &range : std::as_const(references)) {
-        if (!(range.start < fullText.size()) || !(0 < range.end <= fullText.size())) {
+        if (!(range.start < fullText.size()) || !(range.end > 0 && range.end <= fullText.size())) {
             // skip markers with invalid start/begin
             continue;
         }

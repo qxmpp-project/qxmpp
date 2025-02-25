@@ -16,6 +16,10 @@
 class QXmppPubSubIqPrivate;
 
 #if QXMPP_DEPRECATED_SINCE(1, 5)
+
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_DEPRECATED
+
 class QXMPP_EXPORT QXmppPubSubIq : public QXmppIq
 {
 public:
@@ -61,6 +65,9 @@ protected:
 private:
     QSharedDataPointer<QXmppPubSubIqPrivate> d;
 };
+
+QT_WARNING_POP
+
 #endif
 
 #endif  // QXMPPPUBSUBIQ_H

@@ -11,19 +11,19 @@
 #include <QColor>
 #endif
 
-class QXMPP_EXPORT QXmppColorGeneration
+class QXmppColorGeneration
 {
 public:
-    struct Rgb {
+    struct QXMPP_EXPORT Rgb {
         quint8 red;
         quint8 green;
         quint8 blue;
     };
 
-    static Rgb generateRgb(QStringView str);
+    QXMPP_EXPORT static Rgb generateRgb(QStringView str);
 
 #if defined(QT_GUI_LIB) || defined(QXMPP_DOC)
-    static QColor generateColor(QStringView str)
+    static inline QColor generateColor(QStringView str)
     {
         auto rgb = generateRgb(str);
         return QColor(rgb.red, rgb.green, rgb.blue);

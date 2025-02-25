@@ -9,6 +9,7 @@
 #include "QXmppLogger.h"
 
 #include <QObject>
+#include <QSet>
 
 class CandidatePair;
 class QDataStream;

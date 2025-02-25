@@ -37,6 +37,9 @@ private:
     Q_SLOT void testTaskDirect();
     Q_SLOT void testTaskStore();
     Q_SLOT void colorGeneration();
+#if QT_GUI_LIB
+    Q_SLOT void colorGenerationQColor();
+#endif
 
     // outgoing client
 #if BUILD_INTERNAL_TESTS
@@ -244,6 +247,14 @@ void tst_QXmppClient::colorGeneration()
     QCOMPARE(rgb.blue, quint8(0.686 * 255));
 }
 
+#if QT_GUI_LIB
+void tst_QXmppClient::colorGenerationQColor()
+{
+    auto color = QXmppColorGeneration::generateColor(u"Romeo");
+    QCOMPARE(color.red(), quint8(0.865 * 255));
+}
+#endif
+
 #if BUILD_INTERNAL_TESTS
 void tst_QXmppClient::csiManager()
 {
@@ -299,5 +310,5 @@ void tst_QXmppClient::credentialsSerialization()
     QCOMPARE(output, xml);
 }
 
-QTEST_MAIN(tst_QXmppClient)
+QTEST_GUILESS_MAIN(tst_QXmppClient)
 #include "tst_qxmppclient.moc"

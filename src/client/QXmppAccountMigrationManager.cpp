@@ -317,7 +317,7 @@ QXmppTask<QXmppAccountMigrationManager::Result<QXmppExportData>> QXmppAccountMig
     struct State {
         QXmppPromise<Result<QXmppExportData>> p;
         QXmppExportData data;
-        uint counter = 0;
+        size_t counter = 0;
     };
 
     auto state = std::make_shared<State>();
