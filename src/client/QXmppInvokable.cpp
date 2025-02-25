@@ -31,9 +31,15 @@ QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant
     }
 
     const char *typeName = metaObject()->method(idx).typeName();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QMetaType resultType = metaObject()->method(idx).returnMetaType();
+
+    void *result = resultType.create(nullptr);
+#else
     int resultType = QMetaType::type(typeName);
 
     void *result = QMetaType::create(resultType, nullptr);
+#endif
 
     QGenericReturnArgument ret(typeName, result);
     QList<QGenericArgument> genericArgs;
@@ -56,12 +62,12 @@ QVariant QXmppInvokable::dispatch(const QByteArray &method, const QList<QVariant
                                   genericArgs.value(7, QGenericArgument()),
                                   genericArgs.value(8, QGenericArgument()),
                                   genericArgs.value(9, QGenericArgument()))) {
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        QVariant returnValue(QMetaType(resultType), result);
-#else
         QVariant returnValue(resultType, result);
-#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        resultType.destroy(result);
+#else
         QMetaType::destroy(resultType, result);
+#endif
         return returnValue;
     } else {
         qDebug("No such method '%s'", method.constData());
