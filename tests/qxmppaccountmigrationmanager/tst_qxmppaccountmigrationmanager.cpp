@@ -373,23 +373,26 @@ void tst_QXmppAccountMigrationManager::testSerialization()
                    "</iq>"_s);
     client->inject(packetToXml(newClientVCard(client.get(), 1, "qxmpp4", QXmppIq::Result)));
 
-    client->expect(u"<iq id='qxmpp7' to='mix2@gamer.com' type='get'>"
-                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                   "<items node='urn:xmpp:mix:nodes:participants'/>"
-                   "</pubsub>"
-                   "</iq>"_s);
-    client->inject(u"<iq id='qxmpp7' from='mix2@gamer.com' type='result'>"
-                   "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
-                   "<items node='urn:xmpp:mix:nodes:participants'>"
-                   "<item id='mix2BareId'>"
-                   "<participant xmlns='urn:xmpp:mix:core:1'>"
-                   "<nick>Joe @ Mix 2 Gamer</nick>"
-                   "<jid>mix_user@domain.ext</jid>"
-                   "</participant>"
-                   "</item>"
-                   "</items>"
-                   "</pubsub>"
-                   "</iq>"_s);
+    auto packetId = client->expectPacketRandomOrder(
+        u"<iq to='mix2@gamer.com' type='get'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:participants'/>"
+        "</pubsub>"
+        "</iq>"_s);
+    client->inject(
+        u"<iq id='%1' from='mix2@gamer.com' type='result'>"
+        "<pubsub xmlns='http://jabber.org/protocol/pubsub'>"
+        "<items node='urn:xmpp:mix:nodes:participants'>"
+        "<item id='mix2BareId'>"
+        "<participant xmlns='urn:xmpp:mix:core:1'>"
+        "<nick>Joe @ Mix 2 Gamer</nick>"
+        "<jid>mix_user@domain.ext</jid>"
+        "</participant>"
+        "</item>"
+        "</items>"
+        "</pubsub>"
+        "</iq>"_s
+            .arg(packetId));
 
     client->expectNoPacket();
 
