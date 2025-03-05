@@ -40,7 +40,7 @@ void tst_QXmppEntityTimeManager::testSendRequest()
 
     QCOMPARE(spy.size(), 1);
     auto time = spy.at(0).at(0).value<QXmppEntityTimeIq>();
-    QCOMPARE(time.utc(), QDateTime({ 2006, 12, 19 }, { 17, 58, 35 }, Qt::UTC));
+    QCOMPARE(time.utc(), QDateTime({ 2006, 12, 19 }, { 17, 58, 35 }, TimeZoneUTC));
     QCOMPARE(time.tzo(), -6 * 60 * 60);
 }
 

@@ -55,8 +55,8 @@ void tst_QXmppArchiveIq::testArchiveList()
     QCOMPARE(iq.type(), QXmppIq::Get);
     QCOMPARE(iq.id(), u"list_1");
     QCOMPARE(iq.with(), u"juliet@capulet.com");
-    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
-    QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), Qt::UTC));
+    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), TimeZoneUTC));
+    QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), TimeZoneUTC));
     QCOMPARE(iq.resultSetQuery().max(), max);
     serializePacket(iq, xml);
 }
@@ -113,12 +113,12 @@ void tst_QXmppArchiveIq::testArchiveChat()
     QCOMPARE(iq.chat().messages().size(), 3);
     QCOMPARE(iq.chat().messages()[0].isReceived(), true);
     QCOMPARE(iq.chat().messages()[0].body(), QLatin1String("Art thou not Romeo, and a Montague?"));
-    QCOMPARE(iq.chat().messages()[0].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 15), Qt::UTC));
+    QCOMPARE(iq.chat().messages()[0].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 15), TimeZoneUTC));
     QCOMPARE(iq.chat().messages()[1].isReceived(), false);
-    QCOMPARE(iq.chat().messages()[1].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 26), Qt::UTC));
+    QCOMPARE(iq.chat().messages()[1].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 26), TimeZoneUTC));
     QCOMPARE(iq.chat().messages()[1].body(), QLatin1String("Neither, fair saint, if either thee dislike."));
     QCOMPARE(iq.chat().messages()[2].isReceived(), true);
-    QCOMPARE(iq.chat().messages()[2].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 33), Qt::UTC));
+    QCOMPARE(iq.chat().messages()[2].date(), QDateTime(QDate(1469, 7, 21), QTime(2, 56, 33), TimeZoneUTC));
     QCOMPARE(iq.chat().messages()[2].body(), QLatin1String("How cam'st thou hither, tell me, and wherefore?"));
     QCOMPARE(iq.resultSetReply().count(), count);
     serializePacket(iq, xml);
@@ -137,8 +137,8 @@ void tst_QXmppArchiveIq::testArchiveRemove()
     QCOMPARE(iq.type(), QXmppIq::Set);
     QCOMPARE(iq.id(), QLatin1String("remove_1"));
     QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
-    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
-    QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), Qt::UTC));
+    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), TimeZoneUTC));
+    QCOMPARE(iq.end(), QDateTime(QDate(1479, 7, 21), QTime(4, 0, 0), TimeZoneUTC));
     serializePacket(iq, xml);
 }
 
@@ -176,7 +176,7 @@ void tst_QXmppArchiveIq::testArchiveRetrieve()
     QCOMPARE(iq.type(), QXmppIq::Get);
     QCOMPARE(iq.id(), QLatin1String("retrieve_1"));
     QCOMPARE(iq.with(), QLatin1String("juliet@capulet.com"));
-    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), Qt::UTC));
+    QCOMPARE(iq.start(), QDateTime(QDate(1469, 7, 21), QTime(2, 0, 0), TimeZoneUTC));
     QCOMPARE(iq.resultSetQuery().max(), max);
     serializePacket(iq, xml);
 }

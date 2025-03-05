@@ -309,13 +309,13 @@ void tst_QXmppMessage::testDelay_data()
         << QByteArray("<message type=\"normal\">"
                       "<delay xmlns=\"urn:xmpp:delay\" stamp=\"2010-06-29T08:23:06Z\"/>"
                       "</message>")
-        << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC);
+        << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), TimeZoneUTC);
 
     QTest::newRow("legacy")
         << QByteArray("<message type=\"normal\">"
                       "<x xmlns=\"jabber:x:delay\" stamp=\"20100629T08:23:06\"/>"
                       "</message>")
-        << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), Qt::UTC);
+        << QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6), TimeZoneUTC);
 }
 
 void tst_QXmppMessage::testDelay()
@@ -345,7 +345,7 @@ void tst_QXmppMessage::testDelayWithMultipleStamp()
     QXmppMessage message;
     parsePacket(message, xml);
     qDebug() << message.stamp();
-    QCOMPARE(message.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6, 123), Qt::UTC));
+    QCOMPARE(message.stamp(), QDateTime(QDate(2010, 06, 29), QTime(8, 23, 6, 123), TimeZoneUTC));
     serializePacket(message, resultXml);
 }
 

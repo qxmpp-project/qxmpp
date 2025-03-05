@@ -43,7 +43,7 @@ void tst_QXmppStreamInitiationIq::testFileInfo_data()
                       "size=\"1022\">"
                       "<desc>This is a test. If this were a real file...</desc>"
                       "</file>")
-        << QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), Qt::UTC)
+        << QDateTime(QDate(1969, 7, 21), QTime(2, 56, 15), TimeZoneUTC)
         << u"This is a test. If this were a real file..."_s
         << QByteArray::fromHex("552da749930852c69ae5d2141d3766b1")
         << u"test.txt"_s

@@ -118,7 +118,7 @@ void tst_QXmppMixItem::testConfig()
     QCOMPARE(item1.lastEditorJid(), u"greymalkin@shakespeare.example"_s);
     QCOMPARE(item1.ownerJids(), QStringList({ u"hecate@shakespeare.example"_s, u"greymalkin@shakespeare.example"_s }));
     QCOMPARE(item1.administratorJids(), QStringList({ u"juliet@shakespeare.example"_s, u"romeo@shakespeare.example"_s }));
-    QCOMPARE(item1.channelDeletion(), QDateTime({ { 2023, 12, 31 }, { 12, 30 }, Qt::UTC }));
+    QCOMPARE(item1.channelDeletion(), QDateTime({ { 2023, 12, 31 }, { 12, 30 }, TimeZoneUTC }));
     QCOMPARE(item1.nodes(), QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Information);
     QCOMPARE(item1.messagesSubscribeRole(), QXmppMixConfigItem::Role::Allowed);
     QCOMPARE(item1.messagesRetractRole(), QXmppMixConfigItem::Role::Nobody);
@@ -152,7 +152,7 @@ void tst_QXmppMixItem::testConfig()
                                      u"greymalkin@shakespeare.example"_s }));
     item2.setAdministratorJids(QStringList({ u"juliet@shakespeare.example"_s,
                                              u"romeo@shakespeare.example"_s }));
-    item2.setChannelDeletion({ { 2023, 12, 31 }, { 12, 30 }, Qt::UTC });
+    item2.setChannelDeletion({ { 2023, 12, 31 }, { 12, 30 }, TimeZoneUTC });
     item2.setNodes(QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Information);
     item2.setMessagesSubscribeRole(QXmppMixConfigItem::Role::Allowed);
     item2.setMessagesRetractRole(QXmppMixConfigItem::Role::Nobody);
@@ -175,7 +175,7 @@ void tst_QXmppMixItem::testConfig()
     QCOMPARE(item2.lastEditorJid(), u"greymalkin@shakespeare.example"_s);
     QCOMPARE(item2.ownerJids(), QStringList({ u"hecate@shakespeare.example"_s, u"greymalkin@shakespeare.example"_s }));
     QCOMPARE(item2.administratorJids(), QStringList({ u"juliet@shakespeare.example"_s, u"romeo@shakespeare.example"_s }));
-    QCOMPARE(item2.channelDeletion(), QDateTime({ { 2023, 12, 31 }, { 12, 30 }, Qt::UTC }));
+    QCOMPARE(item2.channelDeletion(), QDateTime({ { 2023, 12, 31 }, { 12, 30 }, TimeZoneUTC }));
     QCOMPARE(item2.nodes(), QXmppMixConfigItem::Node::AllowedJids | QXmppMixConfigItem::Node::Information);
     QCOMPARE(item2.messagesSubscribeRole(), QXmppMixConfigItem::Role::Allowed);
     QCOMPARE(item2.messagesRetractRole(), QXmppMixConfigItem::Role::Nobody);
