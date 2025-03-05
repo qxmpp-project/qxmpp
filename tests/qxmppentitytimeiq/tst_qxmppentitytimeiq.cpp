@@ -52,7 +52,7 @@ void tst_QXmppEntityTimeIq::testEntityTimeResult()
     QCOMPARE(entityTime.to(), QLatin1String("romeo@montague.net/orchard"));
     QCOMPARE(entityTime.type(), QXmppIq::Result);
     QCOMPARE(entityTime.tzo(), -21600);
-    QCOMPARE(entityTime.utc(), QDateTime(QDate(2006, 12, 19), QTime(17, 58, 35), Qt::UTC));
+    QCOMPARE(entityTime.utc(), QDateTime(QDate(2006, 12, 19), QTime(17, 58, 35), TimeZoneUTC));
     serializePacket(entityTime, xml);
 }
 
