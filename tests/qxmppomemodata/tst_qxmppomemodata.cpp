@@ -89,7 +89,11 @@ void tst_QXmppOmemoData::testIsOmemoDeviceElement()
     QFETCH(bool, isValid);
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xml, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
     QVERIFY(doc.setContent(xml, true));
+#endif
     const QDomElement element = doc.documentElement();
     QCOMPARE(QXmppOmemoDeviceElement::isOmemoDeviceElement(element), isValid);
 }
@@ -152,7 +156,11 @@ void tst_QXmppOmemoData::testIsOmemoDeviceList()
     QFETCH(bool, isValid);
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xml, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
     QVERIFY(doc.setContent(xml, true));
+#endif
     const QDomElement element = doc.documentElement();
     QCOMPARE(QXmppOmemoDeviceList::isOmemoDeviceList(element), isValid);
 }
@@ -210,7 +218,11 @@ void tst_QXmppOmemoData::testIsOmemoDeviceBundle()
     QFETCH(bool, isValid);
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xml, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
     QVERIFY(doc.setContent(xml, true));
+#endif
     const QDomElement element = doc.documentElement();
     QCOMPARE(QXmppOmemoDeviceBundle::isOmemoDeviceBundle(element), isValid);
 }
@@ -310,7 +322,11 @@ void tst_QXmppOmemoData::testIsOmemoEnvelope()
     QFETCH(bool, isValid);
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xml, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
     QVERIFY(doc.setContent(xml, true));
+#endif
     const QDomElement element = doc.documentElement();
     QCOMPARE(QXmppOmemoEnvelope::isOmemoEnvelope(element), isValid);
 }
@@ -380,7 +396,11 @@ void tst_QXmppOmemoData::testIsOmemoElement()
     QFETCH(bool, isValid);
 
     QDomDocument doc;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xml, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
     QVERIFY(doc.setContent(xml, true));
+#endif
     const QDomElement element = doc.documentElement();
     QCOMPARE(QXmppOmemoElement::isOmemoElement(element), isValid);
 }
@@ -640,11 +660,19 @@ void tst_QXmppOmemoData::testOmemoIq()
         "ZWVrIHdpdGggYSBiaW5hcnkgd3Jpc3Qgd2F0Y2g/");
 
     QDomDocument doc;
-    doc.setContent(xmlOtherIq, true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xmlOtherIq, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
+    QVERIFY(doc.setContent(xmlOtherIq, true));
+#endif
     QDomElement element = doc.documentElement();
     QVERIFY(!QXmppOmemoIq::isOmemoIq(element));
 
-    doc.setContent(xmlOmemoIq, true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    QVERIFY(doc.setContent(xmlOmemoIq, QDomDocument::ParseOption::UseNamespaceProcessing));
+#else
+    QVERIFY(doc.setContent(xmlOmemoIq, true));
+#endif
     element = doc.documentElement();
     QVERIFY(QXmppOmemoIq::isOmemoIq(element));
 

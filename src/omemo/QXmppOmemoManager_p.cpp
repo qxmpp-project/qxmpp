@@ -1489,7 +1489,11 @@ QXmppTask<std::optional<DecryptionResult>> ManagerPrivate::decryptStanza(T stanz
             interface.finish(std::nullopt);
         } else {
             QDomDocument document;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+            document.setContent(serializedSceEnvelope, QDomDocument::ParseOption::UseNamespaceProcessing);
+#else
             document.setContent(serializedSceEnvelope, true);
+#endif
             QXmppSceEnvelopeReader sceEnvelopeReader(document.documentElement());
 
             if (sceEnvelopeReader.from() != senderJid) {
