@@ -75,7 +75,11 @@ int sha512_digest_init_func(void **digest_context, void *)
 int sha512_digest_update_func(void *digest_context, const uint8_t *data, size_t data_len, void *)
 {
     auto *hashGenerator = reinterpret_cast<QCryptographicHash *>(digest_context);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 3, 0)
+    hashGenerator->addData(QByteArrayView(reinterpret_cast<const char *>(data), data_len));
+#else
     hashGenerator->addData(reinterpret_cast<const char *>(data), data_len);
+#endif
     return 0;
 }
 
