@@ -45,6 +45,9 @@ static HashAlgorithm toHashAlgorithm(QCryptographicHash::Algorithm algorithm)
     case QCryptographicHash::Blake2s_224:
     case QCryptographicHash::Blake2s_256:
 #endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
+    case QCryptographicHash::NumAlgorithms:
+#endif
         return HashAlgorithm::Unknown;
     case QCryptographicHash::Md5:
         return HashAlgorithm::Md5;
