@@ -7,19 +7,24 @@
 
 #include <optional>
 
+#include <QMetaType>
 #include <QString>
 
 class QDomElement;
+class QXmlStreamReader;
 class QXmlStreamWriter;
 
 namespace QXmpp::Private {
 
 struct StreamOpen {
+    static StreamOpen fromXml(QXmlStreamReader &reader);
     void toXml(QXmlStreamWriter *) const;
 
     QString to;
     QString from;
-    QStringView xmlns;
+    QString id;
+    QString version;
+    QString xmlns;
 };
 
 struct StarttlsRequest {
@@ -41,5 +46,7 @@ struct CsiInactive {
 };
 
 }  // namespace QXmpp::Private
+
+Q_DECLARE_METATYPE(QXmpp::Private::StreamOpen)
 
 #endif  // STREAM_H

@@ -15,6 +15,10 @@ class QXmppNonza;
 class QXmppIncomingClientPrivate;
 class QXmppPasswordChecker;
 
+namespace QXmpp::Private {
+struct StreamOpen;
+}
+
 ///
 /// \brief The QXmppIncomingClient class represents an incoming XMPP stream
 /// from an XMPP client.
@@ -48,7 +52,7 @@ public:
 protected:
     /// \cond
     void handleStart();
-    void handleStream(const QDomElement &element);
+    void handleStream(const QXmpp::Private::StreamOpen &);
     void handleStanza(const QDomElement &element);
     /// \endcond
 

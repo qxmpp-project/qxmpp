@@ -189,7 +189,7 @@ void QXmppIncomingClient::handleStart()
 {
 }
 
-void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
+void QXmppIncomingClient::handleStream(const StreamOpen &stream)
 {
     if (d->idleTimer->interval()) {
         d->idleTimer->start();
@@ -209,14 +209,14 @@ void QXmppIncomingClient::handleStream(const QDomElement &streamElement)
     sendData(response.toUtf8());
 
     // check requested domain
-    if (streamElement.attribute(u"to"_s) != d->domain) {
+    if (stream.to != d->domain) {
         QString response = u"<stream:error>"
                            "<host-unknown xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\"/>"
                            "<text xmlns=\"urn:ietf:params:xml:ns:xmpp-streams\">"
                            "This server does not serve %1"
                            "</text>"
                            "</stream:error>"_s
-                               .arg(streamElement.attribute(u"to"_s));
+                               .arg(stream.to);
         sendData(response.toUtf8());
         disconnectFromHost();
         return;

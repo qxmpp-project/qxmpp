@@ -28,6 +28,7 @@ struct StreamErrorElement {
 
     static QString streamErrorToString(StreamError);
     static std::variant<StreamErrorElement, QXmppError> fromDom(const QDomElement &);
+    void toXml(QXmlStreamWriter *) const;
 
     Condition condition;
     QString text;
