@@ -22,4 +22,6 @@ add_simple_example(8_server)
 add_subdirectory(example_5_rpcInterface)
 add_subdirectory(example_6_rpcClient)
 add_subdirectory(example_9_vCard)
-
+if(WITH_GSTREAMER)
+    add_subdirectory(audio_call)
+endif()
