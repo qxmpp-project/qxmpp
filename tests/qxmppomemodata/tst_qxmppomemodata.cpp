@@ -366,7 +366,7 @@ void tst_QXmppOmemoData::testOmemoEnvelope()
 
     QXmppOmemoEnvelope omemoEnvelope2;
     omemoEnvelope2.setRecipientDeviceId(recipientDeviceId);
-    omemoEnvelope2.setIsUsedForKeyExchange(isUsedForKeyExchange);
+    omemoEnvelope2.setUsedForKeyExchange(isUsedForKeyExchange);
     omemoEnvelope2.setData(QByteArray::fromBase64(data));
     QCOMPARE(omemoEnvelope2.recipientDeviceId(), recipientDeviceId);
     QCOMPARE(omemoEnvelope2.isUsedForKeyExchange(), isUsedForKeyExchange);
@@ -521,7 +521,7 @@ void tst_QXmppOmemoData::testOmemoElement()
 
     QXmppOmemoEnvelope omemoEnvelope5;
     omemoEnvelope5.setRecipientDeviceId(12321);
-    omemoEnvelope5.setIsUsedForKeyExchange(true);
+    omemoEnvelope5.setUsedForKeyExchange(true);
     omemoEnvelope5.setData(QByteArray::fromBase64("a012U0R9WixWKUYhYipucnZOWG06akFOR3Q1NGNOOmUK"));
     omemoElement2.addEnvelope(u"romeo@montague.lit"_s, omemoEnvelope5);
 

@@ -18,7 +18,7 @@ public:
     void setRecipientDeviceId(uint32_t id);
 
     bool isUsedForKeyExchange() const;
-    void setIsUsedForKeyExchange(bool isUsed);
+    void setUsedForKeyExchange(bool isUsed);
 
     QByteArray data() const;
     void setData(const QByteArray &data);
