@@ -13,17 +13,13 @@ on:
 jobs:
   push-doc:
     runs-on: ubuntu-latest
-    container:
-      image: debian:stable
     env:
       PUSH_KEY_REPO_DOC_QXMPP_ORG: ${{ secrets.PUSH_KEY_REPO_DOC_QXMPP_ORG }}
       CONFIG: full
     steps:
-      - name: Install sudo
-        run: apt update && apt install -qq -y sudo curl
       - uses: actions/checkout@v3
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
       - name: Install extra packages
         run: tests/travis/install-build-depends-debian
       - name: Update XEP metadata
