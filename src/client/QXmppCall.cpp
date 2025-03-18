@@ -443,7 +443,7 @@ QXmppCallStream *QXmppCallPrivate::createStream(const QString &media, const QStr
 
     // connect signals
     QObject::connect(stream->d->connection, &QXmppIceConnection::localCandidatesChanged,
-                     q, &QXmppCall::localCandidatesChanged);
+                     q, [this, stream]() { q->onLocalCandidatesChanged(stream); });
 
     QObject::connect(stream->d->connection, &QXmppIceConnection::disconnected,
                      q, &QXmppCall::hangup);
@@ -656,21 +656,8 @@ void QXmppCall::hangup()
 ///
 /// Sends a transport-info to inform the remote party of new local candidates.
 ///
-void QXmppCall::localCandidatesChanged()
+void QXmppCall::onLocalCandidatesChanged(QXmppCallStream *stream)
 {
-    // find the stream
-    QXmppIceConnection *conn = qobject_cast<QXmppIceConnection *>(sender());
-    QXmppCallStream *stream = nullptr;
-    for (auto ptr : std::as_const(d->streams)) {
-        if (ptr->d->connection == conn) {
-            stream = ptr;
-            break;
-        }
-    }
-    if (!stream) {
-        return;
-    }
-
     QXmppJingleIq iq;
     iq.setTo(d->jid);
     iq.setType(QXmppIq::Set);

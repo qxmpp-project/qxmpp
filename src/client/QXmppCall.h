@@ -82,8 +82,8 @@ public:
     Q_SLOT void addVideo();
 
 private:
-    Q_SLOT void localCandidatesChanged();
-    Q_SLOT void terminated();
+    void onLocalCandidatesChanged(QXmppCallStream *stream);
+    void terminated();
 
     QXmppCall(const QString &jid, QXmppCall::Direction direction, QXmppCallManager *parent);
 
