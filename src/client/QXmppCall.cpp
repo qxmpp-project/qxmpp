@@ -18,6 +18,7 @@
 #include "StringLiterals.h"
 
 #include <chrono>
+#include <ranges>
 
 // gstreamer
 #include <gst/gst.h>
@@ -153,7 +154,7 @@ GstCaps *QXmppCallPrivate::ptMap(uint sessionId, uint pt)
     return nullptr;
 }
 
-bool QXmppCallPrivate::isFormatSupported(const QString &codecName) const
+bool QXmppCallPrivate::isFormatSupported(const QString &codecName)
 {
     GstElementFactory *factory;
     factory = gst_element_factory_find(codecName.toLatin1().data());
@@ -164,67 +165,60 @@ bool QXmppCallPrivate::isFormatSupported(const QString &codecName) const
     return true;
 }
 
+bool QXmppCallPrivate::isCodecSupported(const GstCodec &codec)
+{
+    return isFormatSupported(codec.gstPay) &&
+        isFormatSupported(codec.gstDepay) &&
+        isFormatSupported(codec.gstEnc) &&
+        isFormatSupported(codec.gstDec);
+}
+
 void QXmppCallPrivate::filterGStreamerFormats(QList<GstCodec> &formats)
 {
-    auto it = formats.begin();
-    while (it != formats.end()) {
-        bool supported = isFormatSupported(it->gstPay) &&
-            isFormatSupported(it->gstDepay) &&
-            isFormatSupported(it->gstEnc) &&
-            isFormatSupported(it->gstDec);
-        if (!supported) {
-            it = formats.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    auto removedRange = std::ranges::remove_if(formats, std::not_fn(isCodecSupported));
+    formats.erase(removedRange.begin(), removedRange.end());
 }
 
 QXmppCallStream *QXmppCallPrivate::findStreamByMedia(QStringView media)
 {
-    for (auto stream : std::as_const(streams)) {
-        if (stream->media() == media) {
-            return stream;
-        }
+    if (auto stream = std::ranges::find(streams, media, &QXmppCallStream::media);
+        stream != streams.end()) {
+        return *stream;
     }
     return nullptr;
 }
 
 QXmppCallStream *QXmppCallPrivate::findStreamByName(QStringView name)
 {
-    for (auto stream : std::as_const(streams)) {
-        if (stream->name() == name) {
-            return stream;
-        }
+    if (auto stream = std::ranges::find(streams, name, &QXmppCallStream::name);
+        stream != streams.end()) {
+        return *stream;
     }
     return nullptr;
 }
 
-QXmppCallStream *QXmppCallPrivate::findStreamById(const int id)
+QXmppCallStream *QXmppCallPrivate::findStreamById(int id)
 {
-    for (auto stream : std::as_const(streams)) {
-        if (stream->id() == id) {
-            return stream;
-        }
+    if (auto stream = std::ranges::find(streams, id, &QXmppCallStream::id);
+        stream != streams.end()) {
+        return *stream;
     }
     return nullptr;
 }
 
 void QXmppCallPrivate::handleAck(const QXmppIq &ack)
 {
-    const QString id = ack.id();
-    for (int i = 0; i < requests.size(); ++i) {
-        if (id == requests[i].id()) {
-            // process acknowledgement
-            const QXmppJingleIq request = requests.takeAt(i);
-            q->debug(u"Received ACK for packet %1"_s.arg(id));
+    auto request = std::ranges::find(requests, ack.id(), &QXmppJingleIq::id);
+    if (request != requests.end()) {
+        // process acknowledgement
+        q->debug(u"Received ACK for packet %1"_s.arg(ack.id()));
 
-            // handle termination
-            if (request.action() == QXmppJingleIq::SessionTerminate) {
-                q->terminated();
-            }
-            return;
+        // handle termination
+        if (request->action() == QXmppJingleIq::SessionTerminate) {
+            q->terminated();
         }
+
+        requests.erase(request);
     }
 }
 

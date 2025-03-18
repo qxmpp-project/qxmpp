@@ -52,13 +52,14 @@ public:
     void ssrcActive(uint sessionId, uint ssrc);
     void padAdded(GstPad *pad);
     GstCaps *ptMap(uint sessionId, uint pt);
-    bool isFormatSupported(const QString &codecName) const;
-    void filterGStreamerFormats(QList<GstCodec> &formats);
+    static bool isFormatSupported(const QString &codecName);
+    static bool isCodecSupported(const GstCodec &codec);
+    static void filterGStreamerFormats(QList<GstCodec> &formats);
 
     QXmppCallStream *createStream(const QString &media, const QString &creator, const QString &name);
     QXmppCallStream *findStreamByMedia(QStringView media);
     QXmppCallStream *findStreamByName(QStringView name);
-    QXmppCallStream *findStreamById(const int id);
+    QXmppCallStream *findStreamById(int id);
     QXmppJingleIq::Content localContent(QXmppCallStream *stream) const;
 
     void handleAck(const QXmppIq &iq);
