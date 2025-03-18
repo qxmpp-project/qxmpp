@@ -97,7 +97,7 @@ QXmppCallStreamPrivate::QXmppCallStreamPrivate(QXmppCallStream *parent, GstEleme
     // We need frequent RTCP reports for the bandwidth controller
     GstElement *rtpSession;
     g_signal_emit_by_name(rtpbin, "get-session", static_cast<uint>(id), &rtpSession);
-    g_object_set(rtpSession, "rtcp-min-interval", 100000000, nullptr);
+    g_object_set(rtpSession, "rtcp-min-interval", 100'000'000, nullptr);
 
     gst_element_sync_state_with_parent(iceReceiveBin);
     gst_element_sync_state_with_parent(iceSendBin);
