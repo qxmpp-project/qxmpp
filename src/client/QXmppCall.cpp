@@ -13,6 +13,7 @@
 #include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
 #include "QXmppStun.h"
+#include "QXmppTask.h"
 #include "QXmppUtils.h"
 
 #include "StringLiterals.h"
@@ -212,12 +213,6 @@ void QXmppCallPrivate::handleAck(const QXmppIq &ack)
     if (request != requests.end()) {
         // process acknowledgement
         q->debug(u"Received ACK for packet %1"_s.arg(ack.id()));
-
-        // handle termination
-        if (request->action() == QXmppJingleIq::SessionTerminate) {
-            q->terminated();
-        }
-
         requests.erase(request);
     }
 }
@@ -542,8 +537,13 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
     iq.setAction(QXmppJingleIq::SessionTerminate);
     iq.setSid(sid);
     iq.reason().setType(reasonType);
-    sendRequest(iq);
+
     setState(QXmppCall::DisconnectingState);
+
+    manager->client()->sendIq(std::move(iq)).then(q, [this](auto result) {
+        // terminate on both success or error
+        q->terminated();
+    });
 
     // schedule forceful termination in 5s
     QTimer::singleShot(5s, q, &QXmppCall::terminated);
