@@ -322,7 +322,9 @@ void QXmppCallPrivate::handleRequest(const QXmppJingleIq &iq)
     } else if (iq.action() == QXmppJingleIq::SessionInfo) {
 
         // notify user
-        QTimer::singleShot(0, q, SIGNAL(ringing()));
+        QTimer::singleShot(0, q, [this]() {
+            Q_EMIT q->ringing();
+        });
 
     } else if (iq.action() == QXmppJingleIq::SessionTerminate) {
 
