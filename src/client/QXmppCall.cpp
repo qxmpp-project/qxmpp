@@ -95,21 +95,22 @@ void QXmppCallPrivate::padAdded(GstPad *pad)
     if (nameParts.size() < 4) {
         return;
     }
-    if (nameParts[0] == QLatin1String("send") &&
-        nameParts[1] == QLatin1String("rtp") &&
-        nameParts[2] == QLatin1String("src")) {
+    if (nameParts[0] == u"send" &&
+        nameParts[1] == u"rtp" &&
+        nameParts[2] == u"src") {
         if (nameParts.size() != 4) {
             return;
         }
         int sessionId = nameParts[3].toInt();
         auto stream = findStreamById(sessionId);
         stream->d->addRtpSender(pad);
-    } else if (nameParts[0] == QLatin1String("recv") ||
-               nameParts[1] == QLatin1String("rtp") ||
-               nameParts[2] == QLatin1String("src")) {
+    } else if (nameParts[0] == u"recv" ||
+               nameParts[1] == u"rtp" ||
+               nameParts[2] == u"src") {
         if (nameParts.size() != 6) {
             return;
         }
+
         int sessionId = nameParts[3].toInt();
         int pt = nameParts[5].toInt();
         auto stream = findStreamById(sessionId);
@@ -174,7 +175,7 @@ void QXmppCallPrivate::filterGStreamerFormats(QList<GstCodec> &formats)
     }
 }
 
-QXmppCallStream *QXmppCallPrivate::findStreamByMedia(const QString &media)
+QXmppCallStream *QXmppCallPrivate::findStreamByMedia(QStringView media)
 {
     for (auto stream : std::as_const(streams)) {
         if (stream->media() == media) {
@@ -184,7 +185,7 @@ QXmppCallStream *QXmppCallPrivate::findStreamByMedia(const QString &media)
     return nullptr;
 }
 
-QXmppCallStream *QXmppCallPrivate::findStreamByName(const QString &name)
+QXmppCallStream *QXmppCallPrivate::findStreamByName(QStringView name)
 {
     for (auto stream : std::as_const(streams)) {
         if (stream->name() == name) {
@@ -721,8 +722,8 @@ void QXmppCall::addVideo()
     }
 
     // create video stream
-    QLatin1String creator = (d->direction == QXmppCall::OutgoingDirection) ? QLatin1String("initiator") : QLatin1String("responder");
-    stream = d->createStream(VIDEO_MEDIA, creator, QLatin1String("webcam"));
+    QString creator = (d->direction == QXmppCall::OutgoingDirection) ? u"initiator"_s : u"responder"_s;
+    stream = d->createStream(VIDEO_MEDIA.toString(), creator, u"webcam"_s);
     d->streams << stream;
 
     // build request

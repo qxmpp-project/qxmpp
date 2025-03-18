@@ -56,8 +56,8 @@ public:
     void filterGStreamerFormats(QList<GstCodec> &formats);
 
     QXmppCallStream *createStream(const QString &media, const QString &creator, const QString &name);
-    QXmppCallStream *findStreamByMedia(const QString &media);
-    QXmppCallStream *findStreamByName(const QString &name);
+    QXmppCallStream *findStreamByMedia(QStringView media);
+    QXmppCallStream *findStreamByName(QStringView name);
     QXmppCallStream *findStreamById(const int id);
     QXmppJingleIq::Content localContent(QXmppCallStream *stream) const;
 
