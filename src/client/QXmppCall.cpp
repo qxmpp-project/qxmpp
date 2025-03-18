@@ -17,10 +17,15 @@
 
 #include "StringLiterals.h"
 
+#include <chrono>
+
+// gstreamer
 #include <gst/gst.h>
 
 #include <QDomElement>
 #include <QTimer>
+
+using namespace std::chrono_literals;
 
 /// \cond
 QXmppCallPrivate::QXmppCallPrivate(QXmppCall *qq)
@@ -547,7 +552,7 @@ void QXmppCallPrivate::terminate(QXmppJingleIq::Reason::Type reasonType)
     setState(QXmppCall::DisconnectingState);
 
     // schedule forceful termination in 5s
-    QTimer::singleShot(5000, q, &QXmppCall::terminated);
+    QTimer::singleShot(5s, q, &QXmppCall::terminated);
 }
 /// \endcond
 
