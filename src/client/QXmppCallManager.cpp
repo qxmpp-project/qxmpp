@@ -10,6 +10,7 @@
 #include "QXmppClient.h"
 #include "QXmppConstants_p.h"
 #include "QXmppJingleIq.h"
+#include "QXmppTask.h"
 #include "QXmppUtils.h"
 
 #include "StringLiterals.h"
@@ -95,9 +96,6 @@ void QXmppCallManager::onRegistered(QXmppClient *client)
     connect(client, &QXmppClient::disconnected,
             this, &QXmppCallManager::_q_disconnected);
 
-    connect(client, &QXmppClient::iqReceived,
-            this, &QXmppCallManager::_q_iqReceived);
-
     connect(client, &QXmppClient::presenceReceived,
             this, &QXmppCallManager::_q_presenceReceived);
 }
@@ -106,9 +104,6 @@ void QXmppCallManager::onUnregistered(QXmppClient *client)
 {
     disconnect(client, &QXmppClient::disconnected,
                this, &QXmppCallManager::_q_disconnected);
-
-    disconnect(client, &QXmppClient::iqReceived,
-               this, &QXmppCallManager::_q_iqReceived);
 
     disconnect(client, &QXmppClient::presenceReceived,
                this, &QXmppCallManager::_q_presenceReceived);
@@ -229,21 +224,6 @@ void QXmppCallManager::_q_disconnected()
 }
 
 ///
-/// Handles acknowledgements.
-///
-void QXmppCallManager::_q_iqReceived(const QXmppIq &ack)
-{
-    if (ack.type() != QXmppIq::Result) {
-        return;
-    }
-
-    // find request
-    for (auto *call : std::as_const(d->calls)) {
-        call->d->handleAck(ack);
-    }
-}
-
-///
 /// Handles a Jingle IQ.
 ///
 void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
@@ -292,7 +272,7 @@ void QXmppCallManager::_q_jingleIqReceived(const QXmppJingleIq &iq)
         ringing.setType(QXmppIq::Set);
         ringing.setSid(call->sid());
         ringing.setRtpSessionState(QXmppJingleIq::RtpSessionStateRinging());
-        call->d->sendRequest(ringing);
+        client()->sendIq(std::move(ringing));
 
         // notify user
         Q_EMIT callReceived(call);

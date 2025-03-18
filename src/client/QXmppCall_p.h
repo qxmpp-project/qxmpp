@@ -62,21 +62,18 @@ public:
     QXmppCallStream *findStreamById(int id);
     QXmppJingleIq::Content localContent(QXmppCallStream *stream) const;
 
-    void handleAck(const QXmppIq &iq);
     bool handleDescription(QXmppCallStream *stream, const QXmppJingleIq::Content &content);
     void handleRequest(const QXmppJingleIq &iq);
     bool handleTransport(QXmppCallStream *stream, const QXmppJingleIq::Content &content);
     void setState(QXmppCall::State state);
     bool sendAck(const QXmppJingleIq &iq);
-    bool sendInvite();
-    bool sendRequest(const QXmppJingleIq &iq);
+    void sendInvite();
     void terminate(QXmppJingleIq::Reason::Type reasonType);
 
     QXmppCall::Direction direction;
     QString jid;
     QString ownJid;
     QXmppCallManager *manager;
-    QList<QXmppJingleIq> requests;
     QString sid;
     QXmppCall::State state;
 
