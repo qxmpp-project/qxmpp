@@ -144,7 +144,7 @@ private Q_SLOTS:
 private:
     using RosterResult = std::variant<QXmppRosterIq, QXmppError>;
 
-    void handleSubscriptionRequest(const QString &bareJid, const QXmppPresence &presence, bool accept);
+    void handleSubscriptionRequest(const QString &bareJid, const QXmppPresence &presence);
     QXmppTask<RosterResult> requestRoster();
 
     const std::unique_ptr<QXmppRosterManagerPrivate> d;

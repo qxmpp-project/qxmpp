@@ -265,23 +265,7 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
         Q_EMIT presenceChanged(bareJid, resource);
         break;
     case QXmppPresence::Subscribe: {
-        // accept all incoming subscription requests if enabled
-        if (client()->configuration().autoAcceptSubscriptions()) {
-            handleSubscriptionRequest(bareJid, presence, true);
-            break;
-        }
-
-        // check for XEP-0283: Moved subscription requests and verify them
-        if (auto *movedManager = client()->findExtension<QXmppMovedManager>()) {
-            if (auto verificationTask = movedManager->handleSubscriptionRequest(presence)) {
-                verificationTask->then(this, [this, presence, bareJid](bool valid) {
-                    handleSubscriptionRequest(bareJid, presence, valid);
-                });
-                break;
-            }
-        }
-
-        handleSubscriptionRequest(bareJid, presence, false);
+        handleSubscriptionRequest(bareJid, presence);
         break;
     }
     default:
@@ -289,18 +273,27 @@ void QXmppRosterManager::_q_presenceReceived(const QXmppPresence &presence)
     }
 }
 
-void QXmppRosterManager::handleSubscriptionRequest(const QString &bareJid, const QXmppPresence &presence, bool accept)
+void QXmppRosterManager::handleSubscriptionRequest(const QString &bareJid, const QXmppPresence &presence)
 {
-    if (accept) {
-        // accept subscription request
-        acceptSubscription(bareJid);
-
-        // ask for reciprocal subscription
-        subscribe(bareJid);
-    } else {
-        // let user decide whether to accept the subscription request
+    auto notifyOnSubscriptionRequest = [this, bareJid](const QXmppPresence &presence) {
         Q_EMIT subscriptionReceived(bareJid);
         Q_EMIT subscriptionRequestReceived(bareJid, presence);
+    };
+
+    // Automatically accept all incoming subscription requests if enabled.
+    if (client()->configuration().autoAcceptSubscriptions()) {
+        acceptSubscription(bareJid);
+        subscribe(bareJid);
+        return;
+    }
+
+    // check for XEP-0283: Moved subscription requests and verify them
+    if (auto *movedManager = client()->findExtension<QXmppMovedManager>(); movedManager && !presence.oldJid().isEmpty()) {
+        movedManager->processSubscriptionRequest(presence).then(this, [this, notifyOnSubscriptionRequest](QXmppPresence &&presence) mutable {
+            notifyOnSubscriptionRequest(presence);
+        });
+    } else {
+        notifyOnSubscriptionRequest(presence);
     }
 }
 
