@@ -121,9 +121,14 @@ void tst_QXmppRosterManager::testMovedSubscriptionRequestReceived_data()
     QTest::addColumn<QString>("oldJidResponse");
     QTest::addColumn<bool>("valid");
 
-    QTest::newRow("noMovedManager")
+    QTest::newRow("noMovedManagerNoJid")
         << false
         << QString()
+        << QString()
+        << false;
+    QTest::newRow("noMovedManagerJid")
+        << false
+        << u"old@example.org"_s
         << QString()
         << false;
     QTest::newRow("oldJidEmpty")
@@ -164,7 +169,7 @@ void tst_QXmppRosterManager::testMovedSubscriptionRequestReceived_data()
 
 void tst_QXmppRosterManager::testMovedSubscriptionRequestReceived()
 {
-    TestClient client(true);
+    TestClient client;
     client.configuration().setJid(u"alice@example.org"_s);
     auto *rosterManager = client.addNewExtension<QXmppRosterManager>(&client);
 
@@ -196,10 +201,10 @@ void tst_QXmppRosterManager::testMovedSubscriptionRequestReceived()
     bool subscriptionRequestReceived = false;
     client.resetIdCount();
 
-    connect(rosterManager, &QXmppRosterManager::subscriptionRequestReceived, this, [&subscriptionRequestReceived, &oldJid, &valid](const QString &subscriberBareJid, const QXmppPresence &presence) {
+    connect(rosterManager, &QXmppRosterManager::subscriptionRequestReceived, this, [&](const QString &subscriberBareJid, const QXmppPresence &presence) {
         subscriptionRequestReceived = true;
         QCOMPARE(subscriberBareJid, u"new@example.org"_s);
-        if (valid) {
+        if (valid && movedManagerAdded) {
             QCOMPARE(oldJid, presence.oldJid());
         } else {
             QVERIFY(presence.oldJid().isEmpty());

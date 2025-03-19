@@ -293,7 +293,10 @@ void QXmppRosterManager::handleSubscriptionRequest(const QString &bareJid, const
             notifyOnSubscriptionRequest(presence);
         });
     } else {
-        notifyOnSubscriptionRequest(presence);
+        auto safePresence = presence;
+        safePresence.setOldJid({});
+
+        notifyOnSubscriptionRequest(safePresence);
     }
 }
 
