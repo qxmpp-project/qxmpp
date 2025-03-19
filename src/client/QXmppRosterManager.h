@@ -51,6 +51,33 @@ class QXmppRosterManagerPrivate;
 /// The \c presenceChanged() signal is emitted whenever the presence for a
 /// roster item changes.
 ///
+/// \anchor rostermanager_moved
+/// ## XEP-0283: Moved
+///
+/// \xep{0283, Moved} provides a way to inform other users that an account has moved. This allows a
+/// presence subscription request from a new account to be automatically linked to the old account.
+/// However, this requires verification via a corresponding PubSub node on the old account.
+///
+/// The roster manager automatically checks entries using the QXmppMovedManager. For this to work,
+/// the moved manager must be added to the QXmppClient. If the moved manager is not found or the
+/// specified old JID is incorrect, the entry in the presence subscription request will be removed.
+///
+/// The received and verified presence subscription request is emitted via
+/// subscriptionRequestReceived() and the old JID can be found in QXmppPresence::oldJid().
+/// It is safe to assume that this old JID is valid since QXmpp 1.10.2.
+///
+/// Accepting moved subscription requests automatically is discouraged in
+/// [section 4.3](https://xmpp.org/extensions/xep-0283.html#receive-notification-client) of the
+/// XEP.
+///
+/// ### Behaviour in previous versions
+///
+/// Support in the roster manager and in QXmppPresence was initially added in 1.9.0.
+///
+/// In QXmpp 1.9.0 until 1.9.4 and 1.10.0 until 1.10.1 subscription requests with a Moved element
+/// are verified and automatically accepted without emitting subscriptionRequestReceived(). If
+/// verification fails, the **invalid** old JID is passed in subscriptionRequestReceived()!
+///
 /// \ingroup Managers
 ///
 class QXMPP_EXPORT QXmppRosterManager : public QXmppClientExtension
