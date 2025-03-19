@@ -3140,13 +3140,7 @@ QXmppTask<bool> ManagerPrivate::resetOwnDevice()
             if (isDeviceElementDeleted) {
                 deleteDeviceBundle([=, this](bool isDeviceBundleDeleted) mutable {
                     if (isDeviceBundleDeleted) {
-                        ownDevice = {};
-                        preKeyPairs.clear();
-                        signedPreKeyPairs.clear();
-                        deviceBundle = {};
-                        devices.clear();
-
-                        Q_EMIT q->allDevicesRemoved();
+                        resetCachedData();
                     }
 
                     interface.finish(std::move(isDeviceBundleDeleted));
@@ -3171,6 +3165,7 @@ QXmppTask<void> QXmppOmemoManagerPrivate::resetOwnDeviceLocally()
     future.then(q, [this, interface]() mutable {
         auto future = omemoStorage->resetAll();
         future.then(q, [this, interface]() mutable {
+            resetCachedData();
             interface.finish();
         });
     });
@@ -3190,13 +3185,7 @@ QXmppTask<bool> ManagerPrivate::resetAll()
             if (isDevicesNodeDeleted) {
                 deleteNode(ns_omemo_2_bundles.toString(), [this, interface](bool isBundlesNodeDeleted) mutable {
                     if (isBundlesNodeDeleted) {
-                        ownDevice = {};
-                        preKeyPairs.clear();
-                        signedPreKeyPairs.clear();
-                        deviceBundle = {};
-                        devices.clear();
-
-                        Q_EMIT q->allDevicesRemoved();
+                        resetCachedData();
                     }
 
                     interface.finish(std::move(isBundlesNodeDeleted));
@@ -3208,6 +3197,20 @@ QXmppTask<bool> ManagerPrivate::resetAll()
     });
 
     return interface.task();
+}
+
+//
+// Resets all cached OMEMO data.
+//
+void ManagerPrivate::resetCachedData()
+{
+    ownDevice = {};
+    preKeyPairs.clear();
+    signedPreKeyPairs.clear();
+    deviceBundle = {};
+    devices.clear();
+
+    Q_EMIT q->allDevicesRemoved();
 }
 
 //

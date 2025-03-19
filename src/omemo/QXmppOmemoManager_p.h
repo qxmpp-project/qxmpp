@@ -319,6 +319,7 @@ public:
     QXmppTask<bool> resetOwnDevice();
     QXmppTask<void> resetOwnDeviceLocally();
     QXmppTask<bool> resetAll();
+    void resetCachedData();
 
     QXmppTask<bool> buildSessionForNewDevice(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device);
     QXmppTask<bool> buildSessionWithDeviceBundle(const QString &jid, uint32_t deviceId, QXmppOmemoStorage::Device &device);
