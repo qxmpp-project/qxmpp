@@ -41,7 +41,7 @@ protected:
     /// \endcond
 
 private:
-    std::optional<QXmppTask<bool>> handleSubscriptionRequest(const QXmppPresence &presence);
+    QXmppTask<QXmppPresence> processSubscriptionRequest(QXmppPresence presence);
     void handleDiscoInfo(const QXmppDiscoveryIq &iq);
     Result movedJidsMatch(const QString &newBareJid, const QString &pepBareJid) const;
 
