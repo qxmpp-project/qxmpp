@@ -74,11 +74,16 @@ static void serializeRosterData(const RosterData &d, QXmlStreamWriter &writer)
 /// The user can either accept the request by calling acceptSubscription() or refuse it
 /// by calling refuseSubscription().
 ///
+/// Since *QXmpp 1.10.2* only verified \xep{0283, Moved} old JIDs are passed in \a presence. If
+/// verification fails or the given old JID is not valid, the attribute is cleared in the
+/// QXmppPresence. See \ref rostermanager_moved "above" for more details.
+///
 /// \note If QXmppConfiguration::autoAcceptSubscriptions() is set to true or the subscription
 /// request is automatically accepted by the QXmppMovedManager, this signal will not be emitted.
 ///
 /// \param subscriberBareJid bare JID that wants to subscribe to the user's presence
-/// \param presence presence stanza containing the reason / message (presence.statusText())
+/// \param presence presence stanza, e.g. containing the message (presence.statusText()),
+/// \xep{0283, Moved} old JID or other information
 ///
 /// \since QXmpp 1.5
 ///
