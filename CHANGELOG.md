@@ -9,6 +9,11 @@ QXmpp 1.11.0 (UNRELEASED)
 
 *under development*
 
+QXmpp 1.10.2 (March 19, 2025)
+-----------------------------
+
+ - RosterManager: Do not auto-accept Moved subscription requests to comply with XEP (@melvo, #691)
+
 QXmpp 1.10.1 (February 25, 2025)
 --------------------------------
 
