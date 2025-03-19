@@ -29,8 +29,8 @@ class QXmppIceConnection;
 static const int RTP_COMPONENT = 1;
 static const int RTCP_COMPONENT = 2;
 
-static const QLatin1String AUDIO_MEDIA("audio");
-static const QLatin1String VIDEO_MEDIA("video");
+constexpr QStringView AUDIO_MEDIA = u"audio";
+constexpr QStringView VIDEO_MEDIA = u"video";
 
 class QXmppCallStreamPrivate : public QObject
 {
