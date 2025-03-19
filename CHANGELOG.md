@@ -4,6 +4,11 @@ SPDX-FileCopyrightText: 2010 Jeremy Lainé <jeremy.laine@m4x.org>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+QXmpp 1.10.2 (March 19, 2025)
+-----------------------------
+
+ - RosterManager: Do not auto-accept Moved subscription requests to comply with XEP (@melvo, #691)
+
 QXmpp 1.10.1 (February 25, 2025)
 --------------------------------
 
