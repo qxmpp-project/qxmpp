@@ -96,10 +96,31 @@ int main(int argc, char *argv[])
 
     client.connectToServer(config);
 
+    auto setupCall = [&app, callManager](QXmppCall *call) {
+        if (call->audioStream()) {
+            setupCallStream(call);
+        }
+
+        QObject::connect(call, &QXmppCall::streamCreated, call, [call](QXmppCallStream *stream) {
+            setupCallStream(call);
+        });
+
+        QObject::connect(call, &QXmppCall::connected, &app, [=]() {
+            qDebug() << "[Call] Call to" << call->jid() << "connected!";
+        });
+        QObject::connect(call, &QXmppCall::ringing, [=]() {
+            qDebug() << "[Call] Ringing" << call->jid() << "...";
+        });
+        QObject::connect(call, &QXmppCall::finished, [=]() {
+            qDebug() << "[Call] Call with" << call->jid() << "ended. (Deleting)";
+            call->deleteLater();
+        });
+    };
+
     // on connect
-    QObject::connect(&client, &QXmppClient::connected, &app, [&app, &config, rosterManager, callManager] {
+    QObject::connect(&client, &QXmppClient::connected, &app, [=, &config] {
         // wait 1 second for presence of other clients to arrive
-        QTimer::singleShot(1s, [&app, &config, rosterManager, callManager] {
+        QTimer::singleShot(1s, [=, &config] {
             // other resources of our account
             auto otherResources = rosterManager->getResources(config.jidBare());
             otherResources.removeOne(config.resource());
@@ -112,31 +133,16 @@ int main(int argc, char *argv[])
             auto *call = callManager->call(config.jidBare() + u'/' + otherResources.first());
             Q_ASSERT(call != nullptr);
 
-            QObject::connect(call, &QXmppCall::connected, &app, [call]() {
-                qDebug() << "[Call] Call to" << call->jid() << "connected!";
-                setupCallStream(call);
-            });
-
-            QObject::connect(call, &QXmppCall::ringing, [call]() {
-                qDebug() << "[Call] Ringing" << call->jid() << "...";
-            });
-            QObject::connect(call, &QXmppCall::finished, [call]() {
-                qDebug() << "[Call] Call with" << call->jid() << "ended.";
-            });
+            setupCall(call);
         });
     });
 
-    // on call
-    QObject::connect(callManager, &QXmppCallManager::callReceived, &app, [&app](QXmppCall *call) {
+    // on incoming call
+    QObject::connect(callManager, &QXmppCallManager::callReceived, &app, [=](QXmppCall *call) {
         qDebug() << "[Call] Received incoming call from" << call->jid() << "-" << "Accepting.";
         call->accept();
-        if (call->audioStream()) {
-            setupCallStream(call);
-        }
 
-        QObject::connect(call, &QXmppCall::streamCreated, call, [call](QXmppCallStream *stream) {
-            setupCallStream(call);
-        });
+        setupCall(call);
     });
 
     // disconnect from server to avoid having multiple open dead sessions when testing
