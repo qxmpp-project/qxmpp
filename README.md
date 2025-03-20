@@ -4,6 +4,12 @@ SPDX-FileCopyrightText: 2009 Manjeet Dahiya <manjeetdahiya@gmail.com>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+# Moved to https://invent.kde.org/libraries/qxmpp
+
+KDE Account is required for contributing (https://identity.kde.org)
+
+Issues and pull-requests have been imported with placeholder accounts. To map your placeholder account to your real KDE account, open a ticket at https://phabricator.kde.org/maniphest/task/edit/form/2/.
+
 # QXmpp - Cross-platform C++/Qt XMPP library
 
 <h1 align="center">
